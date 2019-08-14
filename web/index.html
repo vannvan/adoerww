@@ -17,11 +17,9 @@ body{margin:0;background: #000;/*background-repeat: no-repeat;background-attachm
 .content{width:80%;height:auto;margin:0 auto;}
 .head{margin-bottom:10px;height:50px;padding-left:35px;}
 .logo{height:53px;width:188px;margin:20px auto;}
-#bdfm{margin:0 auto;width:700px;height:41px;}
-input{border-radius: 2px;}
-#search1{padding-left:10px;height:35px;width:550px;margin-right:10px;background:none;outline:none;border: 2px solid #09c;}
-#search2{cursor:pointer;border:none;background:#09C;padding:0 27px;height:41px;font-size: 18px;}
-#search2:hover{background:#099;}
+#bdfm{margin:20px auto;width:64%;height:45px;position: relative;}
+#search1{padding-left:10px;height:100%;width: 100%;background:none;outline:none;border: 2px solid #09c;position: absolute;}
+#search2{cursor:pointer;border:none;background:#09C;padding:0 35px;height:50px;font-size: 18px;position: absolute;right: -12px}
 .webBox{margin:20px auto;height: auto;width: 80%;}
 li{margin-right:-1px; margin-bottom:-1px;text-align:center;padding:0 10px;line-height:40px;height:40px;width:110px;border:#CCC 1px solid;float:left;list-style:none;background: rgba(20, 54, 54, 0.5);}
 li:hover{background:rgba(100, 54, 54, 0.5);}
@@ -48,9 +46,9 @@ body::-webkit-scrollbar-track {/*滚动条里面轨道*/
 <script type="text/javascript" language=JavaScript charset="UTF-8">
       document.onkeydown=function(event){
             if (event.ctrlKey && event.keyCode == 13) {
-				 word=document.getElementById("search1").value; 
-				 var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
-				 window.open(str);
+    				 word=document.getElementById("search1").value; 
+    				 var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
+    				 window.open(str);
             }
         }; 
 </script>
