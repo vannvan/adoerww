@@ -61,7 +61,6 @@ body::-webkit-scrollbar-track {/*滚动条里面轨道*/
       <form id="bdfm" target="_blank" method="get" action="http://www.baidu.com/s">
               <input type="text" id="search1" name="word"/>              
               <input type="button" id="search2" value="Search"/>
-
       </form> 
     </div>
     <div class="Favourite webBox clearfix">
@@ -133,9 +132,16 @@ body::-webkit-scrollbar-track {/*滚动条里面轨道*/
     function buildList(elName,dataList) {
       var htmlStr = ''
       for (let i=0;i<dataList.length;i++){
-         htmlStr += `<li class="link"><a target="view_window" href="${dataList[i].link}">${dataList[i].name}</a></li>`
+         htmlStr += `<li class="link"><a target="view_window" style='color:${RandomColor()}' href="${dataList[i].link}">${dataList[i].name}</a></li>`
       }
       $("."+elName).append(htmlStr)
+    }
+    function RandomColor() {
+           let r, g, b;
+           r = Math.floor(Math.random() * 256);
+           g = Math.floor(Math.random() * 256);
+           b = Math.floor(Math.random() * 256);
+           return "rgb(" +r + ',' +g+ ',' +b+ ")";
     }
   })
 </script>
