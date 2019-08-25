@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-08-22 14:26:29
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-08-25 20:06:07
 */
 $(document).ready(function(){
     const FAVOURITE = [
@@ -41,7 +41,8 @@ $(document).ready(function(){
       {name:'阿里图标库',link:'https://www.iconfont.cn/'},
       {name:'Bejson',link:'http://www.bejson.com/'},
       {name:'徽章制作1',link:'https://shields.io/#/'},
-      {name:'在线压缩png',link:'https://compresspng.com/zh/'}
+      {name:'在线压缩png',link:'https://compresspng.com/zh/'},
+      {name:'mock-api',link:'http://mock-api.com/app.html#!/'}
     ]
 
     const OTHER = [
