@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   wanwan
-* @Last Modified time: 2019-08-25 20:06:07
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-09-06 09:20:42
 */
 $(document).ready(function(){
     const FAVOURITE = [
@@ -27,6 +27,7 @@ $(document).ready(function(){
       {name:'bootCDN',link:'https://www.bootcdn.cn/api/#about'},
       {name:'explore',link:'https://github.com/vannvan/web-explore-demo'},
       {name:'archives',link:'https://github.com/vannvan/archives'}
+      {name:'blog',link:"https://dmitripavlutin.com/"}
 
     ]
     const TOOL = [
