@@ -28,7 +28,8 @@ $(document).ready(function(){
       {name:'explore',link:'https://github.com/vannvan/web-explore-demo'},
       {name:'archives',link:'https://github.com/vannvan/archives'},
       {name:'blog',link:"https://dmitripavlutin.com/"},
-      {name:"css手册",link:"http://css.cuishifeng.cn/"}
+      {name:"css手册",link:"http://css.cuishifeng.cn/"},
+      {name:'张鑫旭',link:'https://www.zhangxinxu.com'}
 
     ]
     const TOOL = [
