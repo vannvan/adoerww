@@ -45,7 +45,8 @@ $(document).ready(function(){
       {name:'徽章制作1',link:'https://shields.io/#/'},
       {name:'在线压缩png',link:'https://compresspng.com/zh/'},
       {name:'mock-api',link:'http://mock-api.com/app.html#!/'},
-      {name:'截图工具',link:'https://zh.snipaste.com'}
+      {name:'截图工具',link:'https://zh.snipaste.com'},
+      {name:'gif录屏工具',link:'https://www.screentogif.com/'}
     ]
 
     const OTHER = [
