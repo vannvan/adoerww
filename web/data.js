@@ -44,7 +44,8 @@ $(document).ready(function(){
       {name:'Bejson',link:'http://www.bejson.com/'},
       {name:'徽章制作1',link:'https://shields.io/#/'},
       {name:'在线压缩png',link:'https://compresspng.com/zh/'},
-      {name:'mock-api',link:'http://mock-api.com/app.html#!/'}
+      {name:'mock-api',link:'http://mock-api.com/app.html#!/'},
+      {name:'截图工具',link:'https://zh.snipaste.com'}
     ]
 
     const OTHER = [
