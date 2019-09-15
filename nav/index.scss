@@ -1,0 +1,131 @@
+*{font-size:14px;font-family:"微软雅黑 Light";color: #fff;}
+body{background: #000;margin:0;}
+.clearfix:after {
+	content: "";
+	display: block;
+	height: 0;clear: both;
+	visibility: hidden;}
+body::-webkit-scrollbar {
+  /*display: none*/
+  width: 2px;     /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+ /* 隐藏滚动条，但依旧具备可以滚动的功能 */
+}
+body::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+        border-radius: 10px;
+         -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        background: #666;
+}
+body::-webkit-scrollbar-track {/*滚动条里面轨道*/
+        -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        border-radius: 10px;
+        background: #EDEDED;
+}
+.content{width:100%;height:auto;margin:0 auto;}
+.head{margin-bottom:10px;height:50px;padding-left:35px;}
+.logo{width:100%;border-bottom :1px solid #f6f6f6;text-align: center;vertical-align: middle;padding: 15px 0}
+.search{width: 80%;position: fixed;margin-bottom: 25px;}
+#bdfm{margin:20px auto;width:64%;height:45px;position: relative;z-index: 2}
+#search1{padding-left:10px;height:100%;width: 100%;background:none;outline:none;border: 2px solid #09c;position: absolute;}
+#search2{cursor:pointer;border:none;background:#09C;padding:0 35px;height:50px;font-size: 18px;position: absolute;right: -12px}
+
+.nav-content{
+	display: table;
+	.left-nav{width: 15%;background: #242424;height: 100vh;display: table-cell;position: fixed;}
+	.link-box{
+		li{
+		  cursor: pointer;
+		  list-style: none;
+		  padding:20px 50px;
+		  border-bottom: 1px solid #ccc;
+		}
+	}
+	.right-content{
+		display: table-cell;
+		width: 80%;
+		.website{
+			margin-bottom: 100px;
+			position: relative;
+			top:100px;
+			z-index: -2;
+			.title{
+				width: 100%;
+				height: 45px;
+				background: #242424;
+				line-height: 40px;
+				position: relative;
+				padding-left: 20px;
+				font-weight: bold;
+				&:before{
+					position: absolute;
+					content: '';
+					left:0;
+					top:0;
+					width: 5px;
+					height: 100%;
+					background: #09C
+				}
+			}
+			.webBox{
+				margin:20px auto;
+				height: auto;
+				width: 80%;
+				display: flex;
+				flex-wrap: wrap; 
+				justify-content: space-between;
+				li{
+					list-style: none;
+					background: #242424;
+					width: 15%;padding: 20px;
+					margin-top:15px;
+					cursor: pointer;
+					transition: 2s;
+					position: relative;
+					transition: 800ms;
+					overflow: hidden;
+					&:hover,
+					&:focus {
+					  color: #f00;
+					  -webkit-animation: pulse 800ms;
+					          animation: pulse 800ms;
+					  box-shadow: 0 0 0 2em rgba(255, 255, 255, 0);
+					}
+					&:before,&:after{
+					  content:'';
+					  position:absolute;
+					  top:0;
+					  right:0;
+					  height:2px;
+					  width:0;
+					  background: #09C;
+					  transition:400ms ease all;
+					}
+					&:after{
+					  right:inherit;
+					  top:inherit;
+					  left:0;
+					  bottom:0;
+					}
+					|&:hover:before,&:hover:after{
+					  width:100%;
+					  transition:800ms ease all;
+					}
+				}
+			}
+
+				
+		}
+
+	}
+}
+@-webkit-keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 #09C;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 #09C;
+  }
+}
