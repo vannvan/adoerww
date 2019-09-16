@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-09-16 10:07:48
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-09-16 11:53:24
+* @Last Modified time: 2019-09-16 12:55:38
 */
 *{font-size:14px;font-family:"微软雅黑 Light";color: #fff;user-select: none;}
 body{
@@ -89,13 +89,15 @@ body::-webkit-scrollbar {
 					justify-content: space-between;
 					li{
 						list-style: none;
-						background: #242424;
 						width: 15%;
+						background: #242424;
 						padding: 20px;margin-top:15px;
 						cursor: pointer;transition: 2s;
 						position: relative;
 						transition: 800ms;
 						overflow: hidden;
+					}
+					.link{
 						&:hover,&:focus{
 							 -webkit-animation: pulse 800ms;
 					          animation: pulse 800ms;
@@ -123,7 +125,7 @@ body::-webkit-scrollbar {
 						}
 
 					}
-					.empty{width:15%;height:0;background: transparent !important;}
+					.empty{width:15%;height:0;background: transparent !important;cursor: default;}
 				}
 			}
 
