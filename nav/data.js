@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-09-18 10:16:16
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-09-20 16:30:59
 */
 $(document).ready(function(){
     const WEBSITE = [
@@ -62,7 +62,8 @@ $(document).ready(function(){
             {name:'mock-api',link:'http://mock-api.com/app.html#!/'},
             {name:'截图工具',link:'https://zh.snipaste.com'},
             {name:'gif录屏工具',link:'https://www.screentogif.com/'},
-            {name:'全能转换',link:'https://cn.office-converter.com/'}
+            {name:'全能转换',link:'https://cn.office-converter.com/'},
+            {name:'jquery之家',link:'http://www.htmleaf.com/'}
           ]
         },
         {
