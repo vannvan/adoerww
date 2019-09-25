@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   wanwan
-* @Last Modified time: 2019-09-25 21:15:30
+* @Last Modified time: 2019-09-25 21:18:03
 */
 $(document).ready(function(){
     const WEBSITE = [
@@ -70,7 +70,7 @@ $(document).ready(function(){
           ]
         },
         {
-          'name':'无关紧要',
+          'name':'世间百态',
           'icon':'icon-yinleyule',
           'linkList':[
             {name:"天猫",link:"https://www.tmall.com/"},
