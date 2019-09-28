@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-09-16 10:07:48
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-09-16 12:55:38
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-09-28 15:49:47
 */
 *{font-size:14px;font-family:"微软雅黑 Light";color: #fff;user-select: none;}
 body{
@@ -29,6 +29,22 @@ body::-webkit-scrollbar {
   height: 1px;
  /* 隐藏滚动条，但依旧具备可以滚动的功能 */
 }
+.icon-github{
+  color: #f6f6f6;position: fixed;top:10px;right: 10px;font-size: 40px;-webkit-animation:rotate 3s linear infinite;
+}
+@-webkit-keyframes rotate{
+ 
+    0%{-webkit-transform:rotate(0deg);}
+ 
+    25%{-webkit-transform:rotate(90deg);}
+ 
+    50%{-webkit-transform:rotate(180deg);}
+ 
+    75%{-webkit-transform:rotate(270deg);}
+ 
+    100%{-webkit-transform:rotate(360deg);}
+ 
+  }
 .content{
 	width: 100%;
 	height: auto;
