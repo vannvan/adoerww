@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   wanwan
-* @Last Modified time: 2019-09-25 21:18:03
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-09-29 09:58:50
 */
 $(document).ready(function(){
     const WEBSITE = [
@@ -21,7 +21,8 @@ $(document).ready(function(){
               {name:'博客园',link:'https://www.cnblogs.com/'},
               {name:'国外某大神',link:"https://dmitripavlutin.com/"},
               {name:'张鑫旭',link:'https://www.zhangxinxu.com'},
-              {name:'W3cplus',link:'https://www.w3cplus.com/'}
+              {name:'W3cplus',link:'https://www.w3cplus.com/'},
+              {name:"程序园",link:'http://www.voidcn.com/column/web'}
     	  ]
     	},
         {
