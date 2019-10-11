@@ -2,8 +2,28 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-09-29 09:58:50
+* @Last Modified time: 2019-10-11 15:01:32
 */
+var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
+var timer = null
+function titnimation() {
+  msg=msg.substring(1,msg.length)+msg.substring(0,1); 
+  document.title = msg;
+}
+var hiddenProperty = 'hidden' in document ? 'hidden' :
+                                'webkitHidden' in document ? 'webkitHidden' :   
+                                'mozHidden' in document ? 'mozHidden' :   
+                                null;
+var visibilityChangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange');
+var onVisibilityChange = function(){
+    if (!document[hiddenProperty]) {   
+          clearInterval(timer)
+          document.title = 'JUST DO　IT．．．' 
+     }else{
+      timer = setInterval("titnimation()",200);
+     }
+}
+ document.addEventListener(visibilityChangeEvent, onVisibilityChange)
 $(document).ready(function(){
     const WEBSITE = [
     	{

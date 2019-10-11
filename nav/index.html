@@ -14,13 +14,13 @@
 </style>
 </head>
 <script type="text/javascript" language=JavaScript charset="UTF-8">
-      document.onkeydown=function(event){
-            if (event.ctrlKey && event.keyCode == 13) {
-             word=document.getElementById("search1").value; 
-             var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
-             window.open(str);
-            }
-        }; 
+document.onkeydown=function(event){
+      if (event.ctrlKey && event.keyCode == 13) {
+       word=document.getElementById("search1").value; 
+       var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
+       window.open(str);
+      }
+}; 
 </script>
 <body>
 <div class="content">
