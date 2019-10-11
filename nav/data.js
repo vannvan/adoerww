@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-10-11 15:01:32
+* @Last Modified time: 2019-10-11 15:10:41
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -58,7 +58,7 @@ $(document).ready(function(){
               {name:"Webpack",link:'https://www.webpackjs.com/concepts/'},
               {name:'ES6文档',link:'http://es6.ruanyifeng.com/#docs/intro'},
               {name:'jquery中文',link:'http://jquery.cuishifeng.cn/'},
-              {name:'bootCDN',link:'https://www.bootcdn.cn/api/#about'},
+              {name:'bootCDN',link:'https://www.bootcdn.cn/'},
               {name:'explore',link:'https://github.com/vannvan/web-explore-demo'},
               {name:'archives',link:'https://github.com/vannvan/archives'},
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
