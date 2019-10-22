@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-10-22 18:04:18
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-10-22 20:24:39
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -70,14 +70,11 @@ $(document).ready(function(){
           'icon':'icon-ai-tool',
           'linkList':[
             {name:"草料二维码",link:"http://cli.im/url"},
-            {name:'Fontawesome',link:'http://www.fontawesome.com.cn/'},
             {name:'程序员工具',link:'http://www.bejson.com/ui/phonesize/'},
             {name:'程序员工具2',link:'https://tool.lu/'},
             {name:'徽章制作',link:'https://badgen.net/'},
             {name:'图标定制',link:'http://www.shouce.ren/tool/tubiao'},
-            {name:'icomoon',link:'https://icomoon.io/app/#/select'},
             {name:"草料二维码",link:'http://cli.im/url'},
-            {name:'阿里图标库',link:'https://www.iconfont.cn/'},
             {name:'Bejson',link:'http://www.bejson.com/'},
             {name:'徽章制作1',link:'https://shields.io/#/'},
             {name:'在线压缩png',link:'https://compresspng.com/zh/'},
@@ -85,13 +82,22 @@ $(document).ready(function(){
             {name:'截图工具',link:'https://zh.snipaste.com'},
             {name:'gif录屏工具',link:'https://www.screentogif.com/'},
             {name:'全能转换',link:'https://cn.office-converter.com/'},
-            {name:'jquery之家',link:'http://www.htmleaf.com/'},
             {name:"移动端调试",link:'https://github.com/wuchangming/spy-debugger'},
             {name:'图标下载',link:'https://www.easyicon.net/'},
-            {name:'CTOlib码库',link:'https://www.ctolib.com/'},
-            {name:'JQ插件库',link:'http://www.jq22.com'},
             {name:'减压神器',link:'https://aidn.jp/mikutap/'}
           ]
+        },
+        {
+	      'name':'硬核资源',
+	      'icon':"icon-ziyuan",
+	      'linkList':[
+        	{name:'JQ插件库',link:'http://www.jq22.com'},
+        	{name:'CTOlib码库',link:'https://www.ctolib.com/'},
+       		{name:'icomoon',link:'https://icomoon.io/app/#/select'},
+        	{name:'Fontawesome',link:'http://www.fontawesome.com.cn/'},
+        	{name:'阿里图标库',link:'https://www.iconfont.cn/'},
+        	{name:'jquery之家',link:'http://www.htmleaf.com/'}
+	    	]
         },
         {
           'name':'世间百态',
