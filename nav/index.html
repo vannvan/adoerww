@@ -13,7 +13,7 @@
 
 </style>
 </head>
-<script type="text/javascript" language=JavaScript charset="UTF-8">
+<script type="text/javascript">
 document.onkeydown=function(event){
       if (event.ctrlKey && event.keyCode == 13) {
        word=document.getElementById("search1").value; 
@@ -36,7 +36,7 @@ document.onkeydown=function(event){
      <div class="right-content">
         <div class="search">
           <form id="bdfm" target="_blank" method="get" action="https://www.baidu.com/s">
-                  <input type="text" id="search1" name="word"/>              
+                  <input type="text" id="search1" name="word" autofocus/>              
                   <input type="button" id="search2" value="Search"/>
           </form> 
         </div>
