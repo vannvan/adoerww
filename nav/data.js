@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   wanwan
-* @Last Modified time: 2019-10-24 22:44:13
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-10-29 11:39:53
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -80,12 +80,13 @@ $(document).ready(function(){
             {name:'徽章制作1',link:'https://shields.io/#/'},
             {name:'在线压缩png',link:'https://compresspng.com/zh/'},
             {name:'mock-api',link:'http://mock-api.com/app.html#!/'},
+            {name:'faker',link:'https://github.com/marak/Faker.js/'}
             {name:'截图工具',link:'https://zh.snipaste.com'},
             {name:'gif录屏工具',link:'https://www.screentogif.com/'},
             {name:'全能转换',link:'https://cn.office-converter.com/'},
             {name:"移动端调试",link:'https://github.com/wuchangming/spy-debugger'},
             {name:'图标下载',link:'https://www.easyicon.net/'},
-            {name:'减压神器',link:'https://aidn.jp/mikutap/'}
+            {name:'减压神器',link:'https://aidn.jp/mikutap/'},
           ]
         },
         {
