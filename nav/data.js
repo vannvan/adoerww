@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-10-29 11:50:31
+* @Last Modified time: 2019-10-29 11:55:34
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -59,8 +59,8 @@ $(document).ready(function(){
               {name:'ES6文档',link:'http://es6.ruanyifeng.com/#docs/intro'},
               {name:'jquery中文',link:'http://jquery.cuishifeng.cn/'},
               {name:'bootCDN',link:'https://www.bootcdn.cn/'},
-              {name:'explore',link:'https://github.com/vannvan/web-explore-demo'},
-              {name:'archives',link:'https://github.com/vannvan/archives'},
+              {name:'Explore',link:'https://github.com/vannvan/web-explore-demo'},
+              {name:'Archives',link:'https://github.com/vannvan/archives'},
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
               {name:'taro',link:"https://taro.aotu.io"}
           ]
@@ -79,8 +79,8 @@ $(document).ready(function(){
             {name:'Bejson',link:'http://www.bejson.com/'},
             {name:'徽章制作1',link:'https://shields.io/#/'},
             {name:'在线压缩png',link:'https://compresspng.com/zh/'},
-            {name:'mock-api',link:'http://mock-api.com/app.html#!/'},
-            {name:'faker',link:'https://github.com/marak/Faker.js/'},
+            {name:'Mock-api',link:'http://mock-api.com/app.html#!/'},
+            {name:'Faker',link:'https://github.com/marak/Faker.js/'},
             {name:'截图工具',link:'https://zh.snipaste.com'},
             {name:'gif录屏工具',link:'https://www.screentogif.com/'},
             {name:'全能转换',link:'https://cn.office-converter.com/'},
