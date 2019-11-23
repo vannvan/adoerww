@@ -3,7 +3,7 @@
 * @Date:   2019-08-22 14:26:15
 <<<<<<< HEAD
 * @Last Modified by:   wanwan
-* @Last Modified time: 2019-11-24 02:10:15
+* @Last Modified time: 2019-11-24 02:50:56
 =======
 * @Last Modified by:   vannvan
 * @Last Modified time: 2019-11-22 14:34:15
@@ -47,7 +47,8 @@ $(document).ready(function(){
               {name:'国外某大神',link:"https://dmitripavlutin.com/"},
               {name:'张鑫旭',link:'https://www.zhangxinxu.com'},
               {name:'W3cplus',link:'https://www.w3cplus.com/'},
-              {name:"程序园",link:'http://www.voidcn.com/column/web'}
+              {name:"程序园",link:'http://www.voidcn.com/column/web'},
+              {name:"Aaron的博客",link:"https://www.haorooms.com/"}
     	  ]
     	},
         {
@@ -68,7 +69,6 @@ $(document).ready(function(){
               {name:'Archives',link:'https://github.com/vannvan/archives'},
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
               {name:'taro',link:"https://taro.aotu.io"},
-              {name:"Aaron的博客",link:"https://www.haorooms.com/"},
               {name:'C3.JS',link:"https://c3js.org/"}
           ]
         },
