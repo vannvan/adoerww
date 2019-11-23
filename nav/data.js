@@ -3,7 +3,7 @@
 * @Date:   2019-08-22 14:26:15
 <<<<<<< HEAD
 * @Last Modified by:   wanwan
-* @Last Modified time: 2019-11-24 02:08:27
+* @Last Modified time: 2019-11-24 02:10:15
 =======
 * @Last Modified by:   vannvan
 * @Last Modified time: 2019-11-22 14:34:15
@@ -94,6 +94,7 @@ $(document).ready(function(){
             {name:"移动端调试",link:'https://github.com/wuchangming/spy-debugger'},
             {name:'图标下载',link:'https://www.easyicon.net/'},
             {name:'减压神器',link:'https://aidn.jp/mikutap/'},
+            {name:"css在线选择器",link:"https://www.haorooms.com/tools/css_selecter/"}
           ]
         },
         {
