@@ -1,8 +1,13 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
+<<<<<<< HEAD
 * @Last Modified by:   wanwan
-* @Last Modified time: 2019-11-24 02:07:31
+* @Last Modified time: 2019-11-24 02:08:27
+=======
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-11-22 14:34:15
+>>>>>>> fe0c81a04bd16ac927f51a832a904331bece4388
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -63,7 +68,8 @@ $(document).ready(function(){
               {name:'Archives',link:'https://github.com/vannvan/archives'},
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
               {name:'taro',link:"https://taro.aotu.io"},
-              {name:"Aaron的博客",link:"https://www.haorooms.com/"}
+              {name:"Aaron的博客",link:"https://www.haorooms.com/"},
+              {name:'C3.JS',link:"https://c3js.org/"}
           ]
         },
         {
