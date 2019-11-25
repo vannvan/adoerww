@@ -2,8 +2,8 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 <<<<<<< HEAD
-* @Last Modified by:   wanwan
-* @Last Modified time: 2019-11-24 02:50:56
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-11-25 17:22:42
 =======
 * @Last Modified by:   vannvan
 * @Last Modified time: 2019-11-22 14:34:15
@@ -136,7 +136,7 @@ $(document).ready(function(){
     (function() {
       let htmlStr = ''
       $.each(WEBSITE,(index) => {
-        htmlStr += `<li onClick="window.location.href='#${WEBSITE[index].name}'"><i class="iconfont ${WEBSITE[index].icon}"></i><a href="#${WEBSITE[index].name}">${WEBSITE[index].name}</li>`
+        htmlStr += `<li onClick="window.location.href='#${WEBSITE[index].name}'"><i class="iconfont ${WEBSITE[index].icon}"></i><a>${WEBSITE[index].name}</li>`
       })
       $('.link-box').append(htmlStr)
     })()
@@ -144,7 +144,7 @@ $(document).ready(function(){
     function buildList(elName,dataList) {
       var htmlStr = `<div class="title">${elName}</div>`
       $.each(dataList,(index) => {
-        htmlStr += `<li class="link" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:${RandomColor()}' href="${dataList[index].link}">${dataList[index].name}</a></li>`
+        htmlStr += `<li class="link" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:${RandomColor()}'>${dataList[index].name}</a></li>`
       })
       if(dataList.length%5!=0) {
           for(let i=0;i<Math.abs(dataList.length%5 -5);i++) {
