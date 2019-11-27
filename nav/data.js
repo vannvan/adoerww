@@ -1,13 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-<<<<<<< HEAD
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-11-25 17:22:42
-=======
-* @Last Modified by:   vannvan
-* @Last Modified time: 2019-11-22 14:34:15
->>>>>>> fe0c81a04bd16ac927f51a832a904331bece4388
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-11-27 20:58:10
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -52,25 +47,33 @@ $(document).ready(function(){
     	  ]
     	},
         {
-          'name':'手册文档',
+          'name':'工具文档',
           'icon':'icon-shiyongshouce',
           'linkList':[
-              {name:'Element',link:'https://element.eleme.cn/#/zh-CN/component/table'},
-              {name:'Vux',link:'https://doc.vux.li/zh-CN/components/x-input.html'},
               {name:'Moment',link:'http://momentjs.cn/docs/#/parsing/string-format/'},
               {name:'Gulp',link:'https://www.w3cschool.cn/qtaitm/1cvdkozt.html'},
-              {name:'iview',link:'https://www.iviewui.com/docs/guide/install'},
-              {name:'React',link:'http://caibaojian.com/react/'},
               {name:"Webpack",link:'https://www.webpackjs.com/concepts/'},
               {name:'ES6文档',link:'http://es6.ruanyifeng.com/#docs/intro'},
               {name:'jquery中文',link:'http://jquery.cuishifeng.cn/'},
-              {name:'bootCDN',link:'https://www.bootcdn.cn/'},
-              {name:'Explore',link:'https://github.com/vannvan/web-explore-demo'},
               {name:'Archives',link:'https://github.com/vannvan/archives'},
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
-              {name:'taro',link:"https://taro.aotu.io"},
-              {name:'C3.JS',link:"https://c3js.org/"}
+              {name:'C3.JS图表',link:"https://c3js.org/"},
+              {name:"umi方案",link:"https://umijs.org/zh/guide/"},
           ]
+        },
+        {
+            name:"框架文档",
+            icon:"icon-bangzhushouce",
+            linkList:[
+              {name:'Element',link:'https://element.eleme.cn/#/zh-CN/component/table'},
+              {name:'Vux',link:'https://doc.vux.li/zh-CN/components/x-input.html'},
+              {name:'iview',link:'https://www.iviewui.com/docs/guide/install'},
+              {name:'React',link:'http://caibaojian.com/react/'},
+              {name:'Ant-Design',link:"https://ant.design/docs/react/introduce-cn"},
+              {name:'taro多端框架',link:"https://taro.aotu.io"},
+              {name:'next.js',link:"https://nextjs.frontendx.cn/"},
+              {name:"antv",link:"https://antv.vision/zh#products"}
+            ]
         },
         {
           'name':'码农工具',
@@ -81,21 +84,28 @@ $(document).ready(function(){
             {name:'程序员工具',link:'http://www.bejson.com/ui/phonesize/'},
             {name:'程序员工具2',link:'https://tool.lu/'},
             {name:'徽章制作',link:'https://badgen.net/'},
-            {name:'图标定制',link:'http://www.shouce.ren/tool/tubiao'},
             {name:"草料二维码",link:'http://cli.im/url'},
             {name:'Bejson',link:'http://www.bejson.com/'},
-            {name:'徽章制作1',link:'https://shields.io/#/'},
-            {name:'在线压缩png',link:'https://compresspng.com/zh/'},
             {name:'Mock-api',link:'http://mock-api.com/app.html#!/'},
-            {name:'Faker',link:'https://github.com/marak/Faker.js/'},
-            {name:'截图工具',link:'https://zh.snipaste.com'},
-            {name:'gif录屏工具',link:'https://www.screentogif.com/'},
-            {name:'全能转换',link:'https://cn.office-converter.com/'},
+            {name:'Faker数据模拟',link:'https://github.com/marak/Faker.js/'},
             {name:"移动端调试",link:'https://github.com/wuchangming/spy-debugger'},
             {name:'图标下载',link:'https://www.easyicon.net/'},
-            {name:'减压神器',link:'https://aidn.jp/mikutap/'},
-            {name:"css在线选择器",link:"https://www.haorooms.com/tools/css_selecter/"}
+            {name:"css在线选择器",link:"https://www.haorooms.com/tools/css_selecter/"},
+            {name:'bootCDN',link:'https://www.bootcdn.cn/'},
           ]
+        },
+        {
+            name:"减负工具",
+            icon:"icon-gongju",
+            linkList:[
+              {name:'在线压缩png',link:'https://compresspng.com/zh/'},
+              {name:'徽章制作1',link:'https://shields.io/#/'},
+              {name:'截图工具',link:'https://zh.snipaste.com'},
+              {name:'全能转换',link:'https://cn.office-converter.com/'},
+              {name:'gif录屏工具',link:'https://www.screentogif.com/'},
+              {name:'减压神器',link:'https://aidn.jp/mikutap/'},
+
+            ]
         },
         {
 	      'name':'硬核资源',
@@ -144,7 +154,7 @@ $(document).ready(function(){
     function buildList(elName,dataList) {
       var htmlStr = `<div class="title">${elName}</div>`
       $.each(dataList,(index) => {
-        htmlStr += `<li class="link" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:${RandomColor()}'>${dataList[index].name}</a></li>`
+        htmlStr += `<li class="link" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:#FFFFE0'>${dataList[index].name}</a></li>`
       })
       if(dataList.length%5!=0) {
           for(let i=0;i<Math.abs(dataList.length%5 -5);i++) {
