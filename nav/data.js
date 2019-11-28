@@ -1,8 +1,8 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
-* @Last Modified by:   wanwan
-* @Last Modified time: 2019-11-27 20:58:10
+* @Last Modified by:   vannvan
+* @Last Modified time: 2019-11-28 11:52:49
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -43,7 +43,8 @@ $(document).ready(function(){
               {name:'张鑫旭',link:'https://www.zhangxinxu.com'},
               {name:'W3cplus',link:'https://www.w3cplus.com/'},
               {name:"程序园",link:'http://www.voidcn.com/column/web'},
-              {name:"Aaron的博客",link:"https://www.haorooms.com/"}
+              {name:"Aaron的博客",link:"https://www.haorooms.com/"},
+              {name:'木易杨博客',link:'https://muyiy.cn/'}
     	  ]
     	},
         {
