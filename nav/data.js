@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-11-28 11:52:49
+* @Last Modified time: 2019-12-04 02:02:37
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -60,6 +60,7 @@ $(document).ready(function(){
               {name:"css手册",link:"http://css.cuishifeng.cn/"},
               {name:'C3.JS图表',link:"https://c3js.org/"},
               {name:"umi方案",link:"https://umijs.org/zh/guide/"},
+              {name:"ZEIT静态网站",link:"https://zeit.co/dashboard"}
           ]
         },
         {
