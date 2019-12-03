@@ -1,8 +1,13 @@
 /*
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
+<<<<<<< HEAD
 * @Last Modified by:   vannvan
 * @Last Modified time: 2019-12-04 02:02:37
+=======
+* @Last Modified by:   wanwan
+* @Last Modified time: 2019-11-29 20:10:29
+>>>>>>> dd6983dca3f110fe9959e58a475ef269bfe8b39f
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -106,6 +111,9 @@ $(document).ready(function(){
               {name:'全能转换',link:'https://cn.office-converter.com/'},
               {name:'gif录屏工具',link:'https://www.screentogif.com/'},
               {name:'减压神器',link:'https://aidn.jp/mikutap/'},
+              {name:"无聊",link:'https://thatsthefinger.com/'},
+              {name:"神奇",link:'http://www.koalastothemax.com/'},
+              {name:"无用的网站",link:'https://theuselessweb.com/'}
 
             ]
         },
