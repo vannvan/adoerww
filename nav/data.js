@@ -2,7 +2,7 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
-* @Last Modified time: 2019-12-31 09:51:28
+* @Last Modified time: 2020-01-21 10:24:25
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -122,7 +122,8 @@ $(document).ready(function(){
         	{name:'Fontawesome',link:'http://www.fontawesome.com.cn/'},
         	{name:'阿里图标库',link:'https://www.iconfont.cn/'},
         	{name:'jquery之家',link:'http://www.htmleaf.com/'},
-          {name:"techbrood",link:"https://techbrood.com/"}
+          {name:"techbrood",link:"https://techbrood.com/"},
+          {name:"css动画在线",link:"https://animista.net/play"}
 	    	]
         },
         {
