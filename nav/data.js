@@ -2,7 +2,11 @@
 * @Author: vannvan <https://github.com/vannvan>
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
+<<<<<<< HEAD
 * @Last Modified time: 2020-01-12 22:07:19
+=======
+* @Last Modified time: 2020-01-21 11:42:26
+>>>>>>> gh-pages
 */
 var msg= "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -122,8 +126,15 @@ $(document).ready(function(){
         	{name:'Fontawesome',link:'http://www.fontawesome.com.cn/'},
         	{name:'阿里图标库',link:'https://www.iconfont.cn/'},
         	{name:'jquery之家',link:'http://www.htmleaf.com/'},
+<<<<<<< HEAD
           {name:'techbrood库',link:"https://techbrood.com/"},
           {name:"前端知识体系xmind",link:"https://www.xmind.net/m/NkQc/"}
+=======
+          {name:"techbrood",link:"https://techbrood.com/"},
+          {name:"css动画在线",link:"https://animista.net/play"},
+          {name:"Animate",link:"https://github.com/daneden/animate.css"},
+          {name:"vivify",link:"https://github.com/Martz90/vivify"}
+>>>>>>> gh-pages
 	    	]
         },
         {
@@ -170,6 +181,17 @@ $(document).ready(function(){
       }
       $("#"+elName).append(htmlStr)
     }
+    (function() {
+      let count = 0
+      WEBSITE.map(el => {
+        el.linkList.map(subEl => {
+          count ++ 
+        })
+      })
+      console.log(count)
+      let htmlStr = '已收录' + count + '个'
+      $("#included").append(htmlStr)
+    })();
 
     function RandomColor() {
        let r, g, b;
