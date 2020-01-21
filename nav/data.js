@@ -3,7 +3,7 @@
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
 <<<<<<< HEAD
-* @Last Modified time: 2020-01-12 22:07:19
+* @Last Modified time: 2020-01-21 13:02:51
 =======
 * @Last Modified time: 2020-01-21 11:42:26
 >>>>>>> gh-pages
@@ -126,15 +126,11 @@ $(document).ready(function(){
         	{name:'Fontawesome',link:'http://www.fontawesome.com.cn/'},
         	{name:'阿里图标库',link:'https://www.iconfont.cn/'},
         	{name:'jquery之家',link:'http://www.htmleaf.com/'},
-<<<<<<< HEAD
-          {name:'techbrood库',link:"https://techbrood.com/"},
-          {name:"前端知识体系xmind",link:"https://www.xmind.net/m/NkQc/"}
-=======
+          {name:"前端知识体系xmind",link:"https://www.xmind.net/m/NkQc/"},
           {name:"techbrood",link:"https://techbrood.com/"},
           {name:"css动画在线",link:"https://animista.net/play"},
           {name:"Animate",link:"https://github.com/daneden/animate.css"},
           {name:"vivify",link:"https://github.com/Martz90/vivify"}
->>>>>>> gh-pages
 	    	]
         },
         {
