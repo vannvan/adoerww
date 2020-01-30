@@ -249,7 +249,7 @@ $(document).ready(function() {
             name: "vivify",
             link: "https://github.com/Martz90/vivify"
         },{
-            name: "天行数据"，
+            name: "天行数据",
             link: "https://www.tianapi.com/"
         }]
     }, {
