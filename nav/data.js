@@ -178,7 +178,11 @@ $(document).ready(function() {
         }, {
             name: 'bootCDN',
             link: 'https://www.bootcdn.cn/'
-        }, ]
+        }, 
+        {
+            name:"在线抠图",
+            link:"https://www.remove.bg/zh/upload"
+        }]
     }, {
         name: "减负工具",
         icon: "icon-gongju",
