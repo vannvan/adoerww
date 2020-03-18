@@ -3,10 +3,13 @@
 * @Date:   2019-08-22 14:26:15
 * @Last Modified by:   vannvan
 <<<<<<< HEAD
-* @Last Modified time: 2020-03-17 14:57:07
+<<<<<<< HEAD
+* @Last Modified time: 2020-03-18 16:59:32
 =======
 * @Last Modified time: 2020-01-21 11:42:26
 >>>>>>> gh-pages
+=======
+>>>>>>> c05d5d243113ff662c47fa58d0252d907becfe18
 */
 var msg = "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
@@ -183,7 +186,11 @@ $(document).ready(function() {
         }, {
             name: 'bootCDN',
             link: 'https://www.bootcdn.cn/'
-        }, ]
+        }, 
+        {
+            name:"在线抠图",
+            link:"https://www.remove.bg/zh/upload"
+        }]
     }, {
         name: "减负工具",
         icon: "icon-gongju",
@@ -257,6 +264,9 @@ $(document).ready(function() {
         {
             name:"bootstrapmb",
             link:"http://www.bootstrapmb.com/chajian/css3"
+        },{
+            name: "天行数据",
+            link: "https://www.tianapi.com/"
         }]
     }, {
         'name': '世间百态',
