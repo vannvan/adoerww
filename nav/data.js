@@ -4,7 +4,7 @@
 * @Last Modified by:   vannvan
 <<<<<<< HEAD
 <<<<<<< HEAD
-* @Last Modified time: 2020-04-06 12:08:21
+* @Last Modified time: 2020-04-06 12:11:55
 =======
 * @Last Modified time: 2020-01-21 11:42:26
 >>>>>>> gh-pages
@@ -277,7 +277,11 @@ $(document).ready(function() {
         }, {
             name: '京东',
             link: 'https://www.jd.com'
-        },  {
+        }, 
+        {
+            name:"豆瓣FM",
+            link:"https://fm.douban.com/"
+        }, {
             name: '网易严选',
             link: 'http://you.163.com/'
         }, {
