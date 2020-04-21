@@ -1,0 +1,1 @@
+body,h1,h2,h3,h4,h5,h6,hr,p,blockquote,dl,dt,dd,ul,ol,li,pre,form,fieldset,legend,button,input,textarea,th,td{margin:0;padding:0;font-family:"PingFangSC-Regular";outline:none}body{margin:0px auto !important;width:getUnit(750px);font-size:getUnit(28px);font-weight:400;background-color:#fff}.main{width:10rem;height:100vh;background-image:url("../img/bg.jpg");background-size:cover}
