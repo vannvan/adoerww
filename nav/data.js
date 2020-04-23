@@ -4,7 +4,7 @@
 * @Last Modified by:   vannvan
 <<<<<<< HEAD
 <<<<<<< HEAD
-* @Last Modified time: 2020-04-06 12:11:55
+* @Last Modified time: 2020-04-23 17:36:35
 =======
 * @Last Modified time: 2020-01-21 11:42:26
 >>>>>>> gh-pages
@@ -190,6 +190,9 @@ $(document).ready(function() {
         {
             name:"在线抠图",
             link:"https://www.remove.bg/zh/upload"
+        },{
+            name:"wulihub静态托管",
+            link:"https://www.wulihub.com.cn/store/my_space"
         }]
     }, {
         name: "减负工具",
