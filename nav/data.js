@@ -4,7 +4,7 @@
 * @Last Modified by:   vannvan
 <<<<<<< HEAD
 <<<<<<< HEAD
-* @Last Modified time: 2020-04-25 22:19:31
+* @Last Modified time: 2020-04-25 22:52:09
 =======
 * @Last Modified time: 2020-01-21 11:42:26
 >>>>>>> gh-pages
@@ -81,6 +81,9 @@ $(document).ready(function() {
         }, {
             name: '木易杨博客',
             link: 'https://muyiy.cn/'
+        },{
+        	name:'技术胖',
+        	link:"https://jspang.com/"
         }]
     }, {
         'name': '工具文档',
