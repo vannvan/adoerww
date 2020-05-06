@@ -1,16 +1,4 @@
-/*
-* @Author: vannvan <https://github.com/vannvan>
-* @Date:   2019-08-22 14:26:15
-* @Last Modified by:   vannvan
-<<<<<<< HEAD
-<<<<<<< HEAD
-* @Last Modified time: 2020-04-28 14:46:30
-=======
-* @Last Modified time: 2020-01-21 11:42:26
->>>>>>> gh-pages
-=======
->>>>>>> c05d5d243113ff662c47fa58d0252d907becfe18
-*/
+
 var msg = "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
 
@@ -81,12 +69,15 @@ $(document).ready(function() {
         }, {
             name: '木易杨博客',
             link: 'https://muyiy.cn/'
+        }, {
+            name: '技术胖',
+            link: "https://jspang.com/"
+        }, {
+            name: "技术导航",
+            link: "https://iiter.cn/"
         },{
-        	name:'技术胖',
-        	link:"https://jspang.com/"
-        },{
-            name:"技术导航",
-            link:"https://iiter.cn/"
+            name:"珠峰架构Vue.js",
+            link:"http://www.zhufengpeixun.cn/train/vue-info/component.html"
         }]
     }, {
         'name': '工具文档',
@@ -149,12 +140,12 @@ $(document).ready(function() {
         }, {
             name: "antv",
             link: "https://antv.vision/zh#products"
-        },{
-            name:"nuxt",
-            link:"https://www.nuxtjs.cn/guide"
-        },{
-        	name:'前端面试之道',
-        	link:"http://caibaojian.com/interview-map/frontend/"
+        }, {
+            name: "nuxt",
+            link: "https://www.nuxtjs.cn/guide"
+        }, {
+            name: '前端面试之道',
+            link: "http://caibaojian.com/interview-map/frontend/"
         }]
     }, {
         'name': '码农工具',
@@ -198,13 +189,12 @@ $(document).ready(function() {
         }, {
             name: 'bootCDN',
             link: 'https://www.bootcdn.cn/'
-        }, 
-        {
-            name:"在线抠图",
-            link:"https://www.remove.bg/zh/upload"
-        },{
-            name:"wulihub静态托管",
-            link:"https://www.wulihub.com.cn/store/my_space"
+        }, {
+            name: "在线抠图",
+            link: "https://www.remove.bg/zh/upload"
+        }, {
+            name: "wulihub静态托管",
+            link: "https://www.wulihub.com.cn/store/my_space"
         }]
     }, {
         name: "减负工具",
@@ -275,11 +265,10 @@ $(document).ready(function() {
         }, {
             name: "vivify",
             link: "https://github.com/Martz90/vivify"
-        },
-        {
-            name:"bootstrapmb",
-            link:"http://www.bootstrapmb.com/chajian/css3"
-        },{
+        }, {
+            name: "bootstrapmb",
+            link: "http://www.bootstrapmb.com/chajian/css3"
+        }, {
             name: "天行数据",
             link: "https://www.tianapi.com/"
         }]
@@ -292,10 +281,9 @@ $(document).ready(function() {
         }, {
             name: '京东',
             link: 'https://www.jd.com'
-        }, 
-        {
-            name:"豆瓣FM",
-            link:"https://fm.douban.com/"
+        }, {
+            name: "豆瓣FM",
+            link: "https://fm.douban.com/"
         }, {
             name: '网易严选',
             link: 'http://you.163.com/'
