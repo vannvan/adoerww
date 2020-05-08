@@ -78,6 +78,9 @@ $(document).ready(function() {
         },{
             name:"珠峰架构Vue.js",
             link:"http://www.zhufengpeixun.cn/train/vue-info/component.html"
+        },{
+            name:"汤姆大叔-深入JS",
+            link:"https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html"
         }]
     }, {
         'name': '工具文档',
