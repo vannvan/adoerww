@@ -198,6 +198,10 @@ $(document).ready(function() {
         }, {
             name: "wulihub静态托管",
             link: "https://www.wulihub.com.cn/store/my_space"
+        },
+        {
+            name:"阿里imgcook",
+            link:"https://www.imgcook.com/dsl"
         }]
     }, {
         name: "减负工具",
