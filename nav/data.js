@@ -115,6 +115,9 @@ $(document).ready(function() {
         }, {
             name: "ZEIT静态网站",
             link: "https://zeit.co/dashboard"
+        },{
+            name: "腾讯云开发者文档",
+            link: "https://cloud.tencent.com/developer/section/1490167"
         }]
     }, {
         name: "框架文档",
