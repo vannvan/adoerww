@@ -1,4 +1,3 @@
-
 var msg = "万头攒动火树银花之处不必找我。如欲相见，我在各种悲喜交集处，能做的只是长途跋涉的归真返璞-by木心";
 var timer = null
 
@@ -75,12 +74,15 @@ $(document).ready(function() {
         }, {
             name: "技术导航",
             link: "https://iiter.cn/"
-        },{
-            name:"珠峰架构Vue.js",
-            link:"http://www.zhufengpeixun.cn/train/vue-info/component.html"
-        },{
-            name:"汤姆大叔-深入JS",
-            link:"https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html"
+        }, {
+            name: "珠峰架构Vue.js",
+            link: "http://www.zhufengpeixun.cn/train/vue-info/component.html"
+        }, {
+            name: "汤姆大叔-深入JS",
+            link: "https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html"
+        }, {
+            name: "前端内参",
+            link: "https://coffe1891.gitbook.io/frontend-hard-mode-interview/1/1.2.6"
         }]
     }, {
         'name': '工具文档',
@@ -115,7 +117,7 @@ $(document).ready(function() {
         }, {
             name: "ZEIT静态网站",
             link: "https://zeit.co/dashboard"
-        },{
+        }, {
             name: "腾讯云开发者文档",
             link: "https://cloud.tencent.com/developer/section/1490167"
         }]
@@ -152,7 +154,7 @@ $(document).ready(function() {
         }, {
             name: '前端面试之道',
             link: "http://caibaojian.com/interview-map/frontend/"
-        },{
+        }, {
             name: "nest.js",
             link: "https://exlley.gitbooks.io/nest-js/content/chapter1/di-yi-ge-kong-zhi-qi.html"
         }]
@@ -204,10 +206,9 @@ $(document).ready(function() {
         }, {
             name: "wulihub静态托管",
             link: "https://www.wulihub.com.cn/store/my_space"
-        },
-        {
-            name:"阿里imgcook",
-            link:"https://www.imgcook.com/dsl"
+        }, {
+            name: "阿里imgcook",
+            link: "https://www.imgcook.com/dsl"
         }]
     }, {
         name: "减负工具",
