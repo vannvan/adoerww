@@ -1,0 +1,1461 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width initial-scale=1'>
+  <title>JS常用方法合集</title>
+  <link rel="stylesheet" href="../styles/atom-one-dark-reasonable.css">
+</head>
+<style>
+body{
+  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+}
+</style>
+<body>
+  <h3>JS的6个&quot;假&quot;值</h3>
+  <blockquote>
+    <p><code>null</code> <code>false</code> <code>undefined</code> <code>0</code> <code>&#39;&#39;(空字符串)</code>
+      <code>NaN</code></p>
+  </blockquote>
+  <h3>typeof的结果</h3>
+  <pre><code class='language-javascript' lang='javascript'>typeof(null) //&quot;object&quot;
+typeof(undefined) //&quot;undefined&quot;
+typeof(NaN) //&quot;number&quot;
+typeof(0) // &quot;number&quot;
+typeof(&#39;aaa&#39;) //&quot;string&quot;
+typeof(function fn(){}) //&quot;function&quot;
+typeof(false) //&quot;boolean&quot;
+typeof({}) //&quot;object&quot;
+typeof(new Date()) //&quot;object&quot;
+typeof(new String(&#39;a&#39;)) //&quot;object&quot;
+</code></pre>
+  <h3>number排序</h3>
+  <pre><code class='language-javascript' lang='javascript'>const sortNumbers = (...numbers) =&gt; numbers.sort();   //排序,只适合正数
+[1,2,3,4].sort((a, b) =&gt; a - b); // [1, 2,3,4],默认是升序
+[1,2,3,4].sort((a, b) =&gt; b - a); // [4,3,2,1] 降序
+</code></pre>
+  <h3>一维数组去重思路</h3>
+  <pre><code class='language-javascript' lang='javascript'>const s = new Set();
+[2, 3, 5, 4, 5, 2, 2].forEach(x =&gt; s.add(x));
+for (let i of s) {
+  console.log(i);
+}
+// 2 3 5 4
+-----------------------------------
+const set = new Set([1, 2, 3, 4, 4]);
+[...set]
+//[1,2,3,4]
+-----------------------------------
+[...new Set(&#39;ababbc&#39;)].join(&#39;&#39;)
+-----------------------------------
+// 数组去重
+[...new Set(arr)]
+-----------------------------------
+let arr = [1, 2, 2, 3, 4, 5, 5, 6];
+let newArr =Array.from(new Set(arr)) 
+console.log(newArr)
+// &quot;abc&quot;
+</code></pre>
+  <h3>数组对象去重</h3>
+  <pre><code class='language-javascript' lang='javascript'>const uniqueElementsBy = (arr, fn) =&gt;arr.reduce((acc, v) =&gt; {if (!acc.some(x =&gt; fn(v, x))) acc.push(v);return acc;}, []);
+
+uniqueElementsBy([{id: 1, name: &#39;Jhon&#39;}, {id: 2, name: &#39;sss&#39;}, {id: 1, name: &#39;Jhon&#39;}], (a, b) =&gt; a.id == b.id)
+// [{id: 1, name: &#39;Jhon&#39;}, {id: 2, name: &#39;sss&#39;}]
+</code></pre>
+  <h3>生成连续数组</h3>
+  <pre><code class='language-javascript' lang='javascript'>//有起始
+function generateArray (start, end) {
+      return Array.from(new Array(end + 1).keys()).slice(start)
+}
+//有最大值
+[...new Array(10).keys()]    //[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+Array.from({length:10},(item, index)=&gt; index+1)  //[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+</code></pre>
+  <h3>删除数组一个元素</h3>
+  <pre><code class='language-javascript' lang='javascript'>const deleteFromArr = (arr, item) =&gt; {
+  let index = arr.indexOf(item);
+  return index !== -1 &amp;&amp; arr.splice(index, 1);
+};
+deleteFromArr(arr, n);
+</code></pre>
+  <h3>根据条件删除数组元素</h3>
+  <pre><code class='language-javascript' lang='javascript'>const dropElements = (arr, func) =&gt; {
+  while (arr.length &gt; 0 &amp;&amp; !func(arr[0])) arr = arr.slice(1);
+  return arr;
+};
+dropElements([1, 2, 3, 4], n =&gt; n &gt;= 3); // [3,4]
+</code></pre>
+  <h3>删除数组指定值（改变原数组）</h3>
+  <p>使用 <code>Array.filter()</code> 和 <code>Array.includes()</code> 来剔除指定的值。使用 <code>Array.length = 0</code>
+    将数组中的长度重置为零，并且通过 <code>Array.push()</code> 只使用 pulled 值重新填充数组。</p>
+  <pre><code class='language-javascript' lang='javascript'>const pull = (arr, ...args) =&gt; {
+  let argState = Array.isArray(args[0]) ? args[0] : args;
+  let pulled = arr.filter((v, i) =&gt; !argState.includes(v));
+  arr.length = 0;
+  pulled.forEach(v =&gt; arr.push(v));
+};
+let myArray = [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;a&#39;, &#39;b&#39;, &#39;c&#39;];
+pull(myArray, &#39;a&#39;, &#39;c&#39;); // myArray = [ &#39;b&#39;, &#39;b&#39; ]
+</code></pre>
+  <h3>获取日期组合</h3>
+  <p>创建过去七天的数组，如果将代码中的减号换成加号，你将得到未来7天的数组集合</p>
+  <pre><code class='language-javascript' lang='javascript'>// 创建过去七天的数组
+[...Array(7).keys()].map(days =&gt; new Date(Date.now() - 86400000 * days));
+</code></pre>
+  <h3>生成随机ID，随机字符串</h3>
+  <p>substring() 的第二个参数控制取多少位 (最多可取13位)</p>
+  <pre><code class='language-javascript' lang='javascript'>// 生成长度为11的随机字母数字字符串
+    Math.random().toString(36).substring(2);
+// hg7znok52x
+</code></pre>
+  <h3>生成指定范围随机数</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * @param { number } min 
+ * @param { number } max 
+ */
+export const RandomNum = (min, max) =&gt; Math.floor(Math.random() * (max - min + 1)) + min;
+</code></pre>
+  <h3>获取URL的查询参数</h3>
+  <pre><code class='language-javascript' lang='javascript'>?foo=bar&amp;baz=bing =&gt; {foo: bar, baz: bing}
+// 获取URL的查询参数
+q={};location.search.replace(/([^?&amp;=]+)=([^&amp;]+)/g,(_,k,v)=&gt;q[k]=v);q;
+</code></pre>
+  <h3>本地时间</h3>
+  <pre><code class='language-javascript' lang='javascript'>// 创建本地时间
+&lt;body onload=&quot;setInterval(()=&gt;document.body.innerHTML=new Date().toLocaleString().slice(10,19))&quot;&gt;&lt;/body&gt;
+</code></pre>
+  <h3>返回当前24小时制时间的字符串</h3>
+  <pre><code class='language-javascript' lang='javascript'>const getColonTimeFromDate = date =&gt; date.toTimeString().slice(0, 8);
+
+getColonTimeFromDate(new Date()); // &quot;08:38:00&quot;
+console.log(getColonTimeFromDate(new Date()).replace(/:/g,&#39;-&#39;))    // 10-12-13   替换：为 -
+</code></pre>
+  <h3>数组混淆</h3>
+  <p>随机更改数组元素顺序，混淆数组</p>
+  <pre><code class='language-javascript' lang='javascript'>// 随机更改数组元素顺序，混淆数组
+(arr) =&gt; arr.slice().sort(() =&gt; Math.random() - 0.5)
+/* 
+let a = (arr) =&gt; arr.slice().sort(() =&gt; Math.random() - 0.5)
+let b = a([1,2,3,4,5])
+console.log(b)
+*/
+</code></pre>
+  <h3>数组清空</h3>
+  <pre><code class='language-javascript' lang='javascript'>const arr = [0, 1, 2];
+arr.length = 2;
+// arr =&gt; [0, 1]
+</code></pre>
+  <h3>解构交换赋值</h3>
+  <pre><code class='language-javascript' lang='javascript'>let a = 0;
+let b = 1;
+[a, b] = [b, a];
+// a b =&gt; 1 0
+</code></pre>
+  <h3>数组解构赋值</h3>
+  <pre><code class='language-javascript' lang='javascript'>var arr = [&#39;bob&#39;,29,&#39;student&#39;]
+
+const [name,age,type] = arr 
+
+// name =&gt; bob
+</code></pre>
+  <h3>解构赋值综合</h3>
+  <pre><code class='language-javascript' lang='javascript'>var a, b, rest;
+[a, b] = [10, 20];
+console.log(a); // 10
+
+[a, b, ...rest] = [10, 20, 30, 40, 50];
+console.log(a); // 10
+console.log(b); // 20
+console.log(rest); // [30, 40, 50]
+//对象解构
+({ a, b } = { a: 10, b: 20 });
+console.log(a); // 10
+//结构别名
+const obj = {
+  name: &#39;bob&#39;,
+  age: 22
+}
+const { name: userName, age: userAge } = obj;
+console.log(userName, userAge); // bob 22
+// Stage 4（已完成）提案中的特性
+({a, b, ...rest} = {a: 10, b: 20, c: 30, d: 40});
+console.log(a); // 10
+console.log(b); // 20
+console.log(rest); // {c: 30, d: 40}
+//传给函数的参数
+const person = {
+  name: &#39;bob&#39;,
+  age: 22
+}
+function introduce({ name, age }) {
+  console.log(`我是 ${name} ，今天 ${age} 岁了!`);
+}
+console.log(introduce(person));// 我是 bob ，今天 22 岁了!
+</code></pre>
+  <h3>对象 和数组转换</h3>
+  <pre><code class='language-javascript' lang='javascript'>Object.keys({name:&#39;张三&#39;,age:14}) //[&#39;name&#39;,&#39;age&#39;]
+Object.values({name:&#39;张三&#39;,age:14}) //[&#39;张三&#39;,14]
+Object.entries({name:&#39;张三&#39;,age:14}) //[[name,&#39;张三&#39;],[age,14]]
+Object.fromEntries([name,&#39;张三&#39;],[age,14]) //ES10的api,Chrome不支持 , firebox输出{name:&#39;张三&#39;,age:14}
+</code></pre>
+  <h3>生成随机十六进制代码（生成随机颜色）</h3>
+  <p>使用JavaScript简洁代码生成随机十六进制代码</p>
+  <pre><code class='language-javascript' lang='javascript'>// 生成随机十六进制代码 如：&#39;#c618b2&#39;
+const RandomColor = () =&gt; &quot;#&quot; + Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, &quot;0&quot;);
+const color = RandomColor();
+// color =&gt; &quot;#f03665&quot;
+</code></pre>
+  <h3>filter() 过滤不符合项</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [1,2,3]
+let newArr = arr.filter(item =&gt; item&gt;=3)  
+console.log(newArr)
+</code></pre>
+  <h3>filter() 去掉空字符串、undefined、null</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [&#39;&#39;,&#39;1&#39;,&#39;2&#39;,undefined,&#39;3.jpg&#39;,undefined]
+let newArr = arr.filter(item =&gt; item)
+console.log(newArr)
+</code></pre>
+  <h3>filter 过滤空值：undefined、null、&quot;&quot;、0、false、NaN</h3>
+  <pre><code class='language-javascript' lang='javascript'>const arr = [undefined, null, &quot;&quot;, 0, false, NaN, 1, 2].filter(Boolean);
+// arr =&gt; [1, 2]
+</code></pre>
+  <h3>filter过滤数组空位</h3>
+  <pre><code class='language-javascript' lang='javascript'>[1,2,3,4,5,,6,,7].length //9
+[1,2,3,4,5,,6,,7].filter(el=&gt; el).length //7
+</code></pre>
+  <h3>filter() 数组去重</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [1, 2, 2, 3, 4, 5, 5, 6];
+let newArr = arr.filter((x, index,self)=&gt;self.indexOf(x)===index) 
+console.log(newArr)
+</code></pre>
+  <h3>set数组去重</h3>
+  <pre><code class='language-javascript' lang='javascript'>function dedupe(array) {
+  return Array.from(new Set(array));
+}
+dedupe([1, 1, 2, 3]) // [1, 2, 3]
+
+const distinctValuesOfArray = arr =&gt; [...new Set(arr)];
+distinctValuesOfArray([1, 2, 2, 3, 4, 4, 5]); // [1,2,3,4,5]
+</code></pre>
+  <h3>filter() 筛选数组对象</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [
+	    {a:&#39;苹果&#39;,b:&#39;面包&#39;,c:&#39;吃&#39;},
+	    {a:&#39;香蕉&#39;,b:&#39;面包&#39;,c:&#39;不吃&#39;},
+	    {a:&#39;香蕉&#39;,b:&#39;苹果&#39;,c:&#39;吃&#39;},
+	    {a:&#39;苹果&#39;,b:&#39;香蕉&#39;,c:&#39;不吃&#39;},
+	  ]
+console.log(arr.filter(item =&gt; item.a=== &#39;苹果&#39; ))//[{a:&#39;苹果&#39;,b:&#39;面包&#39;,c:&#39;吃&#39;},{a:&#39;苹果&#39;,b:&#39;香蕉&#39;,c:&#39;不吃&#39;}]
+</code></pre>
+  <h3>map数组映射 // from 也可以</h3>
+  <pre><code class='language-javascript' lang='javascript'>var users = [
+{ name : &quot;Yagyu&quot;,weapon:&quot;shuriken&quot;},
+{ name : &quot;Yoshi&quot;,weapon:&quot;katana&quot;},
+{ name : &quot;Kuma&quot;,weapon:&quot;wakizashi&quot;}
+];
+const mapUsers = users.map(obj =&gt; obj.name)  // [ &#39;Yagyu&#39;, &#39;Yoshi&#39;, &#39;Kuma&#39; ]
+const fromUsers = Array.from(users, ({name}) =&gt; name)  // [ &#39;Yagyu&#39;, &#39;Yoshi&#39;, &#39;Kuma&#39; ]
+</code></pre>
+  <h3>window.location.search 转 JS 对象</h3>
+  <p>假如请求url为
+    <code>https://www.baidu.com?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=baidu&amp;wd=js&amp;rsv_pq=a86b5e5f0007bceb&amp;rsv_t=1e1fAVan%2BVlnkhJHFB0BIGLdLM2slszYMJBTTfFkmyyBUzBpw0ggeuVDE50&amp;rqlang=cn&amp;rsv_enter=0&amp;inputT=1287&amp;rsv_sug3=5&amp;rsv_sug1=3&amp;rsv_sug7=101&amp;rsv_sug2=0&amp;rsv_sug4=1907</code>
+  </p>
+  <pre><code class='language-javascript' lang='javascript'>const searchObj = search =&gt; JSON.parse(`{&quot;${decodeURIComponent(search.substring(1)).replace(/&quot;/g, &#39;\\&quot;&#39;).replace(/&amp;/g, &#39;&quot;,&quot;&#39;).replace(/=/g, &#39;&quot;:&quot;&#39;)}&quot;}`);
+let search = &#39;?ie=utf-8&amp;f=8&amp;rsv_bp=1&amp;rsv_idx=1&amp;tn=baidu&amp;wd=js&amp;rsv_pq=a86b5e5f0007bceb&amp;rsv_t=1e1fAVan%2BVlnkhJHFB0BIGLdLM2slszYMJBTTfFkmyyBUzBpw0ggeuVDE50&amp;rqlang=cn&amp;rsv_enter=0&amp;inputT=1287&amp;rsv_sug3=5&amp;rsv_sug1=3&amp;rsv_sug7=101&amp;rsv_sug2=0&amp;rsv_sug4=1907&#39;
+let obj = searchObj(search)
+{
+  ie: &#39;utf-8&#39;,
+  f: &#39;8&#39;,
+  rsv_bp: &#39;1&#39;,
+  rsv_idx: &#39;1&#39;,
+  tn: &#39;baidu&#39;,
+  wd: &#39;js&#39;,
+  rsv_pq: &#39;a86b5e5f0007bceb&#39;,
+  rsv_t: &#39;1e1fAVan+VlnkhJHFB0BIGLdLM2slszYMJBTTfFkmyyBUzBpw0ggeuVDE50&#39;,
+  rqlang: &#39;cn&#39;,
+  rsv_enter: &#39;0&#39;,
+  inputT: &#39;1287&#39;,
+  rsv_sug3: &#39;5&#39;,
+  rsv_sug1: &#39;3&#39;,
+  rsv_sug7: &#39;101&#39;,
+  rsv_sug2: &#39;0&#39;,
+  rsv_sug4: &#39;1907&#39;
+}
+</code></pre>
+  <h3>直接获取location.search某参数</h3>
+  <pre><code class='language-javascript' lang='javascript'>const params = new URLSearchParams(location.search.replace(/\?/ig, &quot;&quot;)); // location.search = &quot;?name=yajun&amp;sex=female&quot;
+params.has(&quot;yajun&quot;); // true
+params.get(&quot;sex&quot;); // &quot;female&quot;
+</code></pre>
+  <h3>JS 对象转 url 查询字符串</h3>
+  <pre><code class='language-javascript' lang='javascript'>const objectToQueryString = (obj) =&gt; Object.keys(obj).map((key) =&gt; `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`).join(&#39;&amp;&#39;);
+objectToQueryString({name: &#39;Jhon&#39;, age: 18, address: &#39;beijing&#39;})
+// name=Jhon&amp;age=18&amp;address=beijing
+</code></pre>
+  <h3>一维数组交集</h3>
+  <pre><code class='language-javascript' lang='javascript'>const similarity = (arr, values) =&gt; arr.filter(v =&gt; values.includes(v));
+similarity([1, 2, 3], [1, 2, 4]); // [1,2]
+</code></pre>
+  <h3>二维对象数组交集/差集</h3>
+  <pre><code class='language-javascript' lang='javascript'>let a = [
+    { id: 1, name: &#39;1&#39; },
+    { id: 2, name: &#39;2&#39; },
+    { id: 3, name: &#39;3&#39; },
+    { id: 4, name: &#39;4&#39; },
+    { id: 5, name: &#39;5&#39; },
+    { id: 6, name: &#39;6&#39; },
+    { id: 7, name: &#39;7&#39; },
+    { id: 8, name: &#39;8&#39; },
+    { id: 9, name: &#39;9&#39; },
+    { id: 10, name: &#39;10&#39; }
+];
+ 
+let b = [
+    { id: 4, name: &#39;4&#39; },
+    { id: 5, name: &#39;5&#39; },
+    { id: 6, name: &#39;6&#39; },
+    { id: 7, name: &#39;7&#39; },
+    { id: 8, name: &#39;8&#39; }
+];
+ 
+const c = (arr1, arr2, id) =&gt; {
+    let arr = [];
+    for(let item of arr1){
+        if(arr2.find(v =&gt; v[id] === item[id])) {
+        	arr.push(item);
+        }
+    }
+    return arr;
+}
+const d = (arr1, arr2, id) =&gt; {
+    let arr = [];
+    for(let item of arr1){
+        if(arr2.find(v =&gt; v[id] === item[id])) {
+            continue;
+        }
+        	arr.push(item);
+    }
+    return arr;
+}
+console.log(c(a, b, &#39;id&#39;));  //交集
+console.log(d(a, b, &#39;id&#39;));  //差集
+</code></pre>
+  <h3>二维纯数组交集</h3>
+  <pre><code class='language-javascript' lang='javascript'>//方法1
+const similar = function(arrs) {
+	  var arr = arrs.shift(); 
+	  for(var i=arrs.length;i--;){
+	     var p = {&quot;boolean&quot;:{}, &quot;number&quot;:{}, &quot;string&quot;:{}}, obj = [];
+	     arr = arr.concat(arrs[i]).filter(function (x) {
+	       var t = typeof x;
+	       return !((t in p) ? !p[t][x] &amp;&amp; (p[t][x] = 1) : obj.indexOf(x) &lt; 0 &amp;&amp; obj.push(x));
+	     });
+	     if(!arr.length) return null; 
+	  }
+	  return arr;
+}
+//方法2
+const similar = function getTheSame(arr) {
+  return arr.reduce(function(a, b) {
+    return a.filter(function(item) {
+      return b.includes(item);
+    });
+  });
+}
+
+console.log(similar([[1,2,3,5], [2,3,4], [2,3], [2,3,6,7]]))  //[2,3]
+console.log(similar([[0,1,2,3,5],[-1,1,4,5,6,7],[1,2,3,5,6]])) //[1,5]
+</code></pre>
+  <h3>两（yyyy-MM-dd）日期时间差</h3>
+  <pre><code class='language-javascript' lang='javascript'>const getDaysDiffBetweenDates = (dateInitial, dateFinal) =&gt; (dateFinal - dateInitial) / (1000 * 3600 * 24);
+getDaysDiffBetweenDates(new Date(&#39;2017-12-13&#39;), new Date(&#39;2017-12-22&#39;)); 
+// 9
+</code></pre>
+  <h3>判断dom是否有某个className</h3>
+  <pre><code class='language-javascript' lang='javascript'>const  hasClass = (el, className) =&gt; new RegExp(`(^|\\s)${className}(\\s|$)`).test(el.className);
+</code></pre>
+  <h3>是否为空数组</h3>
+  <pre><code class='language-javascript' lang='javascript'>const arr = [];
+const flag = Array.isArray(arr) &amp;&amp; !arr.length;
+// flag =&gt; true
+</code></pre>
+  <h3>是否为数组</h3>
+  <pre><code class='language-javascript' lang='javascript'>function isArray(obj){
+    return Object.prototype.toString.call(obj) === &#39;[object Array]&#39; ;
+}
+</code></pre>
+  <h3>数组首部插入成员</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [1, 2]; // 以下方法任选一种
+arr.unshift(0);
+arr = [0].concat(arr);
+arr = [0, ...arr];
+// arr =&gt; [0, 1, 2]
+</code></pre>
+  <h3>统计数组成员个数</h3>
+  <pre><code class='language-javascript' lang='javascript'>const arr = [0, 1, 1, 2, 2, 2];
+const count = arr.reduce((t, c) =&gt; {
+    t[c] = t[c] ? ++ t[c] : 1;
+    return t;
+}, {});
+// count =&gt; { 0: 1, 1: 2, 2: 3 }
+</code></pre>
+  <h3>是否为空对象</h3>
+  <pre><code class='language-javascript' lang='javascript'>const obj = {};
+const flag = DataType(obj, &quot;object&quot;) &amp;&amp; !Object.keys(obj).length;
+// flag =&gt; true
+</code></pre>
+  <h3>isType</h3>
+  <pre><code class='language-javascript' lang='javascript'>let isType = type =&gt; obj =&gt; {
+  return Object.prototype.toString.call( obj ) === &#39;[object &#39; + type + &#39;]&#39;;
+}
+
+isType(&#39;String&#39;)(&#39;123&#39;);		// true
+isType(&#39;Array&#39;)([1, 2, 3]);	// true
+isType(&#39;Number&#39;)(123);			// true
+
+</code></pre>
+  <h3>多重三元</h3>
+  <pre><code class='language-javascript' lang='javascript'>export function toString (val: any): string {
+  return val == null
+    ? &#39;&#39;
+    : typeof val === &#39;object&#39;
+      ? JSON.stringify(val, null, 2)
+      : String(val)
+}
+
+//解析
+export function toString (val: any): string {
+  return 当变量值为 null 时
+    ? 返回空字符串
+    : 否则，判断当变量类型为 object时
+      ? 返回 JSON.stringify(val, null, 2)
+      : 否则 String(val)
+}
+</code></pre>
+  <h3>Object.is()判断两个值是否相等</h3>
+  <pre><code class='language-javascript' lang='javascript'>Object.is(&#39;foo&#39;, &#39;foo&#39;);     // true
+Object.is(window, window);   // true
+
+Object.is(&#39;foo&#39;, &#39;bar&#39;);     // false
+Object.is([], []);           // false
+
+var foo = { a: 1 };
+var bar = { a: 1 };
+Object.is(foo, foo);         // true
+Object.is(foo, bar);         // false
+
+Object.is(null, null);       // true
+
+// 特例
+Object.is(0, -0);            // false
+Object.is(0, +0);            // true
+Object.is(-0, -0);           // true
+Object.is(NaN, 0/0);         // true
+</code></pre>
+  <h3>判断数据类型</h3>
+  <blockquote>
+    <p>
+      undefined、null、string、number、boolean、array、object、symbol、date、regexp、function、asyncfunction、arguments、set、map、weakset、weakmap
+    </p>
+  </blockquote>
+  <pre><code class='language-javascript' lang='javascript'>function DataType(tgt, type) {
+    const dataType = Object.prototype.toString.call(tgt).replace(/\[object /g, &quot;&quot;).replace(/\]/g, &quot;&quot;).toLowerCase();
+    return type ? dataType === type : dataType;
+}
+DataType(&quot;yajun&quot;); // &quot;string&quot;
+DataType(19941112); // &quot;number&quot;
+DataType(true); // &quot;boolean&quot;
+DataType([], &quot;array&quot;); // true
+DataType({}, &quot;array&quot;); // false
+</code></pre>
+  <h3>判断是否null或undefined</h3>
+  <pre><code class='language-javascript' lang='javascript'>const isNil = val =&gt; val === undefined || val === null;
+
+isNil(null); // true
+isNil(undefined); // true
+</code></pre>
+  <h3>验证是否json字符串</h3>
+  <pre><code class='language-javascript' lang='javascript'>const isValidJSON = str =&gt; {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+</code></pre>
+  <h3>对象字面量(获取环境变量时必用此方法)</h3>
+  <pre><code class='language-javascript' lang='javascript'>const env = &quot;prod&quot;;
+const link = {
+    dev: &quot;Development Address&quot;,
+    test: &quot;Testing Address&quot;,
+    prod: &quot;Production Address&quot;
+}[env];
+// link =&gt; &quot;Production Address&quot;
+</code></pre>
+  <h3>对象变量属性(可变属性名1)</h3>
+  <pre><code class='language-javascript' lang='javascript'>const flag = false;
+const obj = {
+    a: 0,
+    b: 1,
+    [flag ? &quot;c&quot; : &quot;d&quot;]: 2
+};
+// obj =&gt; { a: 0, b: 1, d: 2 }
+</code></pre>
+  <h3>动态属性名(可变属性名2)</h3>
+  <pre><code class='language-javascript' lang='javascript'>const dynamic = &#39;email&#39;;
+let user = {
+    name: &#39;John&#39;,
+    [dynamic]: &#39;john@doe.com&#39;
+}
+console.log(user); // outputs { name: &quot;John&quot;, email: &quot;john@doe.com&quot; }
+</code></pre>
+  <h3>有条件的对象属性</h3>
+  <pre><code class='language-javascript' lang='javascript'>nst getUser = (emailIncluded) =&gt; {
+  return {
+    name: &#39;John&#39;,
+    surname: &#39;Doe&#39;,
+    ...emailIncluded &amp;&amp; { email : &#39;john@doe.com&#39; }
+  }
+}
+
+const user = getUser(true);
+console.log(user); // outputs { name: &quot;John&quot;, surname: &quot;Doe&quot;, email: &quot;john@doe.com&quot; }
+
+const userWithoutEmail = getUser(false);
+console.log(userWithoutEmail); // outputs { name: &quot;John&quot;, surname: &quot;Doe&quot; }
+
+</code></pre>
+  <h3>对象匹配赋值 ，obj2属性值来自obj1相同属性的值</h3>
+  <pre><code class='language-javascript' lang='javascript'>var obj1 = {
+    name:&#39;bob&#39;,
+    age:21,
+    gender:1,
+    hobby:&#39;song&#39;
+}
+var obj2 = {
+    name:&#39;&#39;,
+    age:&#39;&#39;
+}
+Object.keys(obj1).forEach((key) =&gt; {
+    if(key in obj2) {
+        obj2[key] = obj1[key]
+    }
+})
+console.log(obj2)
+//{ name: &#39;bob&#39;, age: 21 }
+//在确定需要哪些属性值的情况下，针对属性值数量上的不同可以采取解构赋值的方法
+let obj3 = { name:userName,age } = obj1
+console.log(userName)  //bob
+console.log(age)  //21
+let obj4 = {...obj1,isLogin:false}  //浅拷贝并添加新属性 
+//{ name: &#39;bob&#39;, age: 21, gender: 1, hobby: &#39;song&#39;, isLogin: false }
+let {hobby,...filterInfo} = obj1 //去除hobby
+console.log(filterInfo)  //{ name: &#39;bob&#39;, age: 21, gender: 1 }
+</code></pre>
+  <h3>删除对象无用属性（扩展运算符）</h3>
+  <pre><code class='language-javascript' lang='javascript'>const obj = { a: 0, b: 1, c: 2 }; // 只想拿b和c
+const { a, ...rest } = obj;
+// rest =&gt; { b: 1, c: 2 }
+</code></pre>
+  <h3>es6隐式返回值</h3>
+  <pre><code class='language-javascript' lang='javascript'>const Func = function(name) {
+    return &quot;I Love &quot; + name;
+};
+// 换成
+const Func = name =&gt; &quot;I Love &quot; + name;
+</code></pre>
+  <h3>检测非空参数</h3>
+  <p>创建方法时方式使用者忽略掉必要的参数</p>
+  <pre><code class='language-javascript' lang='javascript'>function IsRequired() {
+    throw new Error(&quot;param is required&quot;);
+}
+function Func(name = IsRequired()) {
+    console.log(&quot;I Love &quot; + name);
+}
+Func(); // &quot;param is required&quot;
+Func(&quot;雅君妹纸&quot;); // &quot;I Love 雅君妹纸&quot;
+</code></pre>
+  <h3>优雅处理错误信息</h3>
+  <pre><code class='language-javascript' lang='javascript'>try {
+    Func();
+} catch (e) {
+    location.href = &quot;https://stackoverflow.com/search?q=[js]+&quot; + e.message;
+}
+</code></pre>
+  <h3>优雅处理Async/Await参数</h3>
+  <pre><code class='language-javascript' lang='javascript'>function AsyncTo(promise) {
+    return promise.then(data =&gt; [null, data]).catch(err =&gt; [err]);
+}
+const [err, res] = await AsyncTo(Func());
+</code></pre>
+  <h3>存取LocalStorage：反序列化取，序列化存(JSON)</h3>
+  <pre><code class='language-javascript' lang='javascript'>const love = JSON.parse(localStorage.getItem(&quot;love&quot;));
+localStorage.setItem(&quot;love&quot;, JSON.stringify(&quot;I Love 雅君妹纸&quot;));
+</code></pre>
+  <h3>自调用函数</h3>
+  <pre><code class='language-javascript' lang='javascript'>(function(){
+    // 置于此处的代码将自动执行
+})();  
+(function(a,b){
+    var result = a+b;
+    return result;
+})(10,20)
+</code></pre>
+  <h3>从数组种随机获取成员</h3>
+  <pre><code class='language-javascript' lang='javascript'>var items = [12, 548 , &#39;a&#39; , 2 , 5478 , &#39;foo&#39; , 8852, , &#39;Doe&#39; , 2145 , 119];
+var randomItem = items[Math.floor(Math.random() * items.length)];
+</code></pre>
+  <h3>字符串去空格</h3>
+  <pre><code class='language-javascript' lang='javascript'>String.prototype.trim = function(){return this.replace(/^\s+|\s+$/g, &quot;&quot;);};
+</code></pre>
+  <h3>获取数组最大/最小值</h3>
+  <pre><code class='language-javascript' lang='javascript'>var  numbers = [5, 458 , 120 , -215 , 228 , 400 , 122205, -85411]; 
+var maxInNumbers = Math.max.apply(Math, numbers); 
+var minInNumbers = Math.min.apply(Math, numbers);
+
+const maxElementsFromArray = (array, number = 1) =&gt; [...array].sort((x, y) =&gt; y -x).slice(0, number)
+
+// 事例
+maxElementsFromArray([1, 2, 3, 4, 5]) // [5]
+
+maxElementsFromArray([7, 8, 9, 10, 10], 2) // [10, 10]
+</code></pre>
+  <h3>不要直接从数组中delete或remove元素</h3>
+  <h3>精确到指定位数的小数</h3>
+  <pre><code class='language-javascript' lang='javascript'>const round = (n, decimals = 0) =&gt; Number(`${Math.round(`${n}e${decimals}`)}e-${decimals}`)
+round(1.345, 2)                 // 1.35
+round(1.345, 1)                 // 1.3
+</code></pre>
+  <h3>数字补零操作</h3>
+  <pre><code class='language-javascript' lang='javascript'>const addZero1 = (num, len = 2) =&gt; (`0${num}`).slice(-len)
+const addZero2 = (num, len = 2) =&gt; (`${num}`).padStart( len   , &#39;0&#39;)
+addZero1(3) // &#39;03&#39;
+addZero2(32,4)  // &#39;0032&#39;
+</code></pre>
+  <h3>统计数组中相同项的个数</h3>
+  <pre><code class='language-javascript' lang='javascript'>var cars = [&#39;BMW&#39;,&#39;Benz&#39;, &#39;Benz&#39;, &#39;Tesla&#39;, &#39;BMW&#39;, &#39;Toyota&#39;];
+var carsObj = cars.reduce(function (obj, name) {
+  obj[name] = obj[name] ? ++obj[name] : 1;
+  return obj;
+}, {});
+carsObj; // =&gt; { BMW: 2, Benz: 2, Tesla: 1, Toyota: 1 }
+</code></pre>
+  <h3>接收函数返回的多个结果</h3>
+  <pre><code class='language-javascript' lang='javascript'>async function getFullPost(){
+  return await Promise.all([
+     fetch(&#39;/post&#39;),
+     fetch(&#39;/comments&#39;)
+  ]);
+}
+const [post, comments] = getFullPost();
+</code></pre>
+  <h3>将数组平铺到指定深度</h3>
+  <pre><code class='language-javascript' lang='javascript'>const flatten = (arr, depth = 1) =&gt;
+  depth != 1
+    ? arr.reduce((a, v) =&gt; a.concat(Array.isArray(v) ? flatten(v, depth - 1) : v), [])
+    : arr.reduce((a, v) =&gt; a.concat(v), []);
+flatten([1, [2], 3, 4]);                             // [1, 2, 3, 4]
+flatten([1, [2, [3, [4, 5], 6], 7], 8], 2);           // [1, 2, 3, [4, 5], 6, 7, 8]
+</code></pre>
+  <h3>数组扁平化</h3>
+  <pre><code class='language-javascript' lang='javascript'>let arr = [1,2,3,[4,5,6,[7,8]]]
+let arrStr  = JSON.stringgify(arr)
+arr.flat(Infinity)   //  [1, 2, 3, 4, 5, 6, 7, 8]
+arrStr.replace(/(\[|\])/g,&#39;&#39;).split(&#39;,&#39;)  //  [1, 2, 3, 4, 5, 6, 7, 8]
+//只要有一个元素有数组，那么循环继续
+while (ary.some(Array.isArray())) {
+  ary = [].concat(...ary);
+}
+</code></pre>
+  <h3>reduce求和</h3>
+  <pre><code class='language-javascript' lang='javascript'>result = [
+    {subject: &#39;math&#39;,score: 88},
+    {subject: &#39;chinese&#39;,score: 95},
+    {subject: &#39;english&#39;,score: 90}
+];
+var sum = result.reduce(function(prev, cur) {
+    return cur.score + prev;
+}, 0);
+</code></pre>
+  <h3>reduce求和1</h3>
+  <pre><code class='language-javascript' lang='javascript'>let shoppingCart = [
+  { productTitle: &quot;Product 1&quot;, amount: 10 },
+  { productTitle: &quot;Product 2&quot;, amount: 30 },
+  { productTitle: &quot;Product 3&quot;, amount: 20 },
+  { productTitle: &quot;Product 4&quot;, amount: 60 }
+];
+
+const sumAmount = (currentTotalAmount, order) =&gt; currentTotalAmount + order.amount;
+const getTotalAmount = (shoppingCart) =&gt; shoppingCart.reduce(sumAmount, 0);
+getTotalAmount(shoppingCart); // 120
+</code></pre>
+  <h3>eval对一维数组求和的骚操作</h3>
+  <pre><code class='language-javascript' lang='javascript'>eval(arr.join(&quot;+&quot;))
+</code></pre>
+  <h3>数组中某元素出现次数</h3>
+  <pre><code class='language-javascript' lang='javascript'>function countOccurrences(arr, value) {
+  return arr.reduce((a, v) =&gt; v === value ? a + 1 : a + 0, 0);
+}
+
+let arr = [1,2,3,4,1,2,4]
+countOccurrences(arr, 1) // 2
+</code></pre>
+  <h3>数组分页算法</h3>
+  <pre><code class='language-javascript' lang='javascript'>data.slice([每页数据量 *（当前页码 - 1）, 每页数据量 *（当前页码 - 1） + 每页数据量])
+</code></pre>
+  <h3>根据数组中某一属性排序</h3>
+  <pre><code class='language-javascript' lang='javascript'>// 本例根据publishTime排序
+let data = [
+{
+  id: 1,
+  publishTime: &quot;2019-05-14 18:10:29&quot;
+},
+{
+  id: 2,
+  publishTime: &quot;2019-05-14 18:17:29&quot;
+},
+{
+  id: 3,
+  publishTime: &quot;2019-05-14 15:09:25&quot;
+}]
+
+data.sort((a, b) =&gt; b.publishTime - a.publishTime);
+
+// 0: {id: 2, publishTime: &quot;2019-05-14 18:17:29&quot;}
+// 1: {id: 1, publishTime: &quot;2019-05-14 18:10:29&quot;}
+// 2: {id: 3, publishTime: &quot;2019-05-14 15:09:25&quot;}
+</code></pre>
+  <h3>对象合并</h3>
+  <pre><code class='language-javascript' lang='javascript'>//ES6方法
+let obj1 = {
+    a:1,
+    b:{
+        b1:2
+    }
+}
+
+let obj2 = {
+    c:3,
+    d:4
+}
+console.log({...obj1, ...obj2}) // {a: 1, b: {…}, c: 3, d: 4}
+// Obj.assign()：可以把任意多个的源对象自身的可枚举属性拷贝给目标对象，然后返回目标对象
+let o1 = { a: 1 };
+let o2 = { b: 2 };
+
+let obj = Object.assign(o1, o2);
+console.log(obj); // { a: 1, b: 2 }
+console.log(o1);  // { a: 1, b: 2 }, 且 **目标对象** 自身也会改变（也就是assign第一个对象）
+console.log(o2); // { b: 2 } 不改变
+
+// 备注：Object.assign() 拷贝的是属性值。假如源对象的属性值是一个指向对象的引用，它也只拷贝那个引用值
+// 备注：数组合并用 concat() 方法
+</code></pre>
+  <h3>对象数组每一项添加新属性</h3>
+  <pre><code class='language-javascript' lang='javascript'>var arry= [{a:11,b:22,c:33,d:44},{a:11,b:0,c:0,d:44},{a:11,b:22,c:99,d:99}];
+var arry2=[];
+arry.map(((item, index)=&gt; {
+arry2.push(Object.assign({},item,{mess1:item.c,mess2:item.d}))
+}))
+// arry2 -&gt; [{&quot;a&quot;:11,&quot;b&quot;:22,&quot;c&quot;:33,&quot;d&quot;:44,&quot;mess1&quot;:33,&quot;mess2&quot;:44},{&quot;a&quot;:11,&quot;b&quot;:0,&quot;c&quot;:0,&quot;d&quot;:44,&quot;mess1&quot;:0,&quot;mess2&quot;:44},{&quot;a&quot;:11,&quot;b&quot;:22,&quot;c&quot;:99,&quot;d&quot;:99,&quot;mess1&quot;:99,&quot;mess2&quot;:99}]
+var users = [
+{ name : &quot;Yagyu&quot;,weapon:&quot;shuriken&quot;},
+{ name : &quot;Yoshi&quot;,weapon:&quot;katana&quot;},
+{ name : &quot;Kuma&quot;,weapon:&quot;wakizashi&quot;}
+];
+const addNewArgs = users.map((el,index) =&gt; {
+	return Object.assign(el,{age:20})
+})
+//addNewArgs -&gt; [{ name: &#39;Yagyu&#39;, weapon: &#39;shuriken&#39;, age: 20 },{ name: &#39;Yoshi&#39;, weapon: &#39;katana&#39;, age: 20 },{ name: &#39;Kuma&#39;, weapon: &#39;wakizashi&#39;, age: 20 }]
+</code></pre>
+  <h3>根据键值将一个对象的值映射到另一个数组对象中</h3>
+  <pre><code class='language-javascript' lang='javascript'>var obj ={
+  apple: 1,
+  banana:2,
+  li:30
+}
+var arr = [
+  {id:&#39;1&#39;,text:&#39;苹果&#39;,key:&#39;apple&#39;, value:&#39;&#39;},
+  {id:&#39;2&#39;,text:&#39;梨&#39;, key:&#39;li&#39;,value:&#39;&#39;},
+  {id:&#39;3&#39;,text:&#39;香蕉&#39;, key:&#39;banana&#39;, value:&#39;&#39;}
+]
+
+const newArr = arr.map(o =&gt; {
+  o.value = obj[o.key]
+  return o
+})
+</code></pre>
+  <h3>根据索引将一个数组的值映射到另一个数组对象中</h3>
+  <pre><code class='language-javascript' lang='javascript'>var arr = [
+  {id:&#39;1&#39;,text:&#39;苹果&#39;,key:&#39;apple&#39;, value:&#39;&#39;},
+  {id:&#39;2&#39;,text:&#39;梨&#39;, key:&#39;li&#39;,value:&#39;&#39;},
+  {id:&#39;3&#39;,text:&#39;香蕉&#39;, key:&#39;banana&#39;, value:&#39;&#39;}
+]
+
+var arr1 = [1,2,1]
+arr.map((el,index)=&gt;{
+	el.value = arr1[index]
+})
+</code></pre>
+  <h3>将一个对象数组数据拿出来变成另一个对象</h3>
+  <pre><code class='language-javascript' lang='javascript'>var arry= [{a:11,b:22,c:33,d:44},{a:11,b:0,c:0,d:44},{a:11,b:22,c:99,d:99}];
+var arry2=[];
+arry.map(((item, index)=&gt; {
+arry2.push(Object.assign({},{mess1:item.c,mess2:item.d}))
+}))
+//  arry2 -&gt;   [{&quot;mess1&quot;:33,&quot;mess2&quot;:44},{&quot;mess1&quot;:0,&quot;mess2&quot;:44},{&quot;mess1&quot;:99,&quot;mess2&quot;:99}]
+</code></pre>
+  <h3>对象中属性个数</h3>
+  <pre><code class='language-javascript' lang='javascript'>let obj = {name: &#39;朱昆鹏&#39;, age: 21}
+
+// ES6
+Object.keys(obj).length // 2
+
+// ES5
+let attributeCount = obj =&gt; {
+    let count = 0;
+    for(let i in obj) {
+        if(obj.hasOwnProperty(i)) {  // 建议加上判断,如果没有扩展对象属性可以不加
+            count++;
+        }
+    }
+    return count;
+}
+
+attributeCount(obj) // 2
+</code></pre>
+  <h3>全屏</h3>
+  <pre><code class='language-javascript' lang='javascript'>//进入全屏
+function launchFullscreen(element) {
+  if (element.requestFullscreen) {
+    element.requestFullscreen()
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen()
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen()
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullScreen()
+  }
+}
+
+launchFullscreen(document.documentElement) // 整个页面进入全屏
+launchFullscreen(document.getElementById(&quot;id&quot;)) //某个元素进入全屏
+//退出全屏
+function exitFullscreen() {
+  if (document.exitFullscreen) {
+    document.exitFullscreen()
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen()
+  } else if (document.mozCancelFullScreen) {
+    document.mozCancelFullScreen()
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen()
+  }
+}
+
+exitFullscreen()
+//全屏事件
+document.addEventListener(&quot;fullscreenchange&quot;, function (e) {
+  if (document.fullscreenElement) {
+    console.log(&#39;进入全屏&#39;)
+  } else {
+    console.log(&#39;退出全屏&#39;)
+  }
+})
+</code></pre>
+  <h3>获取滚动条位置</h3>
+  <pre><code class='language-javascript' lang='javascript'>function getScrollPosition(el = window) {
+  return {
+    x: (el.pageXOffset !== undefined) ? el.pageXOffset : el.scrollLeft,
+    y: (el.pageYOffset !== undefined) ? el.pageYOffset : el.scrollTop
+  }
+}
+
+getScrollPosition() // {x: 0, y: 692}
+</code></pre>
+  <h3>检测设备类型</h3>
+  <pre><code class='language-javascript' lang='javascript'>const detectDeviceType = () =&gt;/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|OperaMini/i.test(navigator.userAgent) ? &#39;Mobile&#39; : &#39;Desktop&#39;;
+
+detectDeviceType() // &quot;Desktop&quot;
+</code></pre>
+  <h3>防抖</h3>
+  <pre><code class='language-javascript' lang='javascript'>//适应大部分场景普通防抖
+function debounce(fn) {
+  let timeout = null; // 创建一个标记用来存放定时器的返回值
+  return function () {
+    clearTimeout(timeout); // 每当用户输入的时候把前一个 setTimeout clear 掉
+    timeout = setTimeout(() =&gt; { // 然后又创建一个新的 setTimeout, 这样就能保证输入字符后的 interval 间隔内如果还有字符输入的话，就不会执行 fn 函数
+      fn.apply(this, arguments);
+    }, 500);
+  };
+}
+
+debounce(fn) // 使用
+
+//可配置时间防抖
+function debounce(fn, wait = 50) {
+    // 通过闭包缓存一个定时器 id
+    let timer = null
+    // 将 debounce 处理结果当作函数返回
+    // 触发事件回调时执行这个返回函数
+    return function(...args) {
+      	// 如果已经设定过定时器就清空上一次的定时器
+        if (timer) clearTimeout(timer)
+      
+      	// 开始设定一个新的定时器，定时器结束后执行传入的函数 fn
+        timer = setTimeout(() =&gt; {
+            fn.apply(this, args)
+        }, wait)
+    }
+}
+
+//第一次立即执行，之后开始防抖
+// immediate 表示第一次是否立即执行
+function debounce(fn, wait = 50, immediate) {
+    let timer = null
+    return function(...args) {
+        if (timer) clearTimeout(timer)
+      
+      	// ------ 新增部分 start ------ 
+      	// immediate 为 true 表示第一次触发后执行
+      	// timer 为空表示首次触发
+        if (immediate &amp;&amp; !timer) {
+            fn.apply(this, args)
+        }
+      	// ------ 新增部分 end ------ 
+      	
+        timer = setTimeout(() =&gt; {
+            fn.apply(this, args)
+        }, wait)
+    }
+}
+// 执行 debounce 函数返回新函数
+const betterFn = debounce(() =&gt; console.log(&#39;fn 防抖执行了&#39;), 1000, true)
+// 第一次触发 scroll 执行一次 fn，后续只有在停止滑动 1 秒后才执行函数 fn
+document.addEventListener(&#39;scroll&#39;, betterFn)
+</code></pre>
+  <h3>节流</h3>
+  <pre><code class='language-javascript' lang='javascript'>//适应大部分场景普通节流
+function throttle(fn) {
+  let canRun = true; // 通过闭包保存一个标记
+  return function () {
+    if (!canRun) return; // 在函数开头判断标记是否为true，不为true则return
+    canRun = false; // 立即设置为false
+    setTimeout(() =&gt; { // 将外部传入的函数的执行放在setTimeout中
+      fn.apply(this, arguments);
+      // 最后在setTimeout执行完毕后再把标记设置为true(关键)表示可以执行下一次循环了。当定时器没有执行的时候标记永远是false，在开头被return掉
+      canRun = true;
+    }, 500);
+  };
+}
+
+throttle(fn) // 使用
+
+//可配置时间节流
+const throttle = (fn, wait = 50) =&gt; {
+  // 上一次执行 fn 的时间
+  let previous = 0
+  // 将 throttle 处理结果当作函数返回
+  return function(...args) {
+    // 获取当前时间，转换成时间戳，单位毫秒
+    let now = +new Date()
+    // 将当前时间和上一次执行函数的时间进行对比
+    // 大于等待时间就把 previous 设置为当前时间并执行函数 fn
+    if (now - previous &gt; wait) {
+      previous = now
+      fn.apply(this, args)
+    }
+  }
+}
+</code></pre>
+  <h3>计算函数执行时间</h3>
+  <pre><code class='language-javascript' lang='javascript'>
+const timeTaken = callback =&gt; {
+  console.time(&#39;timeTaken&#39;);
+  const r = callback();
+  console.timeEnd(&#39;timeTaken&#39;);
+  return r;
+};
+
+timeTaken(() =&gt; Math.pow(2, 10)); // 1024, (logged): timeTaken: 0.02099609375ms
+</code></pre>
+  <h3>去除空格（多种形式）</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * trim 去除空格
+ * param1  string str 待处理字符串
+ * param2  number type 去除空格类型 1-所有空格  2-前后空格  3-前空格 4-后空格 默认为1
+ * return  string str 处理后的字符串
+ */
+function trim(str, type = 1) {
+    if (type &amp;&amp; type !== 1 &amp;&amp; type !== 2 &amp;&amp; type !== 3 &amp;&amp; type !== 4) return;
+    switch (type) {
+        case 1:
+            return str.replace(/\s/g, &quot;&quot;);
+        case 2:
+            return str.replace(/(^\s)|(\s*$)/g, &quot;&quot;);
+        case 3:
+            return str.replace(/(^\s)/g, &quot;&quot;);
+        case 4:
+            return str.replace(/(\s$)/g, &quot;&quot;);
+        default:
+            return str;
+    }
+}
+</code></pre>
+  <h3>连字符/驼峰互转</h3>
+  <pre><code class='language-javascript' lang='javascript'>const camelizeRE = /-(\w)/g
+export const camelize = cached((str: string): string =&gt; {
+  return str.replace(camelizeRE, (_, c) =&gt; c ? c.toUpperCase() : &#39;&#39;)
+})
+//camelize(&#39;aa-bb&#39;) // aaBb
+
+const hyphenateRE = /\B([A-Z])/g
+export const hyphenate = cached((str: string): string =&gt; {
+  return str.replace(hyphenateRE, &#39;-$1&#39;).toLowerCase()
+})
+	
+</code></pre>
+  <h3>随机16进制颜色</h3>
+  <pre><code class='language-javascript' lang='javascript'>function hexColor() {
+    let str = &#39;#&#39;;
+    let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, &#39;A&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;];
+    for (let i = 0; i &lt; 6; i++) {
+        let index = Number.parseInt(Math.random() * 16);
+        str += arr[index]
+    }
+    return str;
+}
+</code></pre>
+  <h3>随机RGB颜色</h3>
+  <pre><code class='language-javascript' lang='javascript'>function RandomColor() {
+           let r, g, b;
+           r = Math.floor(Math.random() * 256);
+           g = Math.floor(Math.random() * 256);
+           b = Math.floor(Math.random() * 256);
+           return &quot;rgb(&quot; +r + &#39;,&#39; +g+ &#39;,&#39; +b+ &quot;)&quot;;
+}
+</code></pre>
+  <h3>统计指定文字出现次数</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * 关键词统计：统计一段文字中指定文字出现次数 keywordsCount
+ * param1 string text 进行统计的文本
+ * param2 string keywords 进行统计的关键词
+ * return number count 关键词出现次数
+ * tip:param1 document.body.innerText--全文统计
+ */
+
+function keywordsCount(text, keywords) {
+    return text.split(keywords).length - 1
+}
+</code></pre>
+  <h3>获取数组第N个元素</h3>
+  <pre><code class='language-javascript' lang='javascript'>const nthElement = (arr, n = 0) =&gt; (n &gt; 0 ? arr.slice(n, n + 1) : arr.slice(n))[0];
+nthElement([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], 1); // &#39;b&#39;
+nthElement([&#39;a&#39;, &#39;b&#39;, &#39;b&#39;], -3); // &#39;a&#39;
+</code></pre>
+  <h3>返回数组指定元素的所有索引</h3>
+  <pre><code class='language-javascript' lang='javascript'>const indexOfAll = (arr, val) =&gt; arr.reduce((acc, el, i) =&gt; (el === val ? [...acc, i] : acc), []);
+
+indexOfAll([1, 2, 3, 1, 2, 3], 1); // [0,3]
+indexOfAll([1, 2, 3], 4); // []
+</code></pre>
+  <h3>设置CSS样式</h3>
+  <pre><code class='language-javascript' lang='javascript'>const setStyle = (el, ruleName, val) =&gt; (el.style[ruleName] = val);
+setStyle(document.querySelector(&#39;p&#39;), &#39;font-size&#39;, &#39;20px&#39;); // The first &lt;p&gt; element on the page will have a font-size of 20px
+</code></pre>
+  <h3>获取CSS样式</h3>
+  <pre><code class='language-javascript' lang='javascript'>const getStyle = (el, ruleName) =&gt; getComputedStyle(el)[ruleName];
+getStyle(document.querySelector(&#39;p&#39;), &#39;font-size&#39;); // &#39;16px&#39;
+</code></pre>
+  <h3>切换元素样式类</h3>
+  <pre><code class='language-javascript' lang='javascript'>const toggleClass = (el, className) =&gt; el.classList.toggle(className);
+toggleClass(document.querySelector(&#39;p.special&#39;), &#39;special&#39;);
+// The paragraph will not have the &#39;special&#39; class anymore
+</code></pre>
+  <h3>确保函数只被调用一次</h3>
+  <p>使用一个闭包，使用一个成为 <code>called</code> 的标志，并在第一次调用该函数时将其设置为 <code>true</code> ，以防止它被再次调用。 为了允许函数改变它的 <code>this</code>
+    上下文（比如在一个事件监听器中），必须使用<code>function</code> 关键字，并且提供的函数必须应用上下文。 允许使用 rest（剩余）/spread（展开） (<code>...</code>)
+    运算符为函数提供任意数量的参数。</p>
+  <pre><code class='language-javascript' lang='javascript'>const once = fn =&gt; {
+  let called = false;
+  return function(...args) {
+    if (called) return;
+    called = true;
+    return fn.apply(this, args);
+  };
+};
+//eg
+const startApp = function(event) {
+  console.log(this, event); // document.body, MouseEvent
+};
+document.body.addEventListener(&#39;click&#39;, once(startApp)); // only runs `startApp` once upon click
+</code></pre>
+  <h3>初级表单验证</h3>
+  <pre><code class='language-javascript' lang='javascript'>[
+    { selector: &#39;#type&#39;, msg: &#39;请选择请假类别&#39; },
+    { selector: &#39;#start_datetime_picker&#39;, msg: &#39;请选择开始日期&#39; }
+    // ...
+].some(function (item) {
+    if ($(item.selector).val() == &quot;&quot;) {
+        $.toast(item.msg)
+        return true;
+    }
+});
+</code></pre>
+  <h3>查看网页布局</h3>
+  <pre><code class='language-javascript' lang='javascript'>//控制台  
+$$(&#39;*&#39;).forEach(a=&gt;{a.style.outline=&#39;1px solid red&#39;})
+</code></pre>
+  <h3><code>find()</code> <code>findIndex()</code> <code>some()</code> <code>includes()</code></h3>
+  <pre><code class='language-javascript' lang='javascript'>const array = [{ id: 1, checked: true }, { id: 2 }];
+arr.find(item =&gt; item.id === 2) // { id: 2 }
+arr.findIndex(item =&gt; item.id === 2) // 1
+arr.some(item =&gt; item.checked) // true
+[1,2,3,&#39;&#39;].some(item =&gt; !item)   //true //用于查找数组中是否有空值
+const numberArray = [1,2,3,4];
+numberArray.includes(2) // true
+</code></pre>
+  <h3><code>promise</code> and <code>await</code></h3>
+  <pre><code class='language-javascript' lang='javascript'>async function getItems() {
+  try {
+    const user = await getUser();
+    const order = await getOrderByUser(user);
+    const items = await getOrderItemsByOrder(order);
+    return items;
+  } catch(err) {
+    // 在这里处理错误，建议返回某个值或者重新抛出错误
+  }
+}
+
+getItems().then(items =&gt; {
+  // 处理排序后的成员
+})
+</code></pre>
+  <h3><code>export</code> 模块</h3>
+  <pre><code class='language-javascript' lang='javascript'>// math.js
+
+export function add(a,b) { return a + b; }
+export function sub(a,b) { return a - b; }
+
+export default mult(a,b) =&gt; a * b;
+
+// main.js
+import mult, { add, sub } from &#39;./math&#39;;
+
+mult(2, 4) // 8
+add(1,1)   // 2
+sub(1,2)   // -1
+</code></pre>
+  <h3>屏蔽生产环境的console.log</h3>
+  <pre><code class='language-javascript' lang='javascript'>console.log=function(){}
+</code></pre>
+  <h3>平滑滚动至页面指定位置</h3>
+  <pre><code class='language-javascript' lang='javascript'>const smoothScroll = element =&gt;
+  document.querySelector(element).scrollIntoView({
+    behavior: &#39;smooth&#39;
+  });
+  
+smoothScroll(&#39;#fooBar&#39;); 
+smoothScroll(&#39;.fooBar&#39;); 
+</code></pre>
+  <h3>h5 滚动至页面顶部，全面兼容</h3>
+  <pre><code class='language-javascript' lang='javascript'>const scrollToTop = () =&gt; {
+    let scrollTop = document.documentElement.scrollTo || document.body.scrollTop
+    if (scrollTop &gt; 0) {
+        window.requestAnimationFrame(scrollTop)
+        window.scrollTop(0, scrollTop - scrollTo / 8)
+    }
+}
+</code></pre>
+  <h3>访jquery链式操作css html</h3>
+  <pre><code class='language-javascript' lang='javascript'>function $ (option) {
+    var t = typeof(option)
+    if (t == &#39;function&#39;) {
+        window.onload = option
+    } else if (t.toLowerCase() == &#39;string&#39;) {
+        var ele = option.substring(1, option.length)
+        el = document.getElementById(ele)
+    }
+    var obj = {
+        css: function (attr, val) {
+            el.style[attr] = val
+            return obj;
+        },
+        html: function (val) {
+            el.innerHTML = val
+            return obj
+        }
+    }
+    return obj
+}
+$(&#39;#box&#39;).css(&#39;backgroundColor&#39;,&#39;red&#39;).html(&#39;hello&#39;);
+</code></pre>
+  <h3>一行代码获取当前 yyyy-MM-dd hh:mm:ss格式时间</h3>
+  <pre><code class='language-javascript' lang='javascript'>new Date().toJSON().split(&quot;T&quot;)[0] + &#39; &#39; + new Date().toJSON().split(&quot;T&quot;)[1].slice(0,-5)
+</code></pre>
+  <h3>什么是 IIFE（立即调用的函数表达式）</h3>
+  <pre><code class='language-javascript' lang='javascript'>(function IIFE(){
+    console.log( &quot;Hello!&quot; );
+})();
+// &quot;Hello!&quot;
+//常常使用此模式来避免污染全局命名空间，因为在IIFE中使用的所有变量(与任何其他普通函数一样)在其作用域之外都是不可见的。
+</code></pre>
+  <h3>复杂判断优雅解决方式1</h3>
+  <pre><code class='language-javascript' lang='javascript'>    const actions = newMap([
+      [&#39;guest_1&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;guest_2&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;guest_3&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;guest_4&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;guest_5&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;master_1&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;master_2&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;master_3&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;master_4&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;master_5&#39;, ()=&gt;{/*do sth*/}],
+      [&#39;default&#39;, ()=&gt;{/*do sth*/}],
+    ])
+    
+    /**
+     * 按钮点击事件
+     * @param {string} identity 身份标识：guest客态 master主态
+     * @param {number} status 活动状态：1 开团进行中 2 开团失败 3 开团成功 4 商品售罄 5 有库存未开团
+     */const onButtonClick = (identity,status)=&gt;{
+      let action = actions.get(`${identity}_${status}`) || actions.get(&#39;default&#39;)
+      action.call(this)
+    }
+</code></pre>
+  <h3>上述方法的另一种玩法</h3>
+  <pre><code class='language-javascript' lang='javascript'>    const actions = newMap([
+      [{identity:&#39;guest&#39;,status:1},()=&gt;{/*do sth*/}],
+      [{identity:&#39;guest&#39;,status:2},()=&gt;{/*do sth*/}],
+      //...
+    ])
+    
+    const onButtonClick = (identity,status)=&gt;{
+      let action = [...actions].filter(([key,value])=&gt;(key.identity == identity &amp;&amp; key.status == status))
+      action.forEach(([key,value])=&gt;value.call(this))
+    }
+</code></pre>
+  <h3>console.table</h3>
+  <pre><code class='language-javascript' lang='javascript'>//console.table第一个参数为想要打印的对象，数组，类数组，第二个参数为需要的列名
+console.table(JSON.parse(JSON.stringify(this.tableData)), [&quot;personnel&quot;]);   //此方法打印vue变量没有省略号
+</code></pre>
+  <h3>根据某属性过滤树形数据</h3>
+  <pre><code class='language-javascript' lang='javascript'>/*
+arr 需要被过滤的数组
+selectedKey 满足条件的树形值
+ieCheck  用于限定条件的属性
+*/
+filterCheck(arr, selectedKey) {
+      return arr.filter(item =&gt; item.isCheck !== selectedKey).map(item =&gt; {
+        item = Object.assign({}, item)
+        if (item.children) {
+          item.children = this.filterCheck(item.children, selectedKey)
+        }
+        return item
+      })
+},
+    
+</code></pre>
+  <h3>是否全部验证通过every</h3>
+  <pre><code class='language-javascript' lang='javascript'>[true,true,false].every(el=&gt;el==true)  //false
+</code></pre>
+  <h3>递归搜索</h3>
+  <pre><code class='language-javascript' lang='javascript'>function find(arr, fn, result) {
+  arr.forEach(item =&gt; {
+    if (item.children) {
+      find(item.children, fn, result)
+    } else {
+      if (fn(item)) {
+        result.push(item)
+      }
+    }
+  })
+}
+
+var result = []
+find(carr, item =&gt; {
+  return item.name === &#39;啦啦啦&#39;
+}, result)
+
+</code></pre>
+  <h3>四则运算符</h3>
+  <p>只有当加法运算时，其中一方是字符串类型，就会把另一个也转为字符串类型。其他运算只要其中一方是数字，那么另一方就转为数字。并且加法运算会触发三种类型转换：将值转换为原始值，转换为数字，转换为字符串。</p>
+  <pre><code class='language-javascript' lang='javascript'>1 + &#39;1&#39; // &#39;11&#39;
+2 * &#39;2&#39; // 4
+[1, 2] + [2, 1] // &#39;1,22,1&#39;
+// [1, 2].toString() -&gt; &#39;1,2&#39;
+// [2, 1].toString() -&gt; &#39;2,1&#39;
+// &#39;1,2&#39; + &#39;2,1&#39; = &#39;1,22,1&#39;
+对于加号需要注意这个表达式 &#39;a&#39; + + &#39;b&#39;
+&#39;a&#39; + + &#39;b&#39; // -&gt; &quot;aNaN&quot;
+// 因为 + &#39;b&#39; -&gt; NaN
+// 你也许在一些代码中看到过 + &#39;1&#39; -&gt; 1
+</code></pre>
+  <h3>生成n个和为sum的数</h3>
+  <pre><code class='language-javascript' lang='javascript'>function randGenerator(n, sum) {
+  var aryRet = [];
+  var fSumTmp = sum;
+  var iAcc = 0;
+  for (var i = 0; i &lt; (n -1); i++) {
+    var iTmp = Math.ceil(Math.random() * (fSumTmp / 2));
+    aryRet.push(iTmp);
+    fSumTmp -= iTmp;
+    iAcc += iTmp;
+  }
+  aryRet.push(sum-iAcc);
+  return aryRet;
+}
+ 
+console.log(randGenerator(7, 100)); 
+</code></pre>
+  <h3>加法函数（精度丢失问题）</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * @param { number } arg1
+ * @param { number } arg2
+ */
+export function add(arg1, arg2) {
+    let r1, r2, m;
+    try { r1 = arg1.toString().split(&quot;.&quot;)[1].length } catch (e) { r1 = 0 }
+    try { r2 = arg2.toString().split(&quot;.&quot;)[1].length } catch (e) { r2 = 0 }
+    m = Math.pow(10, Math.max(r1, r2));
+    return (arg1 * m + arg2 * m) / m
+}
+</code></pre>
+  <h3>减法函数（精度丢失问题）</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * @param { number } arg1
+ * @param { number } arg2
+ */
+export function sub(arg1, arg2) {
+    let r1, r2, m, n;
+    try { r1 = arg1.toString().split(&quot;.&quot;)[1].length } catch (e) { r1 = 0 }
+    try { r2 = arg2.toString().split(&quot;.&quot;)[1].length } catch (e) { r2 = 0 }
+    m = Math.pow(10, Math.max(r1, r2));
+    n = (r1 &gt;= r2) ? r1 : r2;
+    return Number(((arg1 * m - arg2 * m) / m).toFixed(n));
+}
+
+</code></pre>
+  <h3>除法函数（精度丢失问题）</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * @param { number } num1
+ * @param { number } num2
+ */
+export function division(num1,num2){
+    let t1,t2,r1,r2;
+    try{
+        t1 = num1.toString().split(&#39;.&#39;)[1].length;
+    }catch(e){
+        t1 = 0;
+    }
+    try{
+        t2=num2.toString().split(&quot;.&quot;)[1].length;
+    }catch(e){
+        t2=0;
+    }
+    r1=Number(num1.toString().replace(&quot;.&quot;,&quot;&quot;));
+    r2=Number(num2.toString().replace(&quot;.&quot;,&quot;&quot;));
+    return (r1/r2)*Math.pow(10,t2-t1);
+}
+
+</code></pre>
+  <h3>乘法函数（精度丢失问题）</h3>
+  <pre><code class='language-javascript' lang='javascript'>/**
+ * @param { number } num1
+ * @param { number } num2
+ */
+export function mcl(num1,num2){
+    let m=0,s1=num1.toString(),s2=num2.toString();
+    try{m+=s1.split(&quot;.&quot;)[1].length}catch(e){}
+    try{m+=s2.split(&quot;.&quot;)[1].length}catch(e){}
+    return Number(s1.replace(&quot;.&quot;,&quot;&quot;))*Number(s2.replace(&quot;.&quot;,&quot;&quot;))/Math.pow(10,m);
+}
+</code></pre>
+  <h3>JSON数据分类</h3>
+  <pre><code class='language-javascript' lang='javascript'>function groupBy(array, f) {
+  const groups = {};
+  array.forEach(function(o) {
+    const group = JSON.stringify(f(o));
+    groups[group] = groups[group] || [];
+    groups[group].push(o);
+  });
+  return Object.keys(groups).map(function(group) {
+    return groups[group];
+  });
+}
+
+ groupBy(this.frsSSOInfo.user_list, el =&gt; {
+        return [el.user_type];
+ });
+</code></pre>
+  <h3>找出对象中属性值匹配的key</h3>
+  <pre><code class='language-javascript' lang='javascript'>const findKey = (obj, value, compare = (a, b) =&gt; a === b) =&gt; {
+  return Object.keys(obj).find(k =&gt; compare(obj[k], value));
+};
+let { user_type, role_type, agency_code, agency_type } = this.currentUser;
+
+ const conditionOpt = {
+        1: user_type == 1 &amp;&amp; role_type == 4, //校长
+        2: user_type == 1 &amp;&amp; role_type == 5, //班主任
+        3: agency_code &amp;&amp; agency_type == 3, //县级
+        4: agency_code &amp;&amp; agency_type == 2 //州级
+      };
+ return findKey(conditionOpt,true)
+</code></pre>
+  <h3>使用两个非</h3>
+  <p>两个感叹号会确保参数为非值时只能为false，不会是0、空字符串、undefined等非值</p>
+  <pre><code class='language-javascript' lang='javascript'>//在vue里
+if (options) {
+    this.deep = !!options.deep;
+    this.user = !!options.user;
+    this.lazy = !!options.lazy;
+    this.sync = !!options.sync;
+  } else {
+    this.deep = this.user = this.lazy = this.sync = false;
+  }
+</code></pre>
+  <h3>async 返回值</h3>
+  <p><code>async</code>函数内部<code>return</code>语句返回的值，会成为<code>then</code>方法回调函数的参数。</p>
+  <pre><code class='language-javascript' lang='javascript'>async function f() {
+  return &#39;hello world&#39;;
+}
+
+f().then(v =&gt; console.log(v))
+// &quot;hello world&quot;
+</code></pre>
+  <p><code>async</code>函数内部抛出错误，会导致返回的 Promise 对象变为<code>reject</code>状态。抛出的错误对象会被<code>catch</code>方法回调函数接收到。</p>
+  <pre><code class='language-javascript' lang='javascript'>async function f() {
+  throw new Error(&#39;出错了&#39;);
+}
+
+f().then(
+  v =&gt; console.log(v),
+  e =&gt; console.log(e)
+)
+// Error: 出错了
+</code></pre>
+  <h3>浏览器停止滚动后执行操作</h3>
+  <pre><code class='language-javascript' lang='javascript'>var scrollTimer
+const timeout = 400
+function handler () {
+  // ...
+}
+document.addEventListener(&#39;scroll&#39;, () =&gt; {
+  clearTimeout(scrollTimer)
+  scrollTimer = setTimeout(handler, timeout)
+})
+</code></pre>
+  <p>&nbsp;</p>
+<script src='../highlight.pack.js'></script>
+<script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+  document.querySelectorAll('pre code').forEach((block) => {
+    hljs.highlightBlock(block);
+  });
+});
+</script>
+</body>
+
+</html>
