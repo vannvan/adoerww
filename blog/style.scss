@@ -23,27 +23,39 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+.cate-name {
+    font-weight: bold;
+    color: #999;
+}
 
-#nav {
-    width: 20%;
+.active-name {
+    background: #00B8C0;
+    color: #fff;
+}
+
+ul {
+    margin: 0;
+    // padding: 0;
+    padding-left: 15px;
+}
+
+li {
+    list-style: none;
+    line-height: 35px;
+    font-size: 14px;
+    cursor: pointer;
+    padding-left: 10px
+}
+
+#cate-modal {
+    width: 100%;
+    display: none;
+    height: 100vh;
     overflow-y: auto;
-    background: #ededed;
+    position: fixed;
+    z-index: 999;
+    background: #fff;
 
-    .cate-name {
-        font-weight: bold;
-        color: #999;
-    }
-
-    .active-name {
-        background: #00B8C0;
-        color: #fff;
-    }
-
-    ul {
-        margin: 0;
-        // padding: 0;
-        padding-left: 15px;
-    }
 
     li {
         list-style: none;
@@ -53,9 +65,15 @@ body::-webkit-scrollbar {
         padding-left: 10px
     }
 
-    // li:hover {
-    //     background: #ccc;
-    // }
+}
+
+#nav {
+    width: 20%;
+    overflow-y: auto;
+    background: #ededed;
+
+
+
 }
 
 #header {
@@ -76,6 +94,14 @@ body::-webkit-scrollbar {
     img {
         max-width: 100%;
     }
+}
+
+.icon-menu {
+    color: #000;
+    line-height: 60px;
+    margin-left: 25px;
+    cursor: pointer;
+    font-size: 28px !important;
 }
 
 .icon-github {

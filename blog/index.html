@@ -3,27 +3,31 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+  <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1"> -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <!-- <meta name="referrer" content="no-referrer"/> -->
   <title>vannvan</title>
   <link rel="stylesheet" href="atom-one-dark-reasonable.css">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="//at.alicdn.com/t/font_1413143_iylewagpaqb.css">
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1413143_basptk773d.css">
 </head>
 
 <body>
   <div id="containter">
     <div id="nav" class="scroll"></div>
     <div id="header">
+      <i class="iconfont icon-menu"></i>
       <a href="https://github.com/vannvan/archives" target="view_window"><i class="iconfont icon-github"></i></a>
     </div>
     <div id="content" class="scroll"></div>
-
+    <div id="cate-modal"></div>
     <!-- <div id="outline"></div> -->
   </div>
   <script src="https://cdn.bootcdn.net/ajax/libs/marked/1.1.0/marked.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <script src="flexible.debug.js"></script>
   <script src="highlight.pack.js"></script>
   <script src="filelist.js"></script>
   <script>
@@ -50,6 +54,7 @@
         itemStr += `<ul data-name="${key}" class="cate"><p class="cate-name">${key}</p>${subitem}</ul>`
       })
       document.getElementById("nav").innerHTML = itemStr
+      document.getElementById("cate-modal").innerHTML = itemStr
     }
 
     function getSubItemList(item) {
@@ -78,10 +83,12 @@
     let cateListNode = [...document.querySelectorAll(".cate")]
     cateListNode.map(el => {
       el.addEventListener('click', function (e) {
-        resetActive()
-        e.target.setAttribute('class', 'active-name file-name-item')
         let catePath = this.dataset.name
         let filePath = e.target.dataset.path
+        if (!filePath) return
+        resetActive()
+        e.target.setAttribute('class', 'active-name file-name-item')
+
         let fullPath = catePath + '/' + filePath
         handleGetFile(fullPath)
       })
@@ -102,6 +109,35 @@
         el.setAttribute('class', 'language-html hljs')
       })
     }
+
+    //判断设备
+    function IsPC() {
+      var userAgentInfo = navigator.userAgent;
+      var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+      var flag = true;
+      for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+          flag = false;
+          break;
+        }
+      }
+      return flag;
+    }
+    if (!IsPC()) {
+      document.getElementById("nav").style.display = 'none'
+      document.getElementById("header").style.width = '100%'
+    } else {
+      document.querySelector(".icon-menu").style.display = 'none'
+    }
+
+
+    $(".icon-menu").click(function () {
+      $("#cate-modal").show()
+    })
+    $("#cate-modal").click(function () {
+      $("#cate-modal").hide()
+    })
+    console.log(IsPC())
   </script>
 
 
