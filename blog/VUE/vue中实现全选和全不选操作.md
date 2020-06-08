@@ -1,4 +1,4 @@
-```vue
+```html
 <div class="checkbox">
 	<label for="quan">
 		<!-- 这里的 $event 是将当前对象传入进去，具体详情请参照vue官方文档 -->

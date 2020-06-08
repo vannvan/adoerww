@@ -37,7 +37,7 @@ packages
 
 #### button.vue
 
-```vue
+```js
 <template>
   <button
     :disabled="disabled"

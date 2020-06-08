@@ -53,21 +53,18 @@
       let subItemStr = ''
       item.map(el => {
         let subItemName = el.split(".")[0]
-        subItemStr += `<li data-path="${el}">${subItemName}</li>`
+        subItemStr += `<li data-path="${el}" class="file-name-item">${subItemName}</li>`
       })
       return subItemStr
     }
-
-    $.get('README.md', function (response, status, xhr) {
-      $("#content").html(marked(response));
-      document.querySelectorAll('pre code').forEach((block) => {
-        hljs.highlightBlock(block);
-      });
-    });
+    //默认加载README
+    handleGetFile('README.md')
 
     function handleGetFile(fullPath) {
+      document.title = location.hash = fullPath
       $.get(fullPath, function (response, status, xhr) {
         $("#content").html(marked(response));
+        replaceLanguageVue()
         document.querySelectorAll('pre code').forEach((block) => {
           hljs.highlightBlock(block);
         });
@@ -75,16 +72,33 @@
     }
 
     let cateListNode = [...document.querySelectorAll(".cate")]
-    console.log(cateListNode)
     cateListNode.map(el => {
       el.addEventListener('click', function (e) {
+        resetActive()
+        e.target.setAttribute('class', 'active-name file-name-item')
         let catePath = this.dataset.name
         let filePath = e.target.dataset.path
         let fullPath = catePath + '/' + filePath
-        console.log(fullPath)
         handleGetFile(fullPath)
       })
     })
+
+    function resetActive() {
+      let fileNameItemNode = [...document.querySelectorAll(".file-name-item")]
+      fileNameItemNode.map(el => {
+        el.setAttribute('class', 'file-name-item')
+      })
+    }
+
+
+    //替换所有language-vue
+
+    function replaceLanguageVue() {
+      let fileNameItemNode = [...document.querySelectorAll(".language-vue")]
+      fileNameItemNode.map(el => {
+        el.setAttribute('class', 'language-html hljs')
+      })
+    }
   </script>
 
 

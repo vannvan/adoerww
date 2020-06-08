@@ -14,7 +14,7 @@
 ​	npm install vue-markdown --save
 vue文件代码如下：
 
-```vue
+```js
 <template>
     <div>
         <h1>document</h1>

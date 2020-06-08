@@ -14,8 +14,8 @@
 
 ### message.vue
 
-```vue
-<template lang="html">
+```js
+<template>
   <transition name="message-fade">
     <div class="wui__message" :class="[prefixCls + '--' + type]" v-if="visible">
       <i  :class="[prefixCls + '__icon' + '--' + type,iconType]"></i>  

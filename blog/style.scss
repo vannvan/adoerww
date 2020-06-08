@@ -34,6 +34,11 @@ body::-webkit-scrollbar {
         color: #999;
     }
 
+    .active-name {
+        background: #00B8C0;
+        color: #fff;
+    }
+
     ul {
         margin: 0;
         // padding: 0;
@@ -42,22 +47,24 @@ body::-webkit-scrollbar {
 
     li {
         list-style: none;
-        line-height: 30px;
+        line-height: 35px;
         font-size: 14px;
         cursor: pointer;
+        padding-left: 10px
     }
 
-    li:hover {
-        background: #ccc;
-    }
+    // li:hover {
+    //     background: #ccc;
+    // }
 
-    
+
 }
 
 #content {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
+
     img {
         max-width: 100%;
     }
@@ -78,7 +85,7 @@ body::-webkit-scrollbar {
 
 .scroll::-webkit-scrollbar {
     /*display: none*/
-    width: 2px;
+    width: 5px;
     /*高宽分别对应横竖滚动条的尺寸*/
     height: 1px;
     /* 隐藏滚动条，但依旧具备可以滚动的功能 */
@@ -91,4 +98,74 @@ code {
     span {
         line-height: 35px;
     }
+}
+
+table {
+    border: solid #ccc 1px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    border-collapse:collapse;
+    /*-webkit-box-shadow: 0 1px 1px #ccc;
+    -moz-box-shadow: 0 1px 1px #ccc;
+    box-shadow: 0 1px 1px #ccc;   */
+}
+
+table tr:hover {
+    background: #fbf8e9;
+    -o-transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+}
+
+table td,
+.table th {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #00B8C0;
+    border-top: none;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+    padding: 5px;
+}
+
+table td:first-child,
+table th:first-child {
+    border-left: none;
+}
+
+table th:first-child {
+    -moz-border-radius: 6px 0 0 0;
+    -webkit-border-radius: 6px 0 0 0;
+    border-radius: 6px 0 0 0;
+}
+
+table th:last-child {
+    -moz-border-radius: 0 6px 0 0;
+    -webkit-border-radius: 0 6px 0 0;
+    border-radius: 0 6px 0 0;
+}
+
+table th:only-child {
+    -moz-border-radius: 6px 6px 0 0;
+    -webkit-border-radius: 6px 6px 0 0;
+    border-radius: 6px 6px 0 0;
+}
+
+table tr:last-child td:first-child {
+    -moz-border-radius: 0 0 0 6px;
+    -webkit-border-radius: 0 0 0 6px;
+    border-radius: 0 0 0 6px;
+}
+
+table tr:last-child td:last-child {
+    -moz-border-radius: 0 0 6px 0;
+    -webkit-border-radius: 0 0 6px 0;
+    border-radius: 0 0 6px 0;
 }
