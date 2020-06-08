@@ -3,22 +3,91 @@
 
 <head>
   <meta charset="utf-8">
-  <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1"> -->
-  <!-- <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /> -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <!-- <meta name="referrer" content="no-referrer"/> -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <title>智能安防平台</title>
+  <title>vannvan</title>
+  <link rel="stylesheet" href="atom-one-dark-reasonable.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<div id="content">
+  <div id="containter">
+    <div id="nav" class="scroll">
+    </div>
+    <div id="content" class="scroll">
+    </div>
+  </div>
+  <script src="https://cdn.bootcdn.net/ajax/libs/marked/1.1.0/marked.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <script src="highlight.pack.js"></script>
+  <script src="filelist.js"></script>
+  <script>
+    var cateList = new Map()
+    //文件分类
+    async function buildCate(archives) {
+      archives.map(el => {
+        let cateName = el.split('/')[0]
+        let fileName = el.split('/')[1]
+        if (!cateList.has(cateName)) {
+          cateList.set(cateName, [].concat(fileName))
+        } else {
+          cateList.set(cateName, cateList.get(cateName).concat(fileName))
+        }
+      })
+      await renderList()
+    }
+    buildCate(archives)
+    //渲染列表
+    async function renderList() {
+      let itemStr = ''
+      cateList.forEach((item, key) => {
+        let subitem = getSubItemList(item)
+        itemStr += `<ul data-name="${key}" class="cate"><p class="cate-name">${key}</p>${subitem}</ul>`
+      })
+      document.getElementById("nav").innerHTML = itemStr
+    }
 
-</div>
-<script src="filelist.js">
-</script>
-<script>
-  console.log(archives)
-</script>
+    function getSubItemList(item) {
+      if (item.length < 1) return
+      let subItemStr = ''
+      item.map(el => {
+        let subItemName = el.split(".")[0]
+        subItemStr += `<li data-path="${el}">${subItemName}</li>`
+      })
+      return subItemStr
+    }
+
+    $.get('README.md', function (response, status, xhr) {
+      $("#content").html(marked(response));
+      document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+      });
+    });
+
+    function handleGetFile(fullPath) {
+      $.get(fullPath, function (response, status, xhr) {
+        $("#content").html(marked(response));
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+      });
+    }
+
+    let cateListNode = [...document.querySelectorAll(".cate")]
+    console.log(cateListNode)
+    cateListNode.map(el => {
+      el.addEventListener('click', function (e) {
+        let catePath = this.dataset.name
+        let filePath = e.target.dataset.path
+        let fullPath = catePath + '/' + filePath
+        console.log(fullPath)
+        handleGetFile(fullPath)
+      })
+    })
+  </script>
+
+
 </body>
 
 </html>
