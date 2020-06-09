@@ -33,19 +33,7 @@ body::-webkit-scrollbar {
     color: #fff;
 }
 
-ul {
-    margin: 0;
-    // padding: 0;
-    padding-left: 15px;
-}
 
-li {
-    list-style: none;
-    line-height: 35px;
-    font-size: 14px;
-    cursor: pointer;
-    padding-left: 10px
-}
 
 #cate-modal {
     width: 100%;
@@ -56,6 +44,18 @@ li {
     z-index: 999;
     background: #fff;
 
+    ul {
+        margin: 0;
+
+        ul {
+            margin: 0;
+            // padding: 0;
+            padding-left: 15px;
+        }
+
+        // padding: 0;
+        padding-left: 15px;
+    }
 
     li {
         list-style: none;
@@ -65,6 +65,13 @@ li {
         padding-left: 10px
     }
 
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        color: #00B8C0;
+        cursor: pointer;
+    }
 }
 
 #nav {
@@ -72,7 +79,19 @@ li {
     overflow-y: auto;
     background: #ededed;
 
+    ul {
+        margin: 0;
+        // padding: 0;
+        padding-left: 15px;
+    }
 
+    li {
+        list-style: none;
+        line-height: 35px;
+        font-size: 14px;
+        cursor: pointer;
+        padding-left: 10px
+    }
 
 }
 
@@ -93,6 +112,23 @@ li {
 
     img {
         max-width: 100%;
+    }
+
+    blockquote {
+        p {
+            position: relative;
+            color: #999;
+            font-weight: bolder;
+
+            &::before {
+                content: '';
+                position: absolute;
+                width: 3px;
+                height: 100%;
+                left: -10px;
+                background: #155E63;
+            }
+        }
     }
 }
 

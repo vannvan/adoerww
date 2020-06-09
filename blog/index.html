@@ -53,8 +53,10 @@
         let subitem = getSubItemList(item)
         itemStr += `<ul data-name="${key}" class="cate"><p class="cate-name">${key}</p>${subitem}</ul>`
       })
+      let closeNode = '<b class="close-btn">X</b>'
       document.getElementById("nav").innerHTML = itemStr
       document.getElementById("cate-modal").innerHTML = itemStr
+      $("#cate-modal").append(closeNode)
     }
 
     function getSubItemList(item) {
@@ -74,6 +76,7 @@
       $.get(fullPath, function (response, status, xhr) {
         $("#content").html(marked(response));
         replaceLanguageVue()
+        appendColorToCodeBlock()
         document.querySelectorAll('pre code').forEach((block) => {
           hljs.highlightBlock(block);
         });
@@ -110,6 +113,17 @@
       })
     }
 
+    //给所有code非代码块标签内的文字换颜色
+    function appendColorToCodeBlock() {
+      let codeBlockItemNode = [...document.querySelectorAll('code')]
+      codeBlockItemNode.map(el => {
+        if (!el.className) {
+          el.style.color = '#155E63'
+        }
+      })
+    }
+
+
     //判断设备
     function IsPC() {
       var userAgentInfo = navigator.userAgent;
@@ -137,7 +151,6 @@
     $("#cate-modal").click(function () {
       $("#cate-modal").hide()
     })
-    console.log(IsPC())
   </script>
 
 
