@@ -240,6 +240,10 @@ $(document).ready(function() {
             }, {
                 name: "无用的网站",
                 link: 'https://theuselessweb.com/'
+            },
+            {
+                name:"CSS渐变色",
+                link:"http://color.oulu.me/"
             }
 
         ]
