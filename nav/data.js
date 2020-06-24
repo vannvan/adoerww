@@ -120,6 +120,9 @@ $(document).ready(function() {
         }, {
             name: "腾讯云开发者文档",
             link: "https://cloud.tencent.com/developer/section/1490167"
+        }, {
+            name: 'md美化',
+            link: "https://mdnice.com/"
         }]
     }, {
         name: "框架文档",
@@ -240,10 +243,9 @@ $(document).ready(function() {
             }, {
                 name: "无用的网站",
                 link: 'https://theuselessweb.com/'
-            },
-            {
-                name:"CSS渐变色",
-                link:"http://color.oulu.me/"
+            }, {
+                name: "CSS渐变色",
+                link: "http://color.oulu.me/"
             }
 
         ]
