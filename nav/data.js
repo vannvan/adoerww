@@ -123,6 +123,9 @@ $(document).ready(function() {
         }, {
             name: 'md美化',
             link: "https://mdnice.com/"
+        },{
+            name:"前端开发者手册",
+            link:"https://dwqs.gitbooks.io/frontenddevhandbook/content/"
         }]
     }, {
         name: "框架文档",
