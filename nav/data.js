@@ -126,6 +126,10 @@ $(document).ready(function() {
         },{
             name:"前端开发者手册",
             link:"https://dwqs.gitbooks.io/frontenddevhandbook/content/"
+        },
+        {
+            name:"hexo博客模板",
+            link:"https://hexo.io/"
         }]
     }, {
         name: "框架文档",
