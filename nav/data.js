@@ -83,6 +83,10 @@ $(document).ready(function() {
         }, {
             name: "前端内参",
             link: "https://coffe1891.gitbook.io/frontend-hard-mode-interview/1/1.2.6"
+        },
+        {
+            name:"奇舞周刊-优秀好文章",
+            link:"https://weekly.75team.com/"
         }]
     }, {
         'name': '工具文档',
