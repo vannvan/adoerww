@@ -87,6 +87,10 @@ $(document).ready(function() {
         {
             name:"奇舞周刊-优秀好文章",
             link:"https://weekly.75team.com/"
+        },
+        {
+            name:"css-tricks(国外技术栈)",
+            link:'https://css-tricks.com/archives/'
         }]
     }, {
         'name': '工具文档',
