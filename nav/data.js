@@ -138,6 +138,10 @@ $(document).ready(function() {
         {
             name:"hexo博客模板",
             link:"https://hexo.io/"
+        },
+        {
+            name:"echarts实例",
+            link:"https://gallery.echartsjs.com/explore.html"
         }]
     }, {
         name: "框架文档",
