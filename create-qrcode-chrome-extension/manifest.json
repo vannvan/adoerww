@@ -1,0 +1,39 @@
+{
+	"manifest_version": 2,
+	"name": "插件",
+	"version": "1.0.0",
+	"description": "最简单的Chrome插件demo，需要快速做一个简单的插件时可以基于这个仓库开发",
+	"author": "vannvan",
+	"icons":
+	{
+		"48": "icon.png",
+		"128": "icon.png"
+	},
+	"browser_action": 
+	{
+		"default_icon": "icon.png",
+		"default_popup": "popup.html"
+	},
+	"permissions": [
+        "contextMenus", 
+        "tabs", 
+        "notifications", 
+        "webRequest", 
+        "webRequestBlocking",
+        "storage", 
+        "http://*/*", 
+        "https://*/*" 
+    ],
+	"content_scripts": 
+	[
+		{
+			"matches": ["<all_urls>"],
+			"js": ["content-script.js"],
+			"run_at": "document_start"
+		}
+	],
+	"web_accessible_resources": 
+	[
+		"inject.js"
+	]
+}
