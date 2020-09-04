@@ -47,7 +47,18 @@ $("#submit-btn").click(function() {
     sendMessageToContentScript('你好，我是popup！', (response) => {
         if (response) alert('收到来自content-script的回复：' + JSON.stringify(response));
     });
+
+    // 显示桌面通知
+    // chrome.notifications.create(null, {
+    //     type: 'image',
+    //     iconUrl: './icon.png',
+    //     title: '祝福',
+    //     message: '骚年，祝你圣诞快乐！Merry christmas!',
+    //     imageUrl: './icon.png'
+    // });
+    // chrome.tabs.executeScript(null, { code: "document.body.bgColor='red'" });  //手动触发执行代码
 })
+
 
 //input获取焦点
 $("#text").focus(function() {

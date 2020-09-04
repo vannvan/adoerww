@@ -1,4 +1,4 @@
-function SpyOn() {
+(function SpyOn() {
 
     const _id = 'spyon-container',
         _posBuffer = 3;
@@ -90,10 +90,4 @@ function SpyOn() {
 
     init();
 
-}
-
-
-$("#view_dom_attr").click(function() {
-    console.log('aaa');
-    SpyOn()
-})
+})()

@@ -5,15 +5,25 @@ document.getElementById('get_all_images').addEventListener('click', function() {
         $('.content').empty()
         imgList.map((el, index) => {
             $('#status').text('已渲染：' + (index + 1) + '/' + imgList.length);
-            $('.content').append(`<img src="${el.url}" alt="Question">`);
+
+            $('.content').append(`<div class="img-wrap"><img src="${el.url}"><span class="delete"></span></div>`);
         });
         $('#status').text('已完成')
     });
 });
 
+
+//删除
+$(".content").on("click", ".delete", function() {
+    $(this).parent().remove()
+})
+
 function validateImage(imgPath) {
     const imgExtens = ['.png', '.gif', '.jpg']
-    return imgExtens.includes(imgPath.substring(imgPath.lastIndexOf("."))) || /data/.test(imgPath)
+    let ImgObj = new Image();
+    ImgObj.src = imgPath;
+    let condition = ImgObj.fileSize > 0 || ImgObj.width > 0 && ImgObj.height > 0
+    return imgExtens.includes(imgPath.substring(imgPath.lastIndexOf("."))) && condition
 }
 
 $('#download_all_images').click(function() {
@@ -50,14 +60,13 @@ function packageImages() {
 
     function tt() {
         setTimeout(function() {
-            console.log(imgBase64.length);
             if (imgs.length == imgBase64.length) {
                 for (var i = 0; i < imgs.length; i++) {
                     img.file(i + imageSuffix[i], imgBase64[i], { base64: true });
                 }
                 // console.log(img);
                 zip.generateAsync({ type: "blob" }).then(function(content) {
-                    saveAs(content, "images.zip");
+                    saveAs(content, 'images.zip');
                 });
                 $('#status').text('处理完成。。。。。');
 
@@ -94,3 +103,8 @@ function getBase64(img) {
         return deferred.promise(); //问题要让onload完成后再return sessionStorage['imgTest']
     }
 }
+
+
+$("#view_dom_attr").click(() => {
+    chrome.tabs.executeScript(null, { file: "./js/spyon.js" }); //手动触发引入脚本
+})

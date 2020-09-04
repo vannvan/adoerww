@@ -25,8 +25,8 @@
     ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
-        "js": ["content-script.js"],
-        "run_at": "document_start"
+        "js": ["./js/content-script.js"],
+        "run_at": "document_end"
     }],
     "background": {
         "page": "background.html"
