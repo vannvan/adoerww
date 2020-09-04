@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .content img {
+        width: 100px;
+        height: 100px
+    }
+
+    .loading {
+        display: none;
+    }
+</style>
+
+<body>
+    <p id="status"></p>
+    <button id="get_all_images">获取图片资源</button>
+    <button id="download_all_images">下载图片资源</button>
+    <div class="content"></div>
+    <script src="./jquery.min.js"></script>
+    <script src="./js/file-saver.min.js"></script>
+    <script src="./js/jszip.js"></script>
+    <script type="text/javascript" src="./js/devtool-get-img.js"></script>
+</body>
+
+</html>

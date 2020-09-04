@@ -1,78 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8"/>
-	<title>popup</title>
+    <meta charset="utf-8" />
+    <title>popup</title>
+    <link rel="stylesheet" href="./css/popup.min.css">
 </head>
-<style>
-	.wrap{
-		width: 90%;
-		margin:auto;
-		height: auto;
-		padding: 20px 
-	}
-	.input-wrap{
-		height: 45px;
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 15px;
-	}
-	.input-wrap input {
-		width: 80%;
-		height: 35px;
-		border:1px solid #ccc;
-		position: relative;
-	}
-	.error-area{
-		position: absolute;
-		left:50px;
-		color:tomato;
-		display: none;
-	}
-	#submit-btn {
-		width: 20%;
-		height: 38px;
-		display: block;
-		cursor: pointer;
-		line-height: 38px;
-		color: #fff;
-		text-align: center;
-		background: lightseagreen;
-		user-select: none;
-	}
-	input,button,select,textarea{outline:none}
-	#qrcode{
-		width:160px;
-		height:160px;
-		margin:0 auto
-	}
-	#save-btn{
-		height: 35px;
-		width: 160px;
-		margin:20px auto;
-		line-height: 35px;
-		text-align: center;
-		color: #fff;
-		cursor: pointer;
-		background: lightseagreen;
-		user-select: none;
-	}
-</style>
+
 <body style="width:400px;height: auto;">
-	<div class="wrap">
-		<div class="input-wrap">
-			<input type="text" id="text">
-			<span id="submit-btn">生成二维码</span>
-			<p class="error-area">请输入有效连接</p>
-		</div>
-		<div id="qrcode"></div>
-		<div id="save-btn">
-			保存二维码
-		</div>
-	</div>
-	<script type="text/javascript" src="./qrcode.min.js"></script>
-	<script type="text/javascript" src="./jquery.min.js"></script>
-	<script type="text/javascript" src="./popup.js"></script>
+    <div class="wrap">
+        <div class="input-wrap">
+            <input type="text" id="text">
+            <span id="submit-btn">生成二维码</span>
+            <p class="error-area">请输入有效连接</p>
+        </div>
+        <div id="qrcode"></div>
+        <div id="save-btn">
+            保存二维码
+        </div>
+    </div>
+    <script type="text/javascript" src="./qrcode.min.js"></script>
+    <script type="text/javascript" src="./jquery.min.js"></script>
+    <script type="text/javascript" src="./popup.js"></script>
 </body>
+
 </html>

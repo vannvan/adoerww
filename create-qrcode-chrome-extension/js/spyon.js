@@ -1,20 +1,3 @@
-﻿(function() {
-    console.log('content-script！');
-})();
-
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        console.log(request, '来自popup的消息');
-        console.log(sender.tab ?
-            "from a content script:" + sender.tab.url :
-            "from the extension");
-        SpyOn()
-        sendResponse({ farewell: "goodbye" });
-    });
-
-
-
 function SpyOn() {
 
     const _id = 'spyon-container',
@@ -87,24 +70,30 @@ function SpyOn() {
         const div = document.createElement('div');
         div.id = _id;
         div.setAttribute('style', `
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: auto;
-            height: auto;
-            padding: 10px;
-            box-sizing: border-box;
-            color: #fff;
-            background-color: #444;
-            z-index: 100000;
-            font-size: 12px;
-            border-radius: 5px;
-            line-height: 20px;
-            max-width: 45%;
-            `);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: auto;
+        height: auto;
+        padding: 10px;
+        box-sizing: border-box;
+        color: #fff;
+        background-color: #444;
+        z-index: 100000;
+        font-size: 12px;
+        border-radius: 5px;
+        line-height: 20px;
+        max-width: 45%;
+        `);
         document.body.appendChild(div);
     }
 
     init();
 
 }
+
+
+$("#view_dom_attr").click(function() {
+    console.log('aaa');
+    SpyOn()
+})
