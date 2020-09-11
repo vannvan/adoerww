@@ -20,6 +20,11 @@ document.onkeydown=function(event){
        var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
        window.open(str);
       }
+      if(event.altKey && event.keyCode == 13) {
+         word=document.getElementById("search1").value; 
+       var str ="http://dict.youdao.com/w/"+word; //超链接的地址和参数
+       window.open(str);
+      }
 }; 
 </script>
 <body>
@@ -42,7 +47,7 @@ document.onkeydown=function(event){
      <div class="right-content">
         <div class="search">
           <form id="bdfm" target="_blank" method="get" action="https://www.baidu.com/s">
-                  <input type="text" id="search1" name="word" autofocus/>              
+                  <input type="text" id="search1" name="word" autofocus placeholder="回车百度搜索 | Ctrl+Enter百度翻译 | Alt+Enter有道翻译" />              
                   <input type="button" id="search2" value="Search"/>
           </form> 
         </div>
@@ -51,7 +56,7 @@ document.onkeydown=function(event){
   </div>
 </div>
 <canvas id="canvas" width="1950px" height="800px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
-    <canvas id="canvasbg" width="1950px" height="800px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
+<canvas id="canvasbg" width="1950px" height="800px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
 <!-- <canvas height='100%' width='100%' style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas> -->
 <!-- <footer>©vannvan&nbsp;.&nbsp;It’s better to be alone than to be with someone you’re not happy to be with.</footer> -->
 <script type="text/javascript" src="data.js"></script>
