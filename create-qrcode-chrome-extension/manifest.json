@@ -25,15 +25,14 @@
     ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
-        "js": ["./js/content-script.js"],
+        "js": ["./js/content-script.js", "./js/baidu-style.js"],
+        "css": ["./css/content-style.css"],
         "run_at": "document_end"
     }],
     "background": {
         "page": "background.html"
     },
-    "web_accessible_resources": [
-        "inject.js"
-    ],
+    "web_accessible_resources": ["inject.js"],
 
     "devtools_page": "devtools.html"
 }
