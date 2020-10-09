@@ -83,14 +83,12 @@ $(document).ready(function() {
         }, {
             name: "前端内参",
             link: "https://coffe1891.gitbook.io/frontend-hard-mode-interview/1/1.2.6"
-        },
-        {
-            name:"奇舞周刊-优秀好文章",
-            link:"https://weekly.75team.com/"
-        },
-        {
-            name:"css-tricks(国外技术栈)",
-            link:'https://css-tricks.com/archives/'
+        }, {
+            name: "奇舞周刊-优秀好文章",
+            link: "https://weekly.75team.com/"
+        }, {
+            name: "css-tricks(国外技术栈)",
+            link: 'https://css-tricks.com/archives/'
         }]
     }, {
         'name': '工具文档',
@@ -131,17 +129,15 @@ $(document).ready(function() {
         }, {
             name: 'md美化',
             link: "https://mdnice.com/"
-        },{
-            name:"前端开发者手册",
-            link:"https://dwqs.gitbooks.io/frontenddevhandbook/content/"
-        },
-        {
-            name:"hexo博客模板",
-            link:"https://hexo.io/"
-        },
-        {
-            name:"echarts实例",
-            link:"https://gallery.echartsjs.com/explore.html"
+        }, {
+            name: "前端开发者手册",
+            link: "https://dwqs.gitbooks.io/frontenddevhandbook/content/"
+        }, {
+            name: "hexo博客模板",
+            link: "https://hexo.io/"
+        }, {
+            name: "echarts实例",
+            link: "https://gallery.echartsjs.com/explore.html"
         }]
     }, {
         name: "框架文档",
@@ -310,10 +306,9 @@ $(document).ready(function() {
         }, {
             name: "天行数据",
             link: "https://www.tianapi.com/"
-        },
-        {
-            name:'在线生成字符图案',
-            link:'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
+        }, {
+            name: '在线生成字符图案',
+            link: 'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
         }]
     }, {
         'name': '世间百态',
