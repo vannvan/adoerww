@@ -309,6 +309,9 @@ $(document).ready(function() {
         }, {
             name: '在线生成字符图案',
             link: 'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
+        }, {
+            name: Ï "壁纸",
+            link: "https://wallhere.com/"
         }]
     }, {
         'name': '世间百态',
