@@ -138,6 +138,10 @@ $(document).ready(function() {
         }, {
             name: "echarts实例",
             link: "https://gallery.echartsjs.com/explore.html"
+        },
+        {
+            name:"动画插件",
+            link:"https://www.tweenmax.com.cn/"
         }]
     }, {
         name: "框架文档",
