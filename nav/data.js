@@ -183,7 +183,11 @@ $(document).ready(function() {
     }, {
         'name': '码农工具',
         'icon': 'icon-ai-tool',
-        'linkList': [{
+        'linkList': [
+        {
+            name:"虫洞栈",
+            link:"http://book.bugstack.cn/"
+        },{
             name: "Unicode字符百科",
             link: 'https://unicode-table.com/cn/'
         }, {
