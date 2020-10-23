@@ -1,56 +1,61 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <link rel="stylesheet" href="//at.alicdn.com/t/font_1413143_basptk773d.css">
-    <link rel="stylesheet" href="index.css">
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="index.min.css">
+    <link rel="shortcut icon" href="./favicon.ico">
     <title>JUST DO　IT．．．</title>
     <style>
     </style>
-  </head>
-  <script type="text/javascript">
-  document.onkeydown=function(event){
-  if (event.ctrlKey && event.keyCode == 13) {
-  word=document.getElementById("search1").value;
-  var str ="https://fanyi.baidu.com/#zh/en/"+word; //超链接的地址和参数
-  window.open(str);
-  }
-  if(event.altKey && event.keyCode == 13) {
-  word=document.getElementById("search1").value;
-  var str ="http://dict.youdao.com/w/"+word; //超链接的地址和参数
-  window.open(str);
-  }
-  };
-  </script>
-  <body>
+</head>
+<script type="text/javascript">
+    document.onkeydown = function(event) {
+        let inputValue = document.getElementById("input").value;
+        let baiduWord = 'https://www.baidu.com/s?wd='
+        let baiduTranslate = 'https://fanyi.baidu.com/#zh/en/'
+        let youdaoTranslate = 'http://dict.youdao.com/w/'
+        if (event.ctrlKey && event.keyCode == 13) {
+            window.open(baiduTranslate + inputValue);
+            return
+        }
+        if (event.altKey && event.keyCode == 13) {
+            window.open(youdaoTranslate + inputValue);
+            return
+        }
+        if (event.keyCode == 13) {
+            window.open(baiduWord + inputValue)
+        }
+    };
+</script>
+
+<body>
     <div class="content">
-      <a href="https://github.com/vannvan/adoerww/tree/gh-pages" target="view_window"><i class="iconfont icon-github"></i></a>
-      <div class="nav-content">
-        <div class="left-nav">
-          <div class="logo">
-            <div class="tracking-in-expand" style="font-size: 32px;font-weight: bold">
-              Evething is nothing
+        <a href="https://github.com/vannvan/adoerww/tree/gh-pages" target="view_window"><i class="iconfont icon-github"></i></a>
+        <div class="nav-content">
+            <div class="left-nav">
+                <div class="logo">
+                    <div class="tracking-in-expand" style="font-size: 32px;font-weight: bold">
+                        Evething is nothing
+                    </div>
+                    <!-- <img src="https://vannvan.github.io/adoerww/images/index_logo.png"> -->
+                </div>
+                <div class="link-box"></div>
+                <div class="left-foot">
+                    <p id="included"></p>
+                    ©vannvan&nbsp;.&nbsp;It’s better to be alone than to be with someone you’re not happy to be with.
+                </div>
             </div>
-            <!-- <img src="https://vannvan.github.io/adoerww/images/index_logo.png"> -->
-          </div>
-          <div class="link-box"></div>
-          <div class="left-foot">
-            <p id="included"></p>
-            ©vannvan&nbsp;.&nbsp;It’s better to be alone than to be with someone you’re not happy to be with.
-          </div>
+            <div class="right-content">
+                <div class="search">
+                    <input type="text" id="input" name="word" autofocus placeholder="回车百度搜索 | Ctrl+Enter百度翻译 | Alt+Enter有道翻译" />
+                    <input type="button" id="search-btn" value="Search" />
+                </div>
+                <div class="website"></div>
+            </div>
         </div>
-        <div class="right-content">
-          <div class="search">
-            <form id="bdfm" target="_blank" method="get" action="https://www.baidu.com/s">
-              <input type="text" id="search1" name="word" autofocus placeholder="回车百度搜索 | Ctrl+Enter百度翻译 | Alt+Enter有道翻译" />
-              <input type="button" id="search2" value="Search"/>
-            </form>
-          </div>
-          <div class="website"></div>
-        </div>
-      </div>
     </div>
     <canvas id="canvas" width="1950px" height="1080px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
     <canvas id="canvasbg" width="1950px" height="1080px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
@@ -58,5 +63,6 @@
     <!-- <footer>©vannvan&nbsp;.&nbsp;It’s better to be alone than to be with someone you’re not happy to be with.</footer> -->
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="canvas1.js"></script>
-  </body>
+</body>
+
 </html>
