@@ -94,55 +94,59 @@ $(document).ready(function() {
         'name': '工具文档',
         'icon': 'icon-shiyongshouce',
         'linkList': [{
-            name: 'Moment',
-            link: 'http://momentjs.cn/docs/#/parsing/string-format/'
-        }, {
-            name: 'Gulp',
-            link: 'https://www.w3cschool.cn/qtaitm/1cvdkozt.html'
-        }, {
-            name: "Webpack",
-            link: 'https://www.webpackjs.com/concepts/'
-        }, {
-            name: 'ES6文档',
-            link: 'http://es6.ruanyifeng.com/#docs/intro'
-        }, {
-            name: 'jquery中文',
-            link: 'http://jquery.cuishifeng.cn/'
-        }, {
-            name: 'Archives',
-            link: 'https://github.com/vannvan/archives'
-        }, {
-            name: "css手册",
-            link: "http://css.cuishifeng.cn/"
-        }, {
-            name: 'C3.JS图表',
-            link: "https://c3js.org/"
-        }, {
-            name: "umi方案",
-            link: "https://umijs.org/zh/guide/"
-        }, {
-            name: "ZEIT静态网站",
-            link: "https://zeit.co/dashboard"
-        }, {
-            name: "腾讯云开发者文档",
-            link: "https://cloud.tencent.com/developer/section/1490167"
-        }, {
-            name: 'md美化',
-            link: "https://mdnice.com/"
-        }, {
-            name: "前端开发者手册",
-            link: "https://dwqs.gitbooks.io/frontenddevhandbook/content/"
-        }, {
-            name: "hexo博客模板",
-            link: "https://hexo.io/"
-        }, {
-            name: "echarts实例",
-            link: "https://gallery.echartsjs.com/explore.html"
-        },
-        {
-            name:"动画插件",
-            link:"https://www.tweenmax.com.cn/"
-        }]
+                name: "parcel",
+                link: "https://zh.parceljs.org/getting_started.html"
+            }, {
+                name: 'Moment',
+                link: 'http://momentjs.cn/docs/#/parsing/string-format/'
+            }, {
+                name: 'Gulp',
+                link: 'https://www.w3cschool.cn/qtaitm/1cvdkozt.html'
+            }, {
+                name: "Webpack",
+                link: 'https://www.webpackjs.com/concepts/'
+            }, {
+                name: 'ES6文档',
+                link: 'http://es6.ruanyifeng.com/#docs/intro'
+            }, {
+                name: 'jquery中文',
+                link: 'http://jquery.cuishifeng.cn/'
+            }, {
+                name: 'Archives',
+                link: 'https://github.com/vannvan/archives'
+            }, {
+                name: "css手册",
+                link: "http://css.cuishifeng.cn/"
+            }, {
+                name: 'C3.JS图表',
+                link: "https://c3js.org/"
+            }, {
+                name: "umi方案",
+                link: "https://umijs.org/zh/guide/"
+            }, {
+                name: "ZEIT静态网站",
+                link: "https://zeit.co/dashboard"
+            }, {
+                name: "腾讯云开发者文档",
+                link: "https://cloud.tencent.com/developer/section/1490167"
+            }, {
+                name: 'md美化',
+                link: "https://mdnice.com/"
+            }, {
+                name: "前端开发者手册",
+                link: "https://dwqs.gitbooks.io/frontenddevhandbook/content/"
+            }, {
+                name: "hexo博客模板",
+                link: "https://hexo.io/"
+            }, {
+                name: "echarts实例",
+                link: "https://gallery.echartsjs.com/explore.html"
+            },
+            {
+                name: "动画插件",
+                link: "https://www.tweenmax.com.cn/"
+            }
+        ]
     }, {
         name: "框架文档",
         icon: "icon-bangzhushouce",
@@ -183,11 +187,10 @@ $(document).ready(function() {
     }, {
         'name': '码农工具',
         'icon': 'icon-ai-tool',
-        'linkList': [
-        {
-            name:"虫洞栈",
-            link:"http://book.bugstack.cn/"
-        },{
+        'linkList': [{
+            name: "虫洞栈",
+            link: "http://book.bugstack.cn/"
+        }, {
             name: "Unicode字符百科",
             link: 'https://unicode-table.com/cn/'
         }, {
