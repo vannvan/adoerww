@@ -1,17 +1,8 @@
 //改变百度的样式
 (function() {
-    if (document.location.href == 'https://www.baidu.com/') {
-        // var div = document.createElement('div');
-        // const htmlStr = `<canvas id="canvas" width="1950px" height="800px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
-        // <canvas id="canvasbg" width="1950px" height="800px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>`
-
-        // div.innerHTML = htmlStr;
-        // document.body.appendChild(div)
-        // document.body.style.cssText = 'overflow:hidden;background:#000'
-        // document.getElementById("s_top_wrap").style.cssText = 'display:none'
-        // // document.getElementById("head_wrapper").style.cssText = 'display:none'
-        // document.getElementById("bottom_layer").style.cssText = 'display:none'
-        // drawBg()
+    //屏蔽掘金扩展广告
+    if (/juejin/.test(document.location.host)) {
+        document.querySelector(".recommend-box").style.display = 'none'
     }
 })();
 
