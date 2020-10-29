@@ -2,7 +2,9 @@
 (function() {
     //屏蔽掘金扩展广告
     if (/juejin/.test(document.location.host)) {
-        document.querySelector(".recommend-box").style.display = 'none'
+        if (document.querySelector(".recommend-box")) {
+            document.querySelector(".recommend-box").style.display = 'none'
+        }
     }
 })();
 
