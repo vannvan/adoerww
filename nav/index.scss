@@ -12,7 +12,7 @@
 }
 
 body {
-    background: #000;
+    background: #fff;
     margin: 0;
 }
 
@@ -192,6 +192,9 @@ body::-webkit-scrollbar {
                         transition: 800ms;
                         overflow: hidden;
                     }
+                    .link-item{
+                        background: #242424 !important;
+                    }
 
                     .link {
 
@@ -212,6 +215,7 @@ body::-webkit-scrollbar {
                             width: 0;
                             background: #09C;
                             transition: 400ms ease all;
+                            color: #f00;
                         }
 
                         &:after {
