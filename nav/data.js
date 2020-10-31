@@ -20,6 +20,62 @@ var onVisibilityChange = function() {
 }
 document.addEventListener(visibilityChangeEvent, onVisibilityChange)
 $(document).ready(function() {
+    let currentHour = new Date().getHours()
+    let theme = currentHour < 19 ? 'light' : 'dark'
+    const HOVER_CLASS = [
+        'hvr-sweep-to-right',
+        'hvr-sweep-to-left',
+        'hvr-sweep-to-bottom',
+        'hvr-sweep-to-bottom',
+        'hvr-bounce-to-right',
+        'hvr-bounce-to-left',
+        'hvr-bounce-to-bottom',
+        'hvr-bounce-to-top',
+        'hvr-radial-out',
+        'hvr-rectangle-out',
+        'hvr-shutter-out-vertical'
+    ];
+
+    const THEME_COLOR = {
+        light: {
+            body: '#e7eff4',
+            fontColor: "#31c193",
+            linkFontColor: "#000",
+            listBgColor: '#fff',
+            leftBarBgColor: "#fff",
+            rightTitleBgColor: '#fff',
+            rightLinkItemBgColor: "#fff"
+        },
+        dark: {
+            body: "#000",
+            fontColor: "#fff",
+            listBgColor: "#000",
+            linkFontColor: "#FFFFE0",
+            leftBarBgColor: "#242424",
+            rightTitleBgColor: '#242424',
+            rightLinkItemBgColor: "#242424"
+        }
+    }
+
+
+    function initTheme(theme) {
+        $('body').css('background', THEME_COLOR[theme].body)
+        $(".left-nav").css({
+            background: THEME_COLOR[theme].leftBarBgColor,
+            color: THEME_COLOR[theme].fontColor
+        }) //左侧栏
+        $(".title").css({
+            background: THEME_COLOR[theme].rightTitleBgColor,
+            color: THEME_COLOR[theme].fontColor
+        }) //右侧导航标题
+        $(".link-item").css({
+            background: THEME_COLOR[theme].rightTitleBgColor,
+            color: THEME_COLOR[theme].linkFontColor
+        })
+        $(".iconfont").css('color', THEME_COLOR[theme].fontColor)
+    }
+
+
     const WEBSITE = [{
         'name': '社区博客',
         'icon': 'icon-bokexinwen',
@@ -355,19 +411,7 @@ $(document).ready(function() {
         }]
     }];
 
-    const HOVER_CLASS = [
-        'hvr-sweep-to-right',
-        'hvr-sweep-to-left',
-        'hvr-sweep-to-bottom',
-        'hvr-sweep-to-bottom',
-        'hvr-bounce-to-right',
-        'hvr-bounce-to-left',
-        'hvr-bounce-to-bottom',
-        'hvr-bounce-to-top',
-        'hvr-radial-out',
-        'hvr-rectangle-out',
-        'hvr-shutter-out-vertical'
-    ];
+
 
     (function() {
         let elStr = ''
@@ -390,7 +434,7 @@ $(document).ready(function() {
         var htmlStr = `<div class="title">${elName}</div>`
         $.each(dataList, (index) => {
             let className = HOVER_CLASS[Math.floor((Math.random() * HOVER_CLASS.length))] //随机
-            htmlStr += `<li class="link-item ${className}" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:#FFFFE0'>${dataList[index].name}</a></li>`
+            htmlStr += `<li class="link-item ${className}" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window">${dataList[index].name}</a></li>`
         })
         if (dataList.length % 5 != 0) {
             for (let i = 0; i < Math.abs(dataList.length % 5 - 5); i++) {
@@ -410,6 +454,12 @@ $(document).ready(function() {
         let htmlStr = '已收录' + count + '个'
         $("#included").append(htmlStr)
     })();
+
+    initTheme(theme)
+    $('.icon-mingan').click(function() {
+        theme = theme == 'dark' ? 'light' : 'dark'
+        initTheme(theme)
+    })
 
     function RandomColor() {
         let r, g, b;
