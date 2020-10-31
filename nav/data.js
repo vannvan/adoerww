@@ -59,7 +59,7 @@ $(document).ready(function() {
 
 
     function initTheme(theme) {
-        $('body').css('background', THEME_COLOR[theme].body)
+        $('body').css({ 'background': THEME_COLOR[theme].body })
         $(".left-nav").css({
             background: THEME_COLOR[theme].leftBarBgColor,
             color: THEME_COLOR[theme].fontColor
@@ -71,6 +71,9 @@ $(document).ready(function() {
         $(".link-item").css({
             background: THEME_COLOR[theme].rightTitleBgColor,
             color: THEME_COLOR[theme].linkFontColor
+        })
+        $("#input").css({
+            color: THEME_COLOR[theme].fontColor
         })
         $(".iconfont").css('color', THEME_COLOR[theme].fontColor)
     }
