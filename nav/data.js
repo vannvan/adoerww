@@ -44,7 +44,7 @@ $(document).ready(function() {
             listBgColor: '#fff',
             leftBarBgColor: "#fff",
             rightTitleBgColor: '#fff',
-            rightLinkItemBgColor: "#fff"
+            rightLinkItemBgColor: "rgba(255,255,255,0.8)"
         },
         dark: {
             body: "#000",
@@ -53,7 +53,7 @@ $(document).ready(function() {
             linkFontColor: "#FFFFE0",
             leftBarBgColor: "#242424",
             rightTitleBgColor: '#242424',
-            rightLinkItemBgColor: "#242424"
+            rightLinkItemBgColor: "rgba(36,36,36,0.8)"
         }
     }
 
@@ -65,11 +65,11 @@ $(document).ready(function() {
             color: THEME_COLOR[theme].fontColor
         }) //左侧栏
         $(".title").css({
-            background: THEME_COLOR[theme].rightTitleBgColor,
+            background: THEME_COLOR[theme].rightLinkItemBgColor,
             color: THEME_COLOR[theme].fontColor
         }) //右侧导航标题
         $(".link-item").css({
-            background: THEME_COLOR[theme].rightTitleBgColor,
+            background: THEME_COLOR[theme].rightLinkItemBgColor,
             color: THEME_COLOR[theme].linkFontColor
         })
         $("#input").css({
