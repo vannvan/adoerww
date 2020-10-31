@@ -100,6 +100,7 @@ body::-webkit-scrollbar {
             width: 260px;
             background: #242424;
             height: 100vh;
+            opacity: .4;
             display: table-cell;
             position: fixed;
 
@@ -129,9 +130,10 @@ body::-webkit-scrollbar {
 
             .left-foot {
                 position: absolute;
-                bottom: 20px;
+                bottom: 12px;
                 text-align: center;
                 font-size: small;
+                width: 100%;
             }
         }
 

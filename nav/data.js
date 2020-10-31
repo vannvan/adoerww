@@ -21,7 +21,7 @@ var onVisibilityChange = function() {
 document.addEventListener(visibilityChangeEvent, onVisibilityChange)
 $(document).ready(function() {
     let currentHour = new Date().getHours()
-    let theme = currentHour < 19 ? 'light' : 'dark'
+    let theme = currentHour < 19 ? "light" : "dark"
     const HOVER_CLASS = [
         'hvr-sweep-to-right',
         'hvr-sweep-to-left',
@@ -442,6 +442,9 @@ $(document).ready(function() {
             htmlStr += `<li onClick="window.location.href='#${WEBSITE[index].name}'"><i class="iconfont ${WEBSITE[index].icon}"></i><a>${WEBSITE[index].name}</li>`
         })
         $('.link-box').append(htmlStr)
+        $('.left-nav').animate({
+            opacity: 1
+        }, 'slow');
     })()
 
     function buildList(elName, dataList) {
@@ -456,6 +459,11 @@ $(document).ready(function() {
             }
         }
         $("#" + elName).append(htmlStr)
+        $("#" + elName).animate({
+            width: '100%',
+            height: '+=100%',
+            opacity: 1
+        }, 'slow');
     }
     (function() {
         let count = 0
