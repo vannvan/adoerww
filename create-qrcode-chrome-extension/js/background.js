@@ -6,3 +6,30 @@ chrome.contextMenus.create({
         chrome.tabs.create({ url: 'https://fanyi.baidu.com/#zh/en/' + encodeURI(params.selectionText) });
     }
 });
+
+
+
+
+
+var MAIN = {
+    FirstRun: {
+        open: function(url, callback) {
+            chrome.tabs.create({
+                url: url
+            }, callback && afterTabLoaded(callback));
+        },
+        finishInitialization: function() {
+            MAIN.FirstRun.open(chrome.extension.getURL("index.html"));
+        }
+    }
+}
+
+
+
+chrome.contextMenus.create({
+    title: '打开扩展页',
+    onclick: function(params) {
+        // 注意不能使用location.href，因为location是属于background的window对象
+        MAIN.FirstRun.finishInitialization();
+    }
+});
