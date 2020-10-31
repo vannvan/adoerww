@@ -445,6 +445,9 @@ $(document).ready(function() {
         $('.left-nav').animate({
             opacity: 1
         }, 'slow');
+        $('.logo img').animate({
+            height: '60px'
+        })
     })()
 
     function buildList(elName, dataList) {
@@ -459,6 +462,9 @@ $(document).ready(function() {
             }
         }
         $("#" + elName).append(htmlStr)
+        $('.search').animate({
+            opacity: 1
+        })
         $("#" + elName).animate({
             width: '100%',
             height: '+=100%',
