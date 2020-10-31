@@ -351,6 +351,20 @@ $(document).ready(function() {
         }]
     }];
 
+    const HOVER_CLASS = [
+        'hvr-sweep-to-right',
+        'hvr-sweep-to-left',
+        'hvr-sweep-to-bottom',
+        'hvr-sweep-to-bottom',
+        'hvr-bounce-to-right',
+        'hvr-bounce-to-left',
+        'hvr-bounce-to-bottom',
+        'hvr-bounce-to-top',
+        'hvr-radial-out',
+        'hvr-rectangle-out',
+        'hvr-shutter-out-vertical'
+    ];
+
     (function() {
         let elStr = ''
         $.each(WEBSITE, (index) => {
@@ -371,7 +385,8 @@ $(document).ready(function() {
     function buildList(elName, dataList) {
         var htmlStr = `<div class="title">${elName}</div>`
         $.each(dataList, (index) => {
-            htmlStr += `<li class="link" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:#FFFFE0'>${dataList[index].name}</a></li>`
+            let className = HOVER_CLASS[Math.floor((Math.random() * HOVER_CLASS.length))] //随机
+            htmlStr += `<li class="link-item ${className}" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window" style='color:#FFFFE0'>${dataList[index].name}</a></li>`
         })
         if (dataList.length % 5 != 0) {
             for (let i = 0; i < Math.abs(dataList.length % 5 - 5); i++) {
