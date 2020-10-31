@@ -59,6 +59,7 @@ body::-webkit-scrollbar {
     right: 10px;
     font-size: 46px;
     cursor: pointer;
+    transition-duration: .5s;
 }
 
 @-webkit-keyframes rotate {

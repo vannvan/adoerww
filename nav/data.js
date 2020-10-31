@@ -75,344 +75,355 @@ $(document).ready(function() {
         $("#input").css({
             color: THEME_COLOR[theme].fontColor
         })
-        $(".iconfont").css('color', THEME_COLOR[theme].fontColor)
+        let iconStyle = { 'color': THEME_COLOR[theme].fontColor }
+        $(".iconfont").css(Object.assign(iconStyle, theme == 'dark' ? transform(0) : transform(90)))
     }
 
+    function transform(rotate) {
+        return { 'transform': `rotate(${rotate}deg)` }
+    }
 
     const WEBSITE = [{
-        'name': '社区博客',
-        'icon': 'icon-bokexinwen',
-        'linkList': [{
-            name: "Github",
-            link: "https://github.com/"
-        }, {
-            name: "Gitee",
-            link: "https://gitee.com/wwya"
-        }, {
-            name: "Oschina",
-            link: 'https://www.oschina.net/'
-        }, {
-            name: 'segmentfault',
-            link: 'https://segmentfault.com/'
-        }, {
-            name: '脚本之家',
-            link: 'http://www.jb51.net/'
-        }, {
-            name: '掘金',
-            link: 'https://juejin.im/timeline'
-        }, {
-            name: 'codepen',
-            link: 'http://codepen.io/'
-        }, {
-            name: '前端精选',
-            link: 'http://top.html.cn/'
-        }, {
-            name: '博客园',
-            link: 'https://www.cnblogs.com/'
-        }, {
-            name: '国外某大神',
-            link: "https://dmitripavlutin.com/"
-        }, {
-            name: '张鑫旭',
-            link: 'https://www.zhangxinxu.com'
-        }, {
-            name: 'W3cplus',
-            link: 'https://www.w3cplus.com/'
-        }, {
-            name: "程序园",
-            link: 'http://www.voidcn.com/column/web'
-        }, {
-            name: "Aaron的博客",
-            link: "https://www.haorooms.com/"
-        }, {
-            name: '木易杨博客',
-            link: 'https://muyiy.cn/'
-        }, {
-            name: '技术胖',
-            link: "https://jspang.com/"
-        }, {
-            name: "技术导航",
-            link: "https://iiter.cn/"
-        }, {
-            name: "珠峰架构Vue.js",
-            link: "http://www.zhufengpeixun.cn/train/vue-info/component.html"
-        }, {
-            name: "汤姆大叔-深入JS",
-            link: "https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html"
-        }, {
-            name: "前端内参",
-            link: "https://coffe1891.gitbook.io/frontend-hard-mode-interview/1/1.2.6"
-        }, {
-            name: "奇舞周刊-优秀好文章",
-            link: "https://weekly.75team.com/"
-        }, {
-            name: "css-tricks(国外技术栈)",
-            link: 'https://css-tricks.com/archives/'
-        }]
-    }, {
-        'name': '工具文档',
-        'icon': 'icon-shiyongshouce',
-        'linkList': [{
-                name: "parcel",
-                link: "https://zh.parceljs.org/getting_started.html"
+            'name': '社区博客',
+            'icon': 'icon-bokexinwen',
+            'linkList': [{
+                name: "Github",
+                link: "https://github.com/"
             }, {
-                name: 'Moment',
-                link: 'http://momentjs.cn/docs/#/parsing/string-format/'
+                name: "Gitee",
+                link: "https://gitee.com/wwya"
             }, {
-                name: 'Gulp',
-                link: 'https://www.w3cschool.cn/qtaitm/1cvdkozt.html'
+                name: "Oschina",
+                link: 'https://www.oschina.net/'
             }, {
-                name: "Webpack",
-                link: 'https://www.webpackjs.com/concepts/'
+                name: 'segmentfault',
+                link: 'https://segmentfault.com/'
             }, {
-                name: 'ES6文档',
-                link: 'http://es6.ruanyifeng.com/#docs/intro'
+                name: '脚本之家',
+                link: 'http://www.jb51.net/'
             }, {
-                name: 'jquery中文',
-                link: 'http://jquery.cuishifeng.cn/'
+                name: '掘金',
+                link: 'https://juejin.im/timeline'
             }, {
-                name: 'Archives',
-                link: 'https://github.com/vannvan/archives'
+                name: 'codepen',
+                link: 'http://codepen.io/'
             }, {
-                name: "css手册",
-                link: "http://css.cuishifeng.cn/"
+                name: '前端精选',
+                link: 'http://top.html.cn/'
             }, {
-                name: 'C3.JS图表',
-                link: "https://c3js.org/"
+                name: '博客园',
+                link: 'https://www.cnblogs.com/'
             }, {
-                name: "umi方案",
-                link: "https://umijs.org/zh/guide/"
+                name: '国外某大神',
+                link: "https://dmitripavlutin.com/"
             }, {
-                name: "ZEIT静态网站",
-                link: "https://zeit.co/dashboard"
+                name: '张鑫旭',
+                link: 'https://www.zhangxinxu.com'
             }, {
-                name: "腾讯云开发者文档",
-                link: "https://cloud.tencent.com/developer/section/1490167"
+                name: 'W3cplus',
+                link: 'https://www.w3cplus.com/'
             }, {
-                name: 'md美化',
-                link: "https://mdnice.com/"
+                name: "程序园",
+                link: 'http://www.voidcn.com/column/web'
             }, {
-                name: "前端开发者手册",
-                link: "https://dwqs.gitbooks.io/frontenddevhandbook/content/"
+                name: "Aaron的博客",
+                link: "https://www.haorooms.com/"
             }, {
-                name: "hexo博客模板",
-                link: "https://hexo.io/"
+                name: '木易杨博客',
+                link: 'https://muyiy.cn/'
             }, {
-                name: "echarts实例",
-                link: "https://gallery.echartsjs.com/explore.html"
-            },
-            {
-                name: "动画插件",
-                link: "https://www.tweenmax.com.cn/"
-            },
-            {
-                name: "可商用插画",
-                link: 'https://undraw.co/illustrations'
-            }
-        ]
-    }, {
-        name: "框架文档",
-        icon: "icon-bangzhushouce",
-        linkList: [{
-            name: 'Element',
-            link: 'https://element.eleme.cn/#/zh-CN/component/table'
-        }, {
-            name: 'Vux',
-            link: 'https://doc.vux.li/zh-CN/components/x-input.html'
-        }, {
-            name: 'iview',
-            link: 'https://www.iviewui.com/docs/guide/install'
-        }, {
-            name: 'React',
-            link: 'http://caibaojian.com/react/'
-        }, {
-            name: 'Ant-Design',
-            link: "https://ant.design/docs/react/introduce-cn"
-        }, {
-            name: 'taro多端框架',
-            link: "https://taro.aotu.io"
-        }, {
-            name: 'next.js',
-            link: "https://nextjs.frontendx.cn/"
-        }, {
-            name: "antv",
-            link: "https://antv.vision/zh#products"
-        }, {
-            name: "nuxt",
-            link: "https://www.nuxtjs.cn/guide"
-        }, {
-            name: '前端面试之道',
-            link: "http://caibaojian.com/interview-map/frontend/"
-        }, {
-            name: "nest.js",
-            link: "https://exlley.gitbooks.io/nest-js/content/chapter1/di-yi-ge-kong-zhi-qi.html"
-        }]
-    }, {
-        'name': '码农工具',
-        'icon': 'icon-ai-tool',
-        'linkList': [{
-            name: "虫洞栈",
-            link: "http://book.bugstack.cn/"
-        }, {
-            name: "Unicode字符百科",
-            link: 'https://unicode-table.com/cn/'
-        }, {
-            name: "草料二维码",
-            link: "http://cli.im/url"
-        }, {
-            name: '程序员工具',
-            link: 'http://www.bejson.com/ui/phonesize/'
-        }, {
-            name: '程序员工具2',
-            link: 'https://tool.lu/'
-        }, {
-            name: '徽章制作',
-            link: 'https://badgen.net/'
-        }, {
-            name: "草料二维码",
-            link: 'http://cli.im/url'
-        }, {
-            name: 'Bejson',
-            link: 'http://www.bejson.com/'
-        }, {
-            name: 'Mock-api',
-            link: 'http://mock-api.com/app.html#!/'
-        }, {
-            name: 'Faker数据模拟',
-            link: 'https://github.com/marak/Faker.js/'
-        }, {
-            name: "移动端调试",
-            link: 'https://github.com/wuchangming/spy-debugger'
-        }, {
-            name: '图标下载',
-            link: 'https://www.easyicon.net/'
-        }, {
-            name: "css在线选择器",
-            link: "https://www.haorooms.com/tools/css_selecter/"
-        }, {
-            name: 'bootCDN',
-            link: 'https://www.bootcdn.cn/'
-        }, {
-            name: "在线抠图",
-            link: "https://www.remove.bg/zh/upload"
-        }, {
-            name: "wulihub静态托管",
-            link: "https://www.wulihub.com.cn/store/my_space"
-        }, {
-            name: "阿里imgcook",
-            link: "https://www.imgcook.com/dsl"
-        }]
-    }, {
-        name: "减负工具",
-        icon: "icon-gongju",
-        linkList: [{
-                name: '在线压缩png',
-                link: 'https://compresspng.com/zh/'
+                name: '技术胖',
+                link: "https://jspang.com/"
             }, {
-                name: '徽章制作1',
-                link: 'https://shields.io/#/'
+                name: "技术导航",
+                link: "https://iiter.cn/"
             }, {
-                name: '截图工具',
-                link: 'https://zh.snipaste.com'
+                name: "珠峰架构Vue.js",
+                link: "http://www.zhufengpeixun.cn/train/vue-info/component.html"
             }, {
-                name: '全能转换',
-                link: 'https://cn.office-converter.com/'
+                name: "汤姆大叔-深入JS",
+                link: "https://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html"
             }, {
-                name: 'gif录屏工具',
-                link: 'https://www.screentogif.com/'
+                name: "前端内参",
+                link: "https://coffe1891.gitbook.io/frontend-hard-mode-interview/1/1.2.6"
             }, {
-                name: '减压神器',
-                link: 'https://aidn.jp/mikutap/'
+                name: "奇舞周刊-优秀好文章",
+                link: "https://weekly.75team.com/"
             }, {
-                name: "无聊",
-                link: 'https://thatsthefinger.com/'
+                name: "css-tricks(国外技术栈)",
+                link: 'https://css-tricks.com/archives/'
+            }]
+        },
+        {
+            'name': '工具文档',
+            'icon': 'icon-shiyongshouce',
+            'linkList': [{
+                    name: "parcel",
+                    link: "https://zh.parceljs.org/getting_started.html"
+                }, {
+                    name: 'Moment',
+                    link: 'http://momentjs.cn/docs/#/parsing/string-format/'
+                }, {
+                    name: 'Gulp',
+                    link: 'https://www.w3cschool.cn/qtaitm/1cvdkozt.html'
+                }, {
+                    name: "Webpack",
+                    link: 'https://www.webpackjs.com/concepts/'
+                }, {
+                    name: 'ES6文档',
+                    link: 'http://es6.ruanyifeng.com/#docs/intro'
+                }, {
+                    name: 'jquery中文',
+                    link: 'http://jquery.cuishifeng.cn/'
+                }, {
+                    name: 'Archives',
+                    link: 'https://github.com/vannvan/archives'
+                }, {
+                    name: "css手册",
+                    link: "http://css.cuishifeng.cn/"
+                }, {
+                    name: 'C3.JS图表',
+                    link: "https://c3js.org/"
+                }, {
+                    name: "umi方案",
+                    link: "https://umijs.org/zh/guide/"
+                }, {
+                    name: "ZEIT静态网站",
+                    link: "https://zeit.co/dashboard"
+                }, {
+                    name: "腾讯云开发者文档",
+                    link: "https://cloud.tencent.com/developer/section/1490167"
+                }, {
+                    name: 'md美化',
+                    link: "https://mdnice.com/"
+                }, {
+                    name: "前端开发者手册",
+                    link: "https://dwqs.gitbooks.io/frontenddevhandbook/content/"
+                }, {
+                    name: "hexo博客模板",
+                    link: "https://hexo.io/"
+                }, {
+                    name: "echarts实例",
+                    link: "https://gallery.echartsjs.com/explore.html"
+                },
+                {
+                    name: "动画插件",
+                    link: "https://www.tweenmax.com.cn/"
+                },
+                {
+                    name: "可商用插画",
+                    link: 'https://undraw.co/illustrations'
+                }
+            ]
+        },
+        {
+            name: "框架文档",
+            icon: "icon-bangzhushouce",
+            linkList: [{
+                name: 'Element',
+                link: 'https://element.eleme.cn/#/zh-CN/component/table'
             }, {
-                name: "神奇",
-                link: 'http://www.koalastothemax.com/'
+                name: 'Vux',
+                link: 'https://doc.vux.li/zh-CN/components/x-input.html'
             }, {
-                name: "无用的网站",
-                link: 'https://theuselessweb.com/'
+                name: 'iview',
+                link: 'https://www.iviewui.com/docs/guide/install'
             }, {
-                name: "CSS渐变色",
-                link: "http://color.oulu.me/"
-            }
+                name: 'React',
+                link: 'http://caibaojian.com/react/'
+            }, {
+                name: 'Ant-Design',
+                link: "https://ant.design/docs/react/introduce-cn"
+            }, {
+                name: 'taro多端框架',
+                link: "https://taro.aotu.io"
+            }, {
+                name: 'next.js',
+                link: "https://nextjs.frontendx.cn/"
+            }, {
+                name: "antv",
+                link: "https://antv.vision/zh#products"
+            }, {
+                name: "nuxt",
+                link: "https://www.nuxtjs.cn/guide"
+            }, {
+                name: '前端面试之道',
+                link: "http://caibaojian.com/interview-map/frontend/"
+            }, {
+                name: "nest.js",
+                link: "https://exlley.gitbooks.io/nest-js/content/chapter1/di-yi-ge-kong-zhi-qi.html"
+            }]
+        },
+        {
+            'name': '码农工具',
+            'icon': 'icon-ai-tool',
+            'linkList': [{
+                name: "虫洞栈",
+                link: "http://book.bugstack.cn/"
+            }, {
+                name: "Unicode字符百科",
+                link: 'https://unicode-table.com/cn/'
+            }, {
+                name: "草料二维码",
+                link: "http://cli.im/url"
+            }, {
+                name: '程序员工具',
+                link: 'http://www.bejson.com/ui/phonesize/'
+            }, {
+                name: '程序员工具2',
+                link: 'https://tool.lu/'
+            }, {
+                name: '徽章制作',
+                link: 'https://badgen.net/'
+            }, {
+                name: "草料二维码",
+                link: 'http://cli.im/url'
+            }, {
+                name: 'Bejson',
+                link: 'http://www.bejson.com/'
+            }, {
+                name: 'Mock-api',
+                link: 'http://mock-api.com/app.html#!/'
+            }, {
+                name: 'Faker数据模拟',
+                link: 'https://github.com/marak/Faker.js/'
+            }, {
+                name: "移动端调试",
+                link: 'https://github.com/wuchangming/spy-debugger'
+            }, {
+                name: '图标下载',
+                link: 'https://www.easyicon.net/'
+            }, {
+                name: "css在线选择器",
+                link: "https://www.haorooms.com/tools/css_selecter/"
+            }, {
+                name: 'bootCDN',
+                link: 'https://www.bootcdn.cn/'
+            }, {
+                name: "在线抠图",
+                link: "https://www.remove.bg/zh/upload"
+            }, {
+                name: "wulihub静态托管",
+                link: "https://www.wulihub.com.cn/store/my_space"
+            }, {
+                name: "阿里imgcook",
+                link: "https://www.imgcook.com/dsl"
+            }]
+        },
+        {
+            name: "减负工具",
+            icon: "icon-gongju",
+            linkList: [{
+                    name: '在线压缩png',
+                    link: 'https://compresspng.com/zh/'
+                }, {
+                    name: '徽章制作1',
+                    link: 'https://shields.io/#/'
+                }, {
+                    name: '截图工具',
+                    link: 'https://zh.snipaste.com'
+                }, {
+                    name: '全能转换',
+                    link: 'https://cn.office-converter.com/'
+                }, {
+                    name: 'gif录屏工具',
+                    link: 'https://www.screentogif.com/'
+                }, {
+                    name: '减压神器',
+                    link: 'https://aidn.jp/mikutap/'
+                }, {
+                    name: "无聊",
+                    link: 'https://thatsthefinger.com/'
+                }, {
+                    name: "神奇",
+                    link: 'http://www.koalastothemax.com/'
+                }, {
+                    name: "无用的网站",
+                    link: 'https://theuselessweb.com/'
+                }, {
+                    name: "CSS渐变色",
+                    link: "http://color.oulu.me/"
+                }
 
-        ]
-    }, {
-        'name': '硬核资源',
-        'icon': "icon-ziyuan",
-        'linkList': [{
-            name: 'JQ插件库',
-            link: 'http://www.jq22.com'
-        }, {
-            name: 'CTOlib码库',
-            link: 'https://www.ctolib.com/'
-        }, {
-            name: 'icomoon',
-            link: 'https://icomoon.io/app/#/select'
-        }, {
-            name: 'Fontawesome',
-            link: 'http://www.fontawesome.com.cn/'
-        }, {
-            name: '阿里图标库',
-            link: 'https://www.iconfont.cn/'
-        }, {
-            name: 'jquery之家',
-            link: 'http://www.htmleaf.com/'
-        }, {
-            name: "前端知识体系xmind",
-            link: "https://www.xmind.net/m/NkQc/"
-        }, {
-            name: "techbrood",
-            link: "https://techbrood.com/"
-        }, {
-            name: "css动画在线",
-            link: "https://animista.net/play"
-        }, {
-            name: "Animate",
-            link: "https://github.com/daneden/animate.css"
-        }, {
-            name: "vivify",
-            link: "https://github.com/Martz90/vivify"
-        }, {
-            name: "bootstrapmb",
-            link: "http://www.bootstrapmb.com/chajian/css3"
-        }, {
-            name: "天行数据",
-            link: "https://www.tianapi.com/"
-        }, {
-            name: '在线生成字符图案',
-            link: 'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
-        }, {
-            name: "壁纸",
-            link: "https://wallhere.com/"
-        }]
-    }, {
-        'name': '世间百态',
-        'icon': 'icon-yinleyule',
-        'linkList': [{
-            name: "天猫",
-            link: "https://www.tmall.com/"
-        }, {
-            name: '京东',
-            link: 'https://www.jd.com'
-        }, {
-            name: "豆瓣FM",
-            link: "https://fm.douban.com/"
-        }, {
-            name: '网易严选',
-            link: 'http://you.163.com/'
-        }, {
-            name: 'QQ邮箱',
-            link: 'https://mail.qq.com/'
-        }, {
-            name: "微云",
-            link: 'https://www.weiyun.com/'
-        }, {
-            name: "Google邮箱",
-            link: 'https://mail.google.com/'
-        }]
-    }];
+            ]
+        },
+        {
+            'name': '硬核资源',
+            'icon': "icon-ziyuan",
+            'linkList': [{
+                name: 'JQ插件库',
+                link: 'http://www.jq22.com'
+            }, {
+                name: 'CTOlib码库',
+                link: 'https://www.ctolib.com/'
+            }, {
+                name: 'icomoon',
+                link: 'https://icomoon.io/app/#/select'
+            }, {
+                name: 'Fontawesome',
+                link: 'http://www.fontawesome.com.cn/'
+            }, {
+                name: '阿里图标库',
+                link: 'https://www.iconfont.cn/'
+            }, {
+                name: 'jquery之家',
+                link: 'http://www.htmleaf.com/'
+            }, {
+                name: "前端知识体系xmind",
+                link: "https://www.xmind.net/m/NkQc/"
+            }, {
+                name: "techbrood",
+                link: "https://techbrood.com/"
+            }, {
+                name: "css动画在线",
+                link: "https://animista.net/play"
+            }, {
+                name: "Animate",
+                link: "https://github.com/daneden/animate.css"
+            }, {
+                name: "vivify",
+                link: "https://github.com/Martz90/vivify"
+            }, {
+                name: "bootstrapmb",
+                link: "http://www.bootstrapmb.com/chajian/css3"
+            }, {
+                name: "天行数据",
+                link: "https://www.tianapi.com/"
+            }, {
+                name: '在线生成字符图案',
+                link: 'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
+            }, {
+                name: "壁纸",
+                link: "https://wallhere.com/"
+            }]
+        },
+        {
+            'name': '世间百态',
+            'icon': 'icon-yinleyule',
+            'linkList': [{
+                name: "天猫",
+                link: "https://www.tmall.com/"
+            }, {
+                name: '京东',
+                link: 'https://www.jd.com'
+            }, {
+                name: "豆瓣FM",
+                link: "https://fm.douban.com/"
+            }, {
+                name: '网易严选',
+                link: 'http://you.163.com/'
+            }, {
+                name: 'QQ邮箱',
+                link: 'https://mail.qq.com/'
+            }, {
+                name: "微云",
+                link: 'https://www.weiyun.com/'
+            }, {
+                name: "Google邮箱",
+                link: 'https://mail.google.com/'
+            }]
+        }
+    ];
 
 
 
