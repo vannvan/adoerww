@@ -40,11 +40,12 @@ $(document).ready(function() {
         light: {
             body: '#e7eff4',
             fontColor: "#31c193",
-            linkFontColor: "#000",
+            linkFontColor: "#27ae60",
             listBgColor: '#fff',
             leftBarBgColor: "#fff",
             rightTitleBgColor: '#fff',
-            rightLinkItemBgColor: "rgba(255,255,255,0.8)"
+            rightLinkItemBgColor: "rgba(255,255,255,0.8)",
+            inputColor: "#27ae60"
         },
         dark: {
             body: "#000",
@@ -53,7 +54,8 @@ $(document).ready(function() {
             linkFontColor: "#FFFFE0",
             leftBarBgColor: "#242424",
             rightTitleBgColor: '#242424',
-            rightLinkItemBgColor: "rgba(36,36,36,0.8)"
+            rightLinkItemBgColor: "rgba(36,36,36,0.8)",
+            inputColor: '#09c'
         }
     }
 
@@ -72,11 +74,11 @@ $(document).ready(function() {
             background: THEME_COLOR[theme].rightLinkItemBgColor,
             color: THEME_COLOR[theme].linkFontColor
         })
-        $("#input").css({
-            color: THEME_COLOR[theme].fontColor
-        })
-        let iconStyle = { 'color': THEME_COLOR[theme].fontColor }
-        $(".iconfont").css(Object.assign(iconStyle, theme == 'dark' ? transform(0) : transform(90)))
+        $(".iconfont").css(Object.assign({ 'color': THEME_COLOR[theme].fontColor },
+            theme == 'dark' ? transform(0) : transform(90)))
+        // 输入框样式
+        $("#input").css({ "border-color": THEME_COLOR[theme].inputColor, color: THEME_COLOR[theme].fontColor })
+        $("#search-btn").css("background", THEME_COLOR[theme].inputColor)
     }
 
     function transform(rotate) {
