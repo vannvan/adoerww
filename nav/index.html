@@ -60,12 +60,14 @@
             </div>
         </div>
     </div>
+    <!-- pointer-events: none; 点击能穿透这一层 -->
+    <canvas id="mouse" style="position: fixed; top:0;z-index: 0;pointer-events: none;"></canvas>
     <canvas id="canvas" width="1950px" height="1080px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
     <canvas id="canvasbg" width="1950px" height="1080px" style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas>
     <!-- <canvas height='100%' width='100%' style='position: fixed; top: 0px; left: 0px; z-index: -1; opacity: 1;' id='canvas'></canvas> -->
-    <!-- <footer>©vannvan&nbsp;.&nbsp;It’s better to be alone than to be with someone you’re not happy to be with.</footer> -->
-    <script type="text/javascript" src="data.js"></script>
-    <script type="text/javascript" src="canvas1.js"></script>
+    <script src="data.js"></script>
+    <script src="canvas1.js"></script>
+    <script src="mouse-move.js"></script>
 </body>
 
 </html>
