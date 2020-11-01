@@ -216,8 +216,8 @@ body::-webkit-scrollbar {
                         overflow: hidden;
                     }
 
-                    .link-item {
-                        // background: #242424 !important;
+                    .link-item:hover {
+                        color: #fff !important;
                     }
 
                     .link {
