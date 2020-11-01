@@ -45,7 +45,7 @@ $("#submit-btn").click(function() {
     }
     makeCode()
     sendMessageToContentScript('你好，我是popup！', (response) => {
-        if (response) alert('收到来自content-script的回复：' + JSON.stringify(response));
+        // if (response) alert('收到来自content-script的回复：' + JSON.stringify(response));
     });
 
     // 显示桌面通知
