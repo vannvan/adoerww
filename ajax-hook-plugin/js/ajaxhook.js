@@ -40,86 +40,206 @@
             }, t.unHookAjax = function() { window._ahrealxhr && (XMLHttpRequest = window._ahrealxhr), window._ahrealxhr = void 0 }, t.default = t
         }
     }]);
-    //js加载完成执行
-    //console.log(hookAjax)
-    let isLoading = false
-    let reqNum = 0
-    let searchParams = null
-    const ws = new WebSocket("wss://remark.ikjzd.com/connect");
-    console.log('WebSocket已初始化')
-    ws.onopen = function() {
-        console.log("WebSocket已连接");
-        // ws.send('测试数据，已建立连接');
-    };
 
-    // setTimeout(() => {
-    //     document.getElementById("BRAND_input").value = Math.random().toString(36).substring(2)
-    //     document.querySelector(".searchButton ").click()
-    // }, 5000)
 
-    hookAjax({
-        //拦截回调
-        onreadystatechange: function(xhr) {
-            reqNum--
-            // console.log('当前请求数:', reqNum)
-            // console.log(xhr)
-            let { responseURL, responseText } = xhr
-            if (responseURL == 'https://www3.wipo.int/branddb/jsp/select.jsp' && searchParams) {
-                // console.log(responseURL)
-                console.log('数据拦截成功')
-                sendMessage({ params: searchParams, data: responseText.qi })
-                reqNum = 0
+
+    // if (window.location.host == 'www3.wipo.int') {
+    //     timer = setInterval(() => {
+    //         let searchList = [...document.querySelectorAll('.searchItem')]
+    //         console.log('查询条件数量：', searchList.length);
+    //         if (searchList.length > 0) {
+    //             searchList.map(el => {
+    //                 el.children[0].click()
+    //             })
+    //         }
+    //     }, 5000);
+    // }
+
+
+
+
+
+    // console.log("hook xhr")
+})();
+
+let requestList = []
+
+hookAjax({
+    //拦截回调
+    onreadystatechange: function(xhr) {
+        // console.log(xhr)
+        let { responseURL, responseText } = xhr
+        if (responseURL == 'https://www3.wipo.int/branddb/jsp/select.jsp') {
+            console.log('数据拦截成功')
+            requestList.push(responseText)
+            console.log(requestList.length)
+            if (requestList.length == 3) {
+                setTimeout(() => {
+                    console.log('抓取dom数据')
+                    getTableData()
+                }, 5000)
             }
+        }
 
 
-        },
-        onload: function(xhr) {
-            console.log('onload', xhr);
-            // console.log("onload called: %O", xhr.responseText)
-        },
-        send: function() {
-            reqNum++
-            // console.log('当前请求数+', reqNum)
-        },
-        //拦截方法
-        open: function(arg, xhr) {
-            // console.log("open called: method:%s,url:%s,async:%s", arg[0], arg[1], arg[2])
+    },
+    onload: function(xhr) {
+        console.log('onload', xhr);
+        // console.log("onload called: %O", xhr.responseText)
+    },
+    send: function() {
+        // console.log('当前请求数+', reqNum)
+    },
+    //拦截方法
+    open: function(arg, xhr) {
+        // console.log(arg, 'lllllakjakak')
+        // console.log("open called: method:%s,url:%s,async:%s", arg[0], arg[1], arg[2])
+    }
+})
+
+const wsUrl = "wss://remark.ikjzd.com/connect"
+
+var ws = new WebSocket(wsUrl);
+var searchQuery = null
+var searchQueryQueue = []
+var dataList = []
+var searchText = null
+var searchClass = null
+
+
+
+ws.onclose = function() {
+    reconnect()
+};
+ws.onerror = function() {
+    reconnect()
+};
+
+// 重连
+function reconnect(wsUrl) {
+    setTimeout(function() { //没连接上会一直重连，设置延迟避免请求过多
+        createWebSocket(wsUrl);
+    }, 2000);
+}
+
+// 实例websocket
+function createWebSocket(wsUrl) {
+    try {
+        if ('WebSocket' in window) {
+            ws = new WebSocket(wsUrl);
+        } else if ('MozWebSocket' in window) {
+            ws = new MozWebSocket(wsUrl);
+        } else {
+            // _alert("当前浏览器不支持websocket协议,建议使用现代浏览器", 3000)
+        }
+        initEventHandle();
+    } catch (e) {
+        reconnect(wsUrl);
+    }
+}
+
+// 初始化事件函数
+function initEventHandle() {
+    ws.onclose = function() {
+        reconnect(wsUrl);
+    };
+    ws.onerror = function(err) {
+        reconnect(wsUrl);
+    };
+}
+
+ws.onmessage = function(evt) {
+    let received_msg = evt.data;
+    let { text, cls } = JSON.parse(received_msg)
+    searchText = text
+    searchClass = cls
+    console.log("接收到的数据：", text, cls);
+    // searchQueryQueue.push(searchQuery)
+    handleCheckClick(text, cls)
+};
+
+ws.onclose = function() {
+    console.log('连接已关闭')
+    reconnect()
+};
+ws.onerror = function() {
+    console.log('连接错误');
+    reconnect()
+};
+
+ws.onopen = function(evt) {
+    console.log("连接中");
+};
+
+setTimeout(() => {
+    $("#USTM_check").parent().parent().click()
+    $("#ui-id-10").click()
+    $("#ACT_check").parent().parent().click()
+    $("#PEND_check").parent().parent().click()
+    // ws.send(JSON.stringify({
+    //     text: 10000,
+    //     cls: null
+    // }));
+    console.log('点击事件操作完毕')
+}, 10000)
+
+
+
+function handleCheckClick(text, cls) {
+    // searchQuery = searchQueryQueue[0]
+    $("#BRAND_input").val(text)
+    $("#ui-id-5").click()
+    $("#GOODS_CLASS_input").val(cls)
+    document.querySelector(".searchButton ").click()
+}
+
+
+function getTableData() {
+    let brandList = []
+    let countryList = []
+    let niceList = []
+    $(".ui-widget-content").find("td").each(function() {
+        if ($(this).index() == 6) {
+            brandList.push($(this).text())
+        }
+        if ($(this).index() == 12) {
+            countryList.push($(this).text())
+        }
+        if ($(this).index() == 18) {
+            niceList.push($(this).text())
         }
     })
 
-    function sendMessage(message) {
-        // const ws = new WebSocket("wss://remark.ikjzd.com/connect");
-        console.log("数据发送中...");
-        console.log(message)
-        ws.send(JSON.stringify(message));
+    let data = Array.from({ length: brandList.length }, (v, k) => {
+        return {
+            brand: brandList[k],
+            country: countryList[k],
+            nice: niceList[k]
+        }
+    })
+    data = data.filter(item => item.brand)
+    console.log('发送数据：', JSON.stringify(data))
+    if (searchText && searchClass) {
+        ws.send(JSON.stringify({
+            data: data,
+            text: searchText,
+            cls: searchClass
+        }))
     }
+    clearSearchHistory()
+}
 
-    if (window.location.host == 'www3.wipo.int') {
-        setInterval(() => {
-            let searchList = [...document.querySelectorAll('.searchItem')]
-            console.log(searchList.length, '查询条件');
-            if (searchList.length > 0) {
-                searchList.map(el => {
-                    el.children[0].click()
-                })
-            }
-        }, 5000);
+
+function clearSearchHistory() {
+    requestList = []
+    searchText = null
+    searchClass = null
+    let searchList = [...$('.searchItem')]
+    console.log('查询条件:', searchList.length);
+    if (searchList.length > 0) {
+        console.log('清空页面查询记录...')
+        searchList.map(el => {
+            el.children[0].click()
+        })
     }
-
-
-
-
-    ws.onmessage = function(evt) {
-        var received_msg = evt.data;
-        let { params } = JSON.parse(received_msg)
-        searchParams = params
-        console.log("接收到的数据：", searchParams);
-        document.getElementById("BRAND_input").value = searchParams
-        document.querySelector(".searchButton ").click()
-    };
-
-    ws.onclose = function() {
-        console.log("连接已关闭...");
-    };
-    // console.log("hook xhr")
-})();
+}
