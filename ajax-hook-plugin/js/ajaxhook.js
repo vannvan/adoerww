@@ -40,26 +40,6 @@
             }, t.unHookAjax = function() { window._ahrealxhr && (XMLHttpRequest = window._ahrealxhr), window._ahrealxhr = void 0 }, t.default = t
         }
     }]);
-
-
-
-    // if (window.location.host == 'www3.wipo.int') {
-    //     timer = setInterval(() => {
-    //         let searchList = [...document.querySelectorAll('.searchItem')]
-    //         console.log('查询条件数量：', searchList.length);
-    //         if (searchList.length > 0) {
-    //             searchList.map(el => {
-    //                 el.children[0].click()
-    //             })
-    //         }
-    //     }, 5000);
-    // }
-
-
-
-
-
-    // console.log("hook xhr")
 })();
 
 let requestList = []
@@ -80,21 +60,7 @@ hookAjax({
                 }, 5000)
             }
         }
-
-
     },
-    onload: function(xhr) {
-        console.log('onload', xhr);
-        // console.log("onload called: %O", xhr.responseText)
-    },
-    send: function() {
-        // console.log('当前请求数+', reqNum)
-    },
-    //拦截方法
-    open: function(arg, xhr) {
-        // console.log(arg, 'lllllakjakak')
-        // console.log("open called: method:%s,url:%s,async:%s", arg[0], arg[1], arg[2])
-    }
 })
 
 const wsUrl = "wss://remark.ikjzd.com/connect"
@@ -105,7 +71,7 @@ var searchQueryQueue = []
 var dataList = []
 var searchText = null
 var searchClass = null
-
+let timer = null
 
 
 ws.onclose = function() {
@@ -172,23 +138,42 @@ ws.onopen = function(evt) {
 };
 
 setTimeout(() => {
-    $("#USTM_check").parent().parent().click()
-    $("#ui-id-10").click()
-    $("#ACT_check").parent().parent().click()
-    $("#PEND_check").parent().parent().click()
-    // ws.send(JSON.stringify({
-    //     text: 10000,
-    //     cls: null
-    // }));
+    // $("#USTM_check").parent().parent().click()
+    // $("#ui-id-10").click()
+    // $("#ACT_check").parent().parent().click()
+    // $("#PEND_check").parent().parent().click()
+    // $(".addFilterButton").click()
     console.log('点击事件操作完毕')
 }, 10000)
 
 
+timer = setInterval(() => {
+    // checkLife()
+}, 10000);
+
+function checkLife() {
+    let exit1 = $("#ACT_check").parent().parent().hasClass('selected')
+    let exit2 = $("#USTM_check").parent().parent().hasClass('selected')
+    if (!exit1) {
+        console.log('重置Origin...');
+        $("#ui-id-10").click()
+        $("#ACT_check").parent().parent().click()
+        $("#PEND_check").parent().parent().click()
+        $(".addFilterButton").click()
+    }
+    if (!exit2) {
+        console.log('重置Source');
+        $("#ui-id-7").click()
+        $("#USTM_check").parent().parent().click()
+        $(".addFilterButton").click()
+    }
+}
 
 function handleCheckClick(text, cls) {
     // searchQuery = searchQueryQueue[0]
+    $(".operatorMenu li:eq(1) div").click()
     $("#BRAND_input").val(text)
-    $("#ui-id-5").click()
+    // $("#ui-id-5").click()
     $("#GOODS_CLASS_input").val(cls)
     document.querySelector(".searchButton ").click()
 }
@@ -218,14 +203,36 @@ function getTableData() {
         }
     })
     data = data.filter(item => item.brand)
-    console.log('发送数据：', JSON.stringify(data))
     if (searchText && searchClass) {
+        console.log('发送数据：', JSON.stringify(data))
         ws.send(JSON.stringify({
             data: data,
             text: searchText,
             cls: searchClass
         }))
+        setTimeout(() => {
+            // let searchList = [....click()]
+            // console.log('查询条件:', searchList.length);
+            // if (searchList.length > 0) {
+            //     console.log('清空页面查询记录...')
+            //     searchList.map(el => {
+            //         el.children[0].click()
+            //     })
+            // }
+
+            // $('.searchItem').parent().each(function() {
+            //     $(this).click()
+            // })
+
+            $('.searchItem').parent().find(".ui-icon-close")[0].click();
+            setTimeout(() => {
+                $('.searchItem').parent().find(".ui-icon-close")[0].click();
+            }, 3000)
+
+        }, 2000)
     }
+    // checkLife()
+
     clearSearchHistory()
 }
 
@@ -234,12 +241,6 @@ function clearSearchHistory() {
     requestList = []
     searchText = null
     searchClass = null
-    let searchList = [...$('.searchItem')]
-    console.log('查询条件:', searchList.length);
-    if (searchList.length > 0) {
-        console.log('清空页面查询记录...')
-        searchList.map(el => {
-            el.children[0].click()
-        })
-    }
+    // console.clear()
+
 }
