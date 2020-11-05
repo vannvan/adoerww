@@ -287,6 +287,9 @@ $(document).ready(function() {
                 name: 'Mock-api',
                 link: 'http://mock-api.com/app.html#!/'
             }, {
+                name: "Easy-mock",
+                link: "https://www.easy-mock.com/"
+            }, {
                 name: 'Faker数据模拟',
                 link: 'https://github.com/marak/Faker.js/'
             }, {
