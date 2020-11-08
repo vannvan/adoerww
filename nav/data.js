@@ -313,6 +313,9 @@ $(document).ready(function() {
             }, {
                 name: "阿里imgcook",
                 link: "https://www.imgcook.com/dsl"
+            }, {
+                name: "sentry-web监控工具",
+                link: "https://sentry.io/"
             }]
         },
         {
