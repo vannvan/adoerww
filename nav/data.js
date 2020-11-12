@@ -215,6 +215,10 @@ $(document).ready(function() {
                 {
                     name: "可商用插画",
                     link: 'https://undraw.co/illustrations'
+                },
+                {
+                    name: "现代JavaScript教程",
+                    link: "https://zh.javascript.info/"
                 }
             ]
         },
@@ -260,6 +264,9 @@ $(document).ready(function() {
             'name': '码农工具',
             'icon': 'icon-ai-tool',
             'linkList': [{
+                name: "图床",
+                link: "https://imgchr.com/"
+            }, {
                 name: "虫洞栈",
                 link: "http://book.bugstack.cn/"
             }, {
