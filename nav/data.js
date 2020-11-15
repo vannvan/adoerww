@@ -405,6 +405,9 @@ $(document).ready(function() {
                 name: "天行数据",
                 link: "https://www.tianapi.com/"
             }, {
+                name: "免费开放接口",
+                link: "https://api.66mz8.com/"
+            }, {
                 name: '在线生成字符图案',
                 link: 'http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20'
             }, {
