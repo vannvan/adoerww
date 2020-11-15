@@ -6,6 +6,13 @@ chrome.contextMenus.create({
         chrome.tabs.create({ url: 'https://fanyi.baidu.com/#zh/en/' + encodeURI(params.selectionText) });
     }
 });
+chrome.contextMenus.create({
+    title: '打开扩展页',
+    onclick: function(params) {
+        // 注意不能使用location.href，因为location是属于background的window对象
+        MAIN.FirstRun.finishInitialization();
+    }
+});
 
 
 
@@ -24,12 +31,24 @@ var MAIN = {
     }
 }
 
+function logURL(response) {
+    sendMessageToContentScript(response, (loadMessage) => {
+        if (loadMessage) {
+            //干点别的事
+        }
+    });
+}
 
+chrome.webRequest.onHeadersReceived.addListener(
+    logURL, { urls: ["*://*.baidu.com/*"], types: ['xmlhttprequest'] }, [
+        "responseHeaders"
+    ]
+);
 
-chrome.contextMenus.create({
-    title: '打开扩展页',
-    onclick: function(params) {
-        // 注意不能使用location.href，因为location是属于background的window对象
-        MAIN.FirstRun.finishInitialization();
-    }
-});
+function sendMessageToContentScript(message, callback) {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+            if (callback) callback(response);
+        });
+    });
+}
