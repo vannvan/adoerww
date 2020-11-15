@@ -34,7 +34,7 @@ var MAIN = {
 function logURL(response) {
     sendMessageToContentScript(response, (loadMessage) => {
         if (loadMessage) {
-            //干点别的事
+            console.log(loadMessage);
         }
     });
 }
