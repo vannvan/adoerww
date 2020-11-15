@@ -42,14 +42,22 @@ function ajax(opt) {
             document.querySelector(".recommend-box").style.display = 'none'
         }
     }
+    // 百度背景图片
+    // if (/baidu/.test(document.location.host)) {
+    //     let img = document.createElement('div')
+    //     img.style.backgroundImage = `url(https://api.66mz8.com/api/bg.img.php)`
+    //     img.style.cssText = 'width:100%;height:100vh;mix-blend-mode: multiply;position:fixed;top:0;background:url(https://api.66mz8.com/api/bg.img.php)'
+    //     document.body.append(img)
 
-    if (/baidu/.test(document.location.host)) {
-        let img = document.createElement('div')
-        img.style.backgroundImage = `url(https://api.66mz8.com/api/bg.img.php)`
-        img.style.cssText = 'width:100%;height:100vh;mix-blend-mode: multiply;position:fixed;top:0;background:url(https://api.66mz8.com/api/bg.img.php)'
-        document.body.append(img)
+    // }
+    // menhera酱表情包：
+    // if (/baidu/.test(document.location.host)) {
+    //     let img = document.createElement('div')
+    //     img.style.cssText = 'width:300px;height:300px;background:url(https://acg.yanwz.cn/menhera/api.php);background-size:cover;position:fixed;bottom:0;right:0'
+    //     document.body.append(img)
 
-    }
+    // }
+
 
 
 
