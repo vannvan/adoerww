@@ -30,7 +30,8 @@
             ],
             "js": [
                 "./js/content-script.js",
-                "./js/baidu-style.js"
+                "./js/baidu-style.js",
+                "./js/inject.js"
             ],
             "css": [
                 "./css/content-style.css"
@@ -42,7 +43,7 @@
         "page": "background.html"
     },
     "web_accessible_resources": [
-        "inject.js"
+        "/js/jquery.min.js"
     ],
     "devtools_page": "devtools.html"
 }
