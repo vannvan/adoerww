@@ -1,15 +1,79 @@
-function injectCustomJs(jsPath) {
-    jsPath = jsPath || 'js/inject.js';
-    var temp = document.createElement('script');
-    temp.setAttribute('type', 'text/javascript');
-    // 获得的地址类似：chrome-extension://ihcokhadfjfchaeagdoclpnjdiokfakg/js/inject.js
-    temp.src = chrome.extension.getURL(jsPath);
-    temp.onload = function() {
-        // 放在页面不好看，执行完后移除掉
-        this.parentNode.removeChild(this);
+;
+(function() {
+
+    var jQuery = function(selected) {
+        return new jQuery.prototype.init(selected); //返回一个对象
     };
-    document.head.appendChild(temp);
-}
+
+    var markArray = function(arr, that) {
+
+        var brr = that;
+        for (var i = 0; i < arr.length; i++) {
+
+            brr[i] = arr[i]
+
+        }
+        brr.length = arr.length;
+        return brr.length > 0 ? brr : null;
+    };
+
+    jQuery.prototype = {
+
+        init: function(selected) {
+            //这是一个方法===》选择元素的
+
+            var dom = null;
+
+            if (typeof selected != "string") {
+
+                dom = [selected];
+
+            } else {
+                dom = document.querySelectorAll(selected);
+            }
+            return markArray(dom, this); //返回一个对象
+        },
+        hover: function(over, out) {
+
+            this[0].onmouseover = over;
+            this[0].onmouseout = out;
+            return this;
+
+        },
+        css: function(attr, val) {
+            for (var i = 0; i < this.length; i++) {
+                this[i].style[attr] = val;
+            }
+            return this;
+        },
+        html: function(val) {
+            for (var i = 0; i < this.length; i++) {
+                this[i].innerHTML = val;
+            }
+            return this;
+        },
+        first: function() {
+
+            return $(this[0]);
+        },
+        last: function() {
+
+            return $(this[this.length - 1]);
+        },
+        eq: function(num) {
+
+            return $(this[num]);
+
+        }
+
+    };
+
+    jQuery.prototype.init.prototype = jQuery.prototype;
+
+    window.jQuery = window.$$ = jQuery;
+
+
+})();
 
 
 const Baidu = {
@@ -19,9 +83,22 @@ const Baidu = {
     ],
     //加个表情包
     setMenhera: function() {
-        let img = document.createElement('div')
-        img.style.cssText = 'width:300px;height:0px;background-image:url(https://acg.yanwz.cn/menhera/api.php);background-size:100% auto;padding-top:10%;position:fixed;bottom:0;right:0'
-        document.body.append(img)
+        // 标签
+        let countInfo = document.createElement('div')
+        countInfo.id = 'intercept-box'
+        countInfo.style.cssText = 'width:300px;height:0px;background-image:url(https://acg.yanwz.cn/menhera/api.php);background-size:100% auto;padding-top:10%;position:fixed;bottom:0;right:0'
+        if (!$$('#intercept-box').length) {
+            document.body.append(countInfo)
+        }
+        let countPanel = document.createElement('div')
+        countPanel.id = 'count-panel'
+        let infoText = this.count > 0 ? `已屏蔽${this.count}条CSDN垃圾推荐` : '真好，本次查询没有垃圾信息'
+        countPanel.style.cssText = 'position:fixed;bottom:170px;right:300px;color:#bdc3c7'
+        countPanel.innerHTML = infoText
+        console.log($$("#count-panel").length)
+        if (!$$("#count-panel").length) {
+            document.body.append(countPanel)
+        }
     },
     //更换几个背景图片
     resetBottomBg: function() {
@@ -29,7 +106,6 @@ const Baidu = {
         document.getElementById("page").style.background = white
         document.getElementById("foot").style.background = white
         document.getElementById("help").style.background = white
-
         document.querySelector(".foot-inner").style.background = white
     },
     dissCSDN: function() {
@@ -41,13 +117,8 @@ const Baidu = {
                 this.count++
             }
         })
-        let countInfo = document.createElement('div')
-        let infoText = this.count > 0 ? `已屏蔽${this.count}条CSDN垃圾推荐` : '真好，本次查询没有垃圾信息'
-        countInfo.style.cssText = 'position:fixed;bottom:170px;right:300px;color:#bdc3c7'
-        countInfo.innerHTML = infoText
-        document.body.append(countInfo)
-    },
 
+    },
     init: function() {
         this.dissCSDN()
         this.setMenhera()

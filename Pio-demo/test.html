@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="./static/pio.css">
+    <script src='./static/l2d.js'></script>
+    <!-- 引用看板娘交互组件 -->
+    <script src='./static/pio.js'></script>
+</head>
+
+<body>
+    <div class="pio-container right">
+        <div class="pio-action">
+        </div>
+        <canvas id="pio" width="280" height="250"></canvas>
+    </div>
+    <script type="text/javascript">
+        var pio = new Paul_Pio({
+            "mode": "fixed",
+            "hidden": true,
+            "content": {
+                "welcome": ["欢迎来到保罗的小宇宙！", "今天天气不错，一起来玩吧！", "博主每天都有些折腾记录，欢迎前往他的小窝阅读~"],
+                "custom": [
+                    { "selector": ".comment-form", "text": "欢迎参与本文评论，别发小广告噢~" },
+                    { "selector": ".home-social a:last-child", "text": "在这里可以了解博主的日常噢~" },
+                    { "selector": ".post-item a", "type": "read" },
+                    { "selector": ".post-content a, .page-content a", "type": "link" }
+                ]
+            },
+            "night": "single.night()",
+            "model": ["http://127.0.0.1:8080/models/pio/model.json"] //本地地址
+        });
+    </script>
+</body>
+
+</html/
