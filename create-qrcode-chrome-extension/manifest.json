@@ -43,7 +43,7 @@
         "page": "background.html"
     },
     "web_accessible_resources": [
-        "/js/jquery.min.js"
+        "js/*"
     ],
     "devtools_page": "devtools.html"
 }
