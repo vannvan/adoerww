@@ -1,5 +1,3 @@
-const path = require('path')
-var fs = require('fs')
 const { resolve } = require('path')
 
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
@@ -8,18 +6,14 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WriteJsonWebpackPlugin = require('write-json-webpack-plugin')
-
-// const minicss = new MiniCss({
-//   filename: 'style.css',
-// })
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const env = process.env.NODE_ENV
-// var $pages = fs.readdirSync(path.resolve(__dirname, './src/pages'))
-var htmlTpls = []
 let manifestJSON = require('./src/manifest.json')
 
 // 客户端配置
-const clientConfig = {
+module.exports = {
   //   entry: c,
   entry: {
     background: './src/background.js',
@@ -28,7 +22,7 @@ const clientConfig = {
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, env === 'development' ? 'tmp/' : 'dist/'),
+    path: resolve(__dirname, env === 'development' ? 'tmp/' : 'dist/'),
   },
   module: {
     rules: [
@@ -79,13 +73,15 @@ const clientConfig = {
       },
       chunks: ['popup'],
     }),
+    new UglifyJsPlugin({}), //压缩js输出
+    new OptimizeCSSAssetsPlugin(), //压缩css
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }), // minicss,
     new CopyWebpackPlugin([
       {
         from: resolve('src/assets/icon'),
-        to: path.resolve(
+        to: resolve(
           __dirname,
           env === 'development' ? 'tmp/' + 'icon' : 'dist/' + 'icon'
         ),
@@ -106,7 +102,3 @@ const clientConfig = {
     port: 3000,
   },
 }
-
-clientConfig.plugins = clientConfig.plugins.concat(htmlTpls)
-
-module.exports = [clientConfig]

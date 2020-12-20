@@ -1,10 +1,13 @@
 {
     "name": "插件",
     "manifest_version": 2,
-    "description": "create chrome extend plugin",
+    "description": "webpack版chrome插件",
+    "homepage_url": "https://github.com/vannvan",
     "version": "1.0",
     "icons": {
-        "16": "icon/app.png"
+        "16": "icon/app.png",
+        "48": "icon/app.png",
+        "128": "icon/app.png"
     },
     "scriptsAndCss": [
         {
@@ -21,7 +24,7 @@
     },
     "browser_action": {
         "default_icon": "icon/app.png",
-        "default_title": "chajian",
+        "default_title": "插件",
         "default_popup": "popup.html"
     }
 }

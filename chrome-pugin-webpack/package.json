@@ -29,6 +29,8 @@
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.6.0",
     "nodemon": "^2.0.6",
+    "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^1.1.2",
     "vue": "^2.5.17",
     "vue-loader": "^15.3.0",

@@ -1,8 +1,8 @@
 const manifest_version = 2
 const manifest = require('../src/manifest.json')
 const defaultConfig = {
-  name: '白桥Chrome拓展脚手架',
-  description: 'create chrome extend plugin',
+  name: 'chrome插件',
+  description: 'webpack版chrome插件',
   version: '1.0',
   permissions: [
     'contextMenus', // 右键菜单
@@ -19,7 +19,7 @@ const defaultConfig = {
     default_icon: 'img/app.png',
     default_popup: 'popup.html',
   },
-  homepage_url: 'http://img.idot.site',
+  homepage_url: 'https://github.com/vannvan',
   icons: { 16: 'img/app.png', 48: 'img/app.png', 128: 'img/app.png' },
 }
 
