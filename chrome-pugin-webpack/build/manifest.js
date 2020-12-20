@@ -21,6 +21,11 @@ const defaultConfig = {
   },
   homepage_url: 'https://github.com/vannvan',
   icons: { 16: 'img/app.png', 48: 'img/app.png', 128: 'img/app.png' },
+  options_ui: {
+    page: 'options.html',
+    chrome_style: true,
+  },
+  options_page: 'options.html',
 }
 
 const unsafe = {
@@ -180,7 +185,7 @@ module.exports = function() {
 
   const pathname =
     env === 'development'
-      ? path.resolve(__dirname, '../tmp/')
+      ? path.resolve(__dirname, '../local/')
       : path.resolve(__dirname, '../dist/')
   const filename = '/manifest.json'
 

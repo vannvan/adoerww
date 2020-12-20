@@ -11,10 +11,13 @@
     },
     "scriptsAndCss": [
         {
+            "matches": [
+                "<all_urls>"
+            ],
             "js": [
                 "./inject.js"
             ],
-            "position": "document_start"
+            "position": "document_end"
         }
     ],
     "background": {
@@ -26,5 +29,10 @@
         "default_icon": "icon/app.png",
         "default_title": "插件",
         "default_popup": "popup.html"
-    }
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
+    },
+    "optionpage": "options.html"
 }

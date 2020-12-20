@@ -3,26 +3,29 @@ const { resolve } = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WriteJsonWebpackPlugin = require('write-json-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const env = process.env.NODE_ENV
+const isDev = process.env.NODE_ENV == 'development'
+
+const DevOutPutPath = 'local/'
+
 let manifestJSON = require('./src/manifest.json')
 
 // 客户端配置
 module.exports = {
-  //   entry: c,
   entry: {
     background: './src/background.js',
     inject: './src/inject.js',
     popup: './src/popup/popup.js',
+    home: './src/home/home.js',
+    options: './src/options/options.js',
   },
   output: {
     filename: '[name].js',
-    path: resolve(__dirname, env === 'development' ? 'tmp/' : 'dist/'),
+    path: resolve(__dirname, isDev ? DevOutPutPath : 'dist/'),
   },
   module: {
     rules: [
@@ -73,6 +76,24 @@ module.exports = {
       },
       chunks: ['popup'],
     }),
+    new HtmlWebpackPlugin({
+      filename: 'home.html',
+      template: './src/home/home.html',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+      },
+      chunks: ['home'],
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'options.html',
+      template: './src/options/options.html',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true,
+      },
+      chunks: ['options'],
+    }),
     new UglifyJsPlugin({}), //压缩js输出
     new OptimizeCSSAssetsPlugin(), //压缩css
     new MiniCssExtractPlugin({
@@ -81,10 +102,7 @@ module.exports = {
     new CopyWebpackPlugin([
       {
         from: resolve('src/assets/icon'),
-        to: resolve(
-          __dirname,
-          env === 'development' ? 'tmp/' + 'icon' : 'dist/' + 'icon'
-        ),
+        to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'icon'),
         toType: 'dir',
       },
     ]),

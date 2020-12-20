@@ -7,5 +7,8 @@ export default new Vue({
   components: {
     Button,
   },
+  mounted() {
+    console.log('mounted')
+  },
   render: (h) => h(Button),
 }).$mount('#app')

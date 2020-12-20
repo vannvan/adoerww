@@ -2,7 +2,7 @@
 /*!***************************!*\
   !*** ./src/background.js ***!
   \***************************/
-/*! no exports provided */function(e,t,n){"use strict";n.r(t);n=n(/*! ./lib/chrome */"./src/lib/chrome.js");Object(n.contextMenu)({title:"请使用度娘搜索",showSelect:!0,onclick:function(){console.log("heiheihei")}}),console.log("背景脚本")},"./src/lib/chrome.js":
+/*! no exports provided */function(e,t,n){"use strict";n.r(t);n=n(/*! ./lib/chrome */"./src/lib/chrome.js");Object(n.contextMenu)({title:"请使用度娘搜索",showSelect:!0,onclick:function(){console.log("heiheihei")}}),console.log("背景脚本"),Object(n.getCurrent)(function(e){console.log("tabId",e)})},"./src/lib/chrome.js":
 /*!***************************!*\
   !*** ./src/lib/chrome.js ***!
   \***************************/
