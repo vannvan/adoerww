@@ -1,40 +1,3 @@
-function ajax(opt) {
-    opt = opt || {};
-    opt.method = opt.method.toUpperCase() || 'POST';
-    opt.url = opt.url || '';
-    opt.async = opt.async || true;
-    opt.data = opt.data || null;
-    opt.success = opt.success || function() {};
-    opt.responseType = 'blob'
-    var xmlHttp = null;
-    if (XMLHttpRequest) {
-        xmlHttp = new XMLHttpRequest();
-    } else {
-        xmlHttp = new ActiveXObject('Microsoft.XMLHTTP');
-    }
-    var params = [];
-    for (var key in opt.data) {
-        params.push(key + ':' + opt.data[key]);
-    }
-    var postData = params.join('&');
-    if (opt.method.toUpperCase() === 'POST') {
-        xmlHttp.open(opt.method, opt.url, opt.async);
-        //设置请求头
-        xmlHttp.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
-        xmlHttp.setRequestHeader('Content-Type', 'application/json');
-        xmlHttp.setRequestHeader('Cache-Control', 'private');
-        xmlHttp.send(JSON.stringify(opt.data));
-    } else if (opt.method.toUpperCase() === 'GET') {
-        xmlHttp.open(opt.method, opt.url + '?' + postData, opt.async);
-        xmlHttp.send(null);
-    }
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            opt.success(xmlHttp.responseText);
-        }
-    };
-}
-
 (function() {
     //屏蔽掘金扩展广告
     if (/juejin/.test(document.location.host)) {
@@ -42,25 +5,6 @@ function ajax(opt) {
             document.querySelector(".recommend-box").style.display = 'none'
         }
     }
-    // 百度背景图片
-    // if (/baidu/.test(document.location.host)) {
-    //     let img = document.createElement('div')
-    //     img.style.backgroundImage = `url(https://api.66mz8.com/api/bg.img.php)`
-    //     img.style.cssText = 'width:100%;height:100vh;mix-blend-mode: multiply;position:fixed;top:0;background:url(https://api.66mz8.com/api/bg.img.php)'
-    //     document.body.append(img)
-
-    // }
-    // menhera酱表情包：
-    // if (/baidu/.test(document.location.host)) {
-    //     let img = document.createElement('div')
-    //     img.style.cssText = 'width:300px;height:300px;background:url(https://acg.yanwz.cn/menhera/api.php);background-size:cover;position:fixed;bottom:0;right:0'
-    //     document.body.append(img)
-
-    // }
-
-
-
-
 
 })();
 

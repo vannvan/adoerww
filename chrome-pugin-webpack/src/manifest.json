@@ -1,0 +1,38 @@
+{
+    "name": "插件",
+    "manifest_version": 2,
+    "description": "webpack版chrome插件",
+    "homepage_url": "https://github.com/vannvan",
+    "version": "1.0",
+    "icons": {
+        "16": "icon/app.png",
+        "48": "icon/app.png",
+        "128": "icon/app.png"
+    },
+    "scriptsAndCss": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "./inject.js"
+            ],
+            "position": "document_end"
+        }
+    ],
+    "background": {
+        "scripts": [
+            "./background.js"
+        ]
+    },
+    "browser_action": {
+        "default_icon": "icon/app.png",
+        "default_title": "插件",
+        "default_popup": "popup.html"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
+    },
+    "optionpage": "options.html"
+}
