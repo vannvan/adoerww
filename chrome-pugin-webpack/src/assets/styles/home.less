@@ -1,3 +1,30 @@
-a {
-  color: #f00;
+.follow-next {
+  display: block;
+  position: absolute !important;
+  z-index: 9;
+  width: 150px;
+  height: 40px;
+  font-size: 14px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  background-color: #ee4d2d;
+  opacity: 0;
+  cursor: pointer;
+}
+.overflow-y::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  background: #ededed;
+  position: absolute;
+  right: 0;
+}
+.overflow-y::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background: #fff;
+}
+.overflow-y::-webkit-scrollbar {
+  width: 6px;
+  height: 4px;
 }

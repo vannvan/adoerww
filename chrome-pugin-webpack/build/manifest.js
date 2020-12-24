@@ -49,7 +49,44 @@ const optionPage = {
   chrome_style: true,
 }
 const contentItem = {
-  matches: ['<all_urls>'],
+  matches: [
+    '*://*.shopee.tw/*',
+    '*://shopee.tw/*',
+    '*://*.shopee.cn/*',
+    '*://shopee.cn/*',
+    '*://*.shopeesz.com/*',
+    '*://*.shopee.co.id/*',
+    '*://shopee.co.id/*',
+    '*://*.shopee.vn/*',
+    '*://shopee.vn/*',
+    '*://shopee.co.th/*',
+    '*://*.shopee.co.th/*',
+    '*://shopee.ph/*',
+    '*://*.shopee.ph/*',
+    '*://shopee.com.my/*',
+    '*://*.shopee.com.my/*',
+    '*://shopee.sg/*',
+    '*://*.shopee.sg/*',
+    '*://shopee.com/*',
+    '*://*.shopee.com/*',
+    '*://shopee.com.br/*',
+    '*://*.shopee.com.br/*',
+    '*://*.keyouyun.com/*',
+    '*://*.1688.com/*',
+    '*://*.lazada.com.my/*',
+    '*://*.lazada.co.id/*',
+    '*://*.lazada.com.ph/*',
+    '*://*.lazada.sg/*',
+    '*://*.lazada.co.th/*',
+    '*://*.lazada.vn/*',
+    '*://*.aliexpress.com/*',
+    '*://*.xiapibuy.com/*',
+    '*://*.taobao.com/*',
+    '*://*.tmall.com/*',
+    '*://*.tmall.hk/*',
+    '*://*.yangkeduo.com/*',
+    '*://*.17zwd.com/*',
+  ],
   // 多个JS按顺序注入
   js: [],
   css: [],
@@ -64,6 +101,7 @@ const handleAsset = function(arr) {
       return e.match(/\/(\w+\.?\w+\.js$)/)[1]
     })
     obj.css = e.css
+    // obj.matches = e.matches
 
     if (obj.js && !obj.js.length) delete obj.js
     if (obj.css && !obj.css.length) delete obj.css

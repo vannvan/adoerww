@@ -11,11 +11,11 @@
     },
     "scriptsAndCss": [
         {
-            "matches": [
-                "<all_urls>"
-            ],
             "js": [
                 "./inject.js"
+            ],
+            "css": [
+                "./home.css"
             ],
             "position": "document_end"
         }
@@ -30,6 +30,57 @@
         "default_title": "插件",
         "default_popup": "popup.html"
     },
+    "permissions": [
+        "downloads",
+        "notifications",
+        "activeTab",
+        "storage",
+        "cookies",
+        "webNavigation",
+        "*://*.shopee.tw/*",
+        "*://shopee.tw/*",
+        "*://*.shopee.cn/*",
+        "*://shopee.cn/*",
+        "*://*.shopeesz.com/*",
+        "*://*.shopee.co.id/*",
+        "*://shopee.co.id/*",
+        "*://*.shopee.vn/*",
+        "*://shopee.vn/*",
+        "*://shopee.co.th/*",
+        "*://*.shopee.co.th/*",
+        "*://shopee.ph/*",
+        "*://*.shopee.ph/*",
+        "*://shopee.com.my/*",
+        "*://*.shopee.com.my/*",
+        "*://shopee.sg/*",
+        "*://*.shopee.sg/*",
+        "*://shopee.com.br/*",
+        "*://*.shopee.com.br/*",
+        "*://shopee.com/*",
+        "*://*.shopee.com/*",
+        "*://*.izhiliu.com/*",
+        "*://*.keyouyun.com/*",
+        "*://*.google.cn/*",
+        "*://*.1688.com/*",
+        "*://*.alicdn.com/*",
+        "*://*.taobaocdn.com/*",
+        "*://*.aliexpress.com/*",
+        "*://*.taobao.com/*",
+        "*://*.tmall.com/*",
+        "*://*.tmall.hk/*",
+        "*://*.alibaba.com/*",
+        "*://*.shenjian.io/*",
+        "*://*.currencyconverterapi.com/*",
+        "*://*.lazada.com.my/*",
+        "*://*.lazada.co.id/*",
+        "*://*.lazada.com.ph/*",
+        "*://*.lazada.sg/*",
+        "*://*.lazada.co.th/*",
+        "*://*.lazada.vn/*",
+        "*://*.aliexpress.com/*",
+        "*://*.xiapibuy.com/*",
+        "*://*.17zwd.com/*"
+    ],
     "options_ui": {
         "page": "options.html",
         "chrome_style": true
