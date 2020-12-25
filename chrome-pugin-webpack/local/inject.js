@@ -462,6 +462,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -476,7 +499,7 @@ function getTime() {
   },
   data: function data() {
     return {
-      display: true,
+      display: false,
       drawerWidth: '400px',
       currentTab: 1,
       //   筛选参数
@@ -496,8 +519,7 @@ function getTime() {
         sellerGoodsCount: null //卖家商品数
 
       },
-      buttonText: '开启关注',
-      button2Text: '开启取关',
+      buttonText: '开启',
       countFollowers: null,
       //当前页面粉丝数
       storeInfo: {
@@ -512,7 +534,19 @@ function getTime() {
       isRequest: false,
       globalTimer: null,
       usernameQueue: [],
-      currentUserName: null
+      //用户队列
+      currentUserName: null,
+      //当前操作用用
+      cookieSyncStatus: true,
+      //cookies同步状态
+      actionedUserList: [],
+      //操作过的用户
+      unfollowMaxNumber: 10,
+      //取消关注最大数量
+      isOther: false,
+      //用于标识是关注别人的还是取关自己的
+      lastOffsetHeight: null //用于标识上次垂直高度和当前垂直高度，屏幕是否滚到底部
+
     };
   },
   computed: {
@@ -562,7 +596,7 @@ function getTime() {
           var value = input.value;
 
           if (parseFloat(value) <= parseFloat(binding.value)) {
-            input.value = 1;
+            input.value = parseFloat(binding.value) + 1;
           }
 
           trigger(input, 'input');
@@ -573,39 +607,52 @@ function getTime() {
   mounted: function mounted() {
     var _this2 = this;
 
+    this.isOther = window.location.search.search('other') == 1;
+    this.currentTab = this.isOther ? 1 : 2;
+    this.buttonText = this.isOther ? '开启关注' : '开启取关';
+
     var _this = this;
 
     var pathname = window.location.pathname;
 
-    if (/followers/.test(pathname)) {
+    if (/followers|following/.test(pathname)) {
       var storeId = pathname.split('/')[2];
       _inject_follow_content__WEBPACK_IMPORTED_MODULE_1__["default"].getStoreInfoById(storeId).then(function (res) {
         _this2.storeInfo = res.result.data;
         console.log(_this2.storeInfo);
       });
+
+      _this.scrollTo();
     }
 
-    _this.scrollTo();
-
     window.addEventListener('scroll', this.handleScroll);
+    this.$nextTick(function () {
+      _inject_follow_content__WEBPACK_IMPORTED_MODULE_1__["default"].sendCsrfToken().then(function (res) {
+        console.log('cookies同步成功');
+        _this2.cookieSyncStatus = true;
+      });
+    });
   },
   methods: {
     handleScroll: function handleScroll() {
-      this.countFollowers = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.clickable_area').length;
+      this.countFollowers = jquery__WEBPACK_IMPORTED_MODULE_2___default()('.clickable_area.middle-centered-div').length;
     },
     scrollTo: function scrollTo() {
-      var limit = 500;
-      var timer = setInterval(function () {
-        window.scrollTo(0, limit);
-        limit += 1000;
+      var _this3 = this;
 
-        if (limit > 5000) {
+      var timer = setInterval(function () {
+        if (_this3.lastOffsetHeight >= document.body.offsetHeight) {
           clearTimeout(timer);
+        } else {
+          window.scrollTo(0, document.body.offsetHeight);
+          _this3.lastOffsetHeight = document.body.offsetHeight;
         }
-      }, limit);
+      }, 5000);
     },
     //开始关注
-    handleStart: function handleStart() {
+    handleStart: function handleStart(actionType) {
+      var _this = this;
+
       if (this.isRequest) {
         this.handleCancel();
         return;
@@ -613,47 +660,176 @@ function getTime() {
 
       if (!this.validate()) return;
       var userNameList = [];
-      jquery__WEBPACK_IMPORTED_MODULE_2___default()('.down a').each(function () {
+      var htmlStr = "<li>[".concat(getTime(), "] \u4EFB\u52A1\u5F00\u59CB...</li>");
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()('.down a').each(function (index) {
+        if (index >= _this.filterParams.startIndex) {
+          userNameList.push(jquery__WEBPACK_IMPORTED_MODULE_2___default()(this).attr('username'));
+        } else {
+          _this.resultCount.skip += 1; //跳过
+        }
+      });
+      this.usernameQueue = userNameList;
+      this.getStoreFollowers(actionType);
+    },
+    // //取消关注
+    handleCancelFollow: function handleCancelFollow() {
+      var _this = this;
+
+      if (this.isRequest) {
+        this.handleCancel();
+        return;
+      }
+
+      if (!this.validate()) return;
+      var userNameList = [];
+      var htmlStr = "<li>[".concat(getTime(), "] \u53D6\u5173\u4EFB\u52A1\u5F00\u59CB...</li>");
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+      jquery__WEBPACK_IMPORTED_MODULE_2___default()('.down a').each(function (index) {
         userNameList.push(jquery__WEBPACK_IMPORTED_MODULE_2___default()(this).attr('username'));
       });
-      this.usernameQueue = userNameList; //   console.log(usernameQueue)
+      this.usernameQueue = userNameList;
+      this.getStoreFollowers('unfollow');
+    },
+    //关注或取关操作
+    getStoreFollowers: function getStoreFollowers(actionType) {
+      var _this4 = this;
 
-      this.isRequest = true;
-      this.buttonText = '正在运行中，点击可取消';
-      this.getStoreFollowers();
+      this.globalTimer = setInterval(function () {
+        _this4.currentUserName = _this4.usernameQueue.splice(0, 1);
+
+        if (!!_this4.currentUserName) {
+          _this4.isRequest = true;
+          _this4.buttonText = '正在运行中，点击可取消';
+
+          _this4.actionedUserList.push(_this4.currentUserName);
+
+          if (!_this4.handleSkipJudge(actionType)) return;
+          _inject_follow_content__WEBPACK_IMPORTED_MODULE_1__["default"].getStoreFollowers(_this4.currentUserName).then(function (res) {
+            var shopid = res.result.data.shopid;
+
+            if (actionType == 'follow' && _this4.filterMatch(res.result.data)) {
+              _this4.handleNotifyToBack(actionType, shopid, _this4.currentUserName);
+            } else if (actionType == 'unfollow') {
+              _this4.handleNotifyToBack(actionType, shopid, _this4.currentUserName);
+            } else {
+              _this4.resultCount.skip += 1;
+              var htmlStr = "<li>[".concat(getTime(), "] ").concat(_this4.currentUserName, "\u8DF3\u8FC7</li>");
+              jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+            }
+          });
+        } else {
+          var _infoText = actionType == 'follow' ? '关注' : '取关';
+
+          var htmlStr = "<li>[".concat(getTime(), "] ").concat(_infoText, " \u4EFB\u52A1\u5B8C\u6BD5\uFF01</li>");
+          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+        }
+      }, 1000);
+    },
+    handleSkipJudge: function handleSkipJudge(actionType) {
+      var _this5 = this;
+
+      var limitOpts = {
+        1: this.actionedUserList.length > this.filterParams.limitFollowNumber || this.actionedUserList > this.countFollowers,
+        2: this.actionedUserList.length > this.unfollowMaxNumber || this.actionedUserList > this.countFollowers
+      };
+      console.log(limitOpts[this.currentTab], 'limit');
+
+      if (limitOpts[this.currentTab]) {
+        clearInterval(this.globalTimer);
+        this.$nextTick(function () {
+          var infoText = actionType == 'follow' ? '关注' : '取关';
+          var htmlStr = "<li style=\"color:#2ecc71\">[".concat(getTime(), "] ").concat(infoText, " \u4EFB\u52A1\u5B8C\u6210...</li>");
+          _this5.buttonText = _this5.isOther ? '开启关注' : '开启取关';
+          _this5.isRequest = false;
+          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+        });
+        return false;
+      }
+
+      return true;
+    },
+    //关注或取关，传送给后台
+    handleNotifyToBack: function handleNotifyToBack(actionType, shopid, name) {
+      var _this6 = this;
+
+      //   console.log('操作过的用户', this.actionedUserList)
+      _inject_follow_content__WEBPACK_IMPORTED_MODULE_1__["default"].notifyBackFollowOrUnFollow(actionType, shopid).then(function (res) {
+        if (res.result.success) {
+          var _infoText2 = actionType == 'follow' ? '关注' : '取关';
+
+          var htmlStr = "<li style=\"color:#2ecc71\">[".concat(getTime(), "] ").concat(name).concat(_infoText2, "\u6210\u529F</li>");
+          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(htmlStr);
+          _this6.resultCount.success += 1;
+        } else if (res.result.error == 'error_not_login') {
+          clearInterval(_this6.globalTimer);
+
+          var _htmlStr = "<li style=\"color:#f00\">[".concat(getTime(), "] \u8BF7\u540C\u6B65\u767B\u5F55\u72B6\u6001\u540E\u91CD\u65B0\u64CD\u4F5C</li>");
+
+          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(_htmlStr);
+          _this6.resultCount.fail += 1;
+          _this6.isRequest = false;
+          _this6.buttonText = _this6.isOther ? '开启关注' : '开启取关';
+        } else {
+          var _htmlStr2 = "<li style=\"color:#f00\">[".concat(getTime(), "] ").concat(name).concat(infoText, "\u5931\u8D25</li>");
+
+          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').prepend(_htmlStr2);
+          _this6.resultCount.fail += 1;
+        }
+      });
+    },
+    //过滤匹配
+    filterMatch: function filterMatch(source) {
+      // item_count是商品数
+      var is_seller = source.account.is_seller,
+          mtime = source.mtime,
+          item_count = source.item_count,
+          follower_count = source.follower_count,
+          rating_bad = source.rating_bad,
+          rating_good = source.rating_good,
+          rating_normal = source.rating_normal,
+          name = source.name;
+      var rateCount = rating_bad + rating_good + rating_normal; //评价次数
+
+      console.log("\u4E0A\u6B21\u767B\u5F55: ".concat(new Date(mtime * 1000).toLocaleDateString(), ",\u5546\u54C1\u6570: ").concat(item_count, ",\u5173\u6CE8\u6570: ").concat(follower_count, ",\u8BC4\u4EF7\u6570: ").concat(rateCount, ",\u662F\u5426\u5356\u5BB6\uFF1A").concat(is_seller, ",\u7528\u6237\u59D3\u540D\uFF1A").concat(name, ",\u83B7\u53D6\u65F6\u95F4\uFF1A").concat(getTime()));
+      var _this$filterParams = this.filterParams,
+          lastLoginTime = _this$filterParams.lastLoginTime,
+          commentsTimes = _this$filterParams.commentsTimes,
+          followsTimes = _this$filterParams.followsTimes,
+          isFilterSeller = _this$filterParams.isFilterSeller,
+          sellerGoodsCount = _this$filterParams.sellerGoodsCount;
+      var timestamp = Math.round(new Date().getTime() / 1000).toString();
+      var matchStep1 = follower_count >= followsTimes; //和关注数
+
+      var matchStep2 = parseInt((timestamp - mtime) / 86400) <= lastLoginTime; //限制上次登录
+
+      var matchStep3 = item_count >= sellerGoodsCount; //限制商品数
+
+      var matchStep5 = is_seller == false;
+      var matchStep6 = rateCount >= commentsTimes; //限制评价次数
+      //   如果不过滤卖家
+
+      if (!isFilterSeller) {
+        return matchStep1 && matchStep2 && matchStep3 && matchStep6;
+      } else {
+        return matchStep1 && matchStep2 && matchStep3 && matchStep5 && matchStep6;
+      }
     },
     validate: function validate() {
-      var _this3 = this;
+      var _this7 = this;
 
       var validQueue = [];
       Object.keys(this.filterParams).forEach(function (key) {
         var exclude = ['isFilterSeller', 'sellerGoodsCount'];
 
-        if (!_this3.filterParams[key] && _this3.$refs[key]) {
-          _this3.$refs[key].style.display = 'block';
+        if (!_this7.filterParams[key] && _this7.$refs[key]) {
+          _this7.$refs[key].style.display = 'block';
           validQueue.push(false);
-        } else if (_this3.$refs[key]) {
-          _this3.$refs[key].style.display = 'none';
+        } else if (_this7.$refs[key]) {
+          _this7.$refs[key].style.display = 'none';
         }
       });
       return validQueue.length == 0;
-    },
-    //关注请求
-    getStoreFollowers: function getStoreFollowers() {
-      var _this4 = this;
-
-      this.globalTimer = setInterval(function () {
-        _this4.currentUserName = _this4.usernameQueue.splice(0, 1);
-        _inject_follow_content__WEBPACK_IMPORTED_MODULE_1__["default"].getStoreFollowers(_this4.currentUserName).then(function (res) {
-          console.log(res);
-          var name = res.result.data.name;
-          var htmlStr = "<li>[".concat(getTime(), "] ").concat(name, "\u5F00\u59CB\u5173\u6CE8</li>");
-          jquery__WEBPACK_IMPORTED_MODULE_2___default()('#ResultContent').append(htmlStr);
-        });
-      }, 3000);
-    },
-    //取消关注
-    handleCancelFollow: function handleCancelFollow() {//
     },
     //取消请求
     handleCancel: function handleCancel() {
@@ -12159,12 +12335,7 @@ var render = function() {
                     "span",
                     {
                       staticClass: "tab-item",
-                      class: { active: _vm.currentTab == 1 },
-                      on: {
-                        click: function($event) {
-                          _vm.currentTab = 1
-                        }
-                      }
+                      class: { active: _vm.currentTab == 1 }
                     },
                     [_vm._v("粉丝关注")]
                   ),
@@ -12173,12 +12344,7 @@ var render = function() {
                     "span",
                     {
                       staticClass: "tab-item",
-                      class: { active: _vm.currentTab == 2 },
-                      on: {
-                        click: function($event) {
-                          _vm.currentTab = 2
-                        }
-                      }
+                      class: { active: _vm.currentTab == 2 }
                     },
                     [_vm._v("自动取关")]
                   )
@@ -12272,12 +12438,6 @@ var render = function() {
                                     rawName: "v-enterNumberMin",
                                     value: 0,
                                     expression: "0"
-                                  },
-                                  {
-                                    name: "enterNumberMax",
-                                    rawName: "v-enterNumberMax",
-                                    value: 100,
-                                    expression: "100"
                                   }
                                 ],
                                 attrs: {
@@ -12319,12 +12479,6 @@ var render = function() {
                                     rawName: "v-model",
                                     value: _vm.filterParams.limitFollowNumber,
                                     expression: "filterParams.limitFollowNumber"
-                                  },
-                                  {
-                                    name: "enterNumberMax",
-                                    rawName: "v-enterNumberMax",
-                                    value: 100,
-                                    expression: "100"
                                   },
                                   {
                                     name: "enterNumberMin",
@@ -12391,8 +12545,8 @@ var render = function() {
                                   {
                                     name: "enterNumberMin",
                                     rawName: "v-enterNumberMin",
-                                    value: 0,
-                                    expression: "0"
+                                    value: -1,
+                                    expression: "-1"
                                   }
                                 ],
                                 attrs: {
@@ -12442,8 +12596,8 @@ var render = function() {
                                   {
                                     name: "enterNumberMin",
                                     rawName: "v-enterNumberMin",
-                                    value: 0,
-                                    expression: "0"
+                                    value: -1,
+                                    expression: "-1"
                                   }
                                 ],
                                 attrs: { type: "number", placeholder: ">=0次" },
@@ -12494,8 +12648,8 @@ var render = function() {
                                   {
                                     name: "enterNumberMin",
                                     rawName: "v-enterNumberMin",
-                                    value: 0,
-                                    expression: "0"
+                                    value: -1,
+                                    expression: "-1"
                                   }
                                 ],
                                 attrs: { type: "number", placeholder: ">=0次" },
@@ -12654,11 +12808,11 @@ var render = function() {
                           "button",
                           {
                             style: {
-                              background: _vm.isRequest ? "#27ae60" : "#ee4d2d"
+                              background: _vm.isRequest ? "#747d8c" : "#ee4d2d"
                             },
                             on: {
                               click: function($event) {
-                                return _vm.handleStart()
+                                return _vm.handleStart("follow")
                               }
                             }
                           },
@@ -12669,52 +12823,6 @@ var render = function() {
                                 "\n            "
                             )
                           ]
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _vm.isRequest
-                        ? _c(
-                            "p",
-                            {
-                              staticClass: "text-center",
-                              staticStyle: { color: "#f00" }
-                            },
-                            [_vm._v("\n            请勿关闭本页面\n          ")]
-                          )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.isRequest
-                        ? _c("div", { staticClass: "show-result-count" }, [
-                            _c("div", { staticClass: "count-item success" }, [
-                              _c("p", [_vm._v("成功")]),
-                              _vm._v(" "),
-                              _c("p", [_vm._v(_vm._s(_vm.resultCount.success))])
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "count-item fail" }, [
-                              _c("p", [_vm._v("失败")]),
-                              _vm._v(" "),
-                              _c("p", [_vm._v(_vm._s(_vm.resultCount.fail))])
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "count-item skip" }, [
-                              _c("p", [_vm._v("条国")]),
-                              _vm._v(" "),
-                              _c("p", [_vm._v(_vm._s(_vm.resultCount.skip))])
-                            ])
-                          ])
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _vm.isRequest
-                        ? _c("div", {
-                            staticClass: "show-result-list",
-                            attrs: { id: "ResultContent" }
-                          })
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c("p", { staticClass: "count-info" }, [
-                        _vm._v(
-                          "当前页面可见粉丝数：" + _vm._s(_vm.countFollowers)
                         )
                       ])
                     ]
@@ -12785,16 +12893,45 @@ var render = function() {
                           _vm._v(" "),
                           _c("li", [
                             _c("span", { staticClass: "sub-item" }, [
-                              _vm._v("取消关注(450)")
+                              _vm._v("取消关注")
                             ])
                           ]),
                           _vm._v(" "),
                           _c("li", [
                             _c("span", { staticClass: "sub-item" }, [
                               _c("input", {
+                                directives: [
+                                  {
+                                    name: "enterNumberMin",
+                                    rawName: "v-enterNumberMin",
+                                    value: 0,
+                                    expression: "0"
+                                  },
+                                  {
+                                    name: "enterNumberMax",
+                                    rawName: "v-enterNumberMax",
+                                    value: _vm.countFollowers,
+                                    expression: "countFollowers"
+                                  },
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.unfollowMaxNumber,
+                                    expression: "unfollowMaxNumber"
+                                  }
+                                ],
                                 attrs: {
                                   type: "number",
                                   placeholder: "取消关注的数量"
+                                },
+                                domProps: { value: _vm.unfollowMaxNumber },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.unfollowMaxNumber = $event.target.value
+                                  }
                                 }
                               })
                             ])
@@ -12807,7 +12944,7 @@ var render = function() {
                             {
                               style: {
                                 background: _vm.isRequest
-                                  ? "#27ae60"
+                                  ? "#747d8c"
                                   : "#ee4d2d"
                               },
                               on: {
@@ -12819,7 +12956,7 @@ var render = function() {
                             [
                               _vm._v(
                                 "\n                " +
-                                  _vm._s(_vm.button2Text) +
+                                  _vm._s(_vm.buttonText) +
                                   "\n              "
                               )
                             ]
@@ -12827,7 +12964,61 @@ var render = function() {
                         ])
                       ])
                     ]
-                  : _vm._e()
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isRequest
+                  ? _c(
+                      "p",
+                      {
+                        staticClass: "text-center",
+                        staticStyle: { color: "#f00" }
+                      },
+                      [_vm._v("\n          请勿关闭本页面\n        ")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.actionedUserList.length != 0
+                  ? _c("div", { staticClass: "show-result-count" }, [
+                      _c("div", { staticClass: "count-item success" }, [
+                        _c("p", [_vm._v("成功")]),
+                        _vm._v(" "),
+                        _c("p", [_vm._v(_vm._s(_vm.resultCount.success))])
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "count-item fail" }, [
+                        _c("p", [_vm._v("失败")]),
+                        _vm._v(" "),
+                        _c("p", [_vm._v(_vm._s(_vm.resultCount.fail))])
+                      ]),
+                      _vm._v(" "),
+                      _vm.currentTab == 1
+                        ? _c("div", { staticClass: "count-item skip" }, [
+                            _c("p", [_vm._v("跳过")]),
+                            _vm._v(" "),
+                            _c("p", [_vm._v(_vm._s(_vm.resultCount.skip))])
+                          ])
+                        : _vm._e()
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.actionedUserList.length != 0
+                  ? _c("div", {
+                      staticClass: "show-result-list overflow-y",
+                      attrs: { id: "ResultContent" }
+                    })
+                  : _vm._e(),
+                _vm._v(" "),
+                !_vm.cookieSyncStatus
+                  ? _c("div", { staticClass: "error-wrap" }, [
+                      _c("p", [_vm._v("请登录账号后重新进入此页面")]),
+                      _vm._v(" "),
+                      _c("p", [_vm._v("已登录请刷新此页面")])
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _c("p", { staticClass: "count-info" }, [
+                  _vm._v("当前页面可操作用户数：" + _vm._s(_vm.countFollowers))
+                ])
               ],
               2
             )
@@ -25191,53 +25382,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/lib/chrome-client.js */ "./src/lib/chrome-client.js");
-/* harmony import */ var _components_Home_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/Home.vue */ "./src/components/Home.vue");
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/lib/utils */ "./src/lib/utils.js");
+/* harmony import */ var _lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/lib/chrome-client.js */ "./src/lib/chrome-client.js");
+/* harmony import */ var _components_Home_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/Home.vue */ "./src/components/Home.vue");
 
 
 
 
-var rightFixed = document.createElement('div');
-rightFixed.id = 'shopEdenContent';
-document.body.appendChild(rightFixed);
-setTimeout(function () {
-  new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
-    el: '#shopEdenContent',
-    render: function render(createElement) {
-      return createElement(_components_Home_vue__WEBPACK_IMPORTED_MODULE_3__["default"]);
-    }
-  });
-}, 500); //给后台发送消息
-
-var sendMessageToBackground = function sendMessageToBackground(action, options, type, callback) {
-  return new Promise(function (resolve) {
-    chrome.runtime.sendMessage('', {
-      action: action,
-      options: options,
-      type: type
-    }, callback.bind(resolve));
-  });
-}; //节流
 
 
-function throttle(fn, wait) {
-  var timer = null;
-  return function () {
-    var context = this;
-    var args = arguments;
-
-    if (!timer) {
-      timer = setTimeout(function () {
-        fn.apply(context, args);
-        timer = null;
-      }, wait);
-    }
-  };
+if (/shopee|xiapibuy/.test(window.location.host)) {
+  var rightFixed = document.createElement('div');
+  rightFixed.id = 'shopEdenContent';
+  document.body.appendChild(rightFixed);
+  setTimeout(function () {
+    new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
+      el: '#shopEdenContent',
+      render: function render(createElement) {
+        return createElement(_components_Home_vue__WEBPACK_IMPORTED_MODULE_4__["default"]);
+      }
+    });
+    Follow.init();
+    Follow.sendCsrfToken();
+  }, 500);
 } //粉丝关注
 
 
 var Follow = {
+  domain: window.location.origin,
   init: function init() {
+    console.log(this.domain, 'domain');
     var followActionWrap = jquery__WEBPACK_IMPORTED_MODULE_1___default()("<div id='FollowActionWrap'></div>");
     jquery__WEBPACK_IMPORTED_MODULE_1___default()('body').append(followActionWrap);
   },
@@ -25276,7 +25450,7 @@ var Follow = {
 
           if (storeId) {
             var realId = storeId.split('.')[0];
-            window.open("https://my.xiapibuy.com/shop/".concat(realId, "/followers?__classic__=1"));
+            window.open("/shop/".concat(realId, "/followers?other=true"));
           }
         });
       }
@@ -25285,8 +25459,11 @@ var Follow = {
   },
   //获取店铺信息
   getStoreInfoById: function getStoreInfoById(storeId) {
+    var _this2 = this;
+
     return new Promise(function (resolve, reject) {
-      sendMessageToBackground('request', {
+      Object(_lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_3__["sendMessageToBackground"])('request', {
+        domain: _this2.domain,
         storeId: storeId
       }, 'GET_SHOPPE_STORE_INFO_BY_ID', function (data) {
         resolve(data);
@@ -25297,8 +25474,11 @@ var Follow = {
   },
   //批量获取关注者信息
   getStoreFollowers: function getStoreFollowers(userName) {
+    var _this3 = this;
+
     return new Promise(function (resolve) {
-      sendMessageToBackground('request', {
+      Object(_lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_3__["sendMessageToBackground"])('request', {
+        domain: _this3.domain,
         userName: userName
       }, 'GET_STORE_FOLLOEWERS_INFO', function (data) {
         resolve(data);
@@ -25306,15 +25486,42 @@ var Follow = {
         resolve(res);
       });
     });
+  },
+  //给后台传送csrfToken
+  sendCsrfToken: function sendCsrfToken() {
+    return new Promise(function (resolve) {
+      Object(_lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_3__["sendMessageToBackground"])('request', {
+        csrfToken: Object(_lib_utils__WEBPACK_IMPORTED_MODULE_2__["getCookie"])('csrftoken')
+      }, 'SET_SHOPPE_CRSF_TOKEN', function (data) {
+        resolve(data);
+      }).then(function (res) {
+        resolve(res);
+      });
+    });
+  },
+  //通知后台关注或取关
+  notifyBackFollowOrUnFollow: function notifyBackFollowOrUnFollow(actionType, shopid) {
+    var _this4 = this;
+
+    return new Promise(function (resolve) {
+      Object(_lib_chrome_client_js__WEBPACK_IMPORTED_MODULE_3__["sendMessageToBackground"])('request', {
+        domain: _this4.domain,
+        actionType: actionType,
+        shopid: shopid
+      }, 'POST_SHOPPE_FOLLOW_ACTION', function (data) {
+        resolve(data);
+      }).then(function (res) {
+        resolve(res);
+      });
+    });
   }
 };
-Follow.init();
 
 window.onscroll = function () {
   var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
 
   if (scrollTop > 2000) {
-    throttle(Follow.insertAction(), 500);
+    Object(_lib_utils__WEBPACK_IMPORTED_MODULE_2__["throttle"])(Follow.insertAction(), 500);
   }
 };
 
@@ -25326,7 +25533,7 @@ window.onscroll = function () {
 /*!**********************************!*\
   !*** ./src/lib/chrome-client.js ***!
   \**********************************/
-/*! exports provided: getURL, getInContext, request, sendRequest, getExtension, lStorage, setlStorage */
+/*! exports provided: getURL, getInContext, request, sendRequest, getExtension, lStorage, sendMessageToBackground, setlStorage */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -25337,6 +25544,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sendRequest", function() { return sendRequest; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getExtension", function() { return getExtension; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lStorage", function() { return lStorage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sendMessageToBackground", function() { return sendMessageToBackground; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setlStorage", function() { return setlStorage; });
 // chrome.extension(getURL , inIncognitoContext , lastError , onRequest , sendRequest)
 function getURL(url) {
@@ -25358,7 +25566,61 @@ function getExtension() {
 function lStorage() {
   return chrome.storage;
 }
+var sendMessageToBackground = function sendMessageToBackground(action, options, type, callback) {
+  return new Promise(function (resolve) {
+    chrome.runtime.sendMessage('', {
+      action: action,
+      options: options,
+      type: type
+    }, callback.bind(resolve));
+  });
+};
 function setlStorage(key, v) {}
+
+/***/ }),
+
+/***/ "./src/lib/utils.js":
+/*!**************************!*\
+  !*** ./src/lib/utils.js ***!
+  \**************************/
+/*! exports provided: throttle, getCookie */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "throttle", function() { return throttle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCookie", function() { return getCookie; });
+//节流
+function throttle(fn, wait) {
+  var timer = null;
+  return function () {
+    var context = this;
+    var args = arguments;
+
+    if (!timer) {
+      timer = setTimeout(function () {
+        fn.apply(context, args);
+        timer = null;
+      }, wait);
+    }
+  };
+}
+function getCookie(name) {
+  var strcookie = document.cookie; //获取cookie字符串
+
+  var arrcookie = strcookie.split('; '); //分割
+  //遍历匹配
+
+  for (var i = 0; i < arrcookie.length; i++) {
+    var arr = arrcookie[i].split('=');
+
+    if (arr[0] == name) {
+      return arr[1];
+    }
+  }
+
+  return '';
+}
 
 /***/ })
 

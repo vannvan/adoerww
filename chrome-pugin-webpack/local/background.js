@@ -10979,17 +10979,10 @@ return jQuery;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _lib_chrome__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/chrome */ "./src/lib/chrome.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+// import { contextMenu, getCurrent } from './lib/chrome'
 
-
-
-function dump(tabId) {
-  console.log('tabId', tabId);
-}
-
-Object(_lib_chrome__WEBPACK_IMPORTED_MODULE_0__["getCurrent"])(dump);
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   var action = request.action,
       options = request.options,
@@ -11005,15 +10998,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return true;
   }
 
+  if (action == 'request' && type == 'SET_SHOPPE_CRSF_TOKEN') {
+    Request.setCookies(options, type, sendResponse);
+    return true;
+  }
+
+  if (action == 'request' && type == 'POST_SHOPPE_FOLLOW_ACTION') {
+    Request.postShoppeFollowAction(options, type, sendResponse);
+    return true;
+  }
+
   return true; //   return true //return true可以避免The message port closed before a response was received报错
 }); //需要请求数据
 
 var Request = {
   // 获取店铺信息
   getStoreInfoById: function getStoreInfoById(params, type, call) {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default.a.ajax({
+    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
       type: 'get',
-      url: 'https://my.xiapibuy.com/api/v2/shop/get?is_brief=1&shopid=' + params.storeId,
+      url: "".concat(params.domain, "/api/v2/shop/get?is_brief=1&shopid=").concat(params.storeId),
       dataType: 'json',
       success: function success(data) {
         call({
@@ -11025,9 +11028,9 @@ var Request = {
   },
   //获取店铺粉丝信息
   getFollowersInfoByName: function getFollowersInfoByName(params, type, call) {
-    jquery__WEBPACK_IMPORTED_MODULE_1___default.a.ajax({
+    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
       type: 'get',
-      url: 'https://my.xiapibuy.com/api/v4/shop/get_shop_detail?username=' + params.userName,
+      url: "".concat(params.domain, "/api/v4/shop/get_shop_detail?username=").concat(params.userName),
       dataType: 'json',
       success: function success(data) {
         call({
@@ -11036,108 +11039,54 @@ var Request = {
         });
       }
     });
-  }
-};
+  },
+  setCookies: function setCookies(params, type, call) {
+    if (localStorage.setItem('csrfToken', params.csrfToken)) {
+      call({
+        type: type,
+        result: '设置成功'
+      });
+    }
+  },
+  //   请求虾皮的关注或取关接口
+  postShoppeFollowAction: function postShoppeFollowAction(params, type, call) {
+    var actionType = params.actionType,
+        shopid = params.shopid,
+        domain = params.domain;
+    var mallUrl = 'https://mall.' + domain.split('//'); //取关需要添加二级域名
 
-/***/ }),
-
-/***/ "./src/lib/chrome.js":
-/*!***************************!*\
-  !*** ./src/lib/chrome.js ***!
-  \***************************/
-/*! exports provided: contextMenu, insertCss, exceScript, getCurrent, getTabId, getTabId2, getItem, setItem */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "contextMenu", function() { return contextMenu; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "insertCss", function() { return insertCss; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "exceScript", function() { return exceScript; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCurrent", function() { return getCurrent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTabId", function() { return getTabId; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTabId2", function() { return getTabId2; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getItem", function() { return getItem; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setItem", function() { return setItem; });
-// const chrome = {}
-var contextMenus = {}; // 右键菜单
-
-function contextMenu(config) {
-  config = config || {};
-  contextMenus.title = config.showSelect ? config.title + ': %s' : config.title;
-  config.showSelect ? contextMenus.contexts = ['selection'] : null;
-  contextMenus.onclick = config.onclick;
-  return chrome.contextMenus.create(contextMenus);
-} // 插入Css
-
-function insertCss(tabId, link) {
-  if (!chrome.tab) {
-    console.log(' Sorry, maybe you didn\'t declare tab permission');
-    return;
-  }
-
-  chrome.tab.insertCss(tabId, {
-    file: link.match(/\/?(\w+\.?-?\w+\.css)$/)[1]
-  });
-} // 插入js
-
-function exceScript(tabId, linkOrCode) {
-  if (!chrome.tab) {
-    console.log(' Sorry, maybe you didn\'t declare tab permission');
-    return;
-  }
-
-  chrome.tab.exceScript(tabId, linkOrCode.match(/\.js$/) ? {
-    file: linkOrCode.match(/\/?(\w+\.?-?\w+\.js$)/)[1]
-  } : {
-    code: linkOrCode
-  });
-} // 获取当前窗口的ID
-
-function getCurrent(callback) {
-  if (typeof callback != 'function') return;
-  chrome.windows.getCurrent(function (currentWindow) {
-    callback && callback(currentWindow.id);
-  });
-} // 获取当前tabID
-
-function getTabId(callback) {
-  if (typeof callback != 'function') return;
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, function (tabs) {
-    callback && callback(tabs.length ? tabs[0].id : null);
-  });
-} // 获取当前tabID2
-
-function getTabId2(callback) {
-  if (typeof callback != 'function') return;
-  chrome.windows.getCurrent(function (currentWindow) {
-    chrome.tabs.query({
-      active: true,
-      windowId: currentWindow.id
-    }, function (tabs) {
-      if (callback) callback(tabs.length ? tabs[0].id : null);
+    var Opts = {
+      follow: "".concat(domain, "/buyer/"),
+      unfollow: "".concat(mallUrl, "/buyer/")
+    };
+    jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
+      type: 'post',
+      url: "".concat(Opts[actionType]).concat(actionType, "/shop/").concat(shopid, "/"),
+      data: {
+        csrfmiddlewaretoken: localStorage.getItem('csrfToken')
+      },
+      success: function success(data) {
+        call({
+          type: type,
+          result: data
+        });
+      }
     });
-  });
-} //storage
+  } // Request.handleFollow()
+  // function getCookies(domain, name, callback) {
+  //   chrome.cookies.get({ url: domain, name: name }, function(cookie) {
+  //     if (callback) {
+  //       callback(cookie)
+  //     }
+  //   })
+  // }
+  // //usage:
+  // getCookies('https://shopee.com.my/', 'id', function(id) {
+  //   //   alert(id)
+  //   console.log(id)
+  // })
 
-function getItem(values, callback) {
-  if (!chrome.storage) {
-    console.log('Sorry, maybe you dont have storage permission');
-    return;
-  }
-
-  chrome.storage.sync.get(values, function (items) {
-    callback && callback(items);
-  });
-} // storage 保存数据
-
-function setItem(values, callback) {
-  chrome.storage.sync.set(values, function () {
-    typeof callback == 'function' && callback(values);
-  });
-}
+};
 
 /***/ })
 

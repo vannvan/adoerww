@@ -23,5 +23,19 @@ export function getExtension() {
 export function lStorage() {
   return chrome.storage
 }
+export const sendMessageToBackground = function(
+  action,
+  options,
+  type,
+  callback
+) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(
+      '',
+      { action: action, options: options, type: type },
+      callback.bind(resolve)
+    )
+  })
+}
 
 export function setlStorage(key, v) {}

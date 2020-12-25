@@ -1,50 +1,31 @@
 import Vue from 'vue'
 import $$ from 'jquery'
-import { getURL } from '@/lib/chrome-client.js'
+import { throttle, getCookie } from '@/lib/utils'
+import { getURL, sendMessageToBackground } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 
-let rightFixed = document.createElement('div')
-rightFixed.id = 'shopEdenContent'
-document.body.appendChild(rightFixed)
+if (/shopee|xiapibuy/.test(window.location.host)) {
+  let rightFixed = document.createElement('div')
+  rightFixed.id = 'shopEdenContent'
+  document.body.appendChild(rightFixed)
 
-setTimeout(() => {
-  new Vue({
-    el: '#shopEdenContent',
-    render: (createElement) => {
-      return createElement(Home)
-    },
-  })
-}, 500)
-
-//给后台发送消息
-const sendMessageToBackground = function(action, options, type, callback) {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage(
-      '',
-      { action: action, options: options, type: type },
-      callback.bind(resolve)
-    )
-  })
-}
-
-//节流
-function throttle(fn, wait) {
-  var timer = null
-  return function() {
-    var context = this
-    var args = arguments
-    if (!timer) {
-      timer = setTimeout(function() {
-        fn.apply(context, args)
-        timer = null
-      }, wait)
-    }
-  }
+  setTimeout(() => {
+    new Vue({
+      el: '#shopEdenContent',
+      render: (createElement) => {
+        return createElement(Home)
+      },
+    })
+    Follow.init()
+    Follow.sendCsrfToken()
+  }, 500)
 }
 
 //粉丝关注
 const Follow = {
+  domain: window.location.origin,
   init: function() {
+    console.log(this.domain, 'domain')
     let followActionWrap = $$("<div id='FollowActionWrap'></div>")
     $$('body').append(followActionWrap)
   },
@@ -83,9 +64,7 @@ const Follow = {
           let storeId = $$(_this).attr('data-store-id')
           if (storeId) {
             let realId = storeId.split('.')[0]
-            window.open(
-              `https://my.xiapibuy.com/shop/${realId}/followers?__classic__=1`
-            )
+            window.open(`/shop/${realId}/followers?other=true`)
           }
         })
       }
@@ -97,7 +76,7 @@ const Follow = {
     return new Promise((resolve, reject) => {
       sendMessageToBackground(
         'request',
-        { storeId: storeId },
+        { domain: this.domain, storeId: storeId },
         'GET_SHOPPE_STORE_INFO_BY_ID',
         (data) => {
           resolve(data)
@@ -112,7 +91,7 @@ const Follow = {
     return new Promise((resolve) => {
       sendMessageToBackground(
         'request',
-        { userName: userName },
+        { domain: this.domain, userName: userName },
         'GET_STORE_FOLLOEWERS_INFO',
         (data) => {
           resolve(data)
@@ -122,9 +101,38 @@ const Follow = {
       })
     })
   },
-}
 
-Follow.init()
+  //给后台传送csrfToken
+  sendCsrfToken: function() {
+    return new Promise((resolve) => {
+      sendMessageToBackground(
+        'request',
+        { csrfToken: getCookie('csrftoken') },
+        'SET_SHOPPE_CRSF_TOKEN',
+        (data) => {
+          resolve(data)
+        }
+      ).then((res) => {
+        resolve(res)
+      })
+    })
+  },
+  //通知后台关注或取关
+  notifyBackFollowOrUnFollow: function(actionType, shopid) {
+    return new Promise((resolve) => {
+      sendMessageToBackground(
+        'request',
+        { domain: this.domain, actionType: actionType, shopid: shopid },
+        'POST_SHOPPE_FOLLOW_ACTION',
+        (data) => {
+          resolve(data)
+        }
+      ).then((res) => {
+        resolve(res)
+      })
+    })
+  },
+}
 
 window.onscroll = function() {
   var scrollTop = document.documentElement.scrollTop || document.body.scrollTop

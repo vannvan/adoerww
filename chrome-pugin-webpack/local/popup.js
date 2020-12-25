@@ -12852,7 +12852,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!**********************************!*\
   !*** ./src/lib/chrome-client.js ***!
   \**********************************/
-/*! exports provided: getURL, getInContext, request, sendRequest, getExtension, lStorage, setlStorage */
+/*! exports provided: getURL, getInContext, request, sendRequest, getExtension, lStorage, sendMessageToBackground, setlStorage */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12863,6 +12863,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sendRequest", function() { return sendRequest; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getExtension", function() { return getExtension; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lStorage", function() { return lStorage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sendMessageToBackground", function() { return sendMessageToBackground; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setlStorage", function() { return setlStorage; });
 // chrome.extension(getURL , inIncognitoContext , lastError , onRequest , sendRequest)
 function getURL(url) {
@@ -12884,6 +12885,15 @@ function getExtension() {
 function lStorage() {
   return chrome.storage;
 }
+var sendMessageToBackground = function sendMessageToBackground(action, options, type, callback) {
+  return new Promise(function (resolve) {
+    chrome.runtime.sendMessage('', {
+      action: action,
+      options: options,
+      type: type
+    }, callback.bind(resolve));
+  });
+};
 function setlStorage(key, v) {}
 
 /***/ }),
