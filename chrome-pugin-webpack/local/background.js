@@ -11041,7 +11041,7 @@ var Request = {
     });
   },
   setCookies: function setCookies(params, type, call) {
-    if (localStorage.setItem('csrfToken', params.csrfToken)) {
+    if (params.csrfToken && localStorage.setItem('csrfToken', params.csrfToken)) {
       call({
         type: type,
         result: '设置成功'
@@ -11050,15 +11050,25 @@ var Request = {
   },
   //   请求虾皮的关注或取关接口
   postShoppeFollowAction: function postShoppeFollowAction(params, type, call) {
+    //   const apiOpts= {
+    //       my:'https://shopee.com.my/',//马来
+    //       tw:' https://shopee.tw/', //台湾
+    //       id:'https://shopee.co.id/',//印尼
+    //       th:' https://shopee.co.th/',//泰国
+    //       ph:'https://shopee.ph/',//菲律宾
+    //       sg:'https://shopee.sg/',//新加坡
+    //       vn:'https://shopee.vn/',//越南
+    //       br:'https://shopee.com.br/',//巴西
+    //   }
     var actionType = params.actionType,
         shopid = params.shopid,
-        domain = params.domain;
-    var mallUrl = 'https://mall.' + domain.split('//'); //取关需要添加二级域名
+        domain = params.domain; // let mallUrl = 'https://mall.' + domain.split('//') //取关需要添加二级域名
 
     var Opts = {
       follow: "".concat(domain, "/buyer/"),
-      unfollow: "".concat(mallUrl, "/buyer/")
+      unfollow: "".concat(domain, "/buyer/")
     };
+    console.log("".concat(Opts[actionType]).concat(actionType, "/shop/").concat(shopid, "/"));
     jquery__WEBPACK_IMPORTED_MODULE_0___default.a.ajax({
       type: 'post',
       url: "".concat(Opts[actionType]).concat(actionType, "/shop/").concat(shopid, "/"),

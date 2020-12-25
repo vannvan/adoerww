@@ -531,6 +531,7 @@ function getTime() {
         fail: 0,
         skip: 0
       },
+      //结果统计
       isRequest: false,
       globalTimer: null,
       usernameQueue: [],
@@ -733,7 +734,6 @@ function getTime() {
         1: this.actionedUserList.length > this.filterParams.limitFollowNumber || this.actionedUserList > this.countFollowers,
         2: this.actionedUserList.length > this.unfollowMaxNumber || this.actionedUserList > this.countFollowers
       };
-      console.log(limitOpts[this.currentTab], 'limit');
 
       if (limitOpts[this.currentTab]) {
         clearInterval(this.globalTimer);
