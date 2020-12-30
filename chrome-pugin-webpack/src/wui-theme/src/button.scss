@@ -1,0 +1,144 @@
+@import './mixin.scss';
+@include b(wui){
+  @include e(button){
+    padding: 10px 14px;
+    border:none;
+    color: $defaultColor;
+    background-color: $defaultColor;
+    border: 1px solid transparent;
+    border-color: $lightBorderColor;
+    cursor: pointer;
+    outline: 0;
+    // 圆角
+    &.is-round {
+       border-radius: 20px;
+    }
+    // 空心
+    &.is-plain{
+      background-color: $defaultColor;
+      color: $darkColor;
+      &:hover{
+        background-color: $lightBgColor;
+      }
+    }
+    // loading
+    @include e(loading){
+        float: left;
+        display: block;
+        margin-right: 5px;
+        width: 14px;
+        height: 14px;
+        border:2px solid $lightBgColor;
+        border-bottom: $lightBorderColor 2px solid;
+        border-radius: 50%;
+        border-radius: 50%;
+        -webkit-animation:loading 1.1s infinite linear;
+        &.info{
+          border-bottom: $infoColor 2px solid;
+        }
+        &.primary{
+          border-bottom: $primaryColor 2px solid;
+        }
+        &.success{
+          border-bottom: $successColor 2px solid;
+        }
+        &.warning{
+          border-bottom: $warningColor 2px solid;
+        }
+        &.danger{
+          border-bottom: $dangerColor 2px solid;
+        }
+        &.default{
+          border-color: $infoColor;
+          border-bottom: $lightBgColor 2px solid;
+        }
+    }
+    // 禁止
+    &.is-disabled{
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    @include e(default){
+      color: $darkColor;
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 6px 10px;
+      }
+    }
+    @include e(primary){
+      background-color: $primaryColor;
+      border-color: $primaryColor;
+      &:hover {
+        background-color: $primaryLightColor;
+      }
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 8px 10px;
+      }
+    }
+    @include e(success){
+      background-color: $successColor;
+      border-color: $successColor;
+      &:hover {
+        background-color: $successLightColor;
+      }
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 8px 10px;
+      }
+    }
+    @include e(info){
+      background-color: $infoColor;
+      border-color: $infoColor;
+      &:hover{
+        background-color: $infoLightColor;
+      }
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 8px 10px;
+      }
+    }
+    @include e(warning){
+      background-color: $warningColor;
+      border-color: $warningColor;
+      &:hover{
+        background-color: $warningLightColor;
+      }
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 8px 10px;
+      }
+    }
+    @include e(danger){
+      background-color: $dangerColor;
+      border-color: $dangerColor;
+      &:hover{
+        background-color: $dangerLightColor;
+      }
+      @include m(medium){
+        padding: 8px 12px;
+      }
+      @include m(small){
+        padding: 8px 10px;
+      }
+    }
+  }
+}
+@-webkit-keyframes loading{
+  from{
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(360deg);
+  }
+}

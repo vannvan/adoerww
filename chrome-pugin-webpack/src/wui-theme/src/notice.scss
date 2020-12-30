@@ -1,0 +1,63 @@
+@import 'mixin.scss';
+@include b(wui__notice){
+  display: flex;
+  width: 330px;
+  padding: 14px 26px 14px 13px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  // border: 1px solid #ebeef5;
+  position: fixed;
+  background-color: $lightColor;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  transition: opacity .3s,transform .3s,left .3s,right .3s,top .4s,bottom .3s;
+  overflow: hidden;
+  z-index: 1000;
+  right:16px;
+  @include e(icon){
+    display: block;
+    width: 15px;
+    height: 100%;
+    line-height: 1;
+    @include m(info){
+      color: $primaryColor
+    }
+    @include m(warning){
+      color: $warningColor
+    }
+    @include m(error){
+      color: $errorColor
+    }
+    @include m(success){
+      color: $successColor
+    }
+  }
+  @include e(content){
+    margin:0 10px;
+    line-height: 1;
+    @include m(title){
+      margin-bottom: 5px;
+      &.info{
+        color: $primaryColor
+      }
+      &.warning{
+        color: $warningColor
+      }
+      &.success{
+        color: $successColor
+      }
+      &.error{
+        color: $errorColor
+      }
+    }
+    @include m(body){
+      color: $textPrimaryColor;
+      line-height: 1.3
+    }
+  }
+  @include e(closeIcon){
+    cursor: pointer;
+    position: absolute;
+    color: $textPrimaryColor;
+    right:10px;
+  }
+}

@@ -67,6 +67,10 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
       },
       {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'], // 从右向左解析原则
+      },
+      {
         test: /\.(woff|woff2|ttf|eot|svg)$/,
         loader: 'file-loader?name=fonts/[name].[ext]',
       },

@@ -1,0 +1,84 @@
+@import 'mixin.scss';
+@include b(wui){
+  @include e(message){
+    position: fixed;
+    width: auto;
+    @include rounded(4px);
+    line-height: 1;
+    left: 50%;
+    top: 20px;
+    height:auto;
+    transform: translateX(-50%);
+    background-color: #edf2fc;
+    transition: opacity .3s,transform .4s;
+    overflow: hidden;
+    padding: 15px 15px 15px 20px;
+    background-color:$lightColor;
+    @include shadow(0,0,3px,#ccc);
+    z-index: 1000;
+    i{
+      float: left;
+    }
+    @include e(icon--info){
+      color: $primaryColor;
+    }
+    @include e(icon--success){
+      color: $successColor
+    }
+    @include e(icon--warning){
+      color: $warningColor
+    }
+    @include e(icon--error){
+      color: $errorColor
+    }
+    @include e(content){
+      float: left;
+      @include e(body){
+        margin: 0 10px;
+      }
+    }
+    @include e(closeTxt){
+      float: right;
+      cursor: pointer;
+      color: $primaryColor
+      // font-size: 12px;
+    }
+    @include e(iconbox){
+      float: right;
+      cursor: pointer;
+    }
+  }
+
+}
+
+
+
+.message-fade-enter-active {
+  animation: bounce-in .5s;
+}
+.message-fade-leave-active {
+  animation: bounce-out .5s;
+}
+
+@keyframes bounce-in {
+  0% {
+    top:0;
+    // width: 10px;
+    opacity: 0.2
+  }
+  100% {
+    top:20px;
+    width: auto;
+    opacity: 1
+  }
+}
+@keyframes bounce-out {
+  0% {
+    top:20px;
+    opacity: 1
+  }
+  100% {
+    top:0;
+    opacity: 0
+  }
+}

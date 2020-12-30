@@ -1,9 +1,11 @@
 const manifest_version = 2
 const manifest = require('../src/manifest.json')
+const packJSON = require('../package.json')
+
 const defaultConfig = {
   name: 'chrome插件',
   description: 'webpack版chrome插件',
-  version: '1.0',
+  version: packJSON.version,
   permissions: [
     'contextMenus', // 右键菜单
     'tabs', // 标签

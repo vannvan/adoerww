@@ -3,6 +3,8 @@ import $$ from 'jquery'
 import { throttle, getCookie } from '@/lib/utils'
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
+import WUI from '@/components/index'
+import '@/wui-theme/src/index.scss'
 
 if (/shopee|xiapibuy/.test(window.location.host)) {
   let rightFixed = document.createElement('div')
@@ -10,6 +12,7 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
   document.body.appendChild(rightFixed)
 
   setTimeout(() => {
+    Vue.use(WUI)
     new Vue({
       el: '#shopEdenContent',
       render: (createElement) => {

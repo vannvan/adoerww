@@ -2,7 +2,7 @@
   <div class="seller-erp-fixed-right">
     <img
       class="icon-toggle"
-      src="@/assets/icon/fengche.png"
+      src="@/assets/icon/logo-toggle.png"
       @click="display = true"
     />
     <div class="drawer-wrap">
@@ -249,10 +249,7 @@
             id="ResultContent"
             v-if="actionedUserList.length != 0"
           ></div>
-          <div
-            class="error-wrap"
-            v-if="!cookieSyncStatus || !storeInfo.account.username"
-          >
+          <div class="error-wrap" v-if="!cookieSyncStatus">
             <p>请登录账号后重新进入此页面</p>
             <p>已登录请刷新此页面</p>
           </div>
@@ -362,8 +359,14 @@ export default {
   watch: {
     display: {
       handler(newVal) {
-        if (newVal) {
-          //
+        let { pathname } = window.location
+        if (!/followers|following/.test(pathname)) {
+          this.display = false
+        }
+        if (newVal && !this.cookieSyncStatus) {
+          this.$Notice.error({
+            content: '【虾皮粉丝插件】:登录状态同步失败，请关闭窗口重新登录',
+          })
         }
       },
     },
@@ -386,10 +389,16 @@ export default {
 
     window.addEventListener('scroll', this.handleScroll)
     this.$nextTick(() => {
-      Follow.sendCsrfToken().then((res) => {
-        console.log('cookies同步成功')
-        this.cookieSyncStatus = true
-      })
+      Follow.sendCsrfToken()
+        .then((res) => {
+          console.log('cookies同步成功')
+          this.cookieSyncStatus = true
+        })
+        .catch(() => {
+          this.$Notice.error({
+            content: '【虾皮粉丝插件】:登录状态同步失败，请关闭窗口重新登录',
+          })
+        })
     })
   },
   methods: {

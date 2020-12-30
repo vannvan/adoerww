@@ -57,24 +57,12 @@ const Request = {
   },
   //   请求虾皮的关注或取关接口
   postShoppeFollowAction: function(params, type, call) {
-    //   const apiOpts= {
-    //       my:'https://shopee.com.my/',//马来
-    //       tw:' https://shopee.tw/', //台湾
-    //       id:'https://shopee.co.id/',//印尼
-    //       th:' https://shopee.co.th/',//泰国
-    //       ph:'https://shopee.ph/',//菲律宾
-    //       sg:'https://shopee.sg/',//新加坡
-    //       vn:'https://shopee.vn/',//越南
-    //       br:'https://shopee.com.br/',//巴西
-    //   }
-
     let { actionType, shopid, domain } = params
-    // let mallUrl = 'https://mall.' + domain.split('//') //取关需要添加二级域名
     let Opts = {
       follow: `${domain}/buyer/`,
       unfollow: `${domain}/buyer/`,
     }
-    console.log(`${Opts[actionType]}${actionType}/shop/${shopid}/`)
+    // console.log(`${Opts[actionType]}${actionType}/shop/${shopid}/`)
     $$.ajax({
       type: 'post',
       url: `${Opts[actionType]}${actionType}/shop/${shopid}/`,
