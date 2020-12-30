@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import $$ from 'jquery'
 import { throttle, getCookie } from '@/lib/utils'
-import { getURL, sendMessageToBackground } from '@/lib/chrome-client.js'
+import { sendMessageToBackground } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 
 if (/shopee|xiapibuy/.test(window.location.host)) {

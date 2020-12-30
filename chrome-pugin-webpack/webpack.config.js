@@ -111,7 +111,7 @@ module.exports = {
       },
       chunks: ['options'],
     }),
-    //new UglifyJsPlugin({}), //压缩js输出
+    new UglifyJsPlugin({}), //压缩js输出
     new OptimizeCSSAssetsPlugin(), //压缩css
     new MiniCssExtractPlugin({
       filename: '[name].css',

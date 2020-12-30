@@ -468,23 +468,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -602,6 +585,14 @@ function getTime() {
 
           trigger(input, 'input');
         });
+      }
+    }
+  },
+  watch: {
+    display: {
+      handler: function handler(newVal) {
+        if (newVal) {//
+        }
       }
     }
   },
@@ -12522,7 +12513,7 @@ var render = function() {
                             ]),
                             _vm._v(" "),
                             _c("span", { staticClass: "sub-item" }, [
-                              _vm._v("评价次数")
+                              _vm._v("最少评价次数")
                             ])
                           ]),
                           _vm._v(" "),
@@ -12631,7 +12622,7 @@ var render = function() {
                           _vm._v(" "),
                           _c("li", [
                             _c("span", { staticClass: "sub-item" }, [
-                              _vm._v("关注数")
+                              _vm._v("最少关注数")
                             ])
                           ]),
                           _vm._v(" "),
@@ -12676,7 +12667,7 @@ var render = function() {
                                   ref: "followsTimes",
                                   staticClass: "error-info"
                                 },
-                                [_vm._v("请输入关注数\n                  ")]
+                                [_vm._v("请输入关注人数\n                  ")]
                               )
                             ])
                           ]),
@@ -13008,7 +12999,7 @@ var render = function() {
                     })
                   : _vm._e(),
                 _vm._v(" "),
-                !_vm.cookieSyncStatus
+                !_vm.cookieSyncStatus || !_vm.storeInfo.account.username
                   ? _c("div", { staticClass: "error-wrap" }, [
                       _c("p", [_vm._v("请登录账号后重新进入此页面")]),
                       _vm._v(" "),

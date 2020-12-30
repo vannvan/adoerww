@@ -40,5 +40,8 @@
         "webpack-cli": "^3.3.2",
         "webpack-dev-server": "^3.7.2",
         "write-json-webpack-plugin": "^1.1.0"
+    },
+    "dependencies": {
+        "inquirer": "^7.3.3"
     }
 }

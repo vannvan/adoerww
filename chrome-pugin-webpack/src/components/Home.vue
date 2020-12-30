@@ -88,7 +88,7 @@
                 </li>
                 <li>
                   <span class="sub-item">上次登录时间</span>
-                  <span class="sub-item">评价次数</span>
+                  <span class="sub-item">最少评价次数</span>
                 </li>
                 <li>
                   <span class="sub-item">
@@ -116,7 +116,7 @@
                   </span>
                 </li>
                 <li>
-                  <span class="sub-item">关注数</span>
+                  <span class="sub-item">最少关注数</span>
                 </li>
                 <li>
                   <span class="sub-item">
@@ -127,7 +127,7 @@
                       v-enterNumberMin="-1"
                     />
                     <small class="error-info" ref="followsTimes"
-                      >请输入关注数
+                      >请输入关注人数
                     </small>
                   </span>
                 </li>
@@ -165,26 +165,6 @@
                 {{ buttonText }}
               </button>
             </div>
-            <!-- 显示区域 -->
-            <!-- <p style="color:#f00" class="text-center" v-if="isRequest">
-              请勿关闭本页面
-            </p>
-            <div class="show-result-count" v-if="actionedUserList.length != 0">
-              <div class="count-item success">
-                <p>成功</p>
-                <p>{{ resultCount.success }}</p>
-              </div>
-              <div class="count-item fail">
-                <p>失败</p>
-                <p>{{ resultCount.fail }}</p>
-              </div>
-             
-            </div>
-            <div
-              class="show-result-list overflow-y"
-              id="ResultContent"
-              v-if="actionedUserList.length != 0"
-            ></div> -->
           </template>
           <!-- 取消关注 -->
           <template v-if="currentTab == 2">
@@ -269,7 +249,10 @@
             id="ResultContent"
             v-if="actionedUserList.length != 0"
           ></div>
-          <div class="error-wrap" v-if="!cookieSyncStatus">
+          <div
+            class="error-wrap"
+            v-if="!cookieSyncStatus || !storeInfo.account.username"
+          >
             <p>请登录账号后重新进入此页面</p>
             <p>已登录请刷新此页面</p>
           </div>
@@ -372,6 +355,16 @@ export default {
           }
           trigger(input, 'input')
         })
+      },
+    },
+  },
+
+  watch: {
+    display: {
+      handler(newVal) {
+        if (newVal) {
+          //
+        }
       },
     },
   },
@@ -755,7 +748,7 @@ textarea {
       top: 40%;
       left: 50%;
       margin-left: -111px;
-      line-height: 100px;
+      line-height: 15px;
       text-align: center;
       font-size: 16px;
       background: #ededed;
