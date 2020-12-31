@@ -1,14 +1,14 @@
 import Vue from 'vue'
-import Button from '../components/button'
+import Popup from '../components/Popup'
 import '@styles/popup.less'
 
 export default new Vue({
   data: { test1: 'World' },
   components: {
-    Button,
+    Popup,
   },
   mounted() {
     console.log('mounted')
   },
-  render: (h) => h(Button),
+  render: (h) => h(Popup),
 }).$mount('#app')

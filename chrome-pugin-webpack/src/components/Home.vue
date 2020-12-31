@@ -249,10 +249,34 @@
             id="ResultContent"
             v-if="actionedUserList.length != 0"
           ></div>
-          <div class="error-wrap" v-if="!cookieSyncStatus">
-            <p>请登录账号后重新进入此页面</p>
-            <p>已登录请刷新此页面</p>
-          </div>
+          <template v-if="!cookieSyncStatus">
+            <div class="no-login-warning">
+              <p><b>粉丝关注使用步骤：</b></p>
+              <p>1.进入站点指定卖家中心完成登录,"温馨提示"点击取消</p>
+              <p>2.进入站点前台确认右上角账号信息已同步</p>
+              <p>
+                3.在前台底部推荐商品列表点击"获取粉丝"按钮，打开粉丝列表页面进行操作
+              </p>
+              <li v-for="item in shoppeSites" :key="item.name">
+                <a :href="item.seller">{{ item.name }}卖家中心</a>
+                <a :href="item.front">{{ item.name }}前台</a>
+              </li>
+              <p><b>取关粉丝使用步骤：</b></p>
+              <p>1.确认"粉丝关注"步骤1,2已完成</p>
+              <p>
+                2.进入任意一个自己店铺商品详情页，看到形如<span
+                  style="color:#f00"
+                  >https://shopee.com.my/Electronic-i.341541524.6064074928</span
+                >的链接，将第一个数字341541524复制到以下站点对应取关页面将ID替换为该数字后回车后方可进行取关操作<span
+                  style="color:#f00"
+                  >注：(此处341541524只做示例，具体数值以用户店铺实际数值为准)</span
+                >
+              </p>
+              <li v-for="(item, index) in shoppeSites" :key="index + 'b'">
+                <a :href="item.mall" target="black">{{ item.name }}取关页面</a>
+              </li>
+            </div>
+          </template>
           <p class="count-info">当前页面可操作用户数：{{ countFollowers }}</p>
         </div>
       </drawer>
@@ -264,6 +288,7 @@
 import Drawer from './Drawer'
 import Follow from '@/inject/follow-content'
 import $$ from 'jquery'
+import { websites } from './conf'
 function getTime() {
   return new Date().toTimeString().substring(0, 8)
 }
@@ -305,6 +330,7 @@ export default {
       unfollowMaxNumber: 10, //取消关注最大数量
       isOther: false, //用于标识是关注别人的还是取关自己的
       lastOffsetHeight: null, //用于标识上次垂直高度和当前垂直高度，屏幕是否滚到底部
+      shoppeSites: websites,
     }
   },
   computed: {
@@ -361,7 +387,13 @@ export default {
       handler(newVal) {
         let { pathname } = window.location
         if (!/followers|following/.test(pathname)) {
-          this.display = false
+          this.$Notice.error({
+            content:
+              '【虾皮粉丝插件】:请按照关注/取关步骤，打开指定页面后，再打开此面板',
+          })
+          setTimeout(() => {
+            this.display = false
+          }, 2500)
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
@@ -752,18 +784,24 @@ textarea {
         padding-left: 70px;
       }
     }
-    .error-wrap {
+    .no-login-warning {
       position: absolute;
-      top: 40%;
-      left: 50%;
-      margin-left: -111px;
-      line-height: 15px;
-      text-align: center;
+      top: 65px;
+      right: 0;
+      height: 100%;
+      width: 100%;
+      line-height: 30px;
       font-size: 16px;
       background: #ededed;
       padding: 12px;
-      color: #f00;
+      li {
+        display: flex;
+        justify-content: space-around;
+        color: #ee4d2d;
+        font-size: 14px;
+      }
     }
+
     .count-info {
       position: fixed;
       bottom: 0;
