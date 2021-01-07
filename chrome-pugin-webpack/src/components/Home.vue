@@ -2,17 +2,18 @@
   <div class="seller-erp-fixed-right">
     <img
       class="icon-toggle"
-      src="@/assets/icon/logo-toggle.png"
+      src="../assets/icon/logo-toggle.png"
       @click="display = true"
     />
     <div class="drawer-wrap">
       <drawer
-        title="卖旺ERP插件@1.0.2"
+        :title="'马六甲ERP插件' + pluginVersion"
         :display.sync="display"
         :inner="true"
         :width="drawerWidth"
         :mask="false"
       >
+        <!-- 关注 -->
         <div class="follow-panel">
           <div class="tab-wrap">
             <span class="tab-item" :class="{ active: currentTab == 1 }"
@@ -289,6 +290,7 @@ import Drawer from './Drawer'
 import Follow from '@/inject/follow-content'
 import $$ from 'jquery'
 import { websites } from './conf'
+const packJSON = require('../../package.json')
 function getTime() {
   return new Date().toTimeString().substring(0, 8)
 }
@@ -298,16 +300,17 @@ export default {
   },
   data() {
     return {
+      pluginVersion: packJSON.version,
       display: false,
       drawerWidth: '400px',
       currentTab: 1,
       //   筛选参数
       filterParams: {
         startIndex: 1, //自动开始位置
-        limitFollowNumber: 1, //自动关注数量
-        lastLoginTime: 1, //上次登录时间
-        commentsTimes: 1, //评价次数
-        followsTimes: 1, //关注数
+        limitFollowNumber: '', //自动关注数量
+        lastLoginTime: '', //上次登录时间
+        commentsTimes: '', //评价次数
+        followsTimes: '', //关注数
         isFilterSeller: false, //是否过滤卖家
         sellerGoodsCount: null, //卖家商品数
       },
@@ -386,14 +389,15 @@ export default {
     display: {
       handler(newVal) {
         let { pathname } = window.location
-        if (!/followers|following/.test(pathname)) {
-          this.$Notice.error({
-            content:
-              '【虾皮粉丝插件】:请按照关注/取关步骤，打开指定页面后，再打开此面板',
-          })
-          setTimeout(() => {
-            this.display = false
-          }, 2500)
+        if (!/followers|following/.test(pathname) && newVal) {
+          //   setTimeout(() => {
+          //     this.display = false
+          //   }, 1500)
+          //   this.$Notice.error({
+          //     content:
+          //       '【虾皮粉丝插件】:请按照关注/取关步骤，打开指定页面后，再打开此面板',
+          //   })
+          this.getCurrentStoreId()
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
@@ -447,6 +451,40 @@ export default {
         }
       }, 5000)
     },
+
+    //获取当前登录店铺的id
+    getCurrentStoreId() {
+      let pageStoreName = $$('.navbar__username').text()
+      if (!pageStoreName) {
+        this.display = false
+        this.$Notice.error({
+          content: '【虾皮粉丝插件】: 请登录虾皮账号',
+        })
+        return
+      } else {
+        Follow.getCurrentStoreId(pageStoreName).then((res) => {
+          let { result } = res
+          if (!result) {
+            this.$Notice.error({
+              content:
+                '【虾皮粉丝插件】: 请检查当前店铺是否已授权或是否已登录虾皮账户',
+            })
+            this.display = false
+            return
+          }
+
+          let countryCode = result.countryCode.toLowerCase()
+          let reg = new RegExp(countryCode)
+          let countryWebSite = websites.find((el) =>
+            reg.test(JSON.stringify(el))
+          ) //获取到对应的取关地址
+          if (countryWebSite && countryWebSite.mall) {
+            window.open(countryWebSite.mall.replace('ID', result.platformId))
+          }
+        })
+      }
+    },
+
     //开始关注
     handleStart(actionType) {
       let _this = this
@@ -520,7 +558,7 @@ export default {
     handleSkipJudge(actionType) {
       let limitOpts = {
         1:
-          this.actionedUserList.length > this.filterParams.limitFollowNumber ||
+          this.resultCount.success > this.filterParams.limitFollowNumber ||
           this.actionedUserList > this.countFollowers,
         2:
           this.actionedUserList.length > this.unfollowMaxNumber ||
@@ -604,6 +642,7 @@ export default {
         )
       }
     },
+
     validate() {
       let validQueue = []
       Object.keys(this.filterParams).forEach((key) => {

@@ -1,4 +1,3 @@
-// thanks to : https://github.com/ElemeFE/element/tree/dev/packages/notification
 import Vue from 'vue'
 import Notice from './notice.vue'
 

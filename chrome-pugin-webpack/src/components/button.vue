@@ -1,7 +1,6 @@
 <template>
   <div>
     <h1>{{ message }}</h1>
-
     {{ currentTabId }}
     <button @click="handleClick()">使用back的方法</button>
   </div>

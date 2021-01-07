@@ -43,7 +43,7 @@ module.exports = {
           {
             loader: 'url-loader',
             options: {
-              limit: 10240,
+              limit: 102040,
               fallback: {
                 loader: 'file-loader',
                 options: {
@@ -127,6 +127,7 @@ module.exports = {
         toType: 'dir',
       },
     ]),
+
     manifestJSON &&
       new WriteJsonWebpackPlugin({
         pretty: false,

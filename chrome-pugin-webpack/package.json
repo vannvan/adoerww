@@ -1,6 +1,6 @@
 {
     "name": "shoppe-fans-follow",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -17,6 +17,7 @@
         "@babel/preset-env": "^7.0.0",
         "babel-loader": "^8.0.2",
         "clean-webpack-plugin": "^2.0.2",
+        "compression-webpack-plugin": "^7.1.1",
         "copy-webpack-plugin": "^5.0.3",
         "css-loader": "^3.0.0",
         "element-ui": "^2.10.0",

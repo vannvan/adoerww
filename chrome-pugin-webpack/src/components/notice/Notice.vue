@@ -16,12 +16,7 @@
         </h3>
         <div :class="[prefixCls + '__content--body']" v-html="content"></div>
       </div>
-      <i
-        class="icon-close"
-        :class="[prefixCls + '__closeIcon']"
-        @click.stop="close()"
-        v-if="closable"
-      ></i>
+      <!-- <i class="icon-close" @click.stop="close()" v-if="closable"></i> -->
     </div>
   </transition>
 </template>

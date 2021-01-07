@@ -6,15 +6,16 @@ import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
 
+//初始化虾皮网站的基础脚本
 if (/shopee|xiapibuy/.test(window.location.host)) {
   let rightFixed = document.createElement('div')
-  rightFixed.id = 'shopEdenContent'
+  rightFixed.id = 'ShoppeFollow'
   document.body.appendChild(rightFixed)
 
   setTimeout(() => {
     Vue.use(WUI)
     new Vue({
-      el: '#shopEdenContent',
+      el: '#ShoppeFollow',
       render: (createElement) => {
         return createElement(Home)
       },
@@ -28,7 +29,7 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
 const Follow = {
   domain: window.location.origin,
   init: function() {
-    console.log(this.domain, 'domain')
+    // console.log(this.domain, 'domain')
     let followActionWrap = $$("<div id='FollowActionWrap'></div>")
     $$('body').append(followActionWrap)
   },
@@ -89,6 +90,7 @@ const Follow = {
       })
     })
   },
+
   //批量获取关注者信息
   getStoreFollowers: function(userName) {
     return new Promise((resolve) => {
@@ -109,7 +111,7 @@ const Follow = {
   sendCsrfToken: function() {
     return new Promise((resolve) => {
       sendMessageToBackground(
-        'request',
+        'auth',
         { csrfToken: getCookie('csrftoken') },
         'SET_SHOPPE_CRSF_TOKEN',
         (data) => {
@@ -120,6 +122,7 @@ const Follow = {
       })
     })
   },
+
   //通知后台关注或取关
   notifyBackFollowOrUnFollow: function(actionType, shopid) {
     return new Promise((resolve) => {
@@ -127,6 +130,22 @@ const Follow = {
         'request',
         { domain: this.domain, actionType: actionType, shopid: shopid },
         'POST_SHOPPE_FOLLOW_ACTION',
+        (data) => {
+          resolve(data)
+        }
+      ).then((res) => {
+        resolve(res)
+      })
+    })
+  },
+
+  //获取当前登录的店铺id
+  getCurrentStoreId: function(storeName) {
+    return new Promise((resolve) => {
+      sendMessageToBackground(
+        'auth',
+        { storeName: storeName },
+        'GET_CURRENT_STORE_ID',
         (data) => {
           resolve(data)
         }

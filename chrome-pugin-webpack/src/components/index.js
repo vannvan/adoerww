@@ -3,7 +3,7 @@
 
 import WNotice from './notice/index'
 
-const components = [WNotice]
+const components = []
 
 const install = function(Vue, opts = {}) {
   if (install.installed) return

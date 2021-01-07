@@ -52,6 +52,8 @@ const optionPage = {
 }
 const contentItem = {
   matches: [
+    '*://192.168.50.112/*',
+    '*://*.emalacca.com/*',
     '*://*.shopee.tw/*',
     '*://shopee.tw/*',
     '*://*.shopee.cn/*',
