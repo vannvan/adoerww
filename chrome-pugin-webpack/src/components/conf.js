@@ -3,7 +3,7 @@ export const websites = [
     name: '马来西亚',
     seller: 'https://seller.shopee.com.my/',
     front: 'https://shopee.com.my/',
-    mall: 'https://mall.shopee.com.my//shop/ID/following?__classic__=1',
+    mall: 'https://mall.shopee.com.my/shop/ID/following?__classic__=1',
   },
   {
     name: '印度尼西亚',

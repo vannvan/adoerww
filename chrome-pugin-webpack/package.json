@@ -1,5 +1,5 @@
 {
-    "name": "bq_createcrx",
+    "name": "shoppe-fans-follow",
     "version": "1.0.2",
     "description": "",
     "main": "index.js",
@@ -9,7 +9,7 @@
         "build": "node ./build/start.js --mode production",
         "dev": "webpack-dev-server --config webpack.config.js --hot --colorful"
     },
-    "author": "Jimpai",
+    "author": "vannvan",
     "license": "ISC",
     "devDependencies": {
         "@babel/cli": "^7.0.0",

@@ -227,7 +227,7 @@
             </div>
           </template>
           <p style="color:#f00" class="text-center" v-if="isRequest">
-            请勿关闭本页面
+            请勿关闭本页面，如果任务异常终止，点击取消后重新开始即可
           </p>
           <div class="show-result-count" v-if="actionedUserList.length != 0">
             <div class="count-item success">
@@ -411,7 +411,7 @@ export default {
     let _this = this
     let { pathname } = window.location
     if (/followers|following/.test(pathname)) {
-      let storeId = pathname.split('/')[2]
+      let storeId = pathname.replace(/[^0-9]/gi, '')
       Follow.getStoreInfoById(storeId).then((res) => {
         this.storeInfo = res.result.data
         console.log(this.storeInfo)
