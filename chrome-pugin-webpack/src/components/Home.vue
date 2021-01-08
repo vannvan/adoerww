@@ -16,15 +16,44 @@
         <!-- 关注 -->
         <div class="follow-panel">
           <div class="tab-wrap">
-            <span class="tab-item" :class="{ active: currentTab == 1 }"
+            <span
+              class="tab-item"
+              :class="{ active: currentTab == 1 }"
+              @click="handleToggleTabs(1)"
               >粉丝关注</span
             >
-            <span class="tab-item" :class="{ active: currentTab == 2 }"
+            <span
+              class="tab-item"
+              :class="{ active: currentTab == 2 }"
+              @click="handleToggleTabs(2)"
               >自动取关</span
             >
           </div>
-          <!-- 关注 -->
           <template v-if="currentTab == 1">
+            <div style="padding:20px">
+              <p><b>粉丝关注使用步骤：</b></p>
+              <p>1.进入站点指定卖家中心完成登录,"温馨提示"点击取消</p>
+              <p>2.进入站点前台确认右上角账号信息已同步</p>
+              <p>
+                3.在前台底部推荐商品列表点击"获取粉丝"按钮，打开粉丝列表页面进行操作
+              </p>
+              <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
+                <a :href="item.seller" target="black"
+                  >{{ item.name }}卖家中心</a
+                >
+                <a :href="item.front" target="black">{{ item.name }}前台</a>
+              </li>
+            </div>
+          </template>
+          <template v-if="currentTab == 2">
+            <div style="padding:20px">
+              <p><b>取关粉丝使用步骤：</b></p>
+              <p>1.确认"粉丝关注"步骤1,2已完成</p>
+              <p>点击"自动取关"后进入已关注页面列表进行操作</p>
+            </div>
+          </template>
+          <!-- 关注 -->
+          <template v-if="currentTab == 1 && storeInfo.account.username">
             <div class="follow-info-wrap">
               <div class="base-info info-item">
                 <p class="title">店铺信息</p>
@@ -278,7 +307,9 @@
               </li>
             </div>
           </template>
-          <p class="count-info">当前页面可操作用户数：{{ countFollowers }}</p>
+          <p class="count-info" v-if="countFollowers">
+            当前页面可操作用户数：{{ countFollowers }}
+          </p>
         </div>
       </drawer>
     </div>
@@ -325,7 +356,7 @@ export default {
         skip: 0,
       }, //结果统计
       isRequest: false,
-      globalTimer: null,
+      globalTimer: null, //定时器
       usernameQueue: [], //用户队列
       currentUserName: null, //当前操作用用
       cookieSyncStatus: true, //cookies同步状态
@@ -334,6 +365,8 @@ export default {
       isOther: false, //用于标识是关注别人的还是取关自己的
       lastOffsetHeight: null, //用于标识上次垂直高度和当前垂直高度，屏幕是否滚到底部
       shoppeSites: websites,
+      countryCode: null, //当前国家
+      currentStoreId: null,
     }
   },
   computed: {
@@ -390,14 +423,14 @@ export default {
       handler(newVal) {
         let { pathname } = window.location
         if (!/followers|following/.test(pathname) && newVal) {
-          //   setTimeout(() => {
-          //     this.display = false
-          //   }, 1500)
-          //   this.$Notice.error({
-          //     content:
-          //       '【虾皮粉丝插件】:请按照关注/取关步骤，打开指定页面后，再打开此面板',
-          //   })
-          this.getCurrentStoreId()
+          //   this.handleToggleTabs(2)
+          this.currentTab = 1
+        } else {
+          if (/following/.test(window.location.href)) {
+            this.currentTab = 2
+          } else if (/followers/.test(window.location.href)) {
+            this.currentTab = 1
+          }
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
@@ -415,12 +448,16 @@ export default {
     let _this = this
     let { pathname } = window.location
     if (/followers|following/.test(pathname)) {
+      this.display = true
       let storeId = pathname.replace(/[^0-9]/gi, '')
       Follow.getStoreInfoById(storeId).then((res) => {
         this.storeInfo = res.result.data
         console.log(this.storeInfo)
       })
       _this.scrollTo()
+    } else {
+      //获取虾皮的店铺ID,除了以上两个页面
+      this.getCurrentStoreId()
     }
 
     window.addEventListener('scroll', this.handleScroll)
@@ -438,6 +475,27 @@ export default {
     })
   },
   methods: {
+    handleToggleTabs(index) {
+      this.currentTab = index
+      Follow.syncShoppeBaseInfo(null, null).then((res) => {
+        this.currentStoreId = res.result.storeId
+        this.countryCode = res.result.country
+        if (!this.countryCode) {
+          this.$Notice.error({
+            content: '【虾皮粉丝插件】:未获取到当前站点信息',
+          })
+          return
+        }
+        let reg = new RegExp(this.countryCode.toLowerCase())
+        let countryWebSite = websites.find((el) => reg.test(JSON.stringify(el))) //获取到对应的取关地址
+        this.display = false
+        if (this.currentTab == 2) {
+          window.open(countryWebSite.mall.replace('ID', this.currentStoreId))
+        } else if (countryWebSite.front != window.location.href) {
+          window.open(countryWebSite.front)
+        }
+      })
+    },
     handleScroll() {
       this.countFollowers = $$('.clickable_area.middle-centered-div').length
     },
@@ -454,32 +512,28 @@ export default {
 
     //获取当前登录店铺的id
     getCurrentStoreId() {
-      let pageStoreName = $$('.navbar__username').text()
+      let pageStoreName = localStorage.getItem('username')
+        ? localStorage.getItem('username').replace(/"/g, '')
+        : undefined
+      console.log(pageStoreName, 'pageStoreName')
       if (!pageStoreName) {
-        this.display = false
         this.$Notice.error({
-          content: '【虾皮粉丝插件】: 请登录虾皮账号',
+          content: '【虾皮粉丝插件】: 请检查是否已登录虾皮账号',
         })
-        return
       } else {
         Follow.getCurrentStoreId(pageStoreName).then((res) => {
-          let { result } = res
-          if (!result) {
+          let { shopid, country } = res.result.data
+          if (!country || !shopid) {
             this.$Notice.error({
               content:
                 '【虾皮粉丝插件】: 请检查当前店铺是否已授权或是否已登录虾皮账户',
             })
-            this.display = false
-            return
-          }
-
-          let countryCode = result.countryCode.toLowerCase()
-          let reg = new RegExp(countryCode)
-          let countryWebSite = websites.find((el) =>
-            reg.test(JSON.stringify(el))
-          ) //获取到对应的取关地址
-          if (countryWebSite && countryWebSite.mall) {
-            window.open(countryWebSite.mall.replace('ID', result.platformId))
+          } else {
+            Follow.syncShoppeBaseInfo(shopid, country).then((res) => {
+              this.currentStoreId = res.result.storeId
+              this.countryCode = res.result.country
+              console.log(this.countryCode, 'this.countryCode')
+            })
           }
         })
       }
@@ -714,6 +768,16 @@ textarea {
       overflow-x: hidden;
       overflow-y: auto;
       width: 100%;
+      li {
+        list-style: none;
+        padding-left: 20px;
+        a {
+          width: 40%;
+          line-height: 25px;
+          color: #ee4d2d;
+          margin-right: 50px;
+        }
+      }
     }
     .tab-wrap {
       height: 40px;
@@ -724,7 +788,7 @@ textarea {
       .tab-item {
         height: 40px;
         line-height: 40px;
-        // cursor: pointer;
+        cursor: pointer;
         &.active {
           border-bottom: 2px solid #3498db;
         }

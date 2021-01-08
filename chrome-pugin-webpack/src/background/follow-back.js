@@ -22,9 +22,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     Auth.syncErp(options, type, sendResponse)
     return true
   }
-  if (action == 'auth' && type == 'GET_CURRENT_STORE_ID') {
-    console.log('获取店铺id')
-    Auth.getCurrentStoreId(options, type, sendResponse)
+  if (action == 'request' && type == 'GET_CURRENT_STORE_ID') {
+    Request.getCurrentStoreId(options, type, sendResponse)
+    return true
+  }
+  if (action == 'auth' && type == 'SYNC_SHOPPE_BASE_INFO') {
+    Auth.syncShoppeBaseInfo(options, type, sendResponse)
     return true
   }
   return true
@@ -91,8 +94,23 @@ const Request = {
       success: function(data) {
         // console.log(JSON.parse(data))
         // console.log(data.data.records)
-        localStorage.setItem('storeList', JSON.stringify(data.data.records))
+        localStorage.setItem('storeList', JSON.stringify(data.records))
         // call({ type: type, result: data.data.records })
+      },
+    })
+  },
+
+  //获取虾皮店铺信息
+  getCurrentStoreId: function(params, type, call) {
+    $$.ajax({
+      type: 'get',
+      url: `${params.domain}/api/v2/shop/get?username=${params.storeName}`,
+      dataType: 'json',
+      success: function(data) {
+        call({ type: type, result: data || null })
+      },
+      complete: function(data) {
+        console.log(data, 'ahaa')
       },
     })
   },
@@ -109,40 +127,18 @@ const Auth = {
     }
   },
 
-  //同步erp系统的登录状态
-  syncErp: function(params) {
-    chrome.cookies.getAll(
-      {
-        url: params.origin,
+  // 配置虾皮平台信息
+  syncShoppeBaseInfo: function(params, type, call) {
+    if (params.storeId) {
+      localStorage.setItem('storeId', params.storeId)
+      localStorage.setItem('country', params.country)
+    }
+    call({
+      type: type,
+      result: {
+        storeId: localStorage.getItem('storeId') || null,
+        country: localStorage.getItem('country') || null,
       },
-      function(cookies) {
-        console.log('查到 ' + cookies.length + ' 条cookies')
-        // console.log('查到的cookie信息：', cookies)
-        if (cookies.length > 0) {
-          cookies.map((el) => {
-            if (el.name == 'refresh_token') {
-              localStorage.setItem('refresh_token', el.value)
-              Request.getUserBindStoreOfErp(
-                { domain: params.origin },
-                'request'
-              )
-            }
-          })
-        }
-        // cookie数据渲染到表格
-      }
-    )
-  },
-
-  //获取当前登录的店铺id
-  getCurrentStoreId: function(params, type, call) {
-    let storeList = localStorage.getItem('storeList')
-      ? JSON.parse(localStorage.getItem('storeList'))
-      : null
-    let storeInfo = storeList
-      ? storeList.find((el) => el.storeName == params.storeName)
-      : null
-    console.log(storeInfo)
-    call({ type: type, result: storeInfo || null })
+    })
   },
 }

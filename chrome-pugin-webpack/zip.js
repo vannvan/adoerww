@@ -10,7 +10,7 @@ var shell = require('shelljs')
 var exec = shell.exec
 var echo = shell.echo
 
-if (exec('npm version patch').code !== 0) {
+if (exec('mv dist follow-plugin').code !== 0) {
   echo('版本更新出错')
   exit(1)
 }
@@ -59,7 +59,7 @@ function formatDateToString(date) {
 //执行压缩
 function toZip(name) {
   compressing.zip
-    .compressDir('dist', `${name}.zip`)
+    .compressDir('follow-plugin', `${name}.zip`)
     .then(() => {
       console.log(
         symbols.success,

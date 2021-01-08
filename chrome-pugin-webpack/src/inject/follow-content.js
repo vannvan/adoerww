@@ -143,9 +143,25 @@ const Follow = {
   getCurrentStoreId: function(storeName) {
     return new Promise((resolve) => {
       sendMessageToBackground(
-        'auth',
-        { storeName: storeName },
+        'request',
+        { domain: this.domain, storeName: storeName },
         'GET_CURRENT_STORE_ID',
+        (data) => {
+          resolve(data)
+        }
+      ).then((res) => {
+        resolve(res)
+      })
+    })
+  },
+
+  //同步虾皮基础信息
+  syncShoppeBaseInfo: function(storeId, country) {
+    return new Promise((resolve) => {
+      sendMessageToBackground(
+        'auth',
+        { storeId: storeId, country: country },
+        'SYNC_SHOPPE_BASE_INFO',
         (data) => {
           resolve(data)
         }
