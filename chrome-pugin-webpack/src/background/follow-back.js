@@ -45,6 +45,11 @@ const Request = {
       success: function(data) {
         call({ type: type, result: data })
       },
+      complete: function(data) {
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
+      },
     })
   },
 
@@ -56,6 +61,11 @@ const Request = {
       dataType: 'json',
       success: function(data) {
         call({ type: type, result: data })
+      },
+      complete: function(data) {
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
       },
     })
   },
@@ -77,6 +87,11 @@ const Request = {
       success: function(data) {
         call({ type: type, result: data })
       },
+      complete: function(data) {
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
+      },
     })
   },
 
@@ -96,6 +111,11 @@ const Request = {
         // console.log(data.data.records)
         localStorage.setItem('storeList', JSON.stringify(data.records))
         // call({ type: type, result: data.data.records })
+      },
+      complete: function(data) {
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
       },
     })
   },

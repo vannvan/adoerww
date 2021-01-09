@@ -7,7 +7,7 @@
     />
     <div class="drawer-wrap">
       <drawer
-        :title="'马六甲ERP插件' + pluginVersion"
+        :title="'马六甲粉丝关注插件' + pluginVersion"
         :display.sync="display"
         :inner="true"
         :width="drawerWidth"
@@ -31,25 +31,57 @@
           </div>
           <template v-if="currentTab == 1">
             <div style="padding:20px">
-              <p><b>粉丝关注使用步骤：</b></p>
-              <p>1.进入站点指定卖家中心完成登录,"温馨提示"点击取消</p>
-              <p>2.进入站点前台确认右上角账号信息已同步</p>
               <p>
-                3.在前台底部推荐商品列表点击"获取粉丝"按钮，打开粉丝列表页面进行操作
+                <a class="hand" @click="followHelpVisible = !followHelpVisible"
+                  >粉丝关注步骤说明
+                </a>
+                <img
+                  src="../assets/icon/arrow-right.png"
+                  class="arrow-right"
+                  :class="
+                    followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'
+                  "
+                />
               </p>
-              <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
-                <a :href="item.seller" target="black"
-                  >{{ item.name }}卖家中心</a
-                >
-                <a :href="item.front" target="black">{{ item.name }}前台</a>
-              </li>
+              <template v-if="followHelpVisible">
+                <p>
+                  第一步:打开对应站点的卖家中心，弹出shopee“温馨提示”弹框时，点击“取消”再进行登录操作，如点击“确认”会跳转到中国后台链接，则无法使用。此步操作特别关键！
+                </p>
+                <p>
+                  第二步:完成第一步登录成功后，进入对应站点的前台页面，检查右上方账号是否已同步成功，同步成功即可开始使用插件，如显示未登陆状态，请重新操作第一步。
+                </p>
+                <p>
+                  第三步:开始使用粉丝关注，鼠标悬浮在商品图片上显示“获取粉丝”点击进入该商品的卖家粉丝列表，根据需求可输入前置条件进行关注。
+                </p>
+                <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
+                  <a :href="item.seller" target="black"
+                    >{{ item.name }}卖家中心</a
+                  >
+                  <a :href="item.front" target="black">{{ item.name }}前台</a>
+                </li>
+              </template>
             </div>
           </template>
           <template v-if="currentTab == 2">
             <div style="padding:20px">
-              <p><b>取关粉丝使用步骤：</b></p>
-              <p>1.确认"粉丝关注"步骤1,2已完成</p>
-              <p>点击"自动取关"后进入已关注页面列表进行操作</p>
+              <p>
+                <a
+                  class="hand"
+                  @click="unFollowHelpVisible = !unFollowHelpVisible"
+                  >取关粉丝步骤说明
+                </a>
+                <img
+                  src="../assets/icon/arrow-right.png"
+                  class="arrow-right"
+                  :class="
+                    followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'
+                  "
+                />
+              </p>
+              <template v-if="unFollowHelpVisible">
+                <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
+                <p>第二步:点击"自动取关"后进入已关注页面列表进行操作</p>
+              </template>
             </div>
           </template>
           <!-- 关注 -->
@@ -366,7 +398,9 @@ export default {
       lastOffsetHeight: null, //用于标识上次垂直高度和当前垂直高度，屏幕是否滚到底部
       shoppeSites: websites,
       countryCode: null, //当前国家
-      currentStoreId: null,
+      currentStoreId: null, //当前用户自己的店铺id
+      followHelpVisible: false,
+      unFollowHelpVisible: false,
     }
   },
   computed: {
@@ -452,7 +486,6 @@ export default {
       let storeId = pathname.replace(/[^0-9]/gi, '')
       Follow.getStoreInfoById(storeId).then((res) => {
         this.storeInfo = res.result.data
-        console.log(this.storeInfo)
       })
       _this.scrollTo()
     } else {
@@ -512,11 +545,13 @@ export default {
 
     //获取当前登录店铺的id
     getCurrentStoreId() {
-      let pageStoreName = localStorage.getItem('username')
-        ? localStorage.getItem('username').replace(/"/g, '')
-        : undefined
-      console.log(pageStoreName, 'pageStoreName')
-      if (!pageStoreName) {
+      let pageStoreName =
+        localStorage.getItem('username') ||
+        $$('.account-name').textContent ||
+        $$('.navbar__username').textContent
+          ? localStorage.getItem('username').replace(/"/g, '')
+          : undefined
+      if (!pageStoreName && !this.currentStoreId) {
         this.$Notice.error({
           content: '【虾皮粉丝插件】: 请检查是否已登录虾皮账号',
         })
@@ -546,6 +581,12 @@ export default {
         this.handleCancel()
         return
       }
+      //如果没有填,给一波默认值
+      this.filterParams.limitFollowNumber =
+        this.filterParams.limitFollowNumber || 100
+      this.filterParams.lastLoginTime = this.filterParams.lastLoginTime || 30
+      this.filterParams.commentsTimes = this.filterParams.commentsTimes || 1
+      this.filterParams.followsTimes = this.filterParams.followsTimes || 1
       if (!this.validate()) return
       let userNameList = []
       let htmlStr = `<li>[${getTime()}] 任务开始...</li>`
@@ -561,7 +602,7 @@ export default {
       this.getStoreFollowers(actionType)
     },
 
-    // //取消关注
+    //取消关注
     handleCancelFollow() {
       let _this = this
       if (this.isRequest) {
@@ -612,11 +653,11 @@ export default {
     handleSkipJudge(actionType) {
       let limitOpts = {
         1:
-          this.resultCount.success > this.filterParams.limitFollowNumber ||
-          this.actionedUserList > this.countFollowers,
+          this.resultCount.success >= this.filterParams.limitFollowNumber ||
+          this.actionedUserList >= this.countFollowers,
         2:
-          this.actionedUserList.length > this.unfollowMaxNumber ||
-          this.actionedUserList > this.countFollowers,
+          this.resultCount.success >= this.unfollowMaxNumber ||
+          this.actionedUserList >= this.countFollowers,
       }
       if (limitOpts[this.currentTab]) {
         clearInterval(this.globalTimer)
@@ -635,8 +676,8 @@ export default {
     handleNotifyToBack(actionType, shopid, name) {
       //   console.log('操作过的用户', this.actionedUserList)
       Follow.notifyBackFollowOrUnFollow(actionType, shopid).then((res) => {
+        let infoText = actionType == 'follow' ? '关注' : '取关'
         if (res.result.success) {
-          let infoText = actionType == 'follow' ? '关注' : '取关'
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
           $$('#ResultContent').prepend(htmlStr)
           this.resultCount.success += 1
@@ -647,6 +688,14 @@ export default {
           this.resultCount.fail += 1
           this.isRequest = false
           this.buttonText = this.isOther ? '开启关注' : '开启取关'
+        } else if (res.result.error == -1) {
+          let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
+          $$('#ResultContent').prepend(htmlStr)
+          this.resultCount.fail += 1
+          this.$Notice.error({
+            content:
+              '【虾皮粉丝插件】: 请求遇到异常情况,请刷新页面后重新开始操作',
+          })
         } else {
           let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
           $$('#ResultContent').prepend(htmlStr)
@@ -669,11 +718,11 @@ export default {
         name,
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
-      console.log(
-        `上次登录: ${new Date(
-          mtime * 1000
-        ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
-      )
+      //   console.log(
+      //     `上次登录: ${new Date(
+      //       mtime * 1000
+      //     ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
+      //   )
       let {
         lastLoginTime, //上次登录时间
         commentsTimes, //评价次数
@@ -738,6 +787,14 @@ input,
 textarea {
   outline: none;
 }
+.arrow-rotate-back {
+  transition: all 0.5s;
+}
+
+.arrow-rotate {
+  transform: rotate(90deg);
+  transition: all 0.5s;
+}
 .text-center {
   text-align: center;
 }
@@ -747,6 +804,7 @@ textarea {
   top: 0;
   right: 0;
   z-index: 9999999999;
+  font-size: 14px !important;
   .icon-toggle {
     width: 60px;
     height: 60px;
@@ -763,19 +821,28 @@ textarea {
     position: fixed;
 
     .follow-panel {
-      //   height: auto;
       min-height: 100vh;
       overflow-x: hidden;
       overflow-y: auto;
       width: 100%;
+      .hand {
+        cursor: pointer;
+        color: #ee4d2d;
+      }
+      .arrow-right {
+        height: 22px;
+        vertical-align: middle;
+        margin-top: -3px;
+      }
       li {
         list-style: none;
-        padding-left: 20px;
+        display: flex;
         a {
-          width: 40%;
+          width: 50%;
           line-height: 25px;
           color: #ee4d2d;
-          margin-right: 50px;
+          text-align: left;
+          display: inline-block;
         }
       }
     }

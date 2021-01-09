@@ -12,14 +12,7 @@
     </li>
     <p><b>取关粉丝使用步骤：</b></p>
     <p>1.确认"粉丝关注"步骤1,2已完成</p>
-    <p>
-      2.进入任意一个自己店铺商品详情页，看到形如<span style="color:#f00"
-        >https://shopee.com.my/Electronic-i.341541524.6064074928</span
-      >的链接，将第一个数字341541524复制到以下站点对应取关页面将ID替换为该数字后回车后方可进行取关操作<span
-        style="color:#f00"
-        >注：(此处341541524只做示例，具体数值以用户店铺实际数值为准)</span
-      >
-    </p>
+    <p>点击"自动取关"后进入已关注页面列表进行操作</p>
     <li v-for="(item, index) in shoppeSites" :key="index + 'b'">
       <a :href="item.mall" target="black">{{ item.name }}取关页面</a>
     </li>
