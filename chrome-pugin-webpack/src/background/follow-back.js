@@ -130,7 +130,9 @@ const Request = {
         call({ type: type, result: data || null })
       },
       complete: function(data) {
-        console.log(data, 'ahaa')
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
       },
     })
   },

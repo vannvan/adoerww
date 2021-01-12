@@ -21,7 +21,7 @@ export const websites = [
     name: '菲律宾',
     seller: 'https://seller.shopee.ph/',
     front: 'https://shopee.ph/',
-    mall: 'https://mall.shopee.co.th/shop/ID/following?__classic__=1',
+    mall: 'https://mall.shopee.ph/shop/ID/following?__classic__=1',
   },
   {
     name: '新加坡',
@@ -45,6 +45,6 @@ export const websites = [
     name: '台湾',
     seller: 'https://seller.shopee.tw/',
     front: 'https://shopee.tw/',
-    mall: 'https://mall.mall.shopee.com.br/shop/ID/following?__classic__=1',
+    mall: 'https://mall.shopee.com.br/shop/ID/following?__classic__=1',
   },
 ]

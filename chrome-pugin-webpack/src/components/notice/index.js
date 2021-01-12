@@ -47,7 +47,6 @@ const Notification = (options = {}) => {
   instance.visible = true
   instance.name = id
   instance.dom = instance.$el
-  console.log(instance)
 
   setTimeout(function() {
     let verticalOffset = options.offset || 0

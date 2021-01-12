@@ -2,7 +2,7 @@
     "name": "虾皮粉丝关注插件beta-(内测版)",
     "manifest_version": 2,
     "version": "1.0.4",
-    "description": "http://erp.sellerwant.com/ 虾皮粉丝关注插件，用于帮助卖家用户获取同类商家粉丝数据，可以批量关注优质买家，帮助卖家快速引流及推广。",
+    "description": "https://erp.emalacca.com/ 虾皮粉丝关注插件，用于帮助卖家用户获取同类商家粉丝数据，可以批量关注优质买家，帮助卖家快速引流及推广。",
     "homepage_url": "https://github.com/vannvan",
     "icons": {
         "16": "icon/app.png",

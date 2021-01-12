@@ -509,6 +509,7 @@ export default {
   },
   methods: {
     handleToggleTabs(index) {
+      Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
       Follow.syncShoppeBaseInfo(null, null).then((res) => {
         this.currentStoreId = res.result.storeId
@@ -647,6 +648,7 @@ export default {
           let infoText = actionType == 'follow' ? '关注' : '取关'
           let htmlStr = `<li>[${getTime()}] ${infoText} 任务完毕！</li>`
           $$('#ResultContent').prepend(htmlStr)
+          this.handleCancel()
         }
       }, 1000)
     },
@@ -696,10 +698,12 @@ export default {
             content:
               '【虾皮粉丝插件】: 请求遇到异常情况,请刷新页面后重新开始操作',
           })
+          this.handleCancel()
         } else {
           let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
           $$('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
+          this.handleCancel()
         }
       })
     },
