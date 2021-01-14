@@ -156,11 +156,11 @@ const Follow = {
   },
 
   //同步虾皮基础信息
-  syncShoppeBaseInfo: function(storeId, country) {
+  syncShoppeBaseInfo: function() {
     return new Promise((resolve) => {
       sendMessageToBackground(
         'auth',
-        { storeId: storeId, country: country },
+        { domain: this.domain },
         'SYNC_SHOPPE_BASE_INFO',
         (data) => {
           resolve(data)

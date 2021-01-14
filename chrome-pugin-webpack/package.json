@@ -1,6 +1,6 @@
 {
     "name": "shoppe-fans-follow",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -31,8 +31,6 @@
         "mini-css-extract-plugin": "^0.6.0",
         "nodemon": "^2.0.6",
         "optimize-css-assets-webpack-plugin": "^5.0.4",
-        "sass": "^1.32.0",
-        "sass-loader": "^10.1.0",
         "uglifyjs-webpack-plugin": "^2.2.0",
         "url-loader": "^1.1.2",
         "vue": "^2.5.17",

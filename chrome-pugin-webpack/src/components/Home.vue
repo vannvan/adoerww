@@ -5,6 +5,11 @@
       src="../assets/icon/logo-toggle.png"
       @click="display = true"
     />
+    <ul class="follow-quick-action-wrap">
+      <li @click="openPage(storeFront('front'))">店铺前台</li>
+      <li @click="openPage(storeFront('seller'))">店铺后台</li>
+      <!-- <li>店铺清粉</li> -->
+    </ul>
     <div class="drawer-wrap">
       <drawer
         :title="'马六甲粉丝关注插件' + pluginVersion"
@@ -81,6 +86,10 @@
               <template v-if="unFollowHelpVisible">
                 <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
                 <p>第二步:点击"自动取关"后进入已关注页面列表进行操作</p>
+                <p>
+                  <span style="color:#f00">注:</span
+                  >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
+                </p>
               </template>
             </div>
           </template>
@@ -352,8 +361,9 @@
 import Drawer from './Drawer'
 import Follow from '@/inject/follow-content'
 import $$ from 'jquery'
-import { websites } from './conf'
+import { WEBSITES, ERROR } from './conf'
 const packJSON = require('../../package.json')
+import { isEmpty } from '../lib/utils'
 function getTime() {
   return new Date().toTimeString().substring(0, 8)
 }
@@ -396,7 +406,7 @@ export default {
       unfollowMaxNumber: 10, //取消关注最大数量
       isOther: false, //用于标识是关注别人的还是取关自己的
       lastOffsetHeight: null, //用于标识上次垂直高度和当前垂直高度，屏幕是否滚到底部
-      shoppeSites: websites,
+      shoppeSites: WEBSITES,
       countryCode: null, //当前国家
       currentStoreId: null, //当前用户自己的店铺id
       followHelpVisible: false,
@@ -407,6 +417,15 @@ export default {
     calcRate() {
       let { rating_bad, rating_good, rating_normal } = this.storeInfo
       return rating_bad + rating_good + rating_normal
+    },
+    //店铺前台
+    storeFront() {
+      return (type) => {
+        let host = window.location.host.split('.')
+        let country = host[host.length - 1]
+        let countryWebSite = WEBSITES.find((el) => el.key == country) //获取到对应的取关地址
+        return countryWebSite[type]
+      }
     },
   },
   directives: {
@@ -468,7 +487,7 @@ export default {
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
-            content: '【虾皮粉丝插件】:登录状态同步失败，请关闭窗口重新登录',
+            content: ERROR.syncLoginStatusFail,
           })
         }
       },
@@ -502,37 +521,47 @@ export default {
         })
         .catch(() => {
           this.$Notice.error({
-            content: '【虾皮粉丝插件】:登录状态同步失败，请关闭窗口重新登录',
+            content: ERROR.syncLoginStatusFail,
           })
         })
     })
   },
   methods: {
+    openPage(path) {
+      if (/http/.test(path)) {
+        window.open(path)
+      }
+    },
+
     handleToggleTabs(index) {
       Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
-      Follow.syncShoppeBaseInfo(null, null).then((res) => {
+      Follow.syncShoppeBaseInfo().then((res) => {
         this.currentStoreId = res.result.storeId
         this.countryCode = res.result.country
         if (!this.countryCode) {
           this.$Notice.error({
-            content: '【虾皮粉丝插件】:未获取到当前站点信息',
+            content: ERROR.didNotGetToSiteInformation,
           })
           return
         }
         let reg = new RegExp(this.countryCode.toLowerCase())
-        let countryWebSite = websites.find((el) => reg.test(JSON.stringify(el))) //获取到对应的取关地址
+        let countryWebSite = WEBSITES.find((el) => reg.test(JSON.stringify(el))) //获取到对应的取关地址
         this.display = false
         if (this.currentTab == 2) {
-          window.open(countryWebSite.mall.replace('ID', this.currentStoreId))
+          window.location.replace(
+            countryWebSite.mall.replace('ID', this.currentStoreId)
+          )
         } else if (countryWebSite.front != window.location.href) {
-          window.open(countryWebSite.front)
+          window.location.replace(countryWebSite.front)
         }
       })
     },
+
     handleScroll() {
       this.countFollowers = $$('.clickable_area.middle-centered-div').length
     },
+
     scrollTo() {
       let timer = setInterval(() => {
         if (this.lastOffsetHeight >= document.body.offsetHeight) {
@@ -546,33 +575,18 @@ export default {
 
     //获取当前登录店铺的id
     getCurrentStoreId() {
-      let pageStoreName =
-        localStorage.getItem('username') ||
-        $$('.account-name').textContent ||
-        $$('.navbar__username').textContent
-          ? localStorage.getItem('username').replace(/"/g, '')
-          : undefined
-      if (!pageStoreName && !this.currentStoreId) {
-        this.$Notice.error({
-          content: '【虾皮粉丝插件】: 请检查是否已登录虾皮账号',
-        })
-      } else {
-        Follow.getCurrentStoreId(pageStoreName).then((res) => {
-          let { shopid, country } = res.result.data
-          if (!country || !shopid) {
-            this.$Notice.error({
-              content:
-                '【虾皮粉丝插件】: 请检查当前店铺是否已授权或是否已登录虾皮账户',
-            })
-          } else {
-            Follow.syncShoppeBaseInfo(shopid, country).then((res) => {
-              this.currentStoreId = res.result.storeId
-              this.countryCode = res.result.country
-              console.log(this.countryCode, 'this.countryCode')
-            })
-          }
-        })
-      }
+      // 先走登录接口获取到用户名,再用用户名获取店铺id和当前站点信息
+      Follow.syncShoppeBaseInfo().then((res) => {
+        let { username, country, storeId } = res.result
+        if (username) {
+          this.currentStoreId = storeId
+          this.countryCode = country
+        } else {
+          this.$Notice.error({
+            content: ERROR.pleaseCheckWhetherHaveAuthoriz,
+          })
+        }
+      })
     },
 
     //开始关注
@@ -625,7 +639,7 @@ export default {
     getStoreFollowers(actionType) {
       this.globalTimer = setInterval(() => {
         this.currentUserName = this.usernameQueue.splice(0, 1)
-        if (!!this.currentUserName) {
+        if (!isEmpty(this.currentUserName)) {
           this.isRequest = true
           this.buttonText = '正在运行中，点击可取消'
           this.actionedUserList.push(this.currentUserName)
@@ -695,8 +709,7 @@ export default {
           $$('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
           this.$Notice.error({
-            content:
-              '【虾皮粉丝插件】: 请求遇到异常情况,请刷新页面后重新开始操作',
+            content: ERROR.abnormalSituation,
           })
           this.handleCancel()
         } else {
@@ -814,9 +827,28 @@ textarea {
     height: 60px;
     cursor: pointer;
     position: fixed;
-    top: 55%;
+    top: 40%;
     right: 20px;
     z-index: 8;
+  }
+  .follow-quick-action-wrap {
+    position: fixed;
+    right: 25px;
+    top: 51%;
+    li {
+      list-style: none;
+      height: 50px !important;
+      width: 50px !important;
+      box-sizing: border-box;
+      background: #ee4d2d;
+      border-bottom: 1px solid #fff;
+      padding: 5px;
+      display: flex !important;
+      align-items: center !important;
+      text-align: center !important;
+      color: #fff;
+      cursor: pointer;
+    }
   }
   .drawer-wrap {
     width: 100%;

@@ -1,4 +1,5 @@
-import $$, { param, type } from 'jquery'
+import $$ from 'jquery'
+import { WEBSITES, getMatchSite } from '../lib/conf'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -36,6 +37,24 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 //需要请求数据
 const Request = {
+  //登录虾皮
+  handleLoginShopee: function(params) {
+    // console.log(getMatchSite(params.domain), '匹配域名')
+    let matchSite = getMatchSite(params.domain)
+    return new Promise((resolve, reject) => {
+      $$.ajax({
+        type: 'get',
+        url: `${matchSite.seller}/api/v2/login/`,
+        dataType: 'json',
+        success: function(data) {
+          resolve(data)
+        },
+        complete: function() {
+          reject(-1)
+        },
+      })
+    })
+  },
   // 获取店铺信息
   getStoreInfoById: function(params, type, call) {
     $$.ajax({
@@ -72,11 +91,12 @@ const Request = {
 
   //请求虾皮的关注或取关接口
   postShoppeFollowAction: function(params, type, call) {
-    let { actionType, shopid, domain } = params
+    let { actionType, shopid, domain } = params || {}
     let Opts = {
       follow: `${domain}/buyer/`,
       unfollow: `${domain}/buyer/`,
     }
+    if (!shopid) return
     // console.log(`${Opts[actionType]}${actionType}/shop/${shopid}/`)
     $$.ajax({
       type: 'post',
@@ -107,10 +127,7 @@ const Request = {
         )
       },
       success: function(data) {
-        // console.log(JSON.parse(data))
-        // console.log(data.data.records)
         localStorage.setItem('storeList', JSON.stringify(data.records))
-        // call({ type: type, result: data.data.records })
       },
       complete: function(data) {
         if (data.status != 200) {
@@ -122,9 +139,11 @@ const Request = {
 
   //获取虾皮店铺信息
   getCurrentStoreId: function(params, type, call) {
+    // console.log(getMatchSite(params.domain), '匹配域名')
+    let matchSite = getMatchSite(params.domain)
     $$.ajax({
       type: 'get',
-      url: `${params.domain}/api/v2/shop/get?username=${params.storeName}`,
+      url: `${matchSite.front}/api/v2/shop/get?username=${params.storeName}`,
       dataType: 'json',
       success: function(data) {
         call({ type: type, result: data || null })
@@ -151,16 +170,28 @@ const Auth = {
 
   // 配置虾皮平台信息
   syncShoppeBaseInfo: function(params, type, call) {
-    if (params.storeId) {
-      localStorage.setItem('storeId', params.storeId)
-      localStorage.setItem('country', params.country)
-    }
-    call({
-      type: type,
-      result: {
-        storeId: localStorage.getItem('storeId') || null,
-        country: localStorage.getItem('country') || null,
-      },
-    })
+    Request.handleLoginShopee(params)
+      .then((res) => {
+        if (res) {
+          localStorage.setItem('userInfo', JSON.stringify(res))
+          console.log(localStorage.getItem('userInfo'))
+        }
+      })
+      .catch(() => {
+        call({ type: type, result: { error: -1 } })
+      })
+      .finally(() => {
+        let userInfo = localStorage.getItem('userInfo')
+          ? JSON.parse(localStorage.getItem('userInfo'))
+          : {}
+        call({
+          type: type,
+          result: {
+            storeId: userInfo.shopid,
+            country: getMatchSite(params.domain).key,
+            username: userInfo.username,
+          },
+        })
+      })
   },
 }

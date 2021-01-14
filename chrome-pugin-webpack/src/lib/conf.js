@@ -65,3 +65,8 @@ export const ERROR = {
   abnormalSituation:
     '【虾皮粉丝插件】: 请求遇到异常情况,请刷新页面后重新开始操作',
 }
+
+//找到域名配置项中的当前国家的项
+export const getMatchSite = (origin) => {
+  return WEBSITES.find((item) => JSON.stringify(item).search(origin)) || {}
+}

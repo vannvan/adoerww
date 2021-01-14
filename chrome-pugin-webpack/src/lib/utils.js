@@ -25,3 +25,7 @@ export function getCookie(name) {
   }
   return ''
 }
+
+export const isEmpty = (obj) => {
+  return typeof obj === 'undefined' || obj === null || obj === ''
+}
