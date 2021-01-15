@@ -151,6 +151,7 @@ module.exports = function() {
   config.description = manifest.description || defaultConfig.description
   config.version = manifest.version || defaultConfig.version
   config.permissions = manifest.permissions || defaultConfig.permissions // 为了防止权限受限, 默认开启全部权限
+  config.web_accessible_resources = manifest.web_accessible_resources
   // manifest.opentab ? (config.chrome_url_overrides = openTab) : null
   if (manifest.opentab) {
     if (typeof manifest.opentab === 'string') {

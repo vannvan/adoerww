@@ -28,7 +28,8 @@
 </template>
 
 <script>
-import { WEBSITES } from './conf'
+import { WEBSITES } from '../lib/conf'
+
 export default {
   data() {
     return {

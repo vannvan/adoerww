@@ -8,6 +8,7 @@ const WriteJsonWebpackPlugin = require('write-json-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+// const HtmlWithImgLoader = require('html-withimg-loader')
 const isDev = process.env.NODE_ENV == 'development'
 
 const DevOutPutPath = 'local/'
@@ -38,22 +39,30 @@ module.exports = {
         },
       },
       {
-        test: /\.(jpe?g|png|gif)$/i, //图片文件
+        test: /\.(png\jpe?g|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/,
         use: [
           {
             loader: 'url-loader',
             options: {
-              limit: 102040,
-              fallback: {
-                loader: 'file-loader',
-                options: {
-                  name: 'img/[name].[hash:8].[ext]',
-                },
-              },
+              limit: 1024, // 小于这个时将会已base64位图片打包处理
+              outputPath: 'images',
             },
           },
         ],
       },
+      {
+        test: /\.html$/,
+        use: ['html-withimg-loader'], // html中的img标签 ,html文件中的图片可以被打包的关键
+      },
+
       {
         test: /\.vue$/,
         use: ['vue-loader'],
@@ -82,6 +91,7 @@ module.exports = {
       vue$: 'vue/dist/vue.js',
       '@': resolve('src'),
       '@styles': resolve('src/assets/styles'),
+      '@fonts': resolve('src/assets/fonts'),
       '@components': resolve('src/components'),
     },
   },
@@ -126,6 +136,11 @@ module.exports = {
         to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'icon'),
         toType: 'dir',
       },
+      //   {
+      //     from: resolve('src/assets/images'),
+      //     to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'images'),
+      //     toType: 'dir',
+      //   },
     ]),
 
     manifestJSON &&

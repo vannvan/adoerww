@@ -1,5 +1,5 @@
 import $$ from 'jquery'
-import { WEBSITES, getMatchSite } from '../lib/conf'
+import { getMatchSite } from '../lib/conf'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -38,10 +38,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 //需要请求数据
 const Request = {
   //登录虾皮
-  handleLoginShopee: function(params) {
+  handleLoginShopee: function(params, type) {
     // console.log(getMatchSite(params.domain), '匹配域名')
     let matchSite = getMatchSite(params.domain)
+    console.log(params, type, matchSite)
     return new Promise((resolve, reject) => {
+      if (!matchSite) {
+        reject(-1)
+      }
       $$.ajax({
         type: 'get',
         url: `${matchSite.seller}/api/v2/login/`,
@@ -57,6 +61,7 @@ const Request = {
   },
   // 获取店铺信息
   getStoreInfoById: function(params, type, call) {
+    console.log(params, type)
     $$.ajax({
       type: 'get',
       url: `${params.domain}/api/v2/shop/get?is_brief=1&shopid=${params.storeId}`,
@@ -74,6 +79,7 @@ const Request = {
 
   //获取店铺粉丝信息
   getFollowersInfoByName: function(params, type, call) {
+    console.log(params, type)
     $$.ajax({
       type: 'get',
       url: `${params.domain}/api/v4/shop/get_shop_detail?username=${params.userName}`,
@@ -91,6 +97,7 @@ const Request = {
 
   //请求虾皮的关注或取关接口
   postShoppeFollowAction: function(params, type, call) {
+    console.log(params, type)
     let { actionType, shopid, domain } = params || {}
     let Opts = {
       follow: `${domain}/buyer/`,
@@ -117,6 +124,7 @@ const Request = {
 
   //获取erp平台用户绑定的店铺列表
   getUserBindStoreOfErp: function(params, type, call) {
+    console.log(params, type)
     $$.ajax({
       type: 'get',
       url: params.domain + '/api/store/info/page',
@@ -140,7 +148,12 @@ const Request = {
   //获取虾皮店铺信息
   getCurrentStoreId: function(params, type, call) {
     // console.log(getMatchSite(params.domain), '匹配域名')
+    console.log(params, type)
     let matchSite = getMatchSite(params.domain)
+    if (!matchSite) {
+      call({ type: type, result: { error: -1 } })
+      return
+    }
     $$.ajax({
       type: 'get',
       url: `${matchSite.front}/api/v2/shop/get?username=${params.storeName}`,
@@ -160,6 +173,7 @@ const Request = {
 const Auth = {
   //同步虾皮登录token
   setCookies: function(params, type, call) {
+    console.log(params, type)
     if (
       params.csrfToken &&
       localStorage.setItem('csrfToken', params.csrfToken)
@@ -170,7 +184,8 @@ const Auth = {
 
   // 配置虾皮平台信息
   syncShoppeBaseInfo: function(params, type, call) {
-    Request.handleLoginShopee(params)
+    console.log(params, type)
+    Request.handleLoginShopee(params, type)
       .then((res) => {
         if (res) {
           localStorage.setItem('userInfo', JSON.stringify(res))

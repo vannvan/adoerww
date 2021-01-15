@@ -6,8 +6,12 @@
       @click="display = true"
     />
     <ul class="follow-quick-action-wrap">
-      <li @click="openPage(storeFront('front'))">店铺前台</li>
-      <li @click="openPage(storeFront('seller'))">店铺后台</li>
+      <li @click="openPage(storeFront('front'))" v-if="storeFront('front')">
+        店铺前台
+      </li>
+      <li @click="openPage(storeFront('seller'))" v-if="storeFront('seller')">
+        店铺后台
+      </li>
       <!-- <li>店铺清粉</li> -->
     </ul>
     <div class="drawer-wrap">
@@ -64,6 +68,7 @@
                   >
                   <a :href="item.front" target="black">{{ item.name }}前台</a>
                 </li>
+                <p @click="handleGotoDemo()" class="hand">演示动画</p>
               </template>
             </div>
           </template>
@@ -90,6 +95,7 @@
                   <span style="color:#f00">注:</span
                   >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
                 </p>
+                <p @click="handleGotoDemo()" class="hand">演示动画</p>
               </template>
             </div>
           </template>
@@ -361,7 +367,7 @@
 import Drawer from './Drawer'
 import Follow from '@/inject/follow-content'
 import $$ from 'jquery'
-import { WEBSITES, ERROR } from './conf'
+import { WEBSITES, ERROR } from '../lib/conf'
 const packJSON = require('../../package.json')
 import { isEmpty } from '../lib/utils'
 function getTime() {
@@ -424,7 +430,7 @@ export default {
         let host = window.location.host.split('.')
         let country = host[host.length - 1]
         let countryWebSite = WEBSITES.find((el) => el.key == country) //获取到对应的取关地址
-        return countryWebSite[type]
+        return countryWebSite ? countryWebSite[type] : undefined
       }
     },
   },
@@ -531,6 +537,11 @@ export default {
       if (/http/.test(path)) {
         window.open(path)
       }
+    },
+
+    //打开演示动画
+    handleGotoDemo() {
+      Follow.handleGotoDemo()
     },
 
     handleToggleTabs(index) {
@@ -666,6 +677,7 @@ export default {
         }
       }, 1000)
     },
+    //判断跳过条件
     handleSkipJudge(actionType) {
       let limitOpts = {
         1:
@@ -804,17 +816,7 @@ input,
 textarea {
   outline: none;
 }
-.arrow-rotate-back {
-  transition: all 0.5s;
-}
 
-.arrow-rotate {
-  transform: rotate(90deg);
-  transition: all 0.5s;
-}
-.text-center {
-  text-align: center;
-}
 .seller-erp-fixed-right {
   height: 100vh;
   position: fixed;
@@ -869,6 +871,17 @@ textarea {
         height: 22px;
         vertical-align: middle;
         margin-top: -3px;
+      }
+      .arrow-rotate-back {
+        transition: all 0.5s;
+      }
+
+      .arrow-rotate {
+        transform: rotate(90deg);
+        transition: all 0.5s;
+      }
+      .text-center {
+        text-align: center;
       }
       li {
         list-style: none;

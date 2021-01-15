@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Home from '../components/Home'
 import '@styles/home.less'
-import '@styles/icomoon.css'
+import '@fonts/iconfont.css'
 
 export default new Vue({
   components: {

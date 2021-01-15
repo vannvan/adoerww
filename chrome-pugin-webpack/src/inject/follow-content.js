@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import $$ from 'jquery'
 import { throttle, getCookie } from '@/lib/utils'
-import { sendMessageToBackground } from '@/lib/chrome-client.js'
+import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
@@ -140,11 +140,11 @@ const Follow = {
   },
 
   //获取当前登录的店铺id
-  getCurrentStoreId: function(storeName) {
+  getCurrentStoreId: function() {
     return new Promise((resolve) => {
       sendMessageToBackground(
         'request',
-        { domain: this.domain, storeName: storeName },
+        { domain: this.domain },
         'GET_CURRENT_STORE_ID',
         (data) => {
           resolve(data)
@@ -169,6 +169,10 @@ const Follow = {
         resolve(res)
       })
     })
+  },
+
+  handleGotoDemo() {
+    window.open(getURL('options.html'))
   },
 }
 

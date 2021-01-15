@@ -19,10 +19,10 @@ const defaults = {
 }
 
 const typeMap = {
-  info: 'icon-info',
-  error: 'icon-heart-broken',
-  warning: 'icon-stopwatch',
-  success: 'icon-checkmark-outline',
+  info: 'icon iconfont icon-iconfontguanyu1x',
+  error: 'icon iconfont icon-icomoonheartbroken',
+  warning: 'icon iconfont icon-iconstopwatch',
+  success: 'icon iconfont icon-checkmark-outline',
 }
 
 const Notification = (options = {}) => {

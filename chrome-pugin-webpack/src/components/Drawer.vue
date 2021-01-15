@@ -4,8 +4,14 @@
     <div :class="mainClass" :style="mainStyle" class="main overflow-y">
       <div class="drawer-head">
         <span>{{ title }}</span>
-        <span class="close-btn" v-show="closable" @click="closeByButton">
+        <!-- <span class="close-btn" v-show="closable" @click="closeByButton">
           <img src="@/assets/icon/close.png" alt="" />
+        </span> -->
+        <span
+          class="icon iconfont icon-close close-btn"
+          v-show="closable"
+          @click="closeByButton"
+        >
         </span>
       </div>
       <div class="drawer-body">
@@ -160,11 +166,7 @@ export default {
       cursor: pointer;
       height: 100%;
       padding-left: 20px;
-      padding-top: 5px;
-      img {
-        width: 20px;
-        height: 20px;
-      }
+      
     }
   }
   .drawer-body {

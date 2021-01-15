@@ -16,7 +16,14 @@
         </h3>
         <div :class="[prefixCls + '__content--body']" v-html="content"></div>
       </div>
-      <i class="icon-close" @click.stop="close()" v-if="closable"></i>
+
+      <span
+        class="icon iconfont icon-close"
+        @click.stop="close()"
+        v-if="closable"
+        :class="[prefixCls + '__closeIcon']"
+      >
+      </span>
     </div>
   </transition>
 </template>

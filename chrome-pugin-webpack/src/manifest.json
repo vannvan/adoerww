@@ -25,6 +25,9 @@
             "./background.js"
         ]
     },
+    "web_accessible_resources": [
+        "options.html"
+    ],
     "browser_action": {
         "default_icon": "icon/app.png",
         "default_title": "插件",
