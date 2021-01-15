@@ -26,6 +26,30 @@ export function getCookie(name) {
   return ''
 }
 
-export const isEmpty = (obj) => {
-  return typeof obj === 'undefined' || obj === null || obj === ''
+/* 判断是否为空 */
+export function isEmpty(obj) {
+  switch (typeof obj) {
+    case 'undefined':
+      return true
+    case 'string':
+      return obj.trim().length === 0
+    case 'object':
+      if (Array.isArray(obj)) {
+        return obj.length === 0
+      } else if (obj === undefined) {
+        return true
+      } else if (obj === null) {
+        return true
+      } else if (Object.keys(obj).length === 0) {
+        return true
+      } else {
+        return false
+      }
+    case 'number':
+      if (isNaN(obj)) {
+        return true
+      } else {
+        return false
+      }
+  }
 }
