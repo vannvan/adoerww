@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "19574458",
+      "name": "shopee",
+      "font_class": "shopee",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
       "icon_id": "9061993",
       "name": "arrow-right",
       "font_class": "right",

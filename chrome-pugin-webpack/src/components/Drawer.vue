@@ -1,5 +1,5 @@
 <template>
-  <div class="drawer">
+  <div class="emalacca-plugin-drawer">
     <div :class="maskClass" @click="closeByMask"></div>
     <div :class="mainClass" :style="mainStyle" class="main overflow-y">
       <div class="drawer-head">
@@ -108,7 +108,7 @@ export default {
 <style lang="less" scoped>
 @primaryColor: #f7622f;
 
-.drawer {
+.emalacca-plugin-drawer {
   /* 遮罩 */
   .mask-show {
     position: fixed;
@@ -128,7 +128,7 @@ export default {
 
   /* 滑块 */
   .main {
-    position: fixed;
+    position: fixed !important;
     z-index: 10;
     top: 0;
     height: 100%;
@@ -166,7 +166,6 @@ export default {
       cursor: pointer;
       height: 100%;
       padding-left: 20px;
-      
     }
   }
   .drawer-body {

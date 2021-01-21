@@ -1,17 +1,29 @@
-.follow-next {
-  display: block;
+.emalacca-plugin-goods-panel-wrap {
+  width: 150px;
+  height: auto;
+  background: rgba(#ccc, 0.2);
   position: absolute !important;
   z-index: 9;
-  width: 150px;
-  height: 40px;
-  font-size: 14px;
-  line-height: 40px;
-  text-align: center;
-  color: #fff;
-  background-color: #ee4d2d;
   opacity: 0;
-  cursor: pointer;
+
+  .emalacca-goods-panel-button {
+    display: block;
+    width: 100px;
+    height: 30px;
+    font-size: 14px;
+    line-height: 30px;
+    text-align: center;
+    color: #fff;
+    background-color: #ee4d2d;
+    cursor: pointer;
+    margin: 0 auto;
+    border-bottom: 1px solid #ccc;
+    &:nth-last-child {
+      border-bottom: none;
+    }
+  }
 }
+
 .overflow-y::-webkit-scrollbar-thumb {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);

@@ -1,43 +1,45 @@
 <template>
-  <div>
-    <h1>{{ message }}</h1>
-    {{ currentTabId }}
-    <button @click="handleClick()">使用back的方法</button>
-  </div>
+  <button
+    @click="$emit('click')"
+    :disabled="disabled"
+    :class="[
+      prefixCls,
+      prefixCls + '__' + type,
+      prefixCls + '__' + type + '--' + size,
+      { 'is-plain': plain, 'is-disabled': disabled, 'is-round': round },
+    ]"
+  >
+    <i v-if="icon !== ''" :class="icon"></i>
+    <span :class="[prefixCls + '__loading', type]" v-if="loading"></span>
+    <slot></slot>
+  </button>
 </template>
-
 <script>
-import { getURL } from '@/lib/chrome-client.js'
-// 获取当前选项卡ID
-function getCurrentTabId(callback) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    if (callback) callback(tabs.length ? tabs[0].id : null)
-  })
-}
-// 向content-script主动发送消息
-function sendMessageToContentScript(message, callback) {
-  getCurrentTabId((tabId) => {
-    chrome.tabs.sendMessage(tabId, message, function(response) {
-      if (callback) callback(response)
-    })
-  })
-}
+const prefixCls = 'wui__button'
 export default {
-  name: 'w-button',
+  name: 'WButton',
+  props: {
+    type: {
+      type: String,
+      default: 'default',
+    },
+    size: {
+      type: String,
+      default: 'default',
+    },
+    icon: {
+      type: String,
+      default: '',
+    },
+    plain: Boolean,
+    disabled: Boolean,
+    round: Boolean,
+    loading: Boolean,
+  },
   data() {
     return {
-      message: '来自Vue.js的Hello Worlds',
-      currentTabId: null,
+      prefixCls: prefixCls,
     }
-  },
-  mounted() {
-    // console.log(getURL('index.html'))
-    // window.open(getURL('home.html'), '_black')
-  },
-  methods: {
-    handleClick() {},
   },
 }
 </script>
-
-<style></style>

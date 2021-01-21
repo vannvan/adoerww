@@ -1,6 +1,8 @@
+//粉丝关注相关
 import Vue from 'vue'
 import $$ from 'jquery'
 import { throttle, getCookie } from '@/lib/utils'
+import { dragApp } from './drag'
 import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
@@ -32,6 +34,7 @@ const Follow = {
     // console.log(this.domain, 'domain')
     let followActionWrap = $$("<div id='FollowActionWrap'></div>")
     $$('body').append(followActionWrap)
+    dragApp()
   },
 
   insertAction: function() {
@@ -40,9 +43,13 @@ const Follow = {
       if ($$(this)[0].href && $$(this)[0].href.search('i.')) {
         let storeId = $$(this)[0].href.split('i.')[1]
         $$(this).attr('sp-store-id', storeId)
-
         let followItem = $$(
-          `<span class="follow-next" data-store-id="${storeId}">获取粉丝</span>`
+          `
+          <div class="emalacca-plugin-goods-panel-wrap">
+            <span class="emalacca-goods-panel-button" data-store-id="${storeId}">获取粉丝</span>
+            <span class="emalacca-goods-panel-button">采集商品</span>    
+          </div>
+          `
         )
         followItemHtml.append(followItem)
         //鼠标进入
@@ -62,18 +69,22 @@ const Follow = {
             'pointer-events': 'auto',
           })
         })
-        //按钮点击
-        followItem.on('click', function() {
-          let _this = this
-          let storeId = $$(_this).attr('data-store-id')
-          if (storeId) {
-            let realId = storeId.split('.')[0]
-            window.open(`/shop/${realId}/followers?other=true`)
-          }
-        })
       }
     })
     $$('#FollowActionWrap').html($$(followItemHtml))
+    Follow.initFollowEvent()
+  },
+  //获取粉丝事件初始化
+  initFollowEvent: function() {
+    //按钮点击
+    $$('.emalacca-get-follow-button').on('click', function() {
+      let _this = this
+      let storeId = $$(_this).attr('data-store-id')
+      if (storeId) {
+        let realId = storeId.split('.')[0]
+        window.open(`/shop/${realId}/followers?other=true`)
+      }
+    })
   },
   //获取店铺信息
   getStoreInfoById: function(storeId) {
