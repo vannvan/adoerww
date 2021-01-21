@@ -39,20 +39,13 @@ module.exports = {
         },
       },
       {
-        test: /\.(png\jpe?g|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-          },
-        ],
-      },
-      {
         test: /\.(png|jpe?g|gif)$/,
         use: [
           {
             loader: 'url-loader',
             options: {
-              limit: 1024, // 小于这个时将会已base64位图片打包处理
+              limit: 100000, // 小于这个时将会已base64位图片打包处理
+              fallback: 'file-loader', // 当超过100000byte时，会回退使用file-loader
               outputPath: 'images',
             },
           },
@@ -136,11 +129,6 @@ module.exports = {
         to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'icon'),
         toType: 'dir',
       },
-      //   {
-      //     from: resolve('src/assets/images'),
-      //     to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'images'),
-      //     toType: 'dir',
-      //   },
     ]),
 
     manifestJSON &&

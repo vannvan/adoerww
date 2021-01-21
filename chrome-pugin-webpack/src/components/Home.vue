@@ -2,7 +2,7 @@
   <div class="seller-erp-fixed-right">
     <img
       class="icon-toggle"
-      src="../assets/icon/logo-toggle.png"
+      src="@/assets/icon/logo-toggle.png"
       @click="display = true"
     />
     <ul class="follow-quick-action-wrap">
@@ -44,13 +44,13 @@
                 <a class="hand" @click="followHelpVisible = !followHelpVisible"
                   >粉丝关注步骤说明
                 </a>
-                <img
-                  src="../assets/icon/arrow-right.png"
-                  class="arrow-right"
+                <span
+                  class="icon iconfont icon-right arrow-right"
                   :class="
                     followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'
                   "
-                />
+                ></span>
+                <a @click="handleGotoDemo()" class="hand">演示动画</a>
               </p>
               <template v-if="followHelpVisible">
                 <p>
@@ -68,7 +68,6 @@
                   >
                   <a :href="item.front" target="black">{{ item.name }}前台</a>
                 </li>
-                <p @click="handleGotoDemo()" class="hand">演示动画</p>
               </template>
             </div>
           </template>
@@ -80,13 +79,13 @@
                   @click="unFollowHelpVisible = !unFollowHelpVisible"
                   >取关粉丝步骤说明
                 </a>
-                <img
-                  src="../assets/icon/arrow-right.png"
-                  class="arrow-right"
+                <span
+                  class="icon iconfont icon-right arrow-right"
                   :class="
-                    followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'
+                    unFollowHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'
                   "
-                />
+                ></span>
+                <a @click="handleGotoDemo()" class="hand">演示动画</a>
               </p>
               <template v-if="unFollowHelpVisible">
                 <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
@@ -95,7 +94,6 @@
                   <span style="color:#f00">注:</span
                   >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
                 </p>
-                <p @click="handleGotoDemo()" class="hand">演示动画</p>
               </template>
             </div>
           </template>
@@ -871,6 +869,9 @@ textarea {
         height: 22px;
         vertical-align: middle;
         margin-top: -3px;
+        font-size: 12px;
+        color: #ee4d2d;
+        margin-right: 90px;
       }
       .arrow-rotate-back {
         transition: all 0.5s;
