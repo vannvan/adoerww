@@ -78,6 +78,7 @@ const Follow = {
   initFollowEvent: function() {
     //按钮点击
     $$('.emalacca-get-follow-button').on('click', function() {
+      console.log('ahah ')
       let _this = this
       let storeId = $$(_this).attr('data-store-id')
       if (storeId) {
