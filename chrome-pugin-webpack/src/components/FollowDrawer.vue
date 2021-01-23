@@ -2,25 +2,17 @@
   <!-- 关注 -->
   <div class="emalacca-follow-panel">
     <div class="tab-wrap">
-      <span
-        class="tab-item"
-        :class="{ active: currentTab == 1 }"
-        @click="handleToggleTabs(1)"
+      <span class="tab-item" :class="{ active: currentTab == 1 }" @click="handleToggleTabs(1)"
         >粉丝关注</span
       >
-      <span
-        class="tab-item"
-        :class="{ active: currentTab == 2 }"
-        @click="handleToggleTabs(2)"
+      <span class="tab-item" :class="{ active: currentTab == 2 }" @click="handleToggleTabs(2)"
         >自动取关</span
       >
     </div>
     <template v-if="currentTab == 1">
       <div style="padding:20px">
         <p>
-          <a class="hand" @click="followHelpVisible = !followHelpVisible"
-            >粉丝关注步骤说明
-          </a>
+          <a class="hand" @click="followHelpVisible = !followHelpVisible">粉丝关注步骤说明 </a>
           <span
             class="icon iconfont icon-right arrow-right"
             :class="followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'"
@@ -47,9 +39,7 @@
     <template v-if="currentTab == 2">
       <div style="padding:20px">
         <p>
-          <a class="hand" @click="unFollowHelpVisible = !unFollowHelpVisible"
-            >取关粉丝步骤说明
-          </a>
+          <a class="hand" @click="unFollowHelpVisible = !unFollowHelpVisible">取关粉丝步骤说明 </a>
           <span
             class="icon iconfont icon-right arrow-right"
             :class="unFollowHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'"
@@ -88,12 +78,8 @@
             <span class="sub-item"><b>取消率：</b>8%</span>
           </li>
           <li>
-            <span class="sub-item"
-              ><b>粉丝数：</b>{{ storeInfo.follower_count }}</span
-            >
-            <span class="sub-item"
-              ><b>关注中：</b>{{ storeInfo.account.following_count }}</span
-            >
+            <span class="sub-item"><b>粉丝数：</b>{{ storeInfo.follower_count }}</span>
+            <span class="sub-item"><b>关注中：</b>{{ storeInfo.account.following_count }}</span>
           </li>
         </div>
         <div class="info-item">
@@ -120,9 +106,7 @@
                 v-model="filterParams.limitFollowNumber"
                 v-enterNumberMin="0"
               />
-              <small class="error-info" ref="limitFollowNumber"
-                >请输入关注数量</small
-              >
+              <small class="error-info" ref="limitFollowNumber">请输入关注数量</small>
             </span>
           </li>
           <li>
@@ -138,9 +122,7 @@
                 v-enterNumberMax="30"
                 v-enterNumberMin="-1"
               />
-              <small class="error-info" ref="lastLoginTime"
-                >请输入上次登录时间
-              </small>
+              <small class="error-info" ref="lastLoginTime">请输入上次登录时间 </small>
             </span>
             <span class="sub-item">
               <input
@@ -149,9 +131,7 @@
                 v-model="filterParams.commentsTimes"
                 v-enterNumberMin="-1"
               />
-              <small class="error-info" ref="commentsTimes"
-                >请输入评价次数
-              </small>
+              <small class="error-info" ref="commentsTimes">请输入评价次数 </small>
             </span>
           </li>
           <li>
@@ -165,9 +145,7 @@
                 v-model="filterParams.followsTimes"
                 v-enterNumberMin="-1"
               />
-              <small class="error-info" ref="followsTimes"
-                >请输入关注人数
-              </small>
+              <small class="error-info" ref="followsTimes">请输入关注人数 </small>
             </span>
           </li>
           <li>
@@ -178,19 +156,11 @@
           </li>
           <li>
             <span class="sub-item">
-              <input
-                type="checkbox"
-                class="check-box"
-                v-model="filterParams.isFilterSeller"
-              />
+              <input type="checkbox" class="check-box" v-model="filterParams.isFilterSeller" />
               {{ filterParams.isFilterSeller ? '是' : '否' }}
             </span>
             <span class="sub-item" v-if="!filterParams.isFilterSeller">
-              <input
-                type="number"
-                placeholder=">=50"
-                v-model="filterParams.sellerGoodsCount"
-              />
+              <input type="number" placeholder=">=50" v-model="filterParams.sellerGoodsCount" />
             </span>
           </li>
         </div>
@@ -227,12 +197,8 @@
             <span class="sub-item"><b>取消率：</b>8%</span>
           </li>
           <li>
-            <span class="sub-item"
-              ><b>粉丝数：</b>{{ storeInfo.follower_count }}</span
-            >
-            <span class="sub-item"
-              ><b>关注中：</b>{{ storeInfo.account.following_count }}</span
-            >
+            <span class="sub-item"><b>粉丝数：</b>{{ storeInfo.follower_count }}</span>
+            <span class="sub-item"><b>关注中：</b>{{ storeInfo.account.following_count }}</span>
           </li>
         </div>
         <div class="info-item">
@@ -286,9 +252,7 @@
       v-if="actionedUserList.length != 0"
     ></div>
 
-    <p class="count-info" v-if="countFollowers">
-      当前页面可操作用户数：{{ countFollowers }}
-    </p>
+    <p class="count-info" v-if="countFollowers">当前页面可操作用户数：{{ countFollowers }}</p>
   </div>
 </template>
 
@@ -305,7 +269,7 @@ function getTime() {
 
 export default {
   component: {
-    Drawer,
+    Drawer
   },
   data() {
     return {
@@ -318,17 +282,17 @@ export default {
         commentsTimes: '', //评价次数
         followsTimes: '', //关注数
         isFilterSeller: false, //是否过滤卖家
-        sellerGoodsCount: null, //卖家商品数
+        sellerGoodsCount: null //卖家商品数
       },
       buttonText: '开启',
       countFollowers: null, //当前页面粉丝数
       storeInfo: {
-        account: {},
+        account: {}
       }, //店铺信息
       resultCount: {
         success: 0,
         fail: 0,
-        skip: 0,
+        skip: 0
       }, //结果统计
       isRequest: false,
       globalTimer: null, //定时器
@@ -343,20 +307,20 @@ export default {
       countryCode: null, //当前国家
       currentStoreId: null, //当前用户自己的店铺id
       followHelpVisible: false,
-      unFollowHelpVisible: false,
+      unFollowHelpVisible: false
     }
   },
   props: {
     display: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   computed: {
     calcRate() {
       let { rating_bad, rating_good, rating_normal } = this.storeInfo
       return rating_bad + rating_good + rating_normal
-    },
+    }
   },
 
   watch: {
@@ -375,11 +339,11 @@ export default {
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
-            content: ERROR.syncLoginStatusFail,
+            content: ERROR.syncLoginStatusFail
           })
         }
-      },
-    },
+      }
+    }
   },
 
   directives: {
@@ -401,7 +365,7 @@ export default {
           }
           trigger(input, 'input')
         })
-      },
+      }
     },
     //限制可输入最小值
     enterNumberMin: {
@@ -421,8 +385,8 @@ export default {
           }
           trigger(input, 'input')
         })
-      },
-    },
+      }
+    }
   },
   mounted() {
     this.isOther = window.location.search.search('other') == 1
@@ -431,9 +395,9 @@ export default {
     let _this = this
     let { pathname } = window.location
     if (/followers|following/.test(pathname)) {
-      this.display = true
+      this.$emit('update:display', true)
       let storeId = pathname.replace(/[^0-9]/gi, '')
-      Follow.getStoreInfoById(storeId).then((res) => {
+      Follow.getStoreInfoById(storeId).then(res => {
         this.storeInfo = res.result.data
       })
       _this.scrollTo()
@@ -445,13 +409,13 @@ export default {
     window.addEventListener('scroll', this.handleScroll)
     this.$nextTick(() => {
       Follow.sendCsrfToken()
-        .then((res) => {
+        .then(res => {
           console.log('cookies同步成功')
           this.cookieSyncStatus = true
         })
         .catch(() => {
           this.$Notice.error({
-            content: ERROR.syncLoginStatusFail,
+            content: ERROR.syncLoginStatusFail
           })
         })
     })
@@ -465,22 +429,20 @@ export default {
     handleToggleTabs(index) {
       Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
-      Follow.syncShoppeBaseInfo().then((res) => {
+      Follow.syncShoppeBaseInfo().then(res => {
         this.currentStoreId = res.result.storeId
         this.countryCode = res.result.country
         if (!this.countryCode) {
           this.$Notice.error({
-            content: ERROR.didNotGetToSiteInformation,
+            content: ERROR.didNotGetToSiteInformation
           })
           return
         }
         let reg = new RegExp(this.countryCode.toLowerCase())
-        let countryWebSite = WEBSITES.find((el) => reg.test(JSON.stringify(el))) //获取到对应的取关地址
-        this.display = false
+        let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
+        this.$emit('update:display', false)
         if (this.currentTab == 2) {
-          window.location.replace(
-            countryWebSite.mall.replace('ID', this.currentStoreId)
-          )
+          window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
         } else if (countryWebSite.front != window.location.href) {
           window.location.replace(countryWebSite.front)
         }
@@ -505,14 +467,14 @@ export default {
     //获取当前登录店铺的id
     getCurrentStoreId() {
       // 先走登录接口获取到用户名,再用用户名获取店铺id和当前站点信息
-      Follow.syncShoppeBaseInfo().then((res) => {
+      Follow.syncShoppeBaseInfo().then(res => {
         let { username, country, storeId } = res.result
         if (username) {
           this.currentStoreId = storeId
           this.countryCode = country
         } else {
           this.$Notice.error({
-            content: ERROR.pleaseCheckWhetherHaveAuthoriz,
+            content: ERROR.pleaseCheckWhetherHaveAuthoriz
           })
         }
       })
@@ -526,8 +488,7 @@ export default {
         return
       }
       //如果没有填,给一波默认值
-      this.filterParams.limitFollowNumber =
-        this.filterParams.limitFollowNumber || 100
+      this.filterParams.limitFollowNumber = this.filterParams.limitFollowNumber || 100
       this.filterParams.lastLoginTime = this.filterParams.lastLoginTime || 30
       this.filterParams.commentsTimes = this.filterParams.commentsTimes || 1
       this.filterParams.followsTimes = this.filterParams.followsTimes || 1
@@ -573,7 +534,7 @@ export default {
           this.buttonText = '正在运行中，点击可取消'
           this.actionedUserList.push(this.currentUserName)
           if (!this.handleSkipJudge(actionType)) return
-          Follow.getStoreFollowers(this.currentUserName).then((res) => {
+          Follow.getStoreFollowers(this.currentUserName).then(res => {
             let { shopid } = res.result.data
             if (actionType == 'follow' && this.filterMatch(res.result.data)) {
               this.handleNotifyToBack(actionType, shopid, this.currentUserName)
@@ -581,9 +542,7 @@ export default {
               this.handleNotifyToBack(actionType, shopid, this.currentUserName)
             } else {
               this.resultCount.skip += 1
-              let htmlStr = `<li>[${getTime()}] ${
-                this.currentUserName
-              }跳过</li>`
+              let htmlStr = `<li>[${getTime()}] ${this.currentUserName}跳过</li>`
               $('#ResultContent').prepend(htmlStr)
             }
           })
@@ -604,7 +563,7 @@ export default {
           this.actionedUserList >= this.countFollowers,
         2:
           this.resultCount.success >= this.unfollowMaxNumber ||
-          this.actionedUserList >= this.countFollowers,
+          this.actionedUserList >= this.countFollowers
       }
       if (limitOpts[this.currentTab]) {
         clearInterval(this.globalTimer)
@@ -622,7 +581,7 @@ export default {
     //关注或取关，传送给后台
     handleNotifyToBack(actionType, shopid, name) {
       //   console.log('操作过的用户', this.actionedUserList)
-      Follow.notifyBackFollowOrUnFollow(actionType, shopid).then((res) => {
+      Follow.notifyBackFollowOrUnFollow(actionType, shopid).then(res => {
         let infoText = actionType == 'follow' ? '关注' : '取关'
         if (res.result.success) {
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
@@ -640,7 +599,7 @@ export default {
           $('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
           this.$Notice.error({
-            content: ERROR.abnormalSituation,
+            content: ERROR.abnormalSituation
           })
           this.handleCancel()
         } else {
@@ -663,7 +622,7 @@ export default {
         rating_bad,
         rating_good,
         rating_normal,
-        name,
+        name
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
       //   console.log(
@@ -676,7 +635,7 @@ export default {
         commentsTimes, //评价次数
         followsTimes, //关注数
         isFilterSeller, //是否过滤卖家
-        sellerGoodsCount, //卖家商品数
+        sellerGoodsCount //卖家商品数
       } = this.filterParams
       let timestamp = Math.round(new Date().getTime() / 1000).toString()
       let matchStep1 = follower_count >= followsTimes //和关注数
@@ -688,15 +647,13 @@ export default {
       if (!isFilterSeller) {
         return matchStep1 && matchStep2 && matchStep3 && matchStep6
       } else {
-        return (
-          matchStep1 && matchStep2 && matchStep3 && matchStep5 && matchStep6
-        )
+        return matchStep1 && matchStep2 && matchStep3 && matchStep5 && matchStep6
       }
     },
 
     validate() {
       let validQueue = []
-      Object.keys(this.filterParams).forEach((key) => {
+      Object.keys(this.filterParams).forEach(key => {
         const exclude = ['isFilterSeller', 'sellerGoodsCount']
         if (!this.filterParams[key] && this.$refs[key]) {
           this.$refs[key].style.display = 'block'
@@ -713,8 +670,8 @@ export default {
       this.isRequest = false
       this.buttonText = '重新开始'
       clearInterval(this.globalTimer)
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,6 +1,6 @@
 export function dragApp() {
   //获取元素
-  let dv = document.getElementById('emalaccaRightApp')
+  let dv = document.querySelector('.emalacca-plugin-action-wrap')
   let x = 0
   let y = 0
   let l = 0
@@ -23,7 +23,7 @@ export function dragApp() {
     isDown = true
     //设置样式
     dv.style.cursor = 'move'
-    dv.style.position = 'fixed'
+    dv.style.position = 'fixed !important'
   }
   //鼠标移动
   window.onmousemove = function(e) {
@@ -36,7 +36,7 @@ export function dragApp() {
     //计算移动后的左偏移量和顶部的偏移量
     let nl = nx - (x - l)
     let nt = ny - (y - t)
-    dv.style.position = 'fixed'
+    dv.style.position = 'fixed !important'
     if (nl < document.body.offsetWidth - 20 && nl > 20) {
       dv.style.left = nl + 'px'
     }
@@ -52,6 +52,7 @@ export function dragApp() {
     lastTime = new Date().getTime()
     if (lastTime - firstTime < 200) {
       dv.style.cursor = 'default'
+      dv.style.position = 'relative !important'
     }
     setTimeout(() => {
       isDown = false

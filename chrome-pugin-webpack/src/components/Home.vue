@@ -1,11 +1,7 @@
 <template>
   <div class="seller-erp-fixed-right" id="emalaccaRightApp">
-    <div class="app-action-wrap">
-      <span
-        class="icon iconfont icon-shopee icon-toggle"
-        @click="handleOpenDrawer()"
-      >
-      </span>
+    <div class="emalacca-plugin-action-wrap">
+      <span class="icon iconfont icon-shopee icon-toggle" @click="handleOpenDrawer()"> </span>
       <ul class="follow-quick-action-wrap">
         <li @click="openPage(storeFront('front'))" v-if="storeFront('front')">
           店铺前台
@@ -23,7 +19,7 @@
       :width="drawerWidth"
       :mask="false"
     >
-      <FollowDrawer :display="display"></FollowDrawer>
+      <FollowDrawer :display.sync="display"></FollowDrawer>
     </drawer>
   </div>
 </template>
@@ -37,26 +33,26 @@ import Drawer from './Drawer'
 export default {
   components: {
     Drawer,
-    FollowDrawer,
+    FollowDrawer
   },
 
   data() {
     return {
       pluginVersion: packJSON.version,
       display: false,
-      drawerWidth: '400px',
+      drawerWidth: '400px'
     }
   },
   computed: {
     //店铺前台
     storeFront() {
-      return (type) => {
+      return type => {
         let host = window.location.host.split('.')
         let country = host[host.length - 1]
-        let countryWebSite = WEBSITES.find((el) => el.key == country) //获取到对应的取关地址
+        let countryWebSite = WEBSITES.find(el => el.key == country) //获取到对应的取关地址
         return countryWebSite ? countryWebSite[type] : undefined
       }
-    },
+    }
   },
 
   directives: {},
@@ -66,7 +62,7 @@ export default {
   },
   methods: {
     handleOpenDrawer() {
-      if ($('#emalaccaRightApp').css('cursor') == 'default') {
+      if ($('.emalacca-plugin-action-wrap').css('cursor') == 'default') {
         this.display = true
       }
     },
@@ -74,8 +70,8 @@ export default {
       if (/http/.test(path)) {
         window.open(path)
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -104,36 +100,40 @@ textarea {
   z-index: 9999999999;
   font-size: 14px !important;
   cursor: default;
-  .app-action-wrap {
+  .emalacca-plugin-action-wrap {
     width: 60px;
-    position: relative !important;
-  }
-  .icon-toggle {
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    z-index: 8;
-    font-size: 48px;
-    color: #ee4d2d;
-    position: inherit;
-  }
-  .follow-quick-action-wrap {
-    position: inherit;
-    padding: 0 4px !important;
-    li {
-      list-style: none;
-      height: 40px !important;
-      width: 40px !important;
-      box-sizing: border-box;
-      background: #ee4d2d;
-      border-bottom: 1px solid #fff;
-      padding: 5px;
-      display: flex !important;
-      align-items: center !important;
-      text-align: center !important;
-      color: #fff;
+    position: fixed;
+    top: 40%;
+    right: 20px;
+    cursor: default;
+    .icon-toggle {
+      width: 40px;
+      height: 40px;
       cursor: pointer;
-      font-size: 14px;
+      z-index: 8;
+      font-size: 48px;
+      color: #ee4d2d;
+      position: inherit;
+      margin-top: -50px;
+    }
+    .follow-quick-action-wrap {
+      position: inherit;
+      padding: 0 4px !important;
+      li {
+        list-style: none;
+        height: 40px !important;
+        width: 40px !important;
+        box-sizing: border-box;
+        background: #ee4d2d;
+        border-bottom: 1px solid #fff;
+        padding: 5px;
+        display: flex !important;
+        align-items: center !important;
+        text-align: center !important;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+      }
     }
   }
 }

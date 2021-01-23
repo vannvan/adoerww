@@ -254,14 +254,9 @@ const Follow = {
   //获取当前登录的店铺id
   getCurrentStoreId: function() {
     return new Promise(resolve => {
-      sendMessageToBackground(
-        'request',
-        { domain: this.domain },
-        'GET_CURRENT_STORE_ID',
-        data => {
-          resolve(data)
-        }
-      ).then(res => {
+      sendMessageToBackground('request', { domain: this.domain }, 'GET_CURRENT_STORE_ID', data => {
+        resolve(data)
+      }).then(res => {
         resolve(res)
       })
     })
@@ -270,14 +265,9 @@ const Follow = {
   //同步虾皮基础信息
   syncShoppeBaseInfo: function() {
     return new Promise(resolve => {
-      sendMessageToBackground(
-        'auth',
-        { domain: this.domain },
-        'SYNC_SHOPPE_BASE_INFO',
-        data => {
-          resolve(data)
-        }
-      ).then(res => {
+      sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPPE_BASE_INFO', data => {
+        resolve(data)
+      }).then(res => {
         resolve(res)
       })
     })
