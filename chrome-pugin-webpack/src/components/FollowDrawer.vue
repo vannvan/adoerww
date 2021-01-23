@@ -294,7 +294,7 @@
 
 <script>
 import Drawer from './Drawer'
-import Follow from '@/inject/follow-content'
+import Follow from '@/inject/shopee'
 import $$ from 'jquery'
 import { WEBSITES, ERROR } from '../lib/conf'
 const packJSON = require('../../package.json')

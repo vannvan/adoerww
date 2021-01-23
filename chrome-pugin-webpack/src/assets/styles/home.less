@@ -1,3 +1,4 @@
+//商品图层上的操作容器
 .emalacca-plugin-goods-panel-wrap {
   width: 150px;
   height: auto;
@@ -14,14 +15,24 @@
     line-height: 30px;
     text-align: center;
     color: #fff;
-    background-color: #ee4d2d;
+    background-color: rgba(#ee4d2d, 0.8);
     cursor: pointer;
     margin: 0 auto;
     border-bottom: 1px solid #ccc;
-    &:nth-last-child {
+    &:last-child {
       border-bottom: none;
     }
   }
+}
+
+//商品图层下的数据展示容器
+.emalacca-plugin-goods-data-view {
+  width: 100%;
+  min-height: 100px;
+  background: #fff;
+  border-top: 1px solid #d6d6d6;
+  text-align: left;
+  user-select: none;
 }
 
 .overflow-y::-webkit-scrollbar-thumb {

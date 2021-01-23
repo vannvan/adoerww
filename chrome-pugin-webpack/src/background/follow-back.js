@@ -32,6 +32,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     Auth.syncShoppeBaseInfo(options, type, sendResponse)
     return true
   }
+  if ((action = 'requet' && type == 'GET_SHOPPE_ITEM_LIST_INFO')) {
+    Request.getShopeeItemsList(options, type, sendResponse)
+    return true
+  }
   return true
   //   return true //return true可以避免The message port closed before a response was received报错
 })
@@ -146,6 +150,38 @@ const Request = {
     })
   },
 
+  //获取虾皮商品列表中的店铺信息
+  getShopeeItemsList: function(params, type, call) {
+    console.log(params, type)
+    let { goodsList, domain } = params
+    if (goodsList.length > 0) {
+      let requestParams = {
+        item_shop_ids: Array.from({ length: goodsList.length }, (v, k) => {
+          return {
+            itemid: Number(goodsList[k].split('.')[0]),
+            shopid: Number(goodsList[k].split('.')[1]),
+          }
+        }),
+      }
+      console.log(requestParams)
+      $$.ajax({
+        type: 'post',
+        url: `${domain}/api/v2/item/get_list`,
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(requestParams),
+        success: function(data) {
+          call({ type: type, result: data || null })
+        },
+        complete: function(data) {
+          if (data.status != 200) {
+            call({ type: type, result: { error: -1 } })
+          }
+        },
+      })
+    }
+  },
+
   //获取虾皮店铺信息
   getCurrentStoreId: function(params, type, call) {
     // console.log(getMatchSite(params.domain), '匹配域名')
@@ -204,7 +240,9 @@ const Auth = {
           type: type,
           result: {
             storeId: userInfo.shopid,
-            country: getMatchSite(params.domain).key,
+            country: getMatchSite(params.domain)
+              ? getMatchSite(params.domain).key
+              : null,
             username: userInfo.username,
           },
         })
