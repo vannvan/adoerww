@@ -28,11 +28,35 @@
 //商品图层下的数据展示容器
 .emalacca-plugin-goods-data-view {
   width: 100%;
-  min-height: 100px;
+  height: auto;
   background: #fff;
   border-top: 1px solid #d6d6d6;
   text-align: left;
   user-select: none;
+  font-size: 0.75rem;
+  padding: 0 5px;
+  box-sizing: border-box;
+  p {
+    height: 20px;
+    line-height: 20px;
+    font-weight: bolder;
+  }
+  .list-group {
+    display: flex;
+    justify-content: space-between;
+    height: 20px;
+    line-height: 20px;
+    .item {
+      width: 50%;
+      white-space: nowrap;
+      .title {
+        font-weight: bolder;
+      }
+      .value {
+        color: #ee4d2d !important;
+      }
+    }
+  }
 }
 
 .overflow-y::-webkit-scrollbar-thumb {

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import $$ from 'jquery'
+import $ from 'jquery'
 import { WEBSITES } from '../lib/conf'
 const packJSON = require('../../package.json')
 import FollowDrawer from './FollowDrawer'
@@ -66,7 +66,7 @@ export default {
   },
   methods: {
     handleOpenDrawer() {
-      if ($$('#emalaccaRightApp').css('cursor') == 'default') {
+      if ($('#emalaccaRightApp').css('cursor') == 'default') {
         this.display = true
       }
     },

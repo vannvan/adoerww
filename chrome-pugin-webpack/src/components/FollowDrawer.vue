@@ -295,7 +295,7 @@
 <script>
 import Drawer from './Drawer'
 import Follow from '@/inject/shopee'
-import $$ from 'jquery'
+import $ from 'jquery'
 import { WEBSITES, ERROR } from '../lib/conf'
 const packJSON = require('../../package.json')
 import { isEmpty } from '../lib/utils'
@@ -488,7 +488,7 @@ export default {
     },
 
     handleScroll() {
-      this.countFollowers = $$('.clickable_area.middle-centered-div').length
+      this.countFollowers = $('.clickable_area.middle-centered-div').length
     },
 
     scrollTo() {
@@ -534,10 +534,10 @@ export default {
       if (!this.validate()) return
       let userNameList = []
       let htmlStr = `<li>[${getTime()}] 任务开始...</li>`
-      $$('#ResultContent').prepend(htmlStr)
-      $$('.down a').each(function(index) {
+      $('#ResultContent').prepend(htmlStr)
+      $('.down a').each(function(index) {
         if (index >= _this.filterParams.startIndex) {
-          userNameList.push($$(this).attr('username'))
+          userNameList.push($(this).attr('username'))
         } else {
           _this.resultCount.skip += 1 //跳过
         }
@@ -556,9 +556,9 @@ export default {
       if (!this.validate()) return
       let userNameList = []
       let htmlStr = `<li>[${getTime()}] 取关任务开始...</li>`
-      $$('#ResultContent').prepend(htmlStr)
-      $$('.down a').each(function(index) {
-        userNameList.push($$(this).attr('username'))
+      $('#ResultContent').prepend(htmlStr)
+      $('.down a').each(function(index) {
+        userNameList.push($(this).attr('username'))
       })
       this.usernameQueue = userNameList
       this.getStoreFollowers('unfollow')
@@ -584,13 +584,13 @@ export default {
               let htmlStr = `<li>[${getTime()}] ${
                 this.currentUserName
               }跳过</li>`
-              $$('#ResultContent').prepend(htmlStr)
+              $('#ResultContent').prepend(htmlStr)
             }
           })
         } else {
           let infoText = actionType == 'follow' ? '关注' : '取关'
           let htmlStr = `<li>[${getTime()}] ${infoText} 任务完毕！</li>`
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
           this.handleCancel()
         }
       }, 1000)
@@ -613,7 +613,7 @@ export default {
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${infoText} 任务完成...</li>`
           this.buttonText = this.isOther ? '开启关注' : '开启取关'
           this.isRequest = false
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
         })
         return false
       }
@@ -626,18 +626,18 @@ export default {
         let infoText = actionType == 'follow' ? '关注' : '取关'
         if (res.result.success) {
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
           this.resultCount.success += 1
         } else if (res.result.error == 'error_not_login') {
           clearInterval(this.globalTimer)
           let htmlStr = `<li style="color:#f00">[${getTime()}] 请同步登录状态后重新操作</li>`
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
           this.isRequest = false
           this.buttonText = this.isOther ? '开启关注' : '开启取关'
         } else if (res.result.error == -1) {
           let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
           this.$Notice.error({
             content: ERROR.abnormalSituation,
@@ -645,7 +645,7 @@ export default {
           this.handleCancel()
         } else {
           let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
-          $$('#ResultContent').prepend(htmlStr)
+          $('#ResultContent').prepend(htmlStr)
           this.resultCount.fail += 1
           this.handleCancel()
         }

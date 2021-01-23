@@ -29,3 +29,5 @@ dist/
 
 .aliossrc
 /package-lock.json
+/local
+/*.zip

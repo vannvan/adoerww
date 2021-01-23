@@ -1,5 +1,6 @@
 // 粉丝关注相关
-import $$ from 'jquery'
+// -1 接口错误 -2 数据错误
+import $ from 'jquery'
 import { getMatchSite } from '../lib/conf'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -51,7 +52,7 @@ const Request = {
       if (!matchSite) {
         reject(-1)
       }
-      $$.ajax({
+      $.ajax({
         type: 'get',
         url: `${matchSite.seller}/api/v2/login/`,
         dataType: 'json',
@@ -67,7 +68,7 @@ const Request = {
   // 获取店铺信息
   getStoreInfoById: function(params, type, call) {
     console.log(params, type)
-    $$.ajax({
+    $.ajax({
       type: 'get',
       url: `${params.domain}/api/v2/shop/get?is_brief=1&shopid=${params.storeId}`,
       dataType: 'json',
@@ -85,7 +86,7 @@ const Request = {
   //获取店铺粉丝信息
   getFollowersInfoByName: function(params, type, call) {
     console.log(params, type)
-    $$.ajax({
+    $.ajax({
       type: 'get',
       url: `${params.domain}/api/v4/shop/get_shop_detail?username=${params.userName}`,
       dataType: 'json',
@@ -110,7 +111,7 @@ const Request = {
     }
     if (!shopid) return
     // console.log(`${Opts[actionType]}${actionType}/shop/${shopid}/`)
-    $$.ajax({
+    $.ajax({
       type: 'post',
       url: `${Opts[actionType]}${actionType}/shop/${shopid}/`,
       data: {
@@ -130,7 +131,7 @@ const Request = {
   //获取erp平台用户绑定的店铺列表
   getUserBindStoreOfErp: function(params, type, call) {
     console.log(params, type)
-    $$.ajax({
+    $.ajax({
       type: 'get',
       url: params.domain + '/api/store/info/page',
       beforeSend: function(XMLHttpRequest) {
@@ -154,32 +155,33 @@ const Request = {
   getShopeeItemsList: function(params, type, call) {
     console.log(params, type)
     let { goodsList, domain } = params
-    if (goodsList.length > 0) {
-      let requestParams = {
-        item_shop_ids: Array.from({ length: goodsList.length }, (v, k) => {
-          return {
-            itemid: Number(goodsList[k].split('.')[0]),
-            shopid: Number(goodsList[k].split('.')[1]),
-          }
-        }),
-      }
-      console.log(requestParams)
-      $$.ajax({
-        type: 'post',
-        url: `${domain}/api/v2/item/get_list`,
-        dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(requestParams),
-        success: function(data) {
-          call({ type: type, result: data || null })
-        },
-        complete: function(data) {
-          if (data.status != 200) {
-            call({ type: type, result: { error: -1 } })
-          }
-        },
-      })
+    if (goodsList && goodsList.length == 0) return
+    let requestParams = {
+      item_shop_ids: Array.from({ length: goodsList.length }, (v, k) => {
+        return {
+          shopid: Number(goodsList[k].split('.')[0]),
+          itemid: Number(goodsList[k].split('.')[1]),
+        }
+      }),
     }
+    $.ajax({
+      type: 'post',
+      url: `${domain}/api/v2/item/get_list`,
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+      },
+      data: JSON.stringify(requestParams),
+      success: function(data) {
+        call({ type: type, result: data || null })
+      },
+      complete: function(data) {
+        if (data.status != 200) {
+          call({ type: type, result: { error: -1 } })
+        }
+      },
+    })
   },
 
   //获取虾皮店铺信息
@@ -191,7 +193,7 @@ const Request = {
       call({ type: type, result: { error: -1 } })
       return
     }
-    $$.ajax({
+    $.ajax({
       type: 'get',
       url: `${matchSite.front}/api/v2/shop/get?username=${params.storeName}`,
       dataType: 'json',

@@ -10,6 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 // const HtmlWithImgLoader = require('html-withimg-loader')
 const isDev = process.env.NODE_ENV == 'development'
+const webpack = require('webpack')
 
 const DevOutPutPath = 'local/'
 
@@ -22,11 +23,11 @@ module.exports = {
     inject: './src/inject.js',
     popup: './src/popup/popup.js',
     home: './src/home/home.js',
-    options: './src/options/options.js',
+    options: './src/options/options.js'
   },
   output: {
     filename: '[name].js',
-    path: resolve(__dirname, isDev ? DevOutPutPath : 'dist/'),
+    path: resolve(__dirname, isDev ? DevOutPutPath : 'dist/')
   },
   module: {
     rules: [
@@ -35,8 +36,8 @@ module.exports = {
         loader: 'babel-loader?cacheDirectory=true',
         exclude: [/node_modules/],
         options: {
-          presets: ['@babel/preset-env'],
-        },
+          presets: ['@babel/preset-env']
+        }
       },
       {
         test: /\.(png|jpe?g|gif)$/,
@@ -46,37 +47,37 @@ module.exports = {
             options: {
               limit: 100000, // 小于这个时将会已base64位图片打包处理
               fallback: 'file-loader', // 当超过100000byte时，会回退使用file-loader
-              outputPath: 'images',
-            },
-          },
-        ],
+              outputPath: 'images'
+            }
+          }
+        ]
       },
       {
         test: /\.html$/,
-        use: ['html-withimg-loader'], // html中的img标签 ,html文件中的图片可以被打包的关键
+        use: ['html-withimg-loader'] // html中的img标签 ,html文件中的图片可以被打包的关键
       },
 
       {
         test: /\.vue$/,
-        use: ['vue-loader'],
+        use: ['vue-loader']
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       },
       {
         test: /\.less$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
       },
       {
         test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'], // 从右向左解析原则
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'] // 从右向左解析原则
       },
       {
         test: /\.(woff|woff2|ttf|eot|svg)$/,
-        loader: 'file-loader?name=fonts/[name].[ext]',
-      },
-    ],
+        loader: 'file-loader?name=fonts/[name].[ext]'
+      }
+    ]
   },
   resolve: {
     extensions: ['.js', '.vue'],
@@ -85,10 +86,14 @@ module.exports = {
       '@': resolve('src'),
       '@styles': resolve('src/assets/styles'),
       '@fonts': resolve('src/assets/fonts'),
-      '@components': resolve('src/components'),
-    },
+      '@components': resolve('src/components')
+    }
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    }),
     new CleanWebpackPlugin(),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
@@ -96,39 +101,45 @@ module.exports = {
       template: './src/popup/popup.html',
       minify: {
         collapseWhitespace: true,
-        removeComments: true,
+        removeComments: true
       },
-      chunks: ['popup'],
+      chunks: ['popup']
     }),
     new HtmlWebpackPlugin({
       filename: 'home.html',
       template: './src/home/home.html',
       minify: {
         collapseWhitespace: true,
-        removeComments: true,
+        removeComments: true
       },
-      chunks: ['home'],
+      chunks: ['home']
     }),
     new HtmlWebpackPlugin({
       filename: 'options.html',
       template: './src/options/options.html',
       minify: {
         collapseWhitespace: true,
-        removeComments: true,
+        removeComments: true
       },
-      chunks: ['options'],
+      chunks: ['options']
     }),
-    new UglifyJsPlugin({}), //压缩js输出
+    new UglifyJsPlugin({
+      //   uglifyOptions: {
+      //     compress: {
+      //       drop_console: true    // 去除console
+      //     }
+      //   }
+    }), //压缩js输出
     new OptimizeCSSAssetsPlugin(), //压缩css
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: '[name].css'
     }), // minicss,
     new CopyWebpackPlugin([
       {
         from: resolve('src/assets/icon'),
         to: resolve(__dirname, (isDev ? DevOutPutPath : 'dist/') + 'icon'),
-        toType: 'dir',
-      },
+        toType: 'dir'
+      }
     ]),
 
     manifestJSON &&
@@ -136,12 +147,12 @@ module.exports = {
         pretty: false,
         object: manifestJSON,
         path: '/',
-        filename: 'manifest.json',
-      }),
+        filename: 'manifest.json'
+      })
   ],
   mode: 'development',
   devtool: 'none',
   devServer: {
-    port: 3000,
-  },
+    port: 3000
+  }
 }

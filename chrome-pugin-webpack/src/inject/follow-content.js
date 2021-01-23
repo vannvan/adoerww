@@ -1,6 +1,6 @@
 //粉丝关注相关
 import Vue from 'vue'
-import $$ from 'jquery'
+import $ from 'jquery'
 import { throttle, getCookie, debounce } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import { dragApp } from './drag'
@@ -33,21 +33,21 @@ const Follow = {
   domain: window.location.origin,
   init: function() {
     // console.log(this.domain, 'domain')
-    let followActionWrap = $$("<div id='FollowActionWrap'></div>")
-    $$('body').append(followActionWrap)
+    let followActionWrap = $("<div id='FollowActionWrap'></div>")
+    $('body').append(followActionWrap)
     dragApp()
   },
 
   insertAction: function(type) {
-    let followItemHtml = $$('<div></div>')
-    $$('a').each(function() {
-      //   if(/-i/.test($$(this)[0].href))
-      var test = new Function('url', type)($$(this)[0].href)
+    let followItemHtml = $('<div></div>')
+    $('a').each(function() {
+      //   if(/-i/.test($(this)[0].href))
+      var test = new Function('url', type)($(this)[0].href)
       console.log(test)
-      if ($$(this)[0].href && test) {
-        let storeId = $$(this)[0].href.split('i.')[1]
-        $$(this).attr('sp-store-id', storeId)
-        let followItem = $$(
+      if ($(this)[0].href && test) {
+        let storeId = $(this)[0].href.split('i.')[1]
+        $(this).attr('sp-store-id', storeId)
+        let followItem = $(
           `
           <div class="emalacca-plugin-goods-panel-wrap">
             <span class="emalacca-goods-panel-button emalacca-get-follow-button" data-store-id="${storeId}">获取粉丝</span>
@@ -57,15 +57,15 @@ const Follow = {
         )
         followItemHtml.append(followItem)
         //鼠标进入
-        $$(this).on('mouseenter', function() {
-          let firstImg = $$(this).find('img:first-child')
+        $(this).on('mouseenter', function() {
+          let firstImg = $(this).find('img:first-child')
           let offsetTop, offsetLeft
           if (firstImg.length > 0) {
             offsetTop = firstImg.offset().top
             offsetLeft = firstImg.offset().left
           }
-          offsetTop = $$(this).offset().top
-          offsetLeft = $$(this).offset().left
+          offsetTop = $(this).offset().top
+          offsetLeft = $(this).offset().left
           followItem.css({
             top: offsetTop + 20,
             left: offsetLeft + 20,
@@ -75,15 +75,15 @@ const Follow = {
         })
       }
     })
-    $$('#FollowActionWrap').html($$(followItemHtml))
+    $('#FollowActionWrap').html($(followItemHtml))
     Follow.initFollowEvent()
   },
   //获取粉丝事件初始化
   initFollowEvent: function() {
     //按钮点击
-    $$('.emalacca-get-follow-button').on('click', function() {
+    $('.emalacca-get-follow-button').on('click', function() {
       let _this = this
-      let storeId = $$(_this).attr('data-store-id')
+      let storeId = $(_this).attr('data-store-id')
       if (storeId) {
         let realId = storeId.split('.')[0]
         window.open(`/shop/${realId}/followers?other=true`)
@@ -199,7 +199,7 @@ const Follow = {
 //     handleLinks(CONFIG.detail)
 //     // var test = new Function('url', CONFIG.detect)(location.href)
 //     // showTip(test, location.href)
-//     // $$(window).scroll(Follow.insertAction())
+//     // $(window).scroll(Follow.insertAction())
 //     Follow.insertAction()
 //   } catch (e) {
 //     return
@@ -244,7 +244,7 @@ function preload() {
     CONFIG = JSON.parse(linkrule)
     Follow.insertAction(CONFIG.detail)
     // var test = (new Function("url", CONFIG.detect))(location.href);
-    $$(window).scroll(debounceHandleLinks)
+    $(window).scroll(debounceHandleLinks)
   } catch (e) {
     return
   }

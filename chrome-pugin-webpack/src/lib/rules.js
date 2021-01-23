@@ -1,4 +1,4 @@
-import $$ from 'jquery'
+import $ from 'jquery'
 
 //支持采集的平台
 const ruleInfo = {
@@ -264,7 +264,7 @@ export const getRule = (url) => {
     url = url.replace('tmall.hk', 'tmall.com')
   }
   var rule = ''
-  $$.each(ruleInfo, function(key, value) {
+  $.each(ruleInfo, function(key, value) {
     if (url.indexOf(key) != -1) {
       rule = value
       return
