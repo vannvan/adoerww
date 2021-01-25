@@ -1,4 +1,5 @@
 import './inject/shopee'
+import './inject/history-data'
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
 
 //如果当前在erp平台,将erp的登录信息同步至background

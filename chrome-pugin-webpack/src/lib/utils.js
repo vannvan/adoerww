@@ -108,10 +108,7 @@ export function mcl(num1, num2) {
   try {
     m += s2.split('.')[1].length
   } catch (e) {}
-  return (
-    (Number(s1.replace('.', '')) * Number(s2.replace('.', ''))) /
-    Math.pow(10, m)
-  )
+  return (Number(s1.replace('.', '')) * Number(s2.replace('.', ''))) / Math.pow(10, m)
 }
 
 /** 加法
@@ -132,4 +129,16 @@ export function add(arg1, arg2) {
   }
   m = Math.pow(10, Math.max(r1, r2))
   return (arg1 * m + arg2 * m) / m
+}
+
+/**
+ *
+ *
+ * @export
+ * @param {*} key
+ * @param {*} defaultValue any 如果没有匹配值，需要返回的默认值
+ * @return {*} any
+ */
+export function getStorage(key, defaultValue = null) {
+  return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : defaultValue
 }

@@ -2,6 +2,7 @@
 // -1 接口错误 -2 数据错误
 import $ from 'jquery'
 import { getMatchSite } from '../lib/conf'
+import { getStorage } from '@/lib/utils'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -61,7 +62,7 @@ const Request = {
         },
         complete: function() {
           reject(-1)
-        },
+        }
       })
     })
   },
@@ -79,7 +80,7 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
   },
 
@@ -97,7 +98,7 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
   },
 
@@ -107,7 +108,7 @@ const Request = {
     let { actionType, shopid, domain } = params || {}
     let Opts = {
       follow: `${domain}/buyer/`,
-      unfollow: `${domain}/buyer/`,
+      unfollow: `${domain}/buyer/`
     }
     if (!shopid) return
     // console.log(`${Opts[actionType]}${actionType}/shop/${shopid}/`)
@@ -115,7 +116,7 @@ const Request = {
       type: 'post',
       url: `${Opts[actionType]}${actionType}/shop/${shopid}/`,
       data: {
-        csrfmiddlewaretoken: localStorage.getItem('csrfToken'),
+        csrfmiddlewaretoken: localStorage.getItem('csrfToken')
       },
       success: function(data) {
         call({ type: type, result: data })
@@ -124,7 +125,7 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
   },
 
@@ -147,7 +148,7 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
   },
 
@@ -160,9 +161,9 @@ const Request = {
       item_shop_ids: Array.from({ length: goodsList.length }, (v, k) => {
         return {
           shopid: Number(goodsList[k].split('.')[0]),
-          itemid: Number(goodsList[k].split('.')[1]),
+          itemid: Number(goodsList[k].split('.')[1])
         }
-      }),
+      })
     }
     $.ajax({
       type: 'post',
@@ -170,7 +171,7 @@ const Request = {
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
       headers: {
-        Accept: 'application/json, text/plain, */*',
+        Accept: 'application/json, text/plain, */*'
       },
       data: JSON.stringify(requestParams),
       success: function(data) {
@@ -180,7 +181,7 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
   },
 
@@ -204,19 +205,16 @@ const Request = {
         if (data.status != 200) {
           call({ type: type, result: { error: -1 } })
         }
-      },
+      }
     })
-  },
+  }
 }
 
 const Auth = {
   //同步虾皮登录token
   setCookies: function(params, type, call) {
     console.log(params, type)
-    if (
-      params.csrfToken &&
-      localStorage.setItem('csrfToken', params.csrfToken)
-    ) {
+    if (params.csrfToken && localStorage.setItem('csrfToken', params.csrfToken)) {
       call({ type: type, result: '设置成功' })
     }
   },
@@ -225,29 +223,24 @@ const Auth = {
   syncShoppeBaseInfo: function(params, type, call) {
     console.log(params, type)
     Request.handleLoginShopee(params, type)
-      .then((res) => {
+      .then(res => {
         if (res) {
           localStorage.setItem('userInfo', JSON.stringify(res))
-          console.log(localStorage.getItem('userInfo'))
         }
       })
       .catch(() => {
         call({ type: type, result: { error: -1 } })
       })
       .finally(() => {
-        let userInfo = localStorage.getItem('userInfo')
-          ? JSON.parse(localStorage.getItem('userInfo'))
-          : {}
+        let userInfo = getStorage('userInfo', {})
         call({
           type: type,
           result: {
             storeId: userInfo.shopid,
-            country: getMatchSite(params.domain)
-              ? getMatchSite(params.domain).key
-              : null,
             username: userInfo.username,
-          },
+            country: getMatchSite(params.domain) ? getMatchSite(params.domain).key : null
+          }
         })
       })
-  },
+  }
 }

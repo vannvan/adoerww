@@ -14,11 +14,7 @@ const ClassPrefix = 'emalacca-plugin'
 
 const popup = new Popup()
 
-// var timed = null
-// var shopeeUrl = null
-var CONFIG = null
-
-var globalGoodsInfo = {}
+var CONFIG = null //站点规则
 
 //初始化虾皮网站的基础脚本
 if (/shopee|xiapibuy/.test(window.location.host)) {
@@ -49,7 +45,7 @@ const debounceHandleActions = debounce(function() {
 //粉丝关注
 const Follow = {
   domain: window.location.origin,
-  goodsList: [],
+  goodsList: [], //页面的可操作商品列表
   preload: function() {
     let linkrule = getRule(location.href)
     try {
@@ -71,32 +67,39 @@ const Follow = {
   insertAction: function(type) {
     let _this = this
     $('a').each(function() {
-      let test = new Function('url', type)($(this)[0].href) //链接是否匹配
+      let href = $(this)[0].href
+      let test = new Function('url', type)(href) //链接是否匹配
+      if (href.search('buyer') > 0) return
       if ($(this)[0].href && test) {
         let storeId = $(this)[0].href.split('-i.')[1]
-
         if (!_this.goodsList.includes(storeId)) {
           _this.goodsList.push(storeId)
         }
 
         //鼠标进入
-        $(this).on('mouseenter', function() {
+        $(this).mouseenter(function() {
           let firstImg = $(this).find('img:first-child')
-          let offsetTop, offsetLeft
-          if (firstImg.length > 0) {
-            offsetTop = firstImg.offset().top
-            offsetLeft = firstImg.offset().left
-          }
-          offsetTop = $(this).offset().top
-          offsetLeft = $(this).offset().left
+          let contentOffsetLeft = $(this).offset().left
+            ? $(this).offset().left
+            : firstImg.offset().left
+          let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
+          let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
           // 操作面板显示
           let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
           actionListElement.attr('data-store-id', storeId)
           actionListElement.css({
-            top: offsetTop + 20,
-            left: offsetLeft + 20,
+            top: contentOffsetTop + 20,
+            left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
             opacity: 1,
             'pointer-events': 'auto'
+          })
+        })
+
+        //鼠标离开
+        $(this).mouseout(function() {
+          let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
+          actionListElement.css({
+            opacity: 0
           })
         })
       }
@@ -107,10 +110,8 @@ const Follow = {
   //操作面板点击事件初始化
   initPanelEvent: function() {
     $('.emalacca-plugin-goods-panel-wrap').on('click', 'span', function(e) {
-      //   console.log(e.target.getAttribute('data-type'))
-      let _this = this
       let actionType = e.target.getAttribute('data-type')
-      let storeId = $(_this)
+      let storeId = $(this)
         .parent()
         .attr('data-store-id')
 
@@ -122,7 +123,13 @@ const Follow = {
       switch (actionType) {
         //   粉丝关注
         case 'follow':
-          window.open(`/shop/${realStoreId}/followers?other=true`)
+          Follow.syncShoppeBaseInfo().then(res => {
+            if (res.result && res.result.error == -1) {
+              popup.toast('【马六甲插件】:请登录虾皮卖家中心', 3)
+            } else {
+              window.open(`/shop/${realStoreId}/followers?other=true`)
+            }
+          })
           break
         //   查看店铺
         case 'view':
@@ -140,7 +147,9 @@ const Follow = {
       if (res && res.result.items) {
         let { items } = res.result
         $('a').each(function() {
-          let test = new Function('url', CONFIG.detail)($(this)[0].href) //链接是否匹配
+          let href = $(this)[0].href
+          if (href.search('buyer') > 0) return
+          let test = new Function('url', CONFIG.detail)(href) //链接是否匹配
           let storeId = $(this)[0].href.split('-i.')[1]
           let itemId = storeId ? storeId.split('.')[1] : null
           //   console.log(storeId)

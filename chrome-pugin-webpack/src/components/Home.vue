@@ -1,7 +1,7 @@
 <template>
   <div class="seller-erp-fixed-right" id="emalaccaRightApp">
-    <div class="emalacca-plugin-action-wrap">
-      <span class="icon iconfont icon-shopee icon-toggle" @click="handleOpenDrawer()"> </span>
+    <div class="emalacca-plugin-action-wrap" draggable="false">
+      <span class="icon iconfont icon-shopee icon-toggle" @click="handleOpenDrawer()"></span>
       <ul class="follow-quick-action-wrap">
         <li @click="openPage(storeFront('front'))" v-if="storeFront('front')">
           店铺前台

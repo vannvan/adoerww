@@ -5,10 +5,10 @@ import '@fonts/iconfont.css'
 
 export default new Vue({
   components: {
-    Home,
+    Home
   },
   mounted() {
     console.log('mounted')
   },
-  render: (h) => h(Home),
+  render: h => h(Home)
 }).$mount('#app')
