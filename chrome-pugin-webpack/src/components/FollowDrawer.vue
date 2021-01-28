@@ -468,14 +468,16 @@ export default {
     getCurrentStoreId() {
       // 先走登录接口获取到用户名,再用用户名获取店铺id和当前站点信息
       Follow.syncShoppeBaseInfo().then(res => {
-        let { username, country, storeId } = res.result
-        if (username) {
-          this.currentStoreId = storeId
-          this.countryCode = country
-        } else {
-          this.$Notice.error({
-            content: ERROR.pleaseCheckWhetherHaveAuthoriz
-          })
+        if (res && res.result) {
+          let { username, country, storeId } = res.result
+          if (username) {
+            this.currentStoreId = storeId
+            this.countryCode = country
+          } else {
+            this.$Notice.error({
+              content: ERROR.pleaseCheckWhetherHaveAuthoriz
+            })
+          }
         }
       })
     },
@@ -535,15 +537,17 @@ export default {
           this.actionedUserList.push(this.currentUserName)
           if (!this.handleSkipJudge(actionType)) return
           Follow.getStoreFollowers(this.currentUserName).then(res => {
-            let { shopid } = res.result.data
-            if (actionType == 'follow' && this.filterMatch(res.result.data)) {
-              this.handleNotifyToBack(actionType, shopid, this.currentUserName)
-            } else if (actionType == 'unfollow') {
-              this.handleNotifyToBack(actionType, shopid, this.currentUserName)
-            } else {
-              this.resultCount.skip += 1
-              let htmlStr = `<li>[${getTime()}] ${this.currentUserName}跳过</li>`
-              $('#ResultContent').prepend(htmlStr)
+            if (res && res.result) {
+              let { shopid } = res.result.data
+              if (actionType == 'follow' && this.filterMatch(res.result.data)) {
+                this.handleNotifyToBack(actionType, shopid, this.currentUserName)
+              } else if (actionType == 'unfollow') {
+                this.handleNotifyToBack(actionType, shopid, this.currentUserName)
+              } else {
+                this.resultCount.skip += 1
+                let htmlStr = `<li>[${getTime()}] ${this.currentUserName}跳过</li>`
+                $('#ResultContent').prepend(htmlStr)
+              }
             }
           })
         } else {
@@ -583,7 +587,7 @@ export default {
       //   console.log('操作过的用户', this.actionedUserList)
       Follow.notifyBackFollowOrUnFollow(actionType, shopid).then(res => {
         let infoText = actionType == 'follow' ? '关注' : '取关'
-        if (res.result.success) {
+        if (res && res.result.success) {
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
           $('#ResultContent').prepend(htmlStr)
           this.resultCount.success += 1

@@ -23,7 +23,8 @@ module.exports = {
     inject: './src/inject.js',
     popup: './src/popup/popup.js',
     home: './src/home/home.js',
-    options: './src/options/options.js'
+    options: './src/options/options.js',
+    presentation: './src/presentation/presentation.js'
   },
   output: {
     filename: '[name].js',
@@ -31,6 +32,13 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.css$/,
+        loader: 'webpack-replace-loader',
+        options: {
+          arr: [{ search: 'el-icon', replace: 'el-icon-icon' }]
+        }
+      },
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory=true',
@@ -74,8 +82,8 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'] // 从右向左解析原则
       },
       {
-        test: /\.(woff|woff2|ttf|eot|svg)$/,
-        loader: 'file-loader?name=fonts/[name].[ext]'
+        test: /\.(eot|svg|ttf|woff|woff2?)$/,
+        loader: 'url-loader'
       }
     ]
   },
@@ -85,6 +93,7 @@ module.exports = {
       vue$: 'vue/dist/vue.js',
       '@': resolve('src'),
       '@styles': resolve('src/assets/styles'),
+      '@background': resolve('src/background'),
       '@fonts': resolve('src/assets/fonts'),
       '@components': resolve('src/components')
     }
@@ -123,10 +132,19 @@ module.exports = {
       },
       chunks: ['options']
     }),
+    new HtmlWebpackPlugin({
+      filename: 'presentation.html',
+      template: './src/presentation/presentation.html',
+      minify: {
+        collapseWhitespace: true,
+        removeComments: true
+      },
+      chunks: ['presentation']
+    }),
     new UglifyJsPlugin({
       //   uglifyOptions: {
       //     compress: {
-      //       drop_console: true    // 去除console
+      //       drop_console: !isDev // 去除console
       //     }
       //   }
     }), //压缩js输出

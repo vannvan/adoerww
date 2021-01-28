@@ -1,1 +1,1 @@
-import './background/follow-back'
+import './background/importAll'

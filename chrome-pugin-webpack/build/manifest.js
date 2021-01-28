@@ -16,13 +16,6 @@ const defaultConfig = {
     'http://*/*', // 可以通过executeScript或者insertCSS访问的网站
     'https://*/*', // 可以通过executeScript或者insertCSS访问的网站
   ],
-  browser_action: {
-    default_title: 'Hello Doraking',
-    default_icon: 'img/app.png',
-    default_popup: 'popup.html',
-  },
-  homepage_url: 'https://github.com/vannvan',
-  icons: { 16: 'img/app.png', 48: 'img/app.png', 128: 'img/app.png' },
   options_ui: {
     page: 'options.html',
     chrome_style: true,
@@ -118,9 +111,7 @@ const backgroundobj = {
 }
 // 当某些特定页面打开才显示的图标
 const page_action = {
-  default_icon: 'img/app.png',
-  default_title: '老帅比',
-  default_popup: 'index.html',
+  
 }
 
 // 所有页面显示的

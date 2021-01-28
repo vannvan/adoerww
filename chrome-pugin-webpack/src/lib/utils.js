@@ -142,3 +142,13 @@ export function add(arg1, arg2) {
 export function getStorage(key, defaultValue = null) {
   return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : defaultValue
 }
+
+/**
+ * 对象转字符串
+ *
+ * @param {*} obj
+ */
+export const objectToQueryString = obj =>
+  Object.keys(obj)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
+    .join('&')

@@ -55,8 +55,6 @@ export default {
     }
   },
 
-  directives: {},
-
   mounted() {
     //
   },
@@ -75,66 +73,4 @@ export default {
 }
 </script>
 
-<style lang="less">
-input[type='number'] {
-  -moz-appearance: textfield !important;
-}
-
-input[type='number']::-webkit-inner-spin-button,
-input[type='number']::-webkit-outer-spin-button {
-  -webkit-appearance: none !important;
-  margin: 0 !important;
-}
-input {
-  background-color: transparent;
-}
-input,
-textarea {
-  outline: none;
-}
-
-#emalaccaRightApp {
-  position: fixed !important;
-  top: 40%;
-  right: 20px;
-  z-index: 9999999999;
-  font-size: 14px !important;
-  cursor: default;
-  .emalacca-plugin-action-wrap {
-    width: 60px;
-    position: fixed;
-    top: 40%;
-    right: 20px;
-    cursor: default;
-    .icon-toggle {
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      z-index: 8;
-      font-size: 48px;
-      color: #ee4d2d;
-      position: inherit;
-      margin-top: -50px;
-    }
-    .follow-quick-action-wrap {
-      position: inherit;
-      padding: 0 4px !important;
-      li {
-        list-style: none;
-        height: 40px !important;
-        width: 40px !important;
-        box-sizing: border-box;
-        background: #ee4d2d;
-        border-bottom: 1px solid #fff;
-        padding: 5px;
-        display: flex !important;
-        align-items: center !important;
-        text-align: center !important;
-        color: #fff;
-        cursor: pointer;
-        font-size: 14px;
-      }
-    }
-  }
-}
-</style>
+<style lang="less"></style>

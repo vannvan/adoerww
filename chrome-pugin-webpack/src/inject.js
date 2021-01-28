@@ -1,3 +1,4 @@
+import './inject/content'
 import './inject/shopee'
 import './inject/history-data'
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
@@ -14,3 +15,5 @@ import { sendMessageToBackground } from '@/lib/chrome-client.js'
 //     }
 //   )
 // }
+
+ 

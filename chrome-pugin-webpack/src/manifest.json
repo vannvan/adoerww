@@ -1,9 +1,8 @@
 {
-    "name": "虾皮粉丝关注插件beta-(内测版)",
+    "name": "马六甲采集助手-(合并ing内测版)",
     "manifest_version": 2,
-    "version": "1.0.4",
-    "description": "https://erp.emalacca.com/ 虾皮粉丝关注插件，用于帮助卖家用户获取同类商家粉丝数据，可以批量关注优质买家，帮助卖家快速引流及推广。",
-    "homepage_url": "",
+    "description": "https://erp.emalacca.com/ 马六甲采集助手（虾皮粉丝关注）",
+    "homepage_url": "https://github.com/vannvan",
     "icons": {
         "16": "icon/app.png",
         "48": "icon/app.png",
@@ -15,7 +14,8 @@
                 "./inject.js"
             ],
             "css": [
-                "./home.css"
+                "./home.css",
+                "./inject.css"
             ],
             "position": "document_end"
         }
@@ -26,11 +26,12 @@
         ]
     },
     "web_accessible_resources": [
-        "options.html"
+        "options.html",
+        "presentation.html"
     ],
     "browser_action": {
         "default_icon": "icon/app.png",
-        "default_title": "插件",
+        "default_title": "马六甲采集助手",
         "default_popup": "popup.html"
     },
     "permissions": [
@@ -39,7 +40,31 @@
         "activeTab",
         "storage",
         "cookies",
+        "tabs",
+        "contextMenus",
         "webNavigation",
+        "https://desc.alicdn.com/",
+        "http://dsc.taobaocdn.com/",
+        "http://*.aliexpress.com/",
+        "https://*.aliexpress.com/",
+        "http://*.1688.com/",
+        "http://*.alibaba.com/",
+        "https://*.taobao.com/",
+        "http://*.taobao.com/",
+        "https://*.tmall.com/",
+        "http://*.ebay.com/",
+        "http://*.ebaydesc.com/",
+        "http://www.amazon.com/",
+        "http://item.jd.com/",
+        "http://joom.com/",
+        "https://tophatter.com/",
+        "https://tw.shopeesz.com/*-i.*/",
+        "https://*.xiapibuy.com/*-i.*/",
+        "http://p.3.cn/",
+        "http://d.3.cn/",
+        "https://www.chinabrands.cn/",
+        "https://www.chinabrands.com/",
+        "http://127.0.0.1/",
         "*://192.168.50.112/*",
         "*://*.emalacca.com/*",
         "*://*.shopee.tw/*",
@@ -85,9 +110,5 @@
         "*://*.aliexpress.com/*",
         "*://*.xiapibuy.com/*",
         "*://*.17zwd.com/*"
-    ],
-    "options_ui": {
-        "page": "options.html",
-        "chrome_style": true
-    }
+    ]
 }

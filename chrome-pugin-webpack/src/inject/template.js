@@ -4,7 +4,7 @@ import $ from 'jquery'
 import dayjs from 'dayjs'
 import { division } from '@/lib/utils'
 
-console.log(dayjs(1599121140 * 1000).format('YYYY-MM-DD'))
+// console.log(dayjs(1599121140 * 1000).format('YYYY-MM-DD'))
 
 const ClassPrefix = 'emalacca-plugin'
 
@@ -22,9 +22,7 @@ export const dataViewElementTemplate = (storeId, storeInfo) => {
           <div class="list-group">
               <div class="item">
                   <span class="title">综合评分</span>
-                  <span class="value">${
-                    rating_star ? rating_star.toFixed(1) : '暂无'
-                  }</span>
+                  <span class="value">${rating_star ? rating_star.toFixed(1) : '暂无'}</span>
               </div>
               <div class="item">
                   <span class="title">访问量</span>
@@ -38,9 +36,7 @@ export const dataViewElementTemplate = (storeId, storeInfo) => {
               </div>
               <div class="item">
                   <span class="title">转化率</span>
-                  <span class="value">${(
-                    division(sold, view_count) * 100
-                  ).toFixed(2) + '%'}</span>
+                  <span class="value">${(division(sold, view_count) * 100).toFixed(2) + '%'}</span>
               </div>
          </div>
         </div>`
@@ -52,8 +48,10 @@ export const operationPanelTemplate = () => {
   return $(`
     <div class="${ClassPrefix}-goods-panel-wrap">
         <span class="emalacca-goods-panel-button" data-type="follow">获取粉丝</span>
-        <span class="emalacca-goods-panel-button" data-type="collect">采集商品</span>   
+      
         <span class="emalacca-goods-panel-button" data-type="view">查看店铺</span> 
     </div>
    `)
 }
+
+//   <span class="emalacca-goods-panel-button" data-type="collect">采集商品</span>

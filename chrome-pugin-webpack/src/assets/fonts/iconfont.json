@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "19663121",
+      "name": "退出",
+      "font_class": "emalacca-tuichu",
+      "unicode": "e882",
+      "unicode_decimal": 59522
+    },
+    {
+      "icon_id": "19660424",
+      "name": "选中",
+      "font_class": "emalacca-xuanzhong",
+      "unicode": "9e69",
+      "unicode_decimal": 40553
+    },
+    {
       "icon_id": "19574458",
       "name": "shopee",
       "font_class": "shopee",

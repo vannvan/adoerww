@@ -10,10 +10,10 @@ var shell = require('shelljs')
 var exec = shell.exec
 var echo = shell.echo
 
-if (exec('mv dist follow-plugin').code !== 0) {
-  echo('版本更新出错')
-  exit(1)
-}
+// if (exec('mv dist follow-plugin').code !== 0) {
+//   echo('版本更新出错')
+//   exit(1)
+// }
 
 // exec(`echo git success ${name}`);
 
@@ -59,15 +59,12 @@ function formatDateToString(date) {
 //执行压缩
 function toZip(name) {
   compressing.zip
-    .compressDir('follow-plugin', `${name}.zip`)
+    .compressDir('dist', `${name}.zip`)
     .then(() => {
-      console.log(
-        symbols.success,
-        chalk.green(`${name}.zip` + '已保存至项目目录！')
-      )
+      console.log(symbols.success, chalk.green(`${name}.zip` + '已保存至项目目录！'))
       process.exit()
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err)
     })
 }

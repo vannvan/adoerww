@@ -30,8 +30,11 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
         return createElement(Home)
       }
     })
-    Follow.init()
-    Follow.sendCsrfToken()
+    if (window.location.href.indexOf('xiapibuy.com') > -1 || window.location.href.indexOf('shopee.com')> -1) {
+      Follow.init()
+      Follow.sendCsrfToken()
+    }  
+   
   }, 500)
 }
 
@@ -95,8 +98,13 @@ const Follow = {
           })
         })
 
+        $('.emalacca-plugin-goods-panel-wrap').mouseenter(function() {
+          $(this).css({
+            opacity: 1
+          })
+        })
         //鼠标离开
-        $(this).mouseout(function() {
+        $('.emalacca-plugin-goods-panel-wrap').mouseleave(function() {
           let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
           actionListElement.css({
             opacity: 0
