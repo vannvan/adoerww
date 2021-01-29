@@ -1,7 +1,7 @@
 //粉丝关注相关
 import Vue from 'vue'
 import $ from 'jquery'
-import { getCookie, debounce } from '@/lib/utils'
+import { getCookie, debounce, isEmpty } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import { dragApp } from './drag'
 import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
@@ -30,11 +30,13 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
         return createElement(Home)
       }
     })
-    if (window.location.href.indexOf('xiapibuy.com') > -1 || window.location.href.indexOf('shopee.com')> -1) {
+    if (
+      window.location.href.indexOf('xiapibuy.com') > -1 ||
+      window.location.href.indexOf('shopee.com') > -1
+    ) {
       Follow.init()
       Follow.sendCsrfToken()
-    }  
-   
+    }
   }, 500)
 }
 
@@ -59,6 +61,8 @@ const Follow = {
       return
     }
   },
+
+  //粉丝关注应用初始化
   init: function() {
     // console.log(this.domain, 'domain')
     let followActionWrap = operationPanelTemplate()
@@ -67,6 +71,7 @@ const Follow = {
     dragApp()
   },
 
+  //给a标签添加操作面板
   insertAction: function(type) {
     let _this = this
     $('a').each(function() {
@@ -75,6 +80,7 @@ const Follow = {
       if (href.search('buyer') > 0) return
       if ($(this)[0].href && test) {
         let storeId = $(this)[0].href.split('-i.')[1]
+        if (isEmpty(storeId)) return
         if (!_this.goodsList.includes(storeId)) {
           _this.goodsList.push(storeId)
         }
@@ -89,9 +95,10 @@ const Follow = {
           let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
           // 操作面板显示
           let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
-          actionListElement.attr('data-store-id', storeId)
+          actionListElement.attr('data-store-id', storeId) //用于粉丝关注的店铺shopid 和 itemid
+          actionListElement.attr('data-url', href) //用于采集的链接
           actionListElement.css({
-            top: contentOffsetTop + 20,
+            top: contentOffsetTop + 30,
             left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
             opacity: 1,
             'pointer-events': 'auto'
@@ -122,7 +129,7 @@ const Follow = {
       let storeId = $(this)
         .parent()
         .attr('data-store-id')
-
+      if (isEmpty(storeId)) return
       let realStoreId = storeId ? storeId.split('.')[0] : null
       if (!realStoreId) {
         popup.toast('【马六甲插件】:未获取到商品信息', 3)
@@ -145,6 +152,10 @@ const Follow = {
           break
         default:
           break
+        //采集
+        case 'collect':
+
+        //
       }
     })
   },
@@ -159,6 +170,7 @@ const Follow = {
           if (href.search('buyer') > 0) return
           let test = new Function('url', CONFIG.detail)(href) //链接是否匹配
           let storeId = $(this)[0].href.split('-i.')[1]
+          if (isEmpty(storeId)) return
           let itemId = storeId ? storeId.split('.')[1] : null
           //   console.log(storeId)
           let storeInfo = items.find(el => el.itemid == itemId)
@@ -170,6 +182,7 @@ const Follow = {
             let subElElExit = $(this)
               .children()
               .children()
+              .children()
               .is('.emalacca-plugin-goods-data-view')
             // 如果当前a标签有高度就在下一级添加
             if ($(this).height() > 0 && !aElExit) {
@@ -178,6 +191,7 @@ const Follow = {
             // 如果当前a标签没有高度就在下下一级添加
             if ($(this).height() == 0 && !subElElExit) {
               $(this)
+                .children()
                 .children()
                 .append(dataViewElement)
             }
@@ -189,18 +203,16 @@ const Follow = {
 
   //获取店铺列表详情，数据展示
   getGoodsListDetailInfo: function(goodsList) {
-    // console.log(goodsList)
     return new Promise((resolve, reject) => {
       sendMessageToBackground(
         'request',
         { domain: this.domain, goodsList: goodsList || [] },
         'GET_SHOPPE_ITEM_LIST_INFO',
         data => {
+          console.log(data, 'inside')
           resolve(data)
         }
-      ).then(res => {
-        resolve(res)
-      })
+      )
     })
   },
 
@@ -214,9 +226,7 @@ const Follow = {
         data => {
           resolve(data)
         }
-      ).then(res => {
-        resolve(res)
-      })
+      )
     })
   },
 
@@ -230,9 +240,7 @@ const Follow = {
         data => {
           resolve(data)
         }
-      ).then(res => {
-        resolve(res)
-      })
+      )
     })
   },
 
@@ -246,9 +254,7 @@ const Follow = {
         data => {
           resolve(data)
         }
-      ).then(res => {
-        resolve(res)
-      })
+      )
     })
   },
 
@@ -262,9 +268,7 @@ const Follow = {
         data => {
           resolve(data)
         }
-      ).then(res => {
-        resolve(res)
-      })
+      )
     })
   },
 
@@ -273,8 +277,6 @@ const Follow = {
     return new Promise(resolve => {
       sendMessageToBackground('request', { domain: this.domain }, 'GET_CURRENT_STORE_ID', data => {
         resolve(data)
-      }).then(res => {
-        resolve(res)
       })
     })
   },
@@ -284,8 +286,6 @@ const Follow = {
     return new Promise(resolve => {
       sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPPE_BASE_INFO', data => {
         resolve(data)
-      }).then(res => {
-        resolve(res)
       })
     })
   },

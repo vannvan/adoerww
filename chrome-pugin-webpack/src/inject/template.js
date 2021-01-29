@@ -1,6 +1,5 @@
 // DOM节点模板
 import $ from 'jquery'
-
 import dayjs from 'dayjs'
 import { division } from '@/lib/utils'
 
@@ -48,10 +47,10 @@ export const operationPanelTemplate = () => {
   return $(`
     <div class="${ClassPrefix}-goods-panel-wrap">
         <span class="emalacca-goods-panel-button" data-type="follow">获取粉丝</span>
-      
+        <span class="emalacca-goods-panel-button" data-type="collect">采集商品</span>
         <span class="emalacca-goods-panel-button" data-type="view">查看店铺</span> 
     </div>
    `)
 }
 
-//   <span class="emalacca-goods-panel-button" data-type="collect">采集商品</span>
+//

@@ -3,8 +3,6 @@ const manifest = require('../src/manifest.json')
 const packJSON = require('../package.json')
 
 const defaultConfig = {
-  name: 'chrome插件',
-  description: 'webpack版chrome插件',
   version: packJSON.version,
   permissions: [
     'contextMenus', // 右键菜单
@@ -14,21 +12,21 @@ const defaultConfig = {
     'webRequestBlocking',
     'storage', // 插件本地存储
     'http://*/*', // 可以通过executeScript或者insertCSS访问的网站
-    'https://*/*', // 可以通过executeScript或者insertCSS访问的网站
+    'https://*/*' // 可以通过executeScript或者insertCSS访问的网站
   ],
   options_ui: {
     page: 'options.html',
-    chrome_style: true,
+    chrome_style: true
   },
-  options_page: 'options.html',
+  options_page: 'options.html'
 }
 
 const unsafe = {
-  content_security_policy: "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  content_security_policy: "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
 
 var injects = {
-  web_accessible_resources: [],
+  web_accessible_resources: []
 }
 
 // const openTab =
@@ -37,11 +35,11 @@ var injects = {
 //     "newtab": "newtab.html"
 // }
 const registerObj = {
-  omnibox: { keyword: '' },
+  omnibox: { keyword: '' }
 }
 const optionPage = {
   page: '',
-  chrome_style: true,
+  chrome_style: true
 }
 const contentItem = {
   matches: [
@@ -82,12 +80,12 @@ const contentItem = {
     '*://*.tmall.com/*',
     '*://*.tmall.hk/*',
     '*://*.yangkeduo.com/*',
-    '*://*.17zwd.com/*',
+    '*://*.17zwd.com/*'
   ],
   // 多个JS按顺序注入
   js: [],
   css: [],
-  run_at: 'document_end',
+  run_at: 'document_end'
 }
 
 const handleAsset = function(arr) {
@@ -110,17 +108,11 @@ const backgroundobj = {
   // 2种指定方式，如果指定JS，那么会自动生成一个背景页
 }
 // 当某些特定页面打开才显示的图标
-const page_action = {
-  
-}
+const page_action = {}
 
 // 所有页面显示的
 
-// const browser_action = {
-//   default_icon: 'img/app.png',
-//   default_title: '老帅比',
-//   default_popup: 'popup.html',
-// }
+const browser_action = {}
 
 const testObj = function(obj) {
   return obj.default_icon && obj.default_title && obj.default_popup
@@ -147,25 +139,23 @@ module.exports = function() {
   if (manifest.opentab) {
     if (typeof manifest.opentab === 'string') {
       config.chrome_url_overrides = {
-        newtab: manifest.opentab,
+        newtab: manifest.opentab
       }
     } else {
       config.chrome_url_overrides = {
-        newtab: 'newtab.html',
+        newtab: 'newtab.html'
       }
     }
   }
   manifest.register
-    ? (registerObj.omnibox.keyword = manifest.register) &&
-      (config.omnibox = registerObj)
+    ? (registerObj.omnibox.keyword = manifest.register) && (config.omnibox = registerObj)
     : null
   // config.default_locale = config.language || defaultConfig.default_locale
   manifest.devpage && manifest.devpage.endsWith('.html')
     ? (config.devtools_page = manifest.devpage)
     : null
   manifest.optionpage && manifest.optionpage.endsWith('.html')
-    ? (optionPage.page = manifest.optionpage) &&
-      (config.options_ui = optionPage)
+    ? (optionPage.page = manifest.optionpage) && (config.options_ui = optionPage)
     : null
   config.homepage_url = manifest.home || defaultConfig.homepage_url
 
@@ -181,11 +171,7 @@ module.exports = function() {
   ) {
     backgroundobj.page = manifest.background.page
   }
-  if (
-    manifest.background &&
-    manifest.background.scripts &&
-    manifest.background.scripts.length
-  ) {
+  if (manifest.background && manifest.background.scripts && manifest.background.scripts.length) {
     backgroundobj.scripts = manifest.background.scripts.map(function(e) {
       return e.match(/\/?(\w+\.?\w+\.js$)/)[1]
     })
@@ -196,10 +182,7 @@ module.exports = function() {
 
   // backgroundobj.page && !backgroundobj.page.endsWith('.html') && (delete backgroundobj.page);
   // (!backgroundobj.scripts || !backgroundobj.scripts.length) && (delete backgroundobj.scripts)
-  if (
-    backgroundobj.page ||
-    (backgroundobj.scripts && backgroundobj.scripts.length)
-  ) {
+  if (backgroundobj.page || (backgroundobj.scripts && backgroundobj.scripts.length)) {
     config.background = backgroundobj
   }
   /**handle background */
@@ -223,8 +206,7 @@ module.exports = function() {
       : path.resolve(__dirname, '../dist/')
   const filename = '/manifest.json'
 
-  ;(config.content_security_policy =
-    "script-src 'self' 'unsafe-eval'; object-src 'self'"),
+  ;(config.content_security_policy = "script-src 'self' 'unsafe-eval'; object-src 'self'"),
     jsonfile.writeFile(pathname + filename, config, null, function(err) {
       if (err) console.log('=====>>> make manifest.json error: ', err)
       console.log('======>>> : manifest.json build success : <<<======')

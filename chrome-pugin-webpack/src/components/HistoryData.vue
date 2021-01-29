@@ -207,9 +207,7 @@ export default {
             }
           },
           backgroundColor: '#fff',
-          textStyle: {
-            color: '#5c6c7c'
-          },
+          color: '#5c6c7c',
           padding: [10, 10],
           extraCssText: 'box-shadow: 1px 0 2px 0 rgba(163,163,163,0.5)'
         },
@@ -219,9 +217,7 @@ export default {
           right: '48%',
           itemWidth: 6,
           itemGap: 20,
-          textStyle: {
-            color: '#556677'
-          }
+          color: '#556677'
         },
         xAxis: {
           type: 'category',
@@ -242,9 +238,7 @@ export default {
               }
             },
             axisLabel: {
-              textStyle: {
-                color: '#556677'
-              }
+              color: '#556677'
             },
             splitLine: {
               show: false
@@ -258,9 +252,7 @@ export default {
               show: false
             },
             axisLabel: {
-              textStyle: {
-                color: '#556677'
-              },
+              color: '#556677',
               formatter: '{value}'
             },
             axisLine: {

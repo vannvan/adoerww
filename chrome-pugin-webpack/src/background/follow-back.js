@@ -7,9 +7,12 @@ import { getStorage } from '@/lib/utils'
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
   // 判断是否是shopee网站
-  if (window.location.href.indexOf('xiapibuy.com') === -1 || window.location.href.indexOf('shopee.com') === -1) {
-    return;
-  } 
+  //   if (
+  //     window.location.href.indexOf('xiapibuy.com') === -1 &&
+  //     window.location.href.indexOf('shopee.com') === -1
+  //   ) {
+  //     return
+  //   }
   if (action == 'request' && type == 'GET_SHOPPE_STORE_INFO_BY_ID') {
     Request.getStoreInfoById(options, type, sendResponse)
     return true
@@ -38,7 +41,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     Auth.syncShoppeBaseInfo(options, type, sendResponse)
     return true
   }
-  if ((action = 'requet' && type == 'GET_SHOPPE_ITEM_LIST_INFO')) {
+  if ((action = 'request' && type == 'GET_SHOPPE_ITEM_LIST_INFO')) {
     Request.getShopeeItemsList(options, type, sendResponse)
     return true
   }

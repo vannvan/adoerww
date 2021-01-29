@@ -2,7 +2,7 @@
 
 import Vue from 'vue'
 import $ from 'jquery'
-import { debounce } from '@/lib/utils'
+import { debounce, isEmpty } from '@/lib/utils'
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
 
 import HistoryData from '@/components/HistoryData.vue'
@@ -19,8 +19,6 @@ const History = {
     return new Promise((resolve, reject) => {
       sendMessageToBackground('request', params, 'GET_DYNAMIC_PRICES_SALES', data => {
         resolve(data)
-      }).then(res => {
-        resolve(res)
       })
     })
   },
@@ -31,8 +29,6 @@ const History = {
     return new Promise((resolve, reject) => {
       sendMessageToBackground('request', param, 'GET_GOODS_DETAIL_INFO', data => {
         resolve(data)
-      }).then(res => {
-        resolve(res)
       })
     })
   }
@@ -43,11 +39,13 @@ const insertHistoryWrap = debounce(function() {
     /shopee|xiapibuy/.test(window.location.host) && window.location.pathname.search('-i.') > -1
   try {
     let urlId = window.location.href.split('-i.')[1]
+    if (isEmpty(urlId)) return
     History.shopId = urlId.split('.')[0]
     History.itemId = urlId.split('.')[1]
     if (condition && !$('#emalaccaHistoryData')[0]) {
       let HistoryDataWrap = '<div id="ShoppeHistoryData">啊哈哈</div>'
       $(HistoryDataWrap).insertAfter($('.product-briefing'))
+
       Vue.use(ViewUI)
       Vue.use(WUI)
 
@@ -60,9 +58,11 @@ const insertHistoryWrap = debounce(function() {
   }
 }, 800)
 // 判断是否是shopee网站
-if (window.location.href.indexOf('xiapibuy.com') > -1 || window.location.href.indexOf('shopee.com') > -1) {
+if (
+  window.location.href.indexOf('xiapibuy.com') > -1 ||
+  window.location.href.indexOf('shopee.com') > -1
+) {
   $(window).scroll(insertHistoryWrap)
-} 
-
+}
 
 export default History

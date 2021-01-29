@@ -1,4 +1,4 @@
-@import './css/shope.css';
+@import './css/shopee.less';
 //商品图层上的操作容器
 .emalacca-plugin-goods-panel-wrap {
   width: 150px;
@@ -134,17 +134,15 @@
 
       .time-action {
         // margin-top: 22px;
-        height: 40px;
+        height: 32px;
         width: 100%;
         background: #f6f6f6;
-        line-height: 40px;
+        line-height: 32px;
         display: flex;
         justify-content: flex-end;
         position: relative;
         .item {
           padding: 0 20px;
-          //   background: #3498db;
-          //   color: #fff;
           font-size: 12px;
           cursor: pointer;
           position: relative;
@@ -181,12 +179,13 @@
     .icon-toggle {
       width: 40px;
       height: 40px;
+      line-height: 40px;
       cursor: pointer;
       z-index: 8;
       font-size: 48px;
       color: #ee4d2d;
       position: inherit;
-      margin-top: -50px;
+      margin-top: -60px;
     }
     .follow-quick-action-wrap {
       position: inherit;
@@ -204,7 +203,7 @@
         text-align: center !important;
         color: #fff;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 12px;
       }
     }
   }
@@ -224,8 +223,4 @@
   textarea {
     outline: none;
   }
-}
-
-.el-icon-d-arrow-left:before {
-  content: '\e619' !important;
 }

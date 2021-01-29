@@ -398,7 +398,9 @@ export default {
       this.$emit('update:display', true)
       let storeId = pathname.replace(/[^0-9]/gi, '')
       Follow.getStoreInfoById(storeId).then(res => {
-        this.storeInfo = res.result.data
+        if (res && res.result) {
+          this.storeInfo = res.result.data
+        }
       })
       _this.scrollTo()
     } else {
@@ -436,6 +438,7 @@ export default {
           this.$Notice.error({
             content: ERROR.didNotGetToSiteInformation
           })
+          this.$emit('update:display', false)
           return
         }
         let reg = new RegExp(this.countryCode.toLowerCase())
@@ -511,7 +514,6 @@ export default {
 
     //取消关注
     handleCancelFollow() {
-      let _this = this
       if (this.isRequest) {
         this.handleCancel()
         return

@@ -15,7 +15,7 @@ import '@/assets/styles/css/index.css'
 import '@/assets/styles/css/modal.css'
 import '@fonts/iconfont.css'
 
-$(function () {
+$(function() {
   MAIN.FirstRun.finishInitialization()
   MAIN.INIT.init()
 })
@@ -23,8 +23,8 @@ var uid = ''
 var account = ''
 
 function afterTabLoaded(callback) {
-  return function (openedTab) {
-    var onUpdated = function (tabId, changeInfo, tab) {
+  return function(openedTab) {
+    var onUpdated = function(tabId, changeInfo, tab) {
       if (tabId == openedTab.id && changeInfo.status == 'complete') {
         chrome.tabs.onUpdated.removeListener(onUpdated)
         callback(new Page(openedTab))
@@ -36,14 +36,18 @@ function afterTabLoaded(callback) {
 var MAIN = {
   INIT: {
     //js入口
-    init: function () {
+    init: function() {
       //tab 切换
       $(document).off('click', '#CrawlTab li')
-      $(document).on('click', '#CrawlTab li', function () {
+      $(document).on('click', '#CrawlTab li', function() {
         var uid = $(this).attr('data-uid')
-        $('#CrawlTab').find('li').removeClass('active')
+        $('#CrawlTab')
+          .find('li')
+          .removeClass('active')
         $(this).addClass('active')
-        $('#CrawTabContent').find('.TabPane').addClass('hide')
+        $('#CrawTabContent')
+          .find('.TabPane')
+          .addClass('hide')
         $('#CrawTabContent')
           .find('#' + uid)
           .removeClass('hide')
@@ -51,7 +55,7 @@ var MAIN = {
       $('button[name="login"]').on('click', MAIN.LOGIC.login)
       $('button[name="checkLogin"]').on('click', MAIN.LOGIC.checkLogin)
 
-      $('a[name="pro_crawl"]').attr("href", CONFIGINFO.url.showAlreadyCrawl());
+      $('a[name="pro_crawl"]').attr('href', CONFIGINFO.url.showAlreadyCrawl())
 
       $('button[name="crawlBtn"]').on('click', MAIN.LOGIC.initCrawlBtn)
       // 退出登录
@@ -61,12 +65,12 @@ var MAIN = {
       // 取消
       $('button[name="cancleBtn"]').on('click', MAIN.LOGIC.cancle)
 
-      $('button[name="cleanBtn"]').on('click', function () {
+      $('button[name="cleanBtn"]').on('click', function() {
         $('#url').val('')
         $('#cateUrl').val('')
       })
 
-      $('#crawlResultClose').on('click', function () {
+      $('#crawlResultClose').on('click', function() {
         var failNum = parseInt($('#failNum').text())
         if (failNum == 0) {
           $('#url').val('')
@@ -75,7 +79,7 @@ var MAIN = {
         ShopeModal.hide('#crawlResultClose')
       })
 
-      $(document).on('click', 'input[name="curPage"]', function () {
+      $(document).on('click', 'input[name="curPage"]', function() {
         selAllCurrPage(this, 'sourceUrlRepeat')
       })
 
@@ -83,14 +87,14 @@ var MAIN = {
       $('#crawlResultModal .emptyResult').on('click', emptyResultNum)
       MAIN.LOGIC.init(0, 0)
       //MAIN.LOGIC.checkVersion();
-    },
+    }
   },
   LOGIC: {
     //登录逻辑
-    login: function () {
+    login: function() {
       ShopeModal.show('#loginModal')
     },
-    checkLogin: function () {
+    checkLogin: function() {
       var username = $.trim($('#userName').val())
       var passwd = $.trim($('#passwd').val())
       $.ajax({
@@ -101,17 +105,17 @@ var MAIN = {
         data: JSON.stringify({
           account: username,
           password: passwd,
-          type: 2,
+          type: 2
         }),
         timeout: 30000,
-        success: function (data) {
+        success: function(data) {
           if (data.code == 0) {
             $.fn.message({ type: 'success', msg: '登录成功' })
             let datas = {
               token: data.data.token,
               user: data.data.userInfo.maAccount,
               accountType: data.data.userInfo.maType,
-              version: data.data.userInfo.plugVersion,
+              version: data.data.userInfo.plugVersion
             }
             localStorage.removeItem('pt-plug-access-user')
             localStorage.setItem('pt-plug-access-user', JSON.stringify(datas))
@@ -137,42 +141,36 @@ var MAIN = {
             $.fn.message({ type: 'error', msg: data.message })
           }
         },
-        error: function (err) {
+        error: function(err) {
           let { message } = err.responseJSON
           $.fn.message({ type: 'error', msg: message })
-        },
+        }
       })
     },
 
     //初始化采集
-    initCrawlBtn: function () {
-      
+    initCrawlBtn: function() {
       $('.RepeatBox').html('')
       if (!uid) {
         ShopeModal.show('#loginModal')
         return false
       }
-      
+
       var type = $(this).data('type')
-      var url =
-        type == 'single' ? $.trim($('#url').val()) : $.trim($('#cateUrl').val())
+      var url = type == 'single' ? $.trim($('#url').val()) : $.trim($('#cateUrl').val())
       var objDom = type == 'single' ? $('#url') : $('#cateUrl')
       var outDiv = objDom.closest('div')
       outDiv.find('.errorMsg').remove()
       objDom.removeClass('errorBorder')
       if (url == null || url == '') {
-        var errorMsg = $(
-          "<div class='errorMsg'>采集地址为空，请填写采集的URL地址</div>"
-        )
+        var errorMsg = $("<div class='errorMsg'>采集地址为空，请填写采集的URL地址</div>")
         objDom.addClass('errorBorder')
         objDom.after(errorMsg)
         return false
       }
       var errorArr = Crawl.checkUrl(type, url)
       if (errorArr.length > 0) {
-        var errorMsg = $(
-          "<div class='errorMsg'>" + errorArr.join('<br/>') + '</div>'
-        )
+        var errorMsg = $("<div class='errorMsg'>" + errorArr.join('<br/>') + '</div>')
         objDom.addClass('errorBorder')
         objDom.after(errorMsg)
         return false
@@ -201,7 +199,7 @@ var MAIN = {
         $('#failNum').html(0)
       }
     },
-    init: function (t, tt) {
+    init: function(t, tt) {
       if (JSON.parse(localStorage.getItem('pt-plug-access-user')) !== null) {
         let obj = JSON.parse(localStorage.getItem('pt-plug-access-user'))
         account = obj.user
@@ -218,7 +216,7 @@ var MAIN = {
         $('#topNoLoginDiv').show()
         ShopeModal.show('#loginModal')
         $('#loginH').hide()
-        $(document).on('keydown', function (event) {
+        $(document).on('keydown', function(event) {
           var e = event ? event : window.event ? window.event : null
           if (e.keyCode == 13) {
             MAIN.LOGIC.checkLogin()
@@ -227,7 +225,7 @@ var MAIN = {
       }
     },
     // 退出登录
-    loginOut: function () {
+    loginOut: function() {
       if (JSON.parse(localStorage.getItem('pt-plug-access-user')) !== null) {
         localStorage.removeItem('pt-plug-access-user')
         localStorage.removeItem('brandData')
@@ -244,7 +242,7 @@ var MAIN = {
       }
     },
     // 取消按钮
-    cancle: function () {
+    cancle: function() {
       if (JSON.parse(localStorage.getItem('pt-plug-access-user')) == null) {
         $('#topLoginDiv').show()
         $('#loginH')
@@ -254,7 +252,7 @@ var MAIN = {
       }
     },
     // 获取品牌词
-    getBrandWord: function (token, url) {
+    getBrandWord: function(token, url) {
       if (token) {
         Crawl.singleCrawl(
           JSON.parse(localStorage.getItem('pt-plug-access-user')).token,
@@ -296,22 +294,22 @@ var MAIN = {
           },
         })*/
       }
-    },
+    }
   },
   FirstRun: {
-    open: function (url, callback) {
-      chrome.tabs.create(
-        {
-          url: url,
-        },
-        callback && afterTabLoaded(callback)
-      )
-    },
-    finishInitialization: function () {
+    // open: function (url, callback) {
+    //   chrome.tabs.create(
+    //     {
+    //       url: url,
+    //     },
+    //     callback && afterTabLoaded(callback)
+    //   )
+    // },
+    finishInitialization: function() {
       if (JSON.parse(localStorage.getItem('firstRun')) == null) {
         localStorage.setItem('firstRun', false)
-        MAIN.FirstRun.open(window.open(getURL('presentation.html')))
+        window.open(getURL('presentation.html'))
       }
-    },
-  },
+    }
+  }
 }

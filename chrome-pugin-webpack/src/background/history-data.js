@@ -16,7 +16,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 const Request = {
   getDynamicPrices: function(params, type, call) {
     console.log(params, type)
-
     $.ajax({
       type: 'get',
       url: `https://api.keyouyun.com/lux/api/historical-dynamic-prices-sales?${objectToQueryString(
