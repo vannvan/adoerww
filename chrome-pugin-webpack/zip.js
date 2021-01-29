@@ -2,64 +2,26 @@
 
 process.stdin.setEncoding('utf8')
 const compressing = require('compressing')
-const inquirer = require('inquirer')
 const chalk = require('chalk')
 const symbols = require('log-symbols')
 const fs = require('fs')
-var shell = require('shelljs')
-var exec = shell.exec
-var echo = shell.echo
+const dayjs = require('dayjs')
+const { resolve } = require('path')
 
-// if (exec('mv dist follow-plugin').code !== 0) {
-//   echo('版本更新出错')
-//   exit(1)
-// }
+const env = process.argv[2]
 
-// exec(`echo git success ${name}`);
-
-// const promptList = [{
-//     type: 'list',
-//     name: 'type',
-//     message: '部署环境:',
-//     choices: ['test', 'pre', 'prod']
-// }]
 const packJSON = require('./package.json')
 
-const prefixName = '' //默认压缩包前缀
-const time = formatDateToString(new Date())
+const prefixName = 'emalacca-plugin' //默认压缩包前缀
 
-// inquirer.prompt(promptList).then((answers) => {
-//   let { type } = answers
-//   let packName = time
-//   toPack(packName)
-//   // writeApiConfig(area,type)
-// })
+const time = dayjs(new Date()).format('YY-MM-DD-HH-mm')
 
-// toPack('ssss')
-toZip('follow-plugin-' + packJSON.version)
-
-// 执行打包
-const toPack = async function(packName) {
-  // await writeApiConfig()
-  await writePackVersionToIndex(packName)
-  await toZip(packName)
-}
-
-// 052910 格式
-function formatDateToString(date) {
-  var month = date.getMonth() + 1
-  var day = date.getDate()
-  var hour = date.getHours()
-  let fm = month < 10 ? '0' + month : month
-  let fd = day < 10 ? '0' + day : day
-  let fh = hour < 10 ? '0' + hour : hour
-  return fm.toString() + fd + fh
-}
+toZip(`${prefixName}-${env}-${packJSON.version}(${time})`)
 
 //执行压缩
 function toZip(name) {
   compressing.zip
-    .compressDir('dist', `${name}.zip`)
+    .compressDir(resolve(__dirname, 'dist/'), `${name}.zip`)
     .then(() => {
       console.log(symbols.success, chalk.green(`${name}.zip` + '已保存至项目目录！'))
       process.exit()
@@ -67,17 +29,6 @@ function toZip(name) {
     .catch(err => {
       console.error(err)
     })
-}
-//给index追加打包时间注释
-function writePackVersionToIndex(packName) {
-  var time = new Date().toLocaleString()
-  var append = `\n <!--packTime: ${time} packName: ${packName} --> \n`
-  fs.appendFile('dist/index.html', append, 'utf8', function(err) {
-    if (err) {
-      console.log(err)
-    }
-    console.log(symbols.success, chalk.green('打包信息已追加至index.html'))
-  })
 }
 
 process.on('SIGINT', function() {

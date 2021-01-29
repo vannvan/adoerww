@@ -1,14 +1,10 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { resolve } = require('path')
+const isDev = process.env.NODE_ENV == 'development'
+const DevOutPutPath = 'local/'
 
 // 客户端配置
 module.exports = [
-  {
-    test: /\.css$/,
-    loader: 'webpack-replace-loader',
-    options: {
-      arr: [{ search: 'el-icon', replace: 'el-icon-icon' }]
-    }
-  },
   {
     test: /\.js$/,
     loader: 'babel-loader?cacheDirectory=true',
@@ -23,7 +19,8 @@ module.exports = [
       {
         loader: 'url-loader',
         options: {
-          limit: 100000, // 小于这个时将会已base64位图片打包处理
+          extract: true,
+          limit: 200000, // 小于这个时将会已base64位图片打包处理
           fallback: 'file-loader', // 当超过100000byte时，会回退使用file-loader
           outputPath: 'images'
         }

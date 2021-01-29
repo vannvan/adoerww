@@ -58,10 +58,7 @@ const insertHistoryWrap = debounce(function() {
   }
 }, 800)
 // 判断是否是shopee网站
-if (
-  window.location.href.indexOf('xiapibuy.com') > -1 ||
-  window.location.href.indexOf('shopee.com') > -1
-) {
+if (/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
   $(window).scroll(insertHistoryWrap)
 }
 

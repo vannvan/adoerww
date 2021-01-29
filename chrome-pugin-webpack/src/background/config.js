@@ -1,5 +1,6 @@
-import { API_CONFIG } from '@/lib/env'
+import { API_CONFIG, API_CONFIG_COLLECT } from '@/lib/env'
 const SITEAPI = API_CONFIG[process.env.NODE_ENV]
+const COLLECT = API_CONFIG_COLLECT[process.env.NODE_ENV]
 console.log(process.env.NODE_ENV)
 export const CONFIGINFO = {
   url: {
@@ -9,7 +10,7 @@ export const CONFIGINFO = {
     },
     //查看已采集数据
     showAlreadyCrawl: function() {
-      return 'https://test-erp.emalacca.com/publish/collect'
+      return COLLECT
     },
     //API接口
     ApiUrl: SITEAPI,

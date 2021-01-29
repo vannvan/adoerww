@@ -720,49 +720,5 @@ export const Crawl = {
         }
       }
     }
-  },
-
-  fillUrl: function(url, httpFlag) {
-    if (url) {
-      if (url.indexOf('http') == -1 && url.indexOf('HTTP') == -1) {
-        if (httpFlag) {
-          url = 'https:' + url
-        } else {
-          url = 'http:' + url
-        }
-      } else if (url.indexOf('http') > 0 || url.indexOf('HTTP') > 0) {
-        var sp = url.indexOf('HTTP') > 0 ? 'HTTP' : 'http'
-        var urlArray = url.split(sp)
-        url = 'http' + urlArray[1]
-      }
-    }
-    return url
-  },
-  // 解析url参数
-  queryUrlPar: function(url) {
-    url = url || window.location.href
-    var reg = /([^?=&]+)=([^?=&]+)/g
-    var obj = {}
-    url.replace(reg, function() {
-      obj[arguments[1]] = arguments[2]
-    })
-    return obj
-  },
-  // 获取userAgent
-  getUserAgent: function() {
-    let name = navigator.appName ? navigator.appName : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-    let version = navigator.appVersion
-      ? navigator.appVersion
-      : 'AppleWebKit/537.36 (KHTML, like Gecko)'
-    let code = navigator.appCodeName ? navigator.appCodeName : 'Chrome/80.0.3987.132'
-    let agent = navigator.userAgent ? navigator.userAgent : 'Safari/537.36'
-    return `${name} ${version} ${code} ${agent}`
-  },
-  // html转义
-  escape2Html: function(str) {
-    var arrEntities = { lt: '<', gt: '>', nbsp: ' ', amp: '&', quot: '"' }
-    return str.replace(/&(lt|gt|nbsp|amp|quot);/gi, function(all, t) {
-      return arrEntities[t]
-    })
   }
 }

@@ -8,31 +8,35 @@
         "48": "icon/app.png",
         "128": "icon/app.png"
     },
-    "scriptsAndCss": [
+    "content_scripts": [
         {
+            "matches": [
+                "*://*/*"
+            ],
             "js": [
-                "./inject.js"
+                "./inject/inject.js"
             ],
             "css": [
-                "./home.css",
-                "./inject.css"
+                "./styles/home.css",
+                "./styles/inject.css"
             ],
             "position": "document_end"
         }
     ],
     "background": {
+        "persistent": true,
         "scripts": [
-            "./background.js"
+            "./background/background.js"
         ]
     },
     "web_accessible_resources": [
-        "options.html",
-        "presentation.html"
+        "options/options.html",
+        "presentation/presentation.html"
     ],
     "browser_action": {
         "default_icon": "icon/app.png",
         "default_title": "马六甲采集助手",
-        "default_popup": "popup.html"
+        "default_popup": "popup/popup.html"
     },
     "permissions": [
         "downloads",
@@ -54,7 +58,7 @@
         "https://*.tmall.com/",
         "http://*.ebay.com/",
         "http://*.ebaydesc.com/",
-        "http://item.jd.com/",
+        "*://*.jd.com/*",
         "http://joom.com/",
         "https://tophatter.com/",
         "https://tw.shopeesz.com/*-i.*/",
@@ -109,5 +113,6 @@
         "*://*.aliexpress.com/*",
         "*://*.xiapibuy.com/*",
         "*://*.17zwd.com/*"
-    ]
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

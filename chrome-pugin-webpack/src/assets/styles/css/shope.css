@@ -813,13 +813,13 @@
     display: none;
     z-index: 999999;
     pointer-events: none;
-    width: 30px;
-    height: 30px;
-    right: 10px;
-    top: 10px;
+    width: 25px;
+    height: 25px;
+    right: 5px;
+    top: 5px;
     color: rgb(255, 255, 255);
     text-align: center;
-    box-shadow: rgb(17, 17, 17) 0px 0px 10px 2px;
+    box-shadow: rgb(17, 17, 17) 0px 0px 8px 2px;
     cursor: pointer;
     pointer-events: auto;
     border-radius: 50%;
@@ -830,9 +830,9 @@
     border-image: initial;
 }
 .link-sellSelectBox span.link-sellSelect{
-    font-size: 34px !important;
+    font-size: 30px !important;
     margin: 0 !important;
-    color: rgba(245, 154, 35, 1) !important;
+    color: rgba(238, 77, 45, 0.8) !important;
     line-height: 0.9 !important;
     float: none !important;
     text-indent: -2px !important;

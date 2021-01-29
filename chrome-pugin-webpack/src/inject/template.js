@@ -43,11 +43,11 @@ export const dataViewElementTemplate = (storeId, storeInfo) => {
 }
 
 // 操作面板节点模板
-export const operationPanelTemplate = () => {
+export const operationPanelTemplate = (collectText = '采集商品') => {
   return $(`
     <div class="${ClassPrefix}-goods-panel-wrap">
         <span class="emalacca-goods-panel-button" data-type="follow">获取粉丝</span>
-        <span class="emalacca-goods-panel-button" data-type="collect">采集商品</span>
+        <span class="emalacca-goods-panel-button" data-type="collect">${collectText}</span>
         <span class="emalacca-goods-panel-button" data-type="view">查看店铺</span> 
     </div>
    `)

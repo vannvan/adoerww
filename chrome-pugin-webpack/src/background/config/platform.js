@@ -1646,6 +1646,7 @@ export const Platform = {
     crawl: function (url, callback, sync) {
       let shopid = null
       let itemid = null
+      
       if (/-i/.test(url)) {
         let urlInfo = url.split('-i.')[1].trim().split('.')
         shopid = urlInfo[0]

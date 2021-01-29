@@ -106,6 +106,8 @@ function notifyProgress(sum, succNum, failNum) {
     progress_timeout = setTimeout(function() {
       $('.sellerwant-progress-box').fadeOut(3000, function() {
         $('.sellerwant-progress-box').remove()
+        // 采集完成清除样式
+        hintBatch()
       })
     }, 3000)
   }
@@ -394,12 +396,16 @@ function insertFetchBtn($a, url, status) {
       'data-selecturl': url
     })
     if (sumaitongShowArr.includes(pageType)) {
-      $a.after($crawl)
+      if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+        $a.after($crawlBg)
+        $a.after($crawl)
+      } 
+      
       $a.after($crawlSelect)
-      $a.after($crawlBg)
-      $a.css({
-        display: 'inline-block'
-      })
+      
+      // $a.css({
+      //   display: 'inline-block'
+      // })
       $a.parent().css('position', 'relative')
       // 隐藏div
       $a.parent().on('mouseleave', function() {
@@ -409,7 +415,10 @@ function insertFetchBtn($a, url, status) {
   }
   if (!sumaitongShowArr.includes(pageType)) {
     $crawl.insertAfter($body)
-
+     // shopee&&xiapi不显示
+    if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+      $crawl.insertAfter($body)
+    } 
     // 隐藏div
     $a.on('mouseleave', function() {
       $crawl.css({
@@ -459,6 +468,10 @@ function insertFetchBtn($a, url, status) {
       }
     } else {
       // 活动页
+      // shopee&&xiapi不显示
+      if (/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+        return;
+      } 
       var $firstImg = $a.find('img:first-child'),
         href = '',
         crawlTop,
@@ -673,6 +686,7 @@ var batchGatherObj = {
 var batchTimer = null // 延时器
 // 批量采集提示2
 function hintNotifyProgress(isSucc) {
+  window.clearTimeout(batchTimer)
   batchGatherObj.batchGatherSum++
   if (isSucc) {
     batchGatherObj.batchSuccessNum++
@@ -681,20 +695,25 @@ function hintNotifyProgress(isSucc) {
   }
   var num = (batchGatherObj.batchGatherSum / batchGatherObj.batchGatherLength).toFixed(2)
   num = parseInt(num * 100)
-  notifyProgress(num, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-  // 采集完成清除样式
-  if (num === 100) {
-    hintBatch()
-  }
+  
+  if (batchGatherObj.batchGatherSum == batchGatherObj.batchGatherLength) {
+    notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum);
+} else {
+    notifyProgress(num, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
+    batchTimer = window.setTimeout(function () {
+      batchGatherObj.batchErrorNum = batchGatherObj.batchGatherLength - batchGatherObj.batchSuccessNum;
+      notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
+    }, 10000);
+}
 }
 
 // 在图片上直接采集
 function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
   var imageCrawlEnd = function(data) {
-    if (!data) {
+    if (!data.status) {
       notify('您还未登录，请登录采集插件', 'error')
       $('.fetch-btn').text('请登录')
-      if ($span) $span.find('.LinkConBox .LinkCon').text('采集到系统后台')
+      if ($span) $span.find('.LinkConBox .LinkCon').text('请登录')
       return
     }
     uid = data.data.token
@@ -790,6 +809,17 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
     } else if (url.indexOf('https') === -1) {
       url = url.replace('http', 'https')
     }
+    //lazada
+    // if (url.indexOf('www.lazada.') > -1) {
+    //   var params = {
+    //     token: uid,
+    //     detailUrl: url,
+    //     url: url
+    //   }
+    //   Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, function(result) {
+    //   }
+    //   return
+    // }
 
     crawlObj &&
       crawlObj.crawl(url, function(data) {
@@ -845,7 +875,6 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
         if (!hsaBrand) {
           Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {
             if (isBatchGather) {
-              window.clearTimeout(batchTimer)
               var isSucc = result.code == '0'
               hintNotifyProgress(isSucc)
             } else if (result.code == '0') {

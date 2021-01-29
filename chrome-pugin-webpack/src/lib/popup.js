@@ -1,8 +1,14 @@
-export function Popup() {
+function Popup() {
   /*
    * alert 弹窗 title、text 必传
    */
   var that = this
+  const typeColorOpts = {
+    info: 'rgba(52,152,219,0.8)',
+    success: 'rgba(46,204,113,0.8)',
+    error: 'rgba(231,76,60,0.8)',
+    warning: '#f39c12'
+  }
   ;(this.alert = function(title, text) {
     var model = document.getElementById('EmalaccaModel')
     if (model) {
@@ -138,11 +144,9 @@ export function Popup() {
       document.getElementById('sureImg').addEventListener('click', function() {
         that.sureImg(fn)
       })
-      document
-        .getElementById('cancelImg')
-        .addEventListener('click', function() {
-          that.cancelImg()
-        })
+      document.getElementById('cancelImg').addEventListener('click', function() {
+        that.cancelImg()
+      })
     }),
     /*
      * 确定按钮 有回调执行回调
@@ -166,7 +170,7 @@ export function Popup() {
     /*
      * 弱提示 toast
      */
-    (this.toast = function(text, time) {
+    (this.toast = function(text, type = 'info', time = 3) {
       var model = document.getElementById('toast-popup')
       if (model) {
         var content = document.getElementById('toast-content')
@@ -178,8 +182,8 @@ export function Popup() {
       var creatediv = document.createElement('div') // 创建div
       creatediv.className = 'model_toast' // 添加class
       creatediv.setAttribute('id', 'toast-popup') // 添加ID
-      var contentHtml =
-        '<div class="popup-toast" id="toast-content">' + text + '</div>'
+      creatediv.style.background = typeColorOpts[type]
+      var contentHtml = `<div class="popup-toast" id="toast-content"> ${text}</div>`
       creatediv.innerHTML = contentHtml
       document.body.appendChild(creatediv) // 将创建的div 加入 body
       that.cancelToast(time)
@@ -196,3 +200,5 @@ export function Popup() {
       }, time * 1000)
     })
 }
+
+export default Popup

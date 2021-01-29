@@ -8,8 +8,13 @@ import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
-import { Popup } from '@/lib/popup'
+import Popup from '@/lib/popup'
 import { dataViewElementTemplate, operationPanelTemplate } from './template'
+import { solidCrawl } from './shopee-crawl'
+
+const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
+const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
+
 const ClassPrefix = 'emalacca-plugin'
 
 const popup = new Popup()
@@ -51,6 +56,7 @@ const debounceHandleActions = debounce(function() {
 const Follow = {
   domain: window.location.origin,
   goodsList: [], //页面的可操作商品列表
+  goodsMap: new Map(), //页面可操作商品映射，属性名为urlId ，值为采集状态  默认采集商品 -> 采集中 -> 采集成功
   preload: function() {
     let linkrule = getRule(location.href)
     try {
@@ -74,65 +80,69 @@ const Follow = {
   //给a标签添加操作面板
   insertAction: function(type) {
     let _this = this
-    $('a').each(function() {
-      let href = $(this)[0].href
-      let test = new Function('url', type)(href) //链接是否匹配
-      if (href.search('buyer') > 0) return
-      if ($(this)[0].href && test) {
+    $.each(document.links, function(index, a) {
+      $(a).mouseenter(function(param) {
         let storeId = $(this)[0].href.split('-i.')[1]
         if (isEmpty(storeId)) return
         if (!_this.goodsList.includes(storeId)) {
           _this.goodsList.push(storeId)
         }
 
-        //鼠标进入
-        $(this).mouseenter(function() {
-          let firstImg = $(this).find('img:first-child')
-          let contentOffsetLeft = $(this).offset().left
-            ? $(this).offset().left
-            : firstImg.offset().left
-          let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
-          let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
-          // 操作面板显示
-          let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
-          actionListElement.attr('data-store-id', storeId) //用于粉丝关注的店铺shopid 和 itemid
-          actionListElement.attr('data-url', href) //用于采集的链接
-          actionListElement.css({
-            top: contentOffsetTop + 30,
-            left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
-            opacity: 1,
-            'pointer-events': 'auto'
-          })
+        let firstImg = $(this).find('img:first-child')
+        let contentOffsetLeft = $(this).offset().left
+          ? $(this).offset().left
+          : firstImg.offset().left
+        let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
+        let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
+        // 操作面板显示
+        let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
+        actionListElement.attr('data-store-id', storeId)
+        actionListElement.attr('data-store-url', $(this)[0].href)
+        actionListElement.css({
+          top: contentOffsetTop + 30,
+          left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
+          opacity: 1,
+          'pointer-events': 'auto'
         })
 
-        $('.emalacca-plugin-goods-panel-wrap').mouseenter(function() {
+        // 鼠标进入
+        $(EmalaccaPluginGoodsPanelWrapClass).mouseenter(function() {
+          let targetCollectText = Follow.goodsMap.get(storeId) || '开始采集'
+          $(this)
+            .find('span')
+            .eq(1)
+            .text(targetCollectText)
           $(this).css({
             opacity: 1
           })
         })
         //鼠标离开
-        $('.emalacca-plugin-goods-panel-wrap').mouseleave(function() {
-          let actionListElement = $('.emalacca-plugin-goods-panel-wrap')
+        $(EmalaccaPluginGoodsPanelWrapClass).mouseleave(function() {
+          let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
           actionListElement.css({
             opacity: 0
           })
         })
-      }
+      })
     })
+    // 添加数据详情
     this.setGoodDetailInfoToPanel(_this.goodsList)
   },
 
   //操作面板点击事件初始化
   initPanelEvent: function() {
-    $('.emalacca-plugin-goods-panel-wrap').on('click', 'span', function(e) {
+    $(EmalaccaPluginGoodsPanelWrapClass).on('click', 'span', function(e) {
       let actionType = e.target.getAttribute('data-type')
       let storeId = $(this)
         .parent()
         .attr('data-store-id')
+      let collectUrl = $(this)
+        .parent()
+        .attr('data-store-url')
       if (isEmpty(storeId)) return
       let realStoreId = storeId ? storeId.split('.')[0] : null
       if (!realStoreId) {
-        popup.toast('【马六甲插件】:未获取到商品信息', 3)
+        popup.toast('【马六甲插件】:未获取到商品信息')
         return false
       }
       switch (actionType) {
@@ -140,11 +150,29 @@ const Follow = {
         case 'follow':
           Follow.syncShoppeBaseInfo().then(res => {
             if (res.result && res.result.error == -1) {
-              popup.toast('【马六甲插件】:请登录虾皮卖家中心', 3)
+              popup.toast('【马六甲插件】:请登录虾皮卖家中心')
             } else {
               window.open(`/shop/${realStoreId}/followers?other=true`)
             }
           })
+          break
+        //   采集商品
+        case 'collect':
+          $(EmalaccaPluginGoodsPanelWrapClass)
+            .find('span')
+            .eq(1)
+            .text('采集中...')
+          Follow.goodsMap.set(storeId, '采集中...')
+          Follow.syncSolidCrawl(collectUrl).then(
+            res => {
+              Follow.goodsMap.set(storeId, '采集成功')
+              popup.toast('采集成功')
+            },
+            err => {
+              Follow.goodsMap.set(storeId, '采集失败')
+              popup.toast(err.msg, 'error')
+            }
+          )
           break
         //   查看店铺
         case 'view':
@@ -152,10 +180,6 @@ const Follow = {
           break
         default:
           break
-        //采集
-        case 'collect':
-
-        //
       }
     })
   },
@@ -178,12 +202,12 @@ const Follow = {
             let dataViewElement = dataViewElementTemplate(storeId, storeInfo)
             let aElExit = $(this)
               .children()
-              .is('.emalacca-plugin-goods-data-view')
+              .is(EmalaccaPluginGoodsDataViewClass)
             let subElElExit = $(this)
               .children()
               .children()
               .children()
-              .is('.emalacca-plugin-goods-data-view')
+              .is(EmalaccaPluginGoodsDataViewClass)
             // 如果当前a标签有高度就在下一级添加
             if ($(this).height() > 0 && !aElExit) {
               $(this).append(dataViewElement)
@@ -290,9 +314,22 @@ const Follow = {
     })
   },
 
+  //采集商品
+  syncSolidCrawl: function(url) {
+    return new Promise((resolve, reject) => {
+      solidCrawl(url, res => {
+        if (res.code == 0) {
+          resolve(res)
+        } else {
+          reject(res)
+        }
+      })
+    })
+  },
+
   //去粉丝关注演示页面
   handleGotoDemo() {
-    window.open(getURL('options.html'))
+    window.open(getURL('options/options.html'))
   }
 }
 
