@@ -22,6 +22,7 @@
     overflow: hidden;
     z-index: 99999999;
 
+
     .popup-text {
         padding: 25px 40px 35px;
         text-align: center;
@@ -51,13 +52,24 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 99999999;
-    min-width: 200px;
+    min-width: 400px;
+    user-select: none;
+    background: rgba(19, 194, 194, 0.9);
 
     .popup-toast {
         padding: 15px 32px;
         text-align: center;
         font-size: 16px;
         color: #fff;
+        font-weight: 600;
+
+        .close {
+            position: absolute;
+            right: 18px;
+            top: 5px;
+            font-size: 30px;
+            cursor: pointer;
+        }
     }
 }
 

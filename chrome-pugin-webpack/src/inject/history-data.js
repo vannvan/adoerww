@@ -9,6 +9,7 @@ import HistoryData from '@/components/HistoryData.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
 import ViewUI from 'view-design'
+
 const History = {
   domain: window.location.origin,
   shopId: null,

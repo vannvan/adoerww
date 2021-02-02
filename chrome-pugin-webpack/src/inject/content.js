@@ -466,6 +466,7 @@ function insertFetchBtn($a, url, status) {
         })
         $crawlBg.css('display', 'block')
       }
+      
     } else {
       // 活动页
       // shopee&&xiapi不显示
@@ -809,17 +810,39 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
     } else if (url.indexOf('https') === -1) {
       url = url.replace('http', 'https')
     }
+    console.log(type, 'type')
     //lazada
-    // if (url.indexOf('www.lazada.') > -1) {
-    //   var params = {
-    //     token: uid,
-    //     detailUrl: url,
-    //     url: url
-    //   }
-    //   Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, function(result) {
-    //   }
-    //   return
-    // }
+    // 判断当前地址是否是列表
+    var linkruleHref = getRule(location.href)
+    var CONFIG_OBJ = JSON.parse(linkruleHref)
+    var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
+    var sumaitongShowArr = ['category', 'sortlist']
+    // lazada列表页不调用html
+    if (url.indexOf('www.lazada.') > -1 && sumaitongShowArr.includes(pageType)) {
+      var params = {
+        baseURL: CONFIGINFO.url.ApiUrl,
+        token: uid,
+        detailUrl: url,
+        url: url
+      }
+      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, function(result) {
+        if (isBatchGather) {
+          var isSucc = result.code == '0'
+          hintNotifyProgress(isSucc)
+        } else if (result.code == 0) {
+          if ($span) {
+            $span
+              .addClass('linkSuccess')
+              .find('.LinkConBox .LinkCon')
+              .text('采集成功')
+            notify('采集成功', 'success')
+          }
+        } else {
+          notify(result.msg, 'error')
+        }
+      })
+      return
+    }
 
     crawlObj &&
       crawlObj.crawl(url, function(data) {
@@ -1109,11 +1132,9 @@ function showTip(type, url) {
       imageCrawl(url, null, '', 'detail')
     })
   }
-}
-
-$(function() {
   //文档载入之后执行
-  $('.Close').on('click', function(e) {
+  $('.fetch .close').on('click', function(e) {
+    console.log(2222222222)
     if (e && e.preventDefault) {
       //非IE浏览器
       e.preventDefault()
@@ -1125,6 +1146,10 @@ $(function() {
     ShopeModal.hide('#repeatCrawlModal')
     return false //取消冒泡行为
   })
+}
+
+$(function() {
+  
   $('.repeatCrawDefaultBtn').on('click', function() {
     ShopeModal.hide('#repeatCrawlModal')
   })

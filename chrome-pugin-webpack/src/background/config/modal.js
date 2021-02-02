@@ -6,6 +6,21 @@
  * Copyright (C) 2012 Hakim El Hattab, http://hakim.se
  */
 import $ from 'jquery'
+import { isEmpty } from '@/lib/utils'
+
+function isUserInfo() {
+    let userInfoString = localStorage.getItem('pt-plug-access-user')
+    if (!isEmpty(userInfoString) && userInfoString !== 'undefined' && JSON.parse(userInfoString) !== null) {
+        deactivate();
+        $('#account').hide()
+        $('#exit').hide()
+        $("#topLoginDiv").show()
+        $('#loginH').html('<i class="iconfont">&#xe63c;</i>' + '登录').show()
+        return false
+    }
+    return true
+}
+
 export const ShopeModal = (function() {
     var container = document.documentElement,
         popup = document.querySelector('.modal-animate'),
@@ -14,12 +29,7 @@ export const ShopeModal = (function() {
     // Deactivate on ESC
     function onDocumentKeyUp(event) {
         if (event.keyCode === 27) {
-            if (JSON.parse(localStorage.getItem('pt-plug-access-user')) == null) {
-                deactivate();
-                $('#account').hide()
-                $('#exit').hide()
-                $("#topLoginDiv").show()
-                $('#loginH').html('<i class="iconfont">&#xe63c;</i>' + '登录').show()
+            if (!isUserInfo()) {
                 return
             }
             deactivate();
@@ -28,14 +38,7 @@ export const ShopeModal = (function() {
     // Deactivate on click close
     function onDocumentClick(event) {
         if (event.target.id.indexOf('loginClose') > -1) { //登录模态框显示登录按钮
-            if (JSON.parse(localStorage.getItem('pt-plug-access-user')) == null) {
-                deactivate();
-                // console.log($('#loginH'))
-                // show("#topLoginDiv")
-                $('#account').hide()
-                $('#exit').hide()
-                $("#topLoginDiv").show()
-                $('#loginH').html('<i class="iconfont">&#xe63c;</i>' + '登录').show()
+            if (!isUserInfo()) {
                 return
             }
 

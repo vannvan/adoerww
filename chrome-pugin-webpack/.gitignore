@@ -22,12 +22,11 @@ move.js
 *.sln
 *.env
 *.env.development
-
+*.zip
 
 
 dist/
 
 .aliossrc
 /package-lock.json
-local/
-
+/local

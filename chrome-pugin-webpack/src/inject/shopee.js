@@ -9,7 +9,7 @@ import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
 import Popup from '@/lib/popup'
-import { dataViewElementTemplate, operationPanelTemplate } from './template'
+import { dataViewElementTemplate, operationPanelTemplate, collectText } from './template'
 import { solidCrawl } from './shopee-crawl'
 
 const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
@@ -35,13 +35,8 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
         return createElement(Home)
       }
     })
-    if (
-      window.location.href.indexOf('xiapibuy.com') > -1 ||
-      window.location.href.indexOf('shopee.com') > -1
-    ) {
-      Follow.init()
-      Follow.sendCsrfToken()
-    }
+    Follow.init()
+    Follow.sendCsrfToken()
   }, 500)
 }
 
@@ -107,19 +102,18 @@ const Follow = {
 
         // 鼠标进入
         $(EmalaccaPluginGoodsPanelWrapClass).mouseenter(function() {
-          let targetCollectText = Follow.goodsMap.get(storeId) || '开始采集'
+          let targetCollectStatus = Follow.goodsMap.get(storeId) || 'collect'
+          //   给当前商品对应的状态赋值
           $(this)
             .find('span')
             .eq(1)
-            .text(targetCollectText)
-          $(this).css({
-            opacity: 1
-          })
+            .text(collectText[targetCollectStatus].name)
+            .css({ background: collectText[targetCollectStatus].color, opacity: 1 })
         })
         //鼠标离开
         $(EmalaccaPluginGoodsPanelWrapClass).mouseleave(function() {
-          let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
-          actionListElement.css({
+          //   let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
+          $(this).css({
             opacity: 0
           })
         })
@@ -142,7 +136,7 @@ const Follow = {
       if (isEmpty(storeId)) return
       let realStoreId = storeId ? storeId.split('.')[0] : null
       if (!realStoreId) {
-        popup.toast('【马六甲插件】:未获取到商品信息')
+        popup.toast('【马六甲插件】:未获取到商品信息', 'warning')
         return false
       }
       switch (actionType) {
@@ -150,7 +144,7 @@ const Follow = {
         case 'follow':
           Follow.syncShoppeBaseInfo().then(res => {
             if (res.result && res.result.error == -1) {
-              popup.toast('【马六甲插件】:请登录虾皮卖家中心')
+              popup.toast('【马六甲插件】:请登录虾皮卖家中心', 'warning')
             } else {
               window.open(`/shop/${realStoreId}/followers?other=true`)
             }
@@ -161,16 +155,17 @@ const Follow = {
           $(EmalaccaPluginGoodsPanelWrapClass)
             .find('span')
             .eq(1)
-            .text('采集中...')
-          Follow.goodsMap.set(storeId, '采集中...')
+            .text(collectText['pending'].name)
+            .css({ background: collectText['pending'].color })
+          Follow.goodsMap.set(storeId, 'pending')
           Follow.syncSolidCrawl(collectUrl).then(
             res => {
-              Follow.goodsMap.set(storeId, '采集成功')
-              popup.toast('采集成功')
+              Follow.goodsMap.set(storeId, 'success')
+              popup.toast('采集成功', 'success')
             },
             err => {
-              Follow.goodsMap.set(storeId, '采集失败')
-              popup.toast(err.msg, 'error')
+              Follow.goodsMap.set(storeId, 'fail')
+              popup.toast(err.msg || '采集错误', 'error')
             }
           )
           break

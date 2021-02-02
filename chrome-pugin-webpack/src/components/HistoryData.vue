@@ -173,6 +173,7 @@ export default {
           this.dataIsExit = true
           this.$nextTick(() => {
             this.drawCharts(res.result.data)
+            $('.page-product__shop').css({ 'box-sizing': 'content-box' })
           })
         } else {
           this.dataIsExit = false
@@ -180,12 +181,8 @@ export default {
       })
     },
 
-    //替换element字体
-    handleReplaceIcon() {
-      //
-    },
-
-    drawCharts(source) {
+    drawCharts(source = []) {
+      if (source.length == 0) return
       let priceList = source.map(el => el.minPrice)
       let daySalesList = source.map(el => el.daySales)
       let dateList = source.map(el => el.gmtDate)

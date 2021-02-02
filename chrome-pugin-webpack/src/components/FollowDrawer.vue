@@ -29,6 +29,10 @@
           <p>
             第三步:开始使用粉丝关注，鼠标悬浮在商品图片上显示“获取粉丝”点击进入该商品的卖家粉丝列表，根据需求可输入前置条件进行关注。
           </p>
+          <p style="margin:10px auto">
+            <span style="color:#f00">注:</span
+            >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
+          </p>
           <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
             <a :href="item.seller" target="black">{{ item.name }}卖家中心</a>
             <a :href="item.front" target="black">{{ item.name }}前台</a>
@@ -49,7 +53,7 @@
         <template v-if="unFollowHelpVisible">
           <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
           <p>第二步:点击"自动取关"后进入已关注页面列表进行操作</p>
-          <p>
+          <p style="margin:10px auto">
             <span style="color:#f00">注:</span
             >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
           </p>
@@ -554,7 +558,7 @@ export default {
           })
         } else {
           let infoText = actionType == 'follow' ? '关注' : '取关'
-          let htmlStr = `<li>[${getTime()}] ${infoText} 任务完毕！</li>`
+          let htmlStr = `<li style="color:#f00">[${getTime()}] ${infoText} 任务遇到异常！</li>`
           $('#ResultContent').prepend(htmlStr)
           this.handleCancel()
         }

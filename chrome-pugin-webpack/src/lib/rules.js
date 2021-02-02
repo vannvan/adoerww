@@ -169,7 +169,7 @@ const ruleInfo = {
       "}",
 
   'shopee.': "{\n" +
-      "\"detect\": \"if (url.indexOf('/search?keyword') !== -1 || url.indexOf('-cat.') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/shop/') !== -1 ) {\\n  return 'category';\\n}\\nif (url.indexOf('-i.') !== -1 || url.indexOf('/product/') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
+      "\"detect\": \"if (url.indexOf('/search?keyword') !== -1 || url.indexOf('-cat.') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/shop/') !== -1 && url.indexOf('followers?other=true') === -1 && url.indexOf('/following?_') === -1 ) {\\n  return 'category';\\n}\\nif (url.indexOf('-i.') !== -1 || url.indexOf('/product/') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
       "\"detail\": \"if (url.indexOf('-i.')!==-1) {\\n  return true;\\n}\",\n" +
       "\"map\": {\n" +
       "\"detail\": \"single\",\n" +
@@ -189,7 +189,7 @@ const ruleInfo = {
       "}",
 
   'xiapibuy.com': "{\n" +
-      "\"detect\": \"if (url.indexOf('/search?') !== -1 || url.indexOf('-cat.') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/shop/') !== -1 ) {\\n  return 'category';\\n}\\nif (url.indexOf('-i.') !== -1 || url.indexOf('/product/') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
+      "\"detect\": \"if (url.indexOf('/search?') !== -1 || url.indexOf('-cat.') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/shop/') !== -1 && url.indexOf('/followers?other=true') === -1 && url.indexOf('/following?_') === -1 ) {\\n  return 'category';\\n}\\nif (url.indexOf('-i.') !== -1 || url.indexOf('/product/') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
       "\"detail\": \"if (url.indexOf('-i.')!==-1) {\\n  return true;\\n}\",\n" +
       "\"map\": {\n" +
       "\"detail\": \"single\",\n" +

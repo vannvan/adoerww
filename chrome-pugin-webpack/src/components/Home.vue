@@ -13,7 +13,7 @@
       </ul>
     </div>
     <drawer
-      :title="'马六甲粉丝关注插件' + pluginVersion"
+      :title="'马六甲卖家助手' + pluginVersion"
       :display.sync="display"
       :inner="true"
       :width="drawerWidth"

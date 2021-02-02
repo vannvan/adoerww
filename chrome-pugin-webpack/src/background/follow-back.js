@@ -14,26 +14,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     Request.getFollowersInfoByName(options, type, sendResponse)
     return true
   }
-  if (action == 'auth' && type == 'SET_SHOPPE_CRSF_TOKEN') {
-    Auth.setCookies(options, type, sendResponse)
-    return true
-  }
+
   if (action == 'request' && type == 'POST_SHOPPE_FOLLOW_ACTION') {
     Request.postShoppeFollowAction(options, type, sendResponse)
     return true
   }
-  if (action == 'auth' && type == 'SYNC_ERP_AUTH_INFO') {
-    Auth.syncErp(options, type, sendResponse)
-    return true
-  }
+
   if (action == 'request' && type == 'GET_CURRENT_STORE_ID') {
     Request.getCurrentStoreId(options, type, sendResponse)
     return true
   }
-  if (action == 'auth' && type == 'SYNC_SHOPPE_BASE_INFO') {
-    Auth.syncShoppeBaseInfo(options, type, sendResponse)
-    return true
-  }
+
   if ((action = 'request' && type == 'GET_SHOPPE_ITEM_LIST_INFO')) {
     Request.getShopeeItemsList(options, type, sendResponse)
     return true
@@ -43,7 +34,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 })
 
 //需要请求数据
-const Request = {
+export const Request = {
   //登录虾皮
   handleLoginShopee: function(params, type) {
     // console.log(getMatchSite(params.domain), '匹配域名')
@@ -207,40 +198,5 @@ const Request = {
         }
       }
     })
-  }
-}
-
-const Auth = {
-  //同步虾皮登录token
-  setCookies: function(params, type, call) {
-    console.log(params, type)
-    if (params.csrfToken && localStorage.setItem('csrfToken', params.csrfToken)) {
-      call({ type: type, result: '设置成功' })
-    }
-  },
-
-  // 配置虾皮平台信息
-  syncShoppeBaseInfo: function(params, type, call) {
-    console.log(params, type)
-    Request.handleLoginShopee(params, type)
-      .then(res => {
-        if (res) {
-          localStorage.setItem('userInfo', JSON.stringify(res))
-        }
-      })
-      .catch(() => {
-        call({ type: type, result: { error: -1 } })
-      })
-      .finally(() => {
-        let userInfo = getStorage('userInfo', {})
-        call({
-          type: type,
-          result: {
-            storeId: userInfo.shopid,
-            username: userInfo.username,
-            country: getMatchSite(params.domain) ? getMatchSite(params.domain).key : null
-          }
-        })
-      })
   }
 }

@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
+import { isEmpty } from '@/lib/utils'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request && request.sign === 'signShope') {
@@ -25,14 +26,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   }
 })
 
-var backEvent = {
+export const backEvent = {
   //获取用户登录状态
   checkLoginStatus: function(call) {
     var statusData = {
       status: false
     }
-    if (JSON.parse(localStorage.getItem('pt-plug-access-user')) !== null) {
-      let obj = JSON.parse(localStorage.getItem('pt-plug-access-user'))
+    let userInfo = localStorage.getItem('pt-plug-access-user')
+    if (!isEmpty(userInfo) && userInfo !== 'undefined' && JSON.parse(userInfo) !== null) {
+      let obj = JSON.parse(userInfo)
       // account = obj.user
       // uid = obj.token
       statusData.data = obj
@@ -66,6 +68,7 @@ var backEvent = {
         },
       })*/
     } else {
+      console.log(22222222223)
       statusData.status = false
       $('#topLoginDiv').hide()
       $('#topNoLoginDiv').show()
@@ -139,7 +142,9 @@ var backEvent = {
       success: function(data) {
         call({
           code: -1,
-          msg: `授权过期，请重新<a href="${chrome.extension.getURL('index.html')}">登录</a>`
+          msg: `授权过期，请重新<a href="${chrome.extension.getURL(
+            'presentation/presentation.html'
+          )}">登录</a>`
         })
         // data.msg = '采集成功！'
         // call(data)
@@ -149,11 +154,16 @@ var backEvent = {
         // call({ code: 0, msg: '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
-        let { code } = XMLHttpRequest.responseJSON
+        let code = ''
+        if (!isEmpty(XMLHttpRequest)) {
+          code = XMLHttpRequest.responseJSON.code
+        }
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL('index.html')}">登录</a>`
+            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
+              'presentation/presentation.html'
+            )}">登录</a>`
           })
           return
         }
@@ -192,11 +202,16 @@ var backEvent = {
         // call({ code: 0, msg: '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
-        let { code } = XMLHttpRequest.responseJSON
+        let code = ''
+        if (!isEmpty(XMLHttpRequest)) {
+          code = XMLHttpRequest.responseJSON.code
+        }
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL('index.html')}">登录</a>`
+            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
+              'presentation/presentation.html'
+            )}">登录</a>`
           })
           return
         }
@@ -227,11 +242,16 @@ var backEvent = {
         call({ html: data })
       },
       complete: function(XMLHttpRequest, status) {
-        let { code } = XMLHttpRequest.responseJSON
+        let code = ''
+        if (!isEmpty(XMLHttpRequest)) {
+          code = XMLHttpRequest.responseJSON.code
+        }
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL('index.html')}">登录</a>`
+            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
+              'presentation/presentation.html'
+            )}">登录</a>`
           })
           return
         }
@@ -293,7 +313,7 @@ var backEvent = {
 
 var tabId = null
 // chrome.browserAction.onClicked.addListener(function () {
-//   var index = chrome.extension.getURL('index.html')
+//   var index = chrome.extension.getURL('presentation/presentation.html')
 //   tabId
 //     ? chrome.tabs.update(tabId, { selected: true })
 //     : chrome.tabs.create({ url: index }, function (tab) {

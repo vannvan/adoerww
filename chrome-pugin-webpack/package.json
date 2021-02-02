@@ -19,6 +19,7 @@
         "babel-loader": "^8.0.2",
         "babel-plugin-component": "^1.1.1",
         "clean-webpack-plugin": "^2.0.2",
+        "compressing": "^1.5.1",
         "compression-webpack-plugin": "^7.1.1",
         "copy-webpack-plugin": "^5.0.3",
         "cross-env": "^7.0.3",

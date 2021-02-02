@@ -11,9 +11,11 @@
 <body>
     <div class="head">
         <div class="headContent">
-            <!-- <div>
-			<img class="logo" src="" />
-		</div>	 -->
+            <div class="home-wrap">
+                <a href="https://erp.emalacca.com/">
+                    <img src="../../assets/images//logo-white.png" alt="" class="logo">
+                </a>
+            </div>
             <div id="topLoginDiv" class="user">
                 <div class="glyphicon glyphicon-user"></div>
                 <div class="userName" id="account">
@@ -63,11 +65,11 @@
                                     placeholder="请填写产品的网址，多个网址用Enter换行"></textarea>
                                 <!-- <a name="pro_crawl" class="btn btn-success floatL m-top10" href="#" target="_blank">查看已采集数据</a> -->
                                 <div class="mainButton">
+                                    <button name="crawlBtn" data-type="single" type="button"
+                                        class="btn btn-primaryMy m-top5 pull-right">开始采集
+                                    </button>
                                     <button name="cleanBtn" type="button"
                                         class="btn btn-default m-top5 pull-right m-left10">清　空 </button>
-                                    <button name="crawlBtn" data-type="single" type="button"
-                                        class="btn btn-primaryMy m-top5 pull-right m-left10">开始采集
-                                    </button>
                                 </div>
                                 <div class="clear"></div>
                             </div>
@@ -112,7 +114,8 @@
 
                 </div>
                 <div class="modal-foot">
-                    <a name="pro_crawl" target="_blank" href="#" class="btn btn-primaryMy mRight10 emptyResult">查看已采数据</a>
+                    <a name="pro_crawl" target="_blank" href="#"
+                        class="btn btn-primaryMy mRight10 emptyResult">查看已采数据</a>
                     <button style="float: right;" class="btn btn-default emptyResult m-left10" id="crawlResultClose"
                         type="button">关闭</button>
                 </div>

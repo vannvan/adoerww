@@ -627,7 +627,6 @@ export const Platform = {
     },
     crawl: function (url, callback, sync) {
       var html = document.body.outerHTML
-      console.log(html)
       Html.getHtml(
         url,
         0,
@@ -650,7 +649,6 @@ export const Platform = {
                     0,
                     function (price) {
                       if (price.html) {
-                        console.log(price, 'aaaaa')
                         var priceArr = JSON.parse(price.html)
                         priceArr.length > 0 &&
                           priceArr[0]['p'] &&

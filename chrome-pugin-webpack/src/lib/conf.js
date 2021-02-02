@@ -74,11 +74,12 @@ export const WEBSITES = [
 ]
 
 export const ERROR = {
-  syncLoginStatusFail: '【虾皮粉丝插件】:登录状态同步失败，请关闭窗口重新登录',
-  didNotGetToSiteInformation: '【虾皮粉丝插件】:未获取到当前站点信息',
-  pleaseCheckWhetherHaveAuthoriz: '【虾皮粉丝插件】: 请检查当前店铺是否已授权或是否已登录虾皮账户',
-  abnormalSituation: '【虾皮粉丝插件】: 请求遇到异常情况,请刷新页面后重新开始操作',
-  failedToGetShopeeData: '【虾皮粉丝插件】: 获取销量数据失败'
+  syncLoginStatusFail: '【马六甲卖家助手】:登录状态同步失败，请关闭窗口重新登录',
+  didNotGetToSiteInformation: '【马六甲卖家助手】:未获取到当前站点信息',
+  pleaseCheckWhetherHaveAuthoriz:
+    '【马六甲卖家助手】: 请检查当前店铺是否已授权或是否已登录虾皮账户',
+  abnormalSituation: '【马六甲卖家助手】: 请求遇到异常情况,请刷新页面后重新开始操作',
+  failedToGetShopeeData: '【马六甲卖家助手】: 获取销量数据失败'
 }
 
 //找到域名配置项中的当前国家的项

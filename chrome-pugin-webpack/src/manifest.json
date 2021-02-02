@@ -1,5 +1,5 @@
 {
-    "name": "马六甲采集助手-(合并ing内测版)",
+    "name": "马六甲卖家助手-(合并ing内测版)",
     "manifest_version": 2,
     "description": "https://erp.emalacca.com/ 马六甲采集助手（虾皮粉丝关注）",
     "homepage_url": "https://github.com/vannvan",
@@ -20,7 +20,7 @@
                 "./styles/home.css",
                 "./styles/inject.css"
             ],
-            "position": "document_end"
+            "run_at": "document_end"
         }
     ],
     "background": {

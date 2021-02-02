@@ -4,10 +4,10 @@ function Popup() {
    */
   var that = this
   const typeColorOpts = {
-    info: 'rgba(52,152,219,0.8)',
-    success: 'rgba(46,204,113,0.8)',
-    error: 'rgba(231,76,60,0.8)',
-    warning: '#f39c12'
+    info: 'rgba(19,194,194,0.9);',
+    success: 'rgba(46,204,113,0.9)',
+    error: 'rgba(231,76,60,0.9)',
+    warning: 'rgba(250,140,22,0.9)'
   }
   ;(this.alert = function(title, text) {
     var model = document.getElementById('EmalaccaModel')
@@ -164,29 +164,31 @@ function Popup() {
      * 关闭confirm
      */
     (this.cancelImg = function() {
-      var confirmModel = document.getElementById('imgConfirm')
-      confirmModel.style.display = 'none'
+      document.getElementById('imgConfirm').style.display = 'none'
     }),
     /*
      * 弱提示 toast
      */
     (this.toast = function(text, type = 'info', time = 3) {
-      var model = document.getElementById('toast-popup')
-      if (model) {
-        var content = document.getElementById('toast-content')
-        content.innerText = text
-        model.style.display = 'block'
-        that.cancelToast(time)
-        return
-      }
+      //   var model = document.getElementById('toast-popup')
+      //   if (model) {
+      //     var content = document.getElementById('toast-content')
+      //     content.innerText = text
+      //     model.style.display = 'block'
+      //     that.cancelToast(time)
+      //     return
+      //   }
       var creatediv = document.createElement('div') // 创建div
       creatediv.className = 'model_toast' // 添加class
       creatediv.setAttribute('id', 'toast-popup') // 添加ID
       creatediv.style.background = typeColorOpts[type]
-      var contentHtml = `<div class="popup-toast" id="toast-content"> ${text}</div>`
+      var contentHtml = `<div class="popup-toast" id="toast-content">${text}<span class="close" id="PopupCloseBtn">×</span></div>`
       creatediv.innerHTML = contentHtml
       document.body.appendChild(creatediv) // 将创建的div 加入 body
       that.cancelToast(time)
+      document.getElementById('PopupCloseBtn').addEventListener('click', function() {
+        document.getElementById('toast-popup').remove()
+      })
     }),
     /*
      * 弱提示关闭 默认2s
@@ -196,7 +198,7 @@ function Popup() {
         var time = 2 // 关闭时间默认在2s
       }
       setTimeout(function() {
-        document.getElementById('toast-popup').style.display = 'none'
+        document.getElementById('toast-popup').remove()
       }, time * 1000)
     })
 }

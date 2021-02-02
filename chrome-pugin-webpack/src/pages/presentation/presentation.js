@@ -7,19 +7,19 @@ import { selAllCurrPage, closeRepeatCrawl, emptyResultNum } from '@/background/c
 import { CONFIGINFO } from '@/background/config.js'
 import { ShopeModal } from '@/background/config/modal.js'
 import { getURL } from '@/lib/chrome-client.js'
-import { Html } from '@/background/server/html.js'
+// import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
-
+import { isEmpty } from '@/lib/utils'
 import '@/background/config/message.js'
-import '@/assets/styles/css/index.css'
-import '@/assets/styles/css/modal.css'
+import '@/assets/styles/css/index.less'
+import '@/assets/styles/css/modal.less'
 import '@fonts/iconfont.css'
 
 $(function() {
   MAIN.FirstRun.finishInitialization()
   MAIN.INIT.init()
 })
-var uid = ''
+let userInfo = null
 var account = ''
 
 function afterTabLoaded(callback) {
@@ -111,21 +111,17 @@ var MAIN = {
         success: function(data) {
           if (data.code == 0) {
             $.fn.message({ type: 'success', msg: '登录成功' })
-            let datas = {
-              token: data.data.token,
-              user: data.data.userInfo.maAccount,
-              accountType: data.data.userInfo.maType,
-              version: data.data.userInfo.plugVersion
-            }
+
+            let { maAccount, plugVersion, memberNO } = data.data.userInfo || {}
+
             localStorage.removeItem('pt-plug-access-user')
-            localStorage.setItem('pt-plug-access-user', JSON.stringify(datas))
-            ;(account = data.data.userInfo.maAccount),
-              (uid = data.data.token),
-              $('#account')
-                .html(
-                  `版本号：${datas.version}   <span class="icon iconfont icon-shejiao-geren"></span> ${account}`
-                )
-                .show()
+            localStorage.setItem('pt-plug-access-user', JSON.stringify(data.data))
+
+            $('#account')
+              .html(
+                `版本号：${plugVersion} <span style="margin-left:12px">会员ID：${memberNO}</span> <span class="icon iconfont icon-shejiao-geren"></span>  ${maAccount}`
+              )
+              .show()
             $('#exit')
               .html('<span class="icon iconfont icon-emalacca-tuichu"></span>' + '退出')
               .show()
@@ -133,9 +129,6 @@ var MAIN = {
             $('#topLoginDiv').show()
             $('#topNoLoginDiv').hide()
             ShopeModal.hide('#loginModal')
-            // 获取品牌词
-
-            MAIN.LOGIC.getBrandWord(uid)
             // CONFIGINFO.brandData.data = ['苹果', 'iphone', '手机']
           } else {
             $.fn.message({ type: 'error', msg: data.message })
@@ -151,7 +144,7 @@ var MAIN = {
     //初始化采集
     initCrawlBtn: function() {
       $('.RepeatBox').html('')
-      if (!uid) {
+      if (!userInfo) {
         ShopeModal.show('#loginModal')
         return false
       }
@@ -183,7 +176,6 @@ var MAIN = {
         $('#failDetail').html('')
         $('#failNum').html(0)
 
-        //MAIN.LOGIC.getBrandWord(uid, url)
         Crawl.singleCrawl(
           JSON.parse(localStorage.getItem('pt-plug-access-user')).token,
           url,
@@ -200,12 +192,12 @@ var MAIN = {
       }
     },
     init: function(t, tt) {
-      if (JSON.parse(localStorage.getItem('pt-plug-access-user')) !== null) {
-        let obj = JSON.parse(localStorage.getItem('pt-plug-access-user'))
-        account = obj.user
-        uid = obj.token
+      let userInfoString = localStorage.getItem('pt-plug-access-user')
+      if (!isEmpty(userInfoString) && userInfoString !== 'undefined' && JSON.parse(userInfoString) !== null) {
+        userInfo = JSON.parse(userInfoString)
+        let { maAccount, plugVersion, memberNO } = userInfo.userInfo || {}
         $('#account').html(
-          `版本号：  ${obj.version} <span class="icon iconfont icon-shejiao-geren"></span> ${account}`
+          `版本号：${plugVersion} <span style="margin-left:12px">会员ID：${memberNO}</span>  <span class="icon iconfont icon-shejiao-geren"></span>  ${maAccount}`
         )
         $('#exit').html('<span class="icon iconfont icon-emalacca-tuichu"></span>' + '退出')
         $('#topLoginDiv').show()
@@ -243,72 +235,21 @@ var MAIN = {
     },
     // 取消按钮
     cancle: function() {
-      if (JSON.parse(localStorage.getItem('pt-plug-access-user')) == null) {
+      let userInfoString = localStorage.getItem('pt-plug-access-user')
+      if (!isEmpty(userInfoString) && userInfoString !== 'undefined' && JSON.parse(userInfoString) !== null) {
         $('#topLoginDiv').show()
         $('#loginH')
           .html('<span class="icon iconfont icon-shejiao-geren"></span>' + '登录')
           .show()
         ShopeModal.hide('#loginModal')
       }
-    },
-    // 获取品牌词
-    getBrandWord: function(token, url) {
-      if (token) {
-        Crawl.singleCrawl(
-          JSON.parse(localStorage.getItem('pt-plug-access-user')).token,
-          url,
-          true,
-          false,
-          '',
-          '',
-          JSON.parse(localStorage.getItem('brandData'))
-        )
-
-        /*     $.ajax({
-          url: CONFIGINFO.url.BrandAPI(),
-          type: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + token,
-          },
-          timeout: 30000,
-          success: function (res) {
-            localStorage.setItem('brandData', JSON.stringify(res.data))
-            /!*Crawl.singleCrawl(
-              JSON.parse(localStorage.getItem('pt-plug-access-user')).token,
-              url,
-              true,
-              false,
-              '',
-              '',
-              JSON.parse(localStorage.getItem('brandData'))
-            )*!/
-          },
-          complete: function (XMLHttpRequest, status) {
-            if (status == 'timeout') {
-              tt < 3
-                ? init(t, tt + 1)
-                : $.fn.message({ type: 'error', msg: '请求超时，请稍后重试！' })
-            } else if (status == 'error') {
-              $.fn.message({ type: 'error', msg: '请求出错，请联系管理员！' })
-            }
-          },
-        })*/
-      }
     }
   },
   FirstRun: {
-    open: function(url, callback) {
-      chrome.tabs.create(
-        {
-          url: url
-        },
-        callback && afterTabLoaded(callback)
-      )
-    },
     finishInitialization: function() {
       if (JSON.parse(localStorage.getItem('firstRun')) == null) {
         localStorage.setItem('firstRun', false)
-        FirstRun.open(getURL('presentation/presentation.html'))
+        window.open(getURL('presentation/presentation.html'))
       }
     }
   }
