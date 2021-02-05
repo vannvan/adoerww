@@ -1,14 +1,14 @@
 //授权相关
 // -1 接口错误 -2 数据错误
 // import $ from 'jquery'
-import { getMatchSite } from '../lib/conf'
+import { getMatchSite } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
 import { Request } from './follow-back'
-import { backEvent } from './server/server'
+// import { backEvent } from './server/server'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
-  //   同步erp
+  // 同步erp
   if (action == 'auth' && type == 'SYNC_ERP_AUTH_INFO') {
     Auth.syncErpToken(options, type, sendResponse)
     return true
@@ -38,11 +38,22 @@ export const Auth = {
 
   //同步erptoken
   syncErpToken: function(params, type, call) {
-    console.log(params)
-    return new Promise(() => {
+    console.log(params, type)
+    return new Promise((resolve, reject) => {
       let { authInfo } = params || {}
-      localStorage.setItem('pt-plug-access-user', JSON.stringify(authInfo.userInfo.userInfo))
-      call({ type: type, result: localStorage.getItem('pt-plug-access-user') })
+      if (authInfo.access_token) {
+        let userInfo = {
+          token: authInfo.access_token,
+          userInfo: authInfo.userInfo.userInfo,
+          system: params.origin
+        }
+        localStorage.setItem('pt-plug-access-user', JSON.stringify(userInfo))
+        call({ type: type, result: localStorage.getItem('pt-plug-access-user') })
+      } else {
+        // 表示erp是没有登录
+        localStorage.setItem('pt-plug-access-user', null)
+        reject(-1)
+      }
     }).catch(error => {
       console.log(error)
     })
@@ -58,7 +69,7 @@ export const Auth = {
         }
       })
       .catch(() => {
-        call({ type: type, result: { error: -1 } })
+        call({ type: type, error: -1 })
       })
       .finally(() => {
         let userInfo = getStorage('userInfo', {})

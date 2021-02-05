@@ -11,7 +11,8 @@ import { getURL } from '@/lib/chrome-client.js'
 import { Crawl } from '@/background/server/crawl.js'
 import { isEmpty } from '@/lib/utils'
 import '@/background/config/message.js'
-import '@/assets/styles/css/index.less'
+import '@/assets/styles/css/presentation.less'
+import '@/assets/styles/css/toast.less'
 import '@/assets/styles/css/modal.less'
 import '@fonts/iconfont.css'
 
@@ -193,7 +194,11 @@ var MAIN = {
     },
     init: function(t, tt) {
       let userInfoString = localStorage.getItem('pt-plug-access-user')
-      if (!isEmpty(userInfoString) && userInfoString !== 'undefined' && JSON.parse(userInfoString) !== null) {
+      if (
+        !isEmpty(userInfoString) &&
+        userInfoString !== 'undefined' &&
+        JSON.parse(userInfoString) !== null
+      ) {
         userInfo = JSON.parse(userInfoString)
         let { maAccount, plugVersion, memberNO } = userInfo.userInfo || {}
         $('#account').html(
@@ -236,7 +241,11 @@ var MAIN = {
     // 取消按钮
     cancle: function() {
       let userInfoString = localStorage.getItem('pt-plug-access-user')
-      if (!isEmpty(userInfoString) && userInfoString !== 'undefined' && JSON.parse(userInfoString) !== null) {
+      if (
+        !isEmpty(userInfoString) &&
+        userInfoString !== 'undefined' &&
+        JSON.parse(userInfoString) !== null
+      ) {
         $('#topLoginDiv').show()
         $('#loginH')
           .html('<span class="icon iconfont icon-shejiao-geren"></span>' + '登录')

@@ -73,6 +73,7 @@ import History from '@/inject/history-data'
 import dayjs from 'dayjs'
 import { division } from '@/lib/utils'
 import { ERROR } from '../lib/conf'
+
 export default {
   data() {
     return {
@@ -173,7 +174,6 @@ export default {
           this.dataIsExit = true
           this.$nextTick(() => {
             this.drawCharts(res.result.data)
-            $('.page-product__shop').css({ 'box-sizing': 'content-box' })
           })
         } else {
           this.dataIsExit = false
@@ -289,4 +289,6 @@ export default {
 }
 </script>
 
-<style lang="less"></style>
+<style lang="less" scoped>
+
+</style>

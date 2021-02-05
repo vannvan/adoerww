@@ -24,7 +24,7 @@ export function lStorage() {
   return chrome.storage
 }
 export const sendMessageToBackground = function(action, options, type, callback) {
-  console.log(chrome.app)
+  //   console.log(chrome.app)
   if (chrome.runtime.sendMessage && typeof chrome.app.isInstalled !== undefined) {
     return new Promise(resolve => {
       chrome.runtime.sendMessage(

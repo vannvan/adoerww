@@ -1,13 +1,9 @@
-import { API_CONFIG, API_CONFIG_COLLECT } from '@/lib/env'
-const SITEAPI = API_CONFIG[process.env.NODE_ENV]
-const COLLECT = API_CONFIG_COLLECT[process.env.NODE_ENV]
+import { ERP_SYSTEM } from '@/lib/env.conf'
+const SITEAPI = ERP_SYSTEM[process.env.NODE_ENV] + '/api/'
+const COLLECT = ERP_SYSTEM[process.env.NODE_ENV] + '/publish/collect'
 console.log(process.env.NODE_ENV)
 export const CONFIGINFO = {
   url: {
-    //采集服务
-    crawlUrl: function() {
-      return 'http://118.25.184.199:9999'
-    },
     //查看已采集数据
     showAlreadyCrawl: function() {
       return COLLECT
@@ -18,10 +14,7 @@ export const CONFIGINFO = {
     checkUserAccount: function() {
       return this.ApiUrl + 'member/account/login'
     },
-    //请求后台
-    getCrawlHtml: function() {
-      return this.crawlUrl + '/crawl'
-    },
+
     // 品牌词
     BrandAPI: function() {
       return this.ApiUrl + 'product/crawl/getCrwlFilter'

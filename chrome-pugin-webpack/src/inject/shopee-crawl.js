@@ -1,12 +1,11 @@
 import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
 import { CONFIGINFO } from '@/background/config.js'
-import Popup from '@/lib/popup'
-const popup = new Popup()
 
 //获取登录状态
 function checkLoginStatus(call) {
   var checkLoginStatusEnd = function(data) {
+    
     call(data)
   }
   sendMessageToBackground('checkLoginStatus', '', checkLoginStatusEnd)
@@ -28,7 +27,7 @@ var sendMessageToBackground = function(action, options, callback) {
 export function solidCrawl(url, callback) {
   var imageCrawlEnd = function(data) {
     if (!data.status) {
-      popup.toast('您还未登录，请登录采集插件', 'error')
+      $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
       $('.fetch-btn').text('请登录')
       return
     }
@@ -53,7 +52,7 @@ export function solidCrawl(url, callback) {
     } else if (url.indexOf('https') === -1) {
       url = url.replace('http', 'https')
     }
-    console.log(url, 'url')
+    
     crawlObj &&
       crawlObj.crawl(url, function(data) {
         let baseURL = CONFIGINFO.url.ApiUrl

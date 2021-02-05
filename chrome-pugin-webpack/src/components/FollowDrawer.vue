@@ -402,7 +402,7 @@ export default {
       this.$emit('update:display', true)
       let storeId = pathname.replace(/[^0-9]/gi, '')
       Follow.getStoreInfoById(storeId).then(res => {
-        if (res && res.result) {
+        if (res.code == 0) {
           this.storeInfo = res.result.data
         }
       })
@@ -415,7 +415,7 @@ export default {
     window.addEventListener('scroll', this.handleScroll)
     this.$nextTick(() => {
       Follow.sendCsrfToken()
-        .then(res => {
+        .then(() => {
           console.log('cookies同步成功')
           this.cookieSyncStatus = true
         })
@@ -436,22 +436,28 @@ export default {
       Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
       Follow.syncShoppeBaseInfo().then(res => {
-        this.currentStoreId = res.result.storeId
-        this.countryCode = res.result.country
-        if (!this.countryCode) {
-          this.$Notice.error({
-            content: ERROR.didNotGetToSiteInformation
-          })
+        if (res && res.result) {
+          this.currentStoreId = res.result.storeId
+          this.countryCode = res.result.country
+          if (!this.countryCode) {
+            this.$Notice.error({
+              content: ERROR.didNotGetToSiteInformation
+            })
+            this.$emit('update:display', false)
+            return
+          }
+          let reg = new RegExp(this.countryCode.toLowerCase())
+          let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
           this.$emit('update:display', false)
-          return
-        }
-        let reg = new RegExp(this.countryCode.toLowerCase())
-        let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
-        this.$emit('update:display', false)
-        if (this.currentTab == 2) {
-          window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
-        } else if (countryWebSite.front != window.location.href) {
-          window.location.replace(countryWebSite.front)
+          if (this.currentTab == 2) {
+            window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
+          } else if (countryWebSite.front != window.location.href) {
+            window.location.replace(countryWebSite.front)
+          }
+        } else {
+          this.$Notice.error({
+            content: ERROR.syncLoginStatusFail
+          })
         }
       })
     },
@@ -471,11 +477,20 @@ export default {
       }, 5000)
     },
 
+    //更新可操作用户列表，1. 每次向下滚动就向usernameQueue追加数据，2.排除已操作过的数据
+    updateUserList() {
+      let userListDOM = document.querySelectorAll('a')
+      let userNameList = [...userListDOM].map(el => el.getAttribute('username')).filter(Boolean)
+      this.usernameQueue = [
+        ...new Set(userNameList.filter(item => !this.actionedUserList.includes(item)))
+      ]
+    },
+
     //获取当前登录店铺的id
     getCurrentStoreId() {
       // 先走登录接口获取到用户名,再用用户名获取店铺id和当前站点信息
       Follow.syncShoppeBaseInfo().then(res => {
-        if (res && res.result) {
+        if (res.code == 0) {
           let { username, country, storeId } = res.result
           if (username) {
             this.currentStoreId = storeId
@@ -491,7 +506,6 @@ export default {
 
     //开始关注
     handleStart(actionType) {
-      let _this = this
       if (this.isRequest) {
         this.handleCancel()
         return
@@ -502,17 +516,9 @@ export default {
       this.filterParams.commentsTimes = this.filterParams.commentsTimes || 1
       this.filterParams.followsTimes = this.filterParams.followsTimes || 1
       if (!this.validate()) return
-      let userNameList = []
       let htmlStr = `<li>[${getTime()}] 任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
-      $('.down a').each(function(index) {
-        if (index >= _this.filterParams.startIndex) {
-          userNameList.push($(this).attr('username'))
-        } else {
-          _this.resultCount.skip += 1 //跳过
-        }
-      })
-      this.usernameQueue = userNameList
+
       this.getStoreFollowers(actionType)
     },
 
@@ -523,27 +529,29 @@ export default {
         return
       }
       if (!this.validate()) return
-      let userNameList = []
       let htmlStr = `<li>[${getTime()}] 取关任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
-      $('.down a').each(function(index) {
-        userNameList.push($(this).attr('username'))
-      })
-      this.usernameQueue = userNameList
       this.getStoreFollowers('unfollow')
     },
 
     //关注或取关操作
     getStoreFollowers(actionType) {
       this.globalTimer = setInterval(() => {
-        this.currentUserName = this.usernameQueue.splice(0, 1)
+        this.updateUserList()
+        console.log(
+          'usernameQueue length:',
+          this.usernameQueue.length,
+          'actionedUserList length:',
+          this.actionedUserList.length
+        )
+        this.currentUserName = this.usernameQueue.splice(0, 1)[0]
         if (!isEmpty(this.currentUserName)) {
           this.isRequest = true
           this.buttonText = '正在运行中，点击可取消'
           this.actionedUserList.push(this.currentUserName)
           if (!this.handleSkipJudge(actionType)) return
           Follow.getStoreFollowers(this.currentUserName).then(res => {
-            if (res && res.result) {
+            if (res.code == 0) {
               let { shopid } = res.result.data
               if (actionType == 'follow' && this.filterMatch(res.result.data)) {
                 this.handleNotifyToBack(actionType, shopid, this.currentUserName)
@@ -558,7 +566,7 @@ export default {
           })
         } else {
           let infoText = actionType == 'follow' ? '关注' : '取关'
-          let htmlStr = `<li style="color:#f00">[${getTime()}] ${infoText} 任务遇到异常！</li>`
+          let htmlStr = `<li>[${getTime()}] ${infoText} 任务完成！</li>`
           $('#ResultContent').prepend(htmlStr)
           this.handleCancel()
         }
@@ -591,34 +599,38 @@ export default {
     //关注或取关，传送给后台
     handleNotifyToBack(actionType, shopid, name) {
       //   console.log('操作过的用户', this.actionedUserList)
-      Follow.notifyBackFollowOrUnFollow(actionType, shopid).then(res => {
-        let infoText = actionType == 'follow' ? '关注' : '取关'
-        if (res && res.result.success) {
-          let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
-          $('#ResultContent').prepend(htmlStr)
-          this.resultCount.success += 1
-        } else if (res.result.error == 'error_not_login') {
-          clearInterval(this.globalTimer)
-          let htmlStr = `<li style="color:#f00">[${getTime()}] 请同步登录状态后重新操作</li>`
-          $('#ResultContent').prepend(htmlStr)
-          this.resultCount.fail += 1
-          this.isRequest = false
-          this.buttonText = this.isOther ? '开启关注' : '开启取关'
-        } else if (res.result.error == -1) {
-          let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
-          $('#ResultContent').prepend(htmlStr)
-          this.resultCount.fail += 1
-          this.$Notice.error({
-            content: ERROR.abnormalSituation
-          })
-          this.handleCancel()
-        } else {
-          let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
-          $('#ResultContent').prepend(htmlStr)
-          this.resultCount.fail += 1
-          this.handleCancel()
-        }
-      })
+      Follow.notifyBackFollowOrUnFollow(actionType, shopid)
+        .then(res => {
+          let infoText = actionType == 'follow' ? '关注' : '取关'
+          if (res.code == 0 && res.result.success) {
+            let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${name}${infoText}成功</li>`
+            $('#ResultContent').prepend(htmlStr)
+            this.resultCount.success += 1
+          } else if (res.result && res.result.error == 'error_not_login') {
+            clearInterval(this.globalTimer)
+            let htmlStr = `<li style="color:#f00">[${getTime()}] 请同步登录状态后重新操作</li>`
+            $('#ResultContent').prepend(htmlStr)
+            this.resultCount.fail += 1
+            this.isRequest = false
+            this.buttonText = this.isOther ? '开启关注' : '开启取关'
+          } else if (res.code == -1) {
+            let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
+            $('#ResultContent').prepend(htmlStr)
+            this.resultCount.fail += 1
+            this.$Notice.error({
+              content: ERROR.abnormalSituation
+            })
+            this.handleCancel()
+          } else {
+            let htmlStr = `<li style="color:#f00">[${getTime()}] ${name}${infoText}失败</li>`
+            $('#ResultContent').prepend(htmlStr)
+            this.resultCount.fail += 1
+            this.handleCancel()
+          }
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     //过滤匹配
@@ -631,8 +643,7 @@ export default {
         follower_count,
         rating_bad,
         rating_good,
-        rating_normal,
-        name
+        rating_normal
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
       //   console.log(

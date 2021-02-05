@@ -29,28 +29,8 @@ $(function() {
 })
 //显示通知
 //msg 消息内容
-//type : normal 点击采集按钮即显示的内容 success 采集成功 error 采集失败
-var sm_timeout
 var progress_timeout
-function notify(msg, type) {
-  msg = msg || '采集到系统,请稍等...'
-  var html =
-    '<div class="notify ' +
-    (type ? type : '') +
-    '">' +
-    msg +
-    '<span class="remove_notify">×</span></div>'
-  var len = $('body').find('.notify').length
-  if (len == 0) {
-    setToHtml(html)
-  } else {
-    clearTimeout(sm_timeout)
-    sm_timeout = setTimeout(function() {
-      $('body .notify').remove()
-      setTimeout(setToHtml(html), 1000)
-    }, 3000)
-  }
-}
+
 //progress进度条
 function notifyProgress(sum, succNum, failNum) {
   var progressHtml =
@@ -113,24 +93,6 @@ function notifyProgress(sum, succNum, failNum) {
   }
 }
 
-function setToHtml(html) {
-  $(html)
-    .appendTo('body')
-    .fadeIn(function() {
-      var $el = $(this)
-      $el.find('.remove_notify').on('click', function() {
-        $(this)
-          .closest('.notify')
-          .remove()
-      })
-      sm_timeout = setTimeout(function() {
-        $el.fadeOut(function() {
-          $el.remove()
-        })
-      }, 5000) //5s 后消失
-    })
-}
-
 //----------------------------------------------新增内容---------------------------------------------
 var CONFIG,
   OPTIONS = {}
@@ -144,7 +106,7 @@ chrome.extension.onMessage.addListener(function(message, sender, callback) {
   }
   switch (message.action) {
     case 'notify':
-      notify(message.msg)
+      $.fn.message({ type: 'error', msg: message.msg })
       break
     case 'handleLinks':
       debounceHandleLinks()
@@ -399,10 +361,10 @@ function insertFetchBtn($a, url, status) {
       if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
         $a.after($crawlBg)
         $a.after($crawl)
-      } 
-      
+      }
+
       $a.after($crawlSelect)
-      
+
       // $a.css({
       //   display: 'inline-block'
       // })
@@ -415,10 +377,10 @@ function insertFetchBtn($a, url, status) {
   }
   if (!sumaitongShowArr.includes(pageType)) {
     $crawl.insertAfter($body)
-     // shopee&&xiapi不显示
+    // shopee&&xiapi不显示
     if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
       $crawl.insertAfter($body)
-    } 
+    }
     // 隐藏div
     $a.on('mouseleave', function() {
       $crawl.css({
@@ -466,13 +428,12 @@ function insertFetchBtn($a, url, status) {
         })
         $crawlBg.css('display', 'block')
       }
-      
     } else {
       // 活动页
       // shopee&&xiapi不显示
       if (/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
-        return;
-      } 
+        return
+      }
       var $firstImg = $a.find('img:first-child'),
         href = '',
         crawlTop,
@@ -651,7 +612,7 @@ function insertFetchBtn($a, url, status) {
   // });
   // 单采
   $crawl.find('.link-next').on('click', function() {
-    if ($('.notify').length > 0) $('.notify').remove()
+    if ($('.alert').length > 0) $('.alert').remove()
     isBatchGather = false // 取消采集选中的状态
     var $span = $(this)
     if (!$span.hasClass('success')) {
@@ -674,7 +635,6 @@ function hintBatch() {
   $('.fetch .fetch-selectBtn').html('采集选中')
   $('.fetch .FetchBtn').html('采集本页')
   isBatchGather = false
-  // notify('成功采集' + batchGatherObj.batchSuccessNum + '条，采集失败' + batchGatherObj.batchErrorNum + '条', 'success');
 }
 // 是否批量采集选中
 var isBatchGather = false
@@ -696,23 +656,24 @@ function hintNotifyProgress(isSucc) {
   }
   var num = (batchGatherObj.batchGatherSum / batchGatherObj.batchGatherLength).toFixed(2)
   num = parseInt(num * 100)
-  
+
   if (batchGatherObj.batchGatherSum == batchGatherObj.batchGatherLength) {
-    notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum);
-} else {
+    notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
+  } else {
     notifyProgress(num, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-    batchTimer = window.setTimeout(function () {
-      batchGatherObj.batchErrorNum = batchGatherObj.batchGatherLength - batchGatherObj.batchSuccessNum;
+    batchTimer = window.setTimeout(function() {
+      batchGatherObj.batchErrorNum =
+        batchGatherObj.batchGatherLength - batchGatherObj.batchSuccessNum
       notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-    }, 10000);
-}
+    }, 10000)
+  }
 }
 
 // 在图片上直接采集
 function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
   var imageCrawlEnd = function(data) {
     if (!data.status) {
-      notify('您还未登录，请登录采集插件', 'error')
+      $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
       $('.fetch-btn').text('请登录')
       if ($span) $span.find('.LinkConBox .LinkCon').text('请登录')
       return
@@ -810,7 +771,6 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
     } else if (url.indexOf('https') === -1) {
       url = url.replace('http', 'https')
     }
-    console.log(type, 'type')
     //lazada
     // 判断当前地址是否是列表
     var linkruleHref = getRule(location.href)
@@ -835,10 +795,10 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
               .addClass('linkSuccess')
               .find('.LinkConBox .LinkCon')
               .text('采集成功')
-            notify('采集成功', 'success')
+            $.fn.message({ type: 'success', msg: '采集成功' })
           }
         } else {
-          notify(result.msg, 'error')
+          $.fn.message({ type: 'error', msg: result.msg })
         }
       })
       return
@@ -865,19 +825,21 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
 
         // 判断是否是1688登录地址
         if (data.detailUrl.includes('https://login.1688.com/')) {
-          notify('请先登录1688后再采集', 'error')
+          $.fn.message({ type: 'error', msg: '请先登录1688后再采集' })
           return
         }
         if (data.detailUrl.includes('https://login.tmall.com/')) {
-          notify('请先登录天猫后再采集', 'error')
+          $.fn.message({ type: 'error', msg: '请先登录天猫后再采集' })
+
           return
         }
         if (data.detailUrl.includes('https://login.taobao.com/')) {
-          notify('请先登录淘宝后再采集', 'error')
+          $.fn.message({ type: 'error', msg: '请先登录淘宝后再采集' })
+
           return
         }
         if (data.detailUrl.includes('https://login.aliexpress.com/')) {
-          notify('请先登录速卖通后再采集', 'error')
+          $.fn.message({ type: 'error', msg: '请先登录速卖通后再采集' })
           return
         }
         try {
@@ -916,8 +878,7 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
                           .addClass('linkSuccess')
                           .find('.LinkConBox .LinkCon')
                           .text('采集成功')
-                      // notify('已添加到采集任务 <a class="aLable" href="' + CONFIGINFO.url.showAlreadyCrawl() + '" target="_blank">前往查看</a>', 'success');
-                      notify('已添加到采集任务', 'success')
+                      $.fn.message({ type: 'success', msg: '已添加到采集任务' })
                     }
                   })
                 } else {
@@ -946,8 +907,7 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
                   $('.fetch').show()
                 }
                 if (!isSuccessPrompt) {
-                  // notify('已添加到采集任务 <a class="aLable" href="' + CONFIGINFO.url.showAlreadyCrawl() + '" target="_blank">前往查看</a>', 'success');
-                  notify('采集成功', 'success')
+                  $.fn.message({ type: 'success', msg: '采集成功' })
                 }
               }
             } else {
@@ -958,19 +918,18 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
               } else {
                 $span.html('重新采集')
               }
-              notify(result.msg, 'error')
+              $.fn.message({ type: 'success', msg: result.msg })
             }
           })
         } else {
           // 含有品牌词
           if ($span) $span.find('.LinkConBox .LinkCon').text('重新采集')
           $('.fetch-btn.FetchDetailBtn').text('重新采集')
-          notify(
-            '该产品包含品牌词信息 <button id="singleRightNowCrawl" data-url="' +
-              data.detailUrl +
-              '"  type="button" class="brandBtn">确认采集</button>',
-            'error'
-          )
+          $.fn.message({
+            type: 'warning',
+            msg: `该产品包含品牌词信息 <button id="singleRightNowCrawl" data-url="${data.detailUrl}"  type="button" class="brandBtn">确认采集</button>`
+          })
+
           // 忽略品牌词直接采集
           $('#singleRightNowCrawl').on('click', function() {
             //去对应的链接
@@ -1036,7 +995,7 @@ function showTip(type, url) {
       var showTipCategoryEnd = function(data) {
         if (!data.status) {
           // $('.fetch-btn').text('请登录');
-          notify('您还未登录，请登录采集插件', 'error')
+          $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
           return
         }
         isBatchGather = true
@@ -1064,7 +1023,7 @@ function showTip(type, url) {
     $('.fetch .fetch-selectBtn').on('click', function() {
       var showTipCategorySelect = function(data) {
         if (!data.status) {
-          notify('您还未登录，请登录采集插件', 'error')
+          $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
           return
         }
         var selectNum = 0
@@ -1074,11 +1033,11 @@ function showTip(type, url) {
           }
         })
         if (selectNum === 0) {
-          notify('请选择需要采集的商品', 'error')
+          $.fn.message({ type: 'error', msg: '请选择需要采集的商品' })
           return
         }
         if (selectNum > 50) {
-          notify('批量采集不能超过50条', 'error')
+          $.fn.message({ type: 'error', msg: '批量采集不能超过50条' })
           return
         }
         isBatchGather = true
@@ -1134,7 +1093,6 @@ function showTip(type, url) {
   }
   //文档载入之后执行
   $('.fetch .close').on('click', function(e) {
-    console.log(2222222222)
     if (e && e.preventDefault) {
       //非IE浏览器
       e.preventDefault()
@@ -1149,7 +1107,6 @@ function showTip(type, url) {
 }
 
 $(function() {
-  
   $('.repeatCrawDefaultBtn').on('click', function() {
     ShopeModal.hide('#repeatCrawlModal')
   })

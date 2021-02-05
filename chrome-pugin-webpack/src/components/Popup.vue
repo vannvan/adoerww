@@ -1,55 +1,199 @@
 <template>
-  <div class="no-login-warning">
-    <p><b>粉丝关注使用步骤：</b></p>
-    <p>
-      第一步:打开对应站点的卖家中心，弹出shopee“温馨提示”弹框时，点击“取消”再进行登录操作，如点击“确认”会跳转到中国后台链接，则无法使用。此步操作特别关键！
-    </p>
-    <p>
-      第二步:完成第一步登录成功后，进入对应站点的前台页面，检查右上方账号是否已同步成功，同步成功即可开始使用插件，如显示未登陆状态，请重新操作第一步。
-    </p>
-    <p>
-      第三步:开始使用粉丝关注，鼠标悬浮在商品图片上显示“获取粉丝”点击进入该商品的卖家粉丝列表，根据需求可输入前置条件进行关注。
-    </p>
-    <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
-      <a :href="item.seller" target="black">{{ item.name }}卖家中心</a>
-      <a :href="item.front" target="black">{{ item.name }}前台</a>
-    </li>
-    <p><b>取关粉丝使用步骤：</b></p>
-    <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
-    <p>第二步:点击"自动取关"后进入已关注页面列表进行操作</p>
-    <p>
-      <span style="color:#f00">注:</span
-      >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
-    </p>
-    <li v-for="(item, index) in shoppeSites" :key="index + 'b'">
-      <a :href="item.mall" target="black">{{ item.name }}取关页面</a>
-    </li>
+  <div class="emalacca-popup-wrap">
+    <div class="emalacca-popup-header">
+      <!-- <img src="@/assets/images/logo-white.png" alt="" /> -->
+      <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
+      <b class="emalacca-plugin-name">{{ pluginName }}</b>
+      <img
+        class="emalacca-pupup-header-exit"
+        src="@/assets/icon/exit.png"
+        @click="handleExit()"
+        v-if="userInfo"
+      />
+    </div>
+    <div class="emalacca-popup-content">
+      <template v-if="userInfo">
+        <div class="user-info-item">
+          <span class="user-info-title">账号：</span>
+          <span class="user-info-value">{{ userInfo.maAccount }}</span>
+        </div>
+        <div class="user-info-item">
+          <span class="user-info-title">会员ID：</span>
+          <span class="user-info-value">{{ userInfo.memberNO }}</span>
+        </div>
+        <div class="user-info-item border-top">
+          <span class="user-info-title">正在采集数量：30</span>
+          <span class="user-info-value link" @click="handleToCollect()">采集箱</span>
+        </div>
+      </template>
+      <template v-else>
+        <p>插件功能</p>
+        <div class="tool-list">
+          <div class="tool-item">
+            <img src="@/assets/icon/collect.png" alt="" />
+            <p>采集</p>
+          </div>
+          <div class="tool-item">
+            <img src="@/assets/icon/follower.png" alt="" />
+            <p>粉丝</p>
+          </div>
+          <div class="tool-item">
+            <img src="@/assets/icon/data.png" alt="" />
+            <p>数据</p>
+          </div>
+        </div>
+        <p class="bottom-link">
+          <span>一分钟注册，永久免费</span>
+          <a class="link" href="https://www.emalacca.com/" target="_blank">了解更多功能请查看</a>
+        </p>
+      </template>
+
+      <span class="emalacca-popup-login-button" @click="handleLogin()">{{
+        userInfo ? '马六甲ERP' : '注册/登录'
+      }}</span>
+    </div>
   </div>
 </template>
 
 <script>
-import { WEBSITES } from '../lib/conf'
+import { ERP_SYSTEM } from '@/lib/env.conf'
+import { getStorage } from '@/lib/utils'
+const packJSON = require('../../package.json')
+function sendMessageToContentScript(message, callback) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+      if (callback) callback(response)
+    })
+  })
+}
 
 export default {
   data() {
     return {
-      shoppeSites: WEBSITES,
+      userInfo: null,
+      pluginName: '马六甲虾皮助手 V' + packJSON.version
     }
   },
+  mounted() {
+    this.userInfo = getStorage('pt-plug-access-user')
+      ? getStorage('pt-plug-access-user').userInfo
+      : null
+  },
+  methods: {
+    handleLogin() {
+      window.open(ERP_SYSTEM[process.env.NODE_ENV])
+    },
+    handleExit() {
+      sendMessageToContentScript({ cmd: 'logout', type: 'ERP_LOGOUT' }, function(response) {
+        console.log(response)
+        localStorage.setItem('pt-plug-access-user', null)
+        window.close() //关闭popup
+      })
+    },
+
+    handleToCollect() {
+      window.open(ERP_SYSTEM[process.env.NODE_ENV] + 'publish/collect')
+    }
+  }
 }
 </script>
 
 <style lang="less">
-.no-login-warning {
-  width: 100%;
-  li {
-    list-style: none;
-    padding-left: 20px;
-    a {
-      width: 40%;
-      line-height: 25px;
-      color: #ee4d2d;
-      margin-right: 50px;
+@import '../assets/styles/var.less';
+body {
+  padding: 0;
+  margin: 0;
+}
+.emalacca-popup-wrap {
+  width: 360px;
+  min-height: 200px;
+  background: #fff;
+  font-family: 'Arial', 'Microsoft YaHei', '黑体', '宋体', sans-serif;
+  padding-bottom: 16px;
+  .emalacca-popup-header {
+    // background: @primaryColor;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    color: #303031;
+    font-size: 14px;
+    user-select: none;
+    border-bottom: 1px #e7e7e7 solid;
+
+    .emalacca-pupup-header-logo {
+      height: 16px;
+      width: 16px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+
+    .emalacca-pupup-header-exit {
+      float: right;
+      height: 16px;
+      width: 16px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .emalacca-plugin-name {
+      vertical-align: middle;
+    }
+  }
+  .emalacca-popup-content {
+    padding: 12px 20px;
+    .user-info-item {
+      display: flex;
+      justify-content: space-between;
+      line-height: 30px;
+      &.border-top {
+        border-top: 1px #e7e7e7 solid;
+        margin: 16px auto;
+        padding-top: 16px;
+        font-weight: 600;
+      }
+      .user-info-title {
+        color: #303031;
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .user-info-value {
+        &.link {
+          color: @popupPrimaryColor;
+          cursor: pointer;
+        }
+      }
+    }
+    .tool-list {
+      display: flex;
+      justify-content: space-between;
+      .tool-item {
+        width: 80px;
+        text-align: center;
+        img {
+          width: 80px;
+          height: 80px;
+        }
+      }
+    }
+    .bottom-link {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px auto;
+      .link {
+        color: @popupPrimaryColor;
+      }
+    }
+    .emalacca-popup-login-button {
+      display: inline-block;
+      cursor: pointer;
+      width: 320px;
+      height: 40px;
+      background: @popupPrimaryColor;
+      margin: 0 auto;
+      font-size: 14px;
+      text-align: center;
+      line-height: 40px;
+      color: #fff;
+      border-radius: 4px;
     }
   }
 }

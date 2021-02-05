@@ -8,16 +8,14 @@ import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
 import Home from '@/components/Home.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
-import Popup from '@/lib/popup'
 import { dataViewElementTemplate, operationPanelTemplate, collectText } from './template'
 import { solidCrawl } from './shopee-crawl'
+require('@/background/config/message')
 
 const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
 const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
 
 const ClassPrefix = 'emalacca-plugin'
-
-const popup = new Popup()
 
 var CONFIG = null //站点规则
 
@@ -43,6 +41,7 @@ if (/shopee|xiapibuy/.test(window.location.host)) {
 //添加操作面板
 const debounceHandleActions = debounce(function() {
   if (CONFIG && CONFIG.detail) {
+    Follow.setGoodDetailInfoToPanel()
     Follow.insertAction(CONFIG.detail)
   }
 }, 800)
@@ -50,7 +49,6 @@ const debounceHandleActions = debounce(function() {
 //粉丝关注
 const Follow = {
   domain: window.location.origin,
-  goodsList: [], //页面的可操作商品列表
   goodsMap: new Map(), //页面可操作商品映射，属性名为urlId ，值为采集状态  默认采集商品 -> 采集中 -> 采集成功
   preload: function() {
     let linkrule = getRule(location.href)
@@ -68,20 +66,17 @@ const Follow = {
     // console.log(this.domain, 'domain')
     let followActionWrap = operationPanelTemplate()
     $('body').append(followActionWrap)
+
     Follow.initPanelEvent()
     dragApp()
   },
 
   //给a标签添加操作面板
   insertAction: function(type) {
-    let _this = this
     $.each(document.links, function(index, a) {
       $(a).mouseenter(function(param) {
         let storeId = $(this)[0].href.split('-i.')[1]
         if (isEmpty(storeId)) return
-        if (!_this.goodsList.includes(storeId)) {
-          _this.goodsList.push(storeId)
-        }
 
         let firstImg = $(this).find('img:first-child')
         let contentOffsetLeft = $(this).offset().left
@@ -112,15 +107,10 @@ const Follow = {
         })
         //鼠标离开
         $(EmalaccaPluginGoodsPanelWrapClass).mouseleave(function() {
-          //   let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
-          $(this).css({
-            opacity: 0
-          })
+          $(this).css('opacity', 0)
         })
       })
     })
-    // 添加数据详情
-    this.setGoodDetailInfoToPanel(_this.goodsList)
   },
 
   //操作面板点击事件初始化
@@ -136,7 +126,7 @@ const Follow = {
       if (isEmpty(storeId)) return
       let realStoreId = storeId ? storeId.split('.')[0] : null
       if (!realStoreId) {
-        popup.toast('【马六甲插件】:未获取到商品信息', 'warning')
+        $.fn.message({ type: 'warning', msg: '【马六甲插件】:未获取到商品信息' })
         return false
       }
       switch (actionType) {
@@ -144,7 +134,7 @@ const Follow = {
         case 'follow':
           Follow.syncShoppeBaseInfo().then(res => {
             if (res.result && res.result.error == -1) {
-              popup.toast('【马六甲插件】:请登录虾皮卖家中心', 'warning')
+              $.fn.message({ type: 'warning', msg: '【马六甲插件】:请登录虾皮卖家中心' })
             } else {
               window.open(`/shop/${realStoreId}/followers?other=true`)
             }
@@ -161,11 +151,11 @@ const Follow = {
           Follow.syncSolidCrawl(collectUrl).then(
             res => {
               Follow.goodsMap.set(storeId, 'success')
-              popup.toast('采集成功', 'success')
+              $.fn.message({ type: 'success', msg: '采集成功' })
             },
             err => {
               Follow.goodsMap.set(storeId, 'fail')
-              popup.toast(err.msg || '采集错误', 'error')
+              $.fn.message({ type: 'danger', msg: err.msg || '采集错误' })
             }
           )
           break
@@ -180,9 +170,14 @@ const Follow = {
   },
 
   //获取数据展示面板需要的数据，并赋值
-  setGoodDetailInfoToPanel: function(goodsList) {
-    this.getGoodsListDetailInfo(goodsList).then(res => {
-      if (res && res.result.items) {
+  setGoodDetailInfoToPanel: function() {
+    let allGoodsList = [...document.querySelectorAll('a')]
+      .map(el =>
+        /-i/.test(el.getAttribute('href')) ? el.getAttribute('href').split('-i.')[1] : null
+      )
+      .filter(Boolean)
+    this.getGoodsListDetailInfo(allGoodsList).then(res => {
+      if (res.code == 0 && res.result.items) {
         let { items } = res.result
         $('a').each(function() {
           let href = $(this)[0].href
@@ -228,7 +223,6 @@ const Follow = {
         { domain: this.domain, goodsList: goodsList || [] },
         'GET_SHOPPE_ITEM_LIST_INFO',
         data => {
-          console.log(data, 'inside')
           resolve(data)
         }
       )

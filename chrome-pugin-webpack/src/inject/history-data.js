@@ -8,7 +8,6 @@ import { sendMessageToBackground } from '@/lib/chrome-client.js'
 import HistoryData from '@/components/HistoryData.vue'
 import WUI from '@/components/index'
 import '@/wui-theme/src/index.scss'
-import ViewUI from 'view-design'
 
 const History = {
   domain: window.location.origin,
@@ -47,7 +46,6 @@ const insertHistoryWrap = debounce(function() {
       let HistoryDataWrap = '<div id="ShoppeHistoryData">啊哈哈</div>'
       $(HistoryDataWrap).insertAfter($('.product-briefing'))
 
-      Vue.use(ViewUI)
       Vue.use(WUI)
 
       new Vue({

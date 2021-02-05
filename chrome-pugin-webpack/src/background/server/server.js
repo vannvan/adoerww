@@ -68,7 +68,6 @@ export const backEvent = {
         },
       })*/
     } else {
-      console.log(22222222223)
       statusData.status = false
       $('#topLoginDiv').hide()
       $('#topNoLoginDiv').show()

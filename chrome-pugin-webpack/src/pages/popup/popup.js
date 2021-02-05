@@ -1,3 +1,12 @@
-import { getURL } from '@/lib/chrome-client'
+import Vue from 'vue'
+import Popup from '@/components/Popup'
 
-window.open(getURL('presentation/presentation.html'))
+export default new Vue({
+  components: {
+    Popup
+  },
+  mounted() {
+    console.log('mounted')
+  },
+  render: h => h(Popup)
+}).$mount('#app')
