@@ -1,8 +1,12 @@
 export function dragApp() {
   //   //获取元素
   let dv = document.querySelector('.emalacca-plugin-action-wrap')
+<<<<<<< HEAD
   let toggleElement = document.querySelector('.emalacca-plugin-action-toggle')
   toggleElement.addEventListener('mousedown', function(e) {
+=======
+  dv.addEventListener('mousedown', function(e) {
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
     let x = e.clientX - dv.offsetLeft
     let y = e.clientY - dv.offsetTop
     document.onmousemove = function(e) {

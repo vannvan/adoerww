@@ -1,6 +1,10 @@
 <template>
   <div class="emalacca-popup-wrap">
     <div class="emalacca-popup-header">
+<<<<<<< HEAD
+=======
+      <!-- <img src="@/assets/images/logo-white.png" alt="" /> -->
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
       <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
       <b class="emalacca-plugin-name">{{ pluginName }}</b>
       <img
@@ -22,9 +26,13 @@
         </div>
         <div class="user-info-item border-top">
           <span class="user-info-title">正在采集数量：30</span>
+<<<<<<< HEAD
           <span class="user-info-value link" @click="handleOpenPage('publish/collect', 'erp')"
             >采集箱</span
           >
+=======
+          <span class="user-info-value link" @click="handleToCollect()">采集箱</span>
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
         </div>
       </template>
       <template v-else>
@@ -48,6 +56,7 @@
           <a class="link" href="https://www.emalacca.com/" target="_blank">了解更多功能请查看</a>
         </p>
       </template>
+<<<<<<< HEAD
       <span class="emalacca-popup-login-button" @click="handleOpenPage('', 'erp')">{{
         userInfo ? '马六甲ERP' : '注册/登录'
       }}</span>
@@ -66,12 +75,19 @@
           </li>
         </div>
       </div>
+=======
+
+      <span class="emalacca-popup-login-button" @click="handleLogin()">{{
+        userInfo ? '马六甲ERP' : '注册/登录'
+      }}</span>
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
     </div>
   </div>
 </template>
 
 <script>
 import { ERP_SYSTEM } from '@/lib/env.conf'
+<<<<<<< HEAD
 import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
 import { getTabUrl, getAllTabs } from '@/lib/chrome'
@@ -97,6 +113,15 @@ function sendMessageToContentScript(message, callback) {
         })
       })
     }
+=======
+import { getStorage } from '@/lib/utils'
+const packJSON = require('../../package.json')
+function sendMessageToContentScript(message, callback) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
+      if (callback) callback(response)
+    })
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
   })
 }
 
@@ -104,8 +129,12 @@ export default {
   data() {
     return {
       userInfo: null,
+<<<<<<< HEAD
       pluginName: '马六甲虾皮助手 V' + packJSON.version,
       collectSites: COLLECT_SITES
+=======
+      pluginName: '马六甲虾皮助手 V' + packJSON.version
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
     }
   },
   mounted() {
@@ -114,14 +143,23 @@ export default {
       : null
   },
   methods: {
+<<<<<<< HEAD
     handleExit() {
       sendMessageToContentScript({ cmd: 'erp-logout', type: 'ERP_LOGOUT' }, function(response) {
+=======
+    handleLogin() {
+      window.open(ERP_SYSTEM[process.env.NODE_ENV])
+    },
+    handleExit() {
+      sendMessageToContentScript({ cmd: 'logout', type: 'ERP_LOGOUT' }, function(response) {
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
         console.log(response)
         localStorage.setItem('pt-plug-access-user', null)
         window.close() //关闭popup
       })
     },
 
+<<<<<<< HEAD
     // erp 或者外链
     handleOpenPage(link, type = 'site') {
       if (type == 'erp') {
@@ -129,6 +167,10 @@ export default {
       } else {
         window.open(link)
       }
+=======
+    handleToCollect() {
+      window.open(ERP_SYSTEM[process.env.NODE_ENV] + 'publish/collect')
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
     }
   }
 }
@@ -175,19 +217,29 @@ body {
     }
   }
   .emalacca-popup-content {
+<<<<<<< HEAD
     padding: 12px 20px 0;
+=======
+    padding: 12px 20px;
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
     .user-info-item {
       display: flex;
       justify-content: space-between;
       line-height: 30px;
       &.border-top {
         border-top: 1px #e7e7e7 solid;
+<<<<<<< HEAD
         font-weight: 600;
         padding: 14px 20px;
         width: calc(100% + 40px);
         margin-left: -20px;
         box-sizing: border-box;
         margin-top: 10px;
+=======
+        margin: 16px auto;
+        padding-top: 16px;
+        font-weight: 600;
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
       }
       .user-info-title {
         color: #303031;
@@ -235,6 +287,7 @@ body {
       border-radius: 4px;
     }
   }
+<<<<<<< HEAD
   .emalacca-popup-site-list-wrap {
     padding-top: 12px;
     margin: auto;
@@ -255,5 +308,7 @@ body {
       }
     }
   }
+=======
+>>>>>>> 170d99bae1f3f289ec99c5d5e45a6170fe143306
 }
 </style>
