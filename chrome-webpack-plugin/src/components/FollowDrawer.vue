@@ -436,22 +436,28 @@ export default {
       Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
       Follow.syncShoppeBaseInfo().then(res => {
-        this.currentStoreId = res.result.storeId
-        this.countryCode = res.result.country
-        if (!this.countryCode) {
-          this.$Notice.error({
-            content: ERROR.didNotGetToSiteInformation
-          })
+        if (res && res.result) {
+          this.currentStoreId = res.result.storeId
+          this.countryCode = res.result.country
+          if (!this.countryCode) {
+            this.$Notice.error({
+              content: ERROR.didNotGetToSiteInformation
+            })
+            this.$emit('update:display', false)
+            return
+          }
+          let reg = new RegExp(this.countryCode.toLowerCase())
+          let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
           this.$emit('update:display', false)
-          return
-        }
-        let reg = new RegExp(this.countryCode.toLowerCase())
-        let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
-        this.$emit('update:display', false)
-        if (this.currentTab == 2) {
-          window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
-        } else if (countryWebSite.front != window.location.href) {
-          window.location.replace(countryWebSite.front)
+          if (this.currentTab == 2) {
+            window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
+          } else if (countryWebSite.front != window.location.href) {
+            window.location.replace(countryWebSite.front)
+          }
+        } else {
+          this.$Notice.error({
+            content: ERROR.syncLoginStatusFail
+          })
         }
       })
     },

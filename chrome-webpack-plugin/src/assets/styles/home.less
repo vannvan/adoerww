@@ -1,5 +1,7 @@
 @import './css/shopee.less';
 @import './css/toast.less';
+@import './css/content.less';
+@import './var.less';
 //商品图层上的操作容器
 .emalacca-plugin-goods-panel-wrap {
   width: 150px;
@@ -175,36 +177,110 @@
     width: 60px;
     position: fixed;
     top: 40%;
-    right: 20px;
+    right: 0px;
     cursor: default;
-    .icon-toggle {
+    .emalacca-plugin-menu {
       width: 40px;
       height: 40px;
-      line-height: 40px;
       cursor: pointer;
       z-index: 8;
-      font-size: 48px;
-      color: #ee4d2d;
+      border-radius: 0 4px 4px 0;
+      text-align: center;
+      color: #fff;
+      box-sizing: border-box;
+      cursor: pointer;
+      user-select: none;
+      font-size: xx-small;
+      list-style: none;
+    }
+    .emalacca-plugin-action-toggle {
+      background: @toggleOprationBackground;
       position: inherit;
-      margin-top: -60px;
+      margin-top: -40px;
+      line-height: 40px;
+      .emalacca-plugin-menu();
+      border-radius: 4px;
+      .icon-erp-logo {
+        font-size: 23px;
+        color: #fff;
+      }
     }
     .follow-quick-action-wrap {
       position: inherit;
-      padding: 0 4px !important;
-      li {
-        list-style: none;
-        height: 40px !important;
-        width: 40px !important;
+      padding: 0 !important;
+      box-sizing: border-box;
+      margin: 0;
+      .emalacca-plugin-quick-action-item {
+        background: @toggleOprationBackground;
+        margin-top: 8px;
+        padding: 4px;
         box-sizing: border-box;
-        background: #ee4d2d;
-        border-bottom: 1px solid #fff;
-        padding: 5px;
-        display: flex !important;
-        align-items: center !important;
-        text-align: center !important;
-        color: #fff;
-        cursor: pointer;
-        font-size: 12px;
+        position: relative;
+        .emalacca-plugin-menu();
+        &.dark {
+          background: rgba(0, 0, 0, 0.8);
+        }
+        &.help {
+          border-radius: 4px;
+        }
+        .iconfont {
+          font-size: 16px;
+        }
+        .emalacca-plugin-quick-action-title {
+          font-size: x-small;
+          margin: 0;
+          padding: 0;
+        }
+        .emalacca-plugin-quick-action-content {
+          width: max-content;
+          height: 40px;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 4px 0px 0px 4px;
+          position: absolute;
+          right: 40px;
+          top: 0;
+          display: flex;
+          padding: 8px;
+          box-sizing: border-box;
+          justify-content: flex-end;
+          pointer-events: auto;
+          &.dark {
+            background: rgba(0, 0, 0, 0.8);
+          }
+
+          .icon-nail {
+            margin-right: 12px;
+            margin-top: 3px;
+          }
+          .emalacca-plugin-quick-action-sub-button {
+            padding: 0 4px;
+            height: 24px;
+            line-height: 24px;
+            background: @toggleOprationBackground;
+            border-radius: 2px;
+            margin-right: 8px;
+            font-size: x-small;
+            display: inline-block;
+          }
+        }
+      }
+    }
+    .emalacca-plugin-fold-dark {
+      background: rgba(0, 0, 0, 0.8);
+      user-select: none;
+      font-size: xx-small;
+      margin-top: 8px;
+      padding: 4px;
+      margin-top: 200px;
+      .emalacca-plugin-menu();
+      border-radius: 4px;
+      .iconfont {
+        font-size: 16px;
+      }
+      .emalacca-plugin-quick-action-title {
+        font-size: x-small;
+        margin: 0;
+        padding: 0;
       }
     }
   }

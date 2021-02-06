@@ -1,6 +1,6 @@
 // -1 接口错误 -2 数据错误
 import $ from 'jquery'
-import { objectToQueryString } from '@/lib/utils'
+import { objectToQueryString, requestResult } from '@/lib/utils'
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
   if (action == 'request' && type == 'GET_DYNAMIC_PRICES_SALES') {
@@ -22,14 +22,7 @@ const Request = {
         params
       )}`,
       dataType: 'json',
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   },
 
@@ -42,14 +35,7 @@ const Request = {
       type: 'get',
       url: `${domain}/api/v2/item/get?itemid=${itemId}&shopid=${shopId}`,
       dataType: 'json',
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   }
 }

@@ -1,8 +1,8 @@
 // 粉丝关注相关
 // -1 接口错误 -2 数据错误
 import $ from 'jquery'
-import { getMatchSite } from '../lib/conf'
-import { getStorage } from '@/lib/utils'
+import { getMatchSite } from '@/lib/conf'
+import { requestResult } from '@/lib/utils'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -64,14 +64,7 @@ export const Request = {
       type: 'get',
       url: `${params.domain}/api/v2/shop/get?is_brief=1&shopid=${params.storeId}`,
       dataType: 'json',
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   },
 
@@ -82,14 +75,7 @@ export const Request = {
       type: 'get',
       url: `${params.domain}/api/v4/shop/get_shop_detail?username=${params.userName}`,
       dataType: 'json',
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   },
 
@@ -109,37 +95,7 @@ export const Request = {
       data: {
         csrfmiddlewaretoken: localStorage.getItem('csrfToken')
       },
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
-    })
-  },
-
-  //获取erp平台用户绑定的店铺列表
-  getUserBindStoreOfErp: function(params, type, call) {
-    console.log(params, type)
-    $.ajax({
-      type: 'get',
-      url: params.domain + '/api/store/info/page',
-      beforeSend: function(XMLHttpRequest) {
-        XMLHttpRequest.setRequestHeader(
-          'Authorization',
-          'Bearer ' + localStorage.getItem('refresh_token')
-        )
-      },
-      success: function(data) {
-        localStorage.setItem('storeList', JSON.stringify(data.records))
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, error: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   },
 
@@ -165,14 +121,7 @@ export const Request = {
         Accept: 'application/json, text/plain, */*'
       },
       data: JSON.stringify(requestParams),
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   },
 
@@ -189,14 +138,7 @@ export const Request = {
       type: 'get',
       url: `${matchSite.front}/api/v2/shop/get?username=${params.storeName}`,
       dataType: 'json',
-      success: function(data) {
-        call({ type: type, result: data, code: 0 })
-      },
-      complete: function(data) {
-        if (data.status != 200) {
-          call({ type: type, result: null, code: -1 })
-        }
-      }
+      ...requestResult(type, call)
     })
   }
 }

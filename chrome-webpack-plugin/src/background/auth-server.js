@@ -1,21 +1,14 @@
 //授权相关
 // -1 接口错误 -2 数据错误
 // import $ from 'jquery'
-import { getMatchSite } from '../lib/conf'
+import { getMatchSite } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
 import { Request } from './follow-back'
 // import { backEvent } from './server/server'
 
-function test(url) {
-  alert('我是background.js页面收到:' + url) //收到数据
-  // document.body.innerHTML = "";
-  // document.write(url);
-  // alert(document.all[0].outerHTML);
-}
-
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
-  //   同步erp
+  // 同步erp
   if (action == 'auth' && type == 'SYNC_ERP_AUTH_INFO') {
     Auth.syncErpToken(options, type, sendResponse)
     return true
@@ -57,7 +50,8 @@ export const Auth = {
         localStorage.setItem('pt-plug-access-user', JSON.stringify(userInfo))
         call({ type: type, result: localStorage.getItem('pt-plug-access-user') })
       } else {
-        //
+        // 表示erp是没有登录
+        localStorage.setItem('pt-plug-access-user', null)
         reject(-1)
       }
     }).catch(error => {

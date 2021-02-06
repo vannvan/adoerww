@@ -1,6 +1,8 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
 import { isEmpty } from '@/lib/utils'
+import { ERP_SYSTEM } from '@/lib/env.conf'
+const ERP_LOGIN_URL = ERP_SYSTEM[process.env.NODE_ENV]
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request && request.sign === 'signShope') {
@@ -93,11 +95,6 @@ export const backEvent = {
         call({ html: data })
       },
       complete: function(XMLHttpRequest, status) {
-        /*let { code } = XMLHttpRequest.responseJSON
-        if (/300/.test(code)) {
-          call({ code: -1, msg: '授权过期，请重新登录' })
-          return
-        }*/
         if (status == 'timeout') {
           try_times >= 3
             ? call({ html: '' })
@@ -141,9 +138,7 @@ export const backEvent = {
       success: function(data) {
         call({
           code: -1,
-          msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-            'presentation/presentation.html'
-          )}">登录</a>`
+          msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
         })
         // data.msg = '采集成功！'
         // call(data)
@@ -160,9 +155,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }
@@ -208,9 +201,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }
@@ -248,9 +239,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }

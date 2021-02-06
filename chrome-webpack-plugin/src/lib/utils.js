@@ -152,3 +152,24 @@ export const objectToQueryString = obj =>
   Object.keys(obj)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
     .join('&')
+
+/**
+ *
+ * 接口请求返回值
+ * @param {*} type  //请求类型，唯一值
+ * @param {*} callback // 回调函数
+ * @return {*}
+ */
+export const requestResult = (type, callback) => {
+  return {
+    success: function(data) {
+      callback({ type: type, result: data, code: 0 })
+    },
+    complete: function(data) {
+      console.log(data.responseJSON)
+      if (data.status != 200) {
+        callback({ type: type, result: null, code: -1 })
+      }
+    }
+  }
+}

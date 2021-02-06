@@ -376,7 +376,7 @@ function insertFetchBtn($a, url, status) {
     }
   }
   if (!sumaitongShowArr.includes(pageType)) {
-    $crawl.insertAfter($body)
+    // $crawl.insertAfter($body)
     // shopee&&xiapi不显示
     if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
       $crawl.insertAfter($body)
@@ -479,99 +479,6 @@ function insertFetchBtn($a, url, status) {
         padding: '5px 0px'
       })
     }
-
-    // 淘宝店铺获取折扣价格  天猫店铺获取折扣价格
-    try {
-      if (
-        document.location.href.includes('taobao.com/search.htm?spm') ||
-        document.location.href.includes('tmall.com/search.htm') ||
-        !!$a
-          .parent()
-          .parent()
-          .find('.c-price').length > 0
-      ) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .find('.c-price')
-            .text()
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          } else if (
-            $a
-              .parent()
-              .parent()
-              .find('.s-price')
-              .text()
-          ) {
-            salePrice = $a
-              .parent()
-              .parent()
-              .find('.s-price')
-              .text()
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-        // 淘宝搜索获取折扣价
-      } else if (document.location.href.includes('s.taobao.com')) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .parent()
-            .parent()
-            .find('.g_price-highlight')
-            .find('strong')
-            .text()
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-        // 天猫搜索获取折扣价
-      } else if (document.location.href.includes('tmall.com/search_product')) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .find('.productPrice')
-            .find('em')
-            .attr('title')
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-      }
-    } catch (e) {
-      // console.log(e)
-    }
-    return false
   })
   // 选中商品
   $crawlSelect.on('click', function() {

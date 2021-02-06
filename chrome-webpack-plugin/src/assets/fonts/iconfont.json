@@ -1,10 +1,66 @@
 {
   "id": "1833787",
-  "name": "tiny-chat",
+  "name": "erp插件",
   "font_family": "iconfont",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
+    {
+      "icon_id": "19869662",
+      "name": "矩形",
+      "font_class": "pick-down",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "19868960",
+      "name": "固定默认",
+      "font_class": "nail",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "19860817",
+      "name": "矩形",
+      "font_class": "collect",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "19860815",
+      "name": "矩形(4)",
+      "font_class": "pick-up",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
+      "icon_id": "19860810",
+      "name": "矩形(3)",
+      "font_class": "question",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "19860807",
+      "name": "矩形(2)",
+      "font_class": "menu",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "19860804",
+      "name": "矩形(1)",
+      "font_class": "fans",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "19860790",
+      "name": "编组 21",
+      "font_class": "erp-logo",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
     {
       "icon_id": "19663121",
       "name": "退出",
