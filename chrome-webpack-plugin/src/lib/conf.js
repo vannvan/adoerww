@@ -7,12 +7,8 @@ export const WEBSITES = [
     front: 'https://shopee.com.my/',
     mall: 'https://mall.shopee.com.my/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.my.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://my.xiapibuy.com/',
     cnmall: 'https://mall.my.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://my.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '印度尼西亚',
@@ -21,12 +17,8 @@ export const WEBSITES = [
     front: 'https://shopee.co.id/',
     mall: 'https://mall.shopee.co.id/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.id.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://id.xiapibuy.com/',
     cnmall: 'https://mall.id.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://id.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '泰国',
@@ -35,12 +27,8 @@ export const WEBSITES = [
     front: 'https://shopee.co.th/',
     mall: 'https://mall.shopee.co.th/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.th.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://th.xiapibuy.com/',
     cnmall: 'https://mall.th.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://th.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '菲律宾',
@@ -49,12 +37,8 @@ export const WEBSITES = [
     front: 'https://shopee.ph/',
     mall: 'https://mall.shopee.ph/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.ph.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://ph.xiapibuy.com/',
     cnmall: 'https://mall.ph.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://ph.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '新加坡',
@@ -63,12 +47,8 @@ export const WEBSITES = [
     front: 'https://shopee.sg/',
     mall: 'https://mall.shopee.sg/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.sg.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://sg.xiapibuy.com/',
     cnmall: 'https://mall.sg.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://sg.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '越南',
@@ -77,12 +57,8 @@ export const WEBSITES = [
     front: 'https://shopee.vn/',
     mall: 'https://mall.shopee.vn/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.vn.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://vn.xiapibuy.com/',
     cnmall: 'https://mall.vn.xiapibuy.com/shop/ID/following?__classic__='
-=======
-    cnfront: 'https://vn.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '巴西',
@@ -91,12 +67,8 @@ export const WEBSITES = [
     front: 'https://shopee.com.br/',
     mall: 'https://mall.shopee.com.br/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.br.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://br.xiapibuy.com/',
     cnmall: 'https://mall.br.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://br.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   },
   {
     name: '台湾',
@@ -105,12 +77,8 @@ export const WEBSITES = [
     front: 'https://shopee.tw/',
     mall: 'https://mall.shopee.tw/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.xiapi.shopee.cn/',
-<<<<<<< HEAD
     cnfront: 'https://xiapi.xiapibuy.com/',
     cnmall: 'https://mall.xiapi.xiapibuy.com/shop/ID/following?__classic__=1'
-=======
-    cnfront: 'https://xiapi.xiapibuy.com/'
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   }
 ]
 
@@ -189,7 +157,6 @@ export const COLLECT_SITES = [
     logo: require('@/assets/icon/logo-lazada.png')
   }
 ]
-<<<<<<< HEAD
 
 // 公共采集侧栏工具
 export const COMMON_COLLECT = [
@@ -209,7 +176,7 @@ export const COMMON_COLLECT = [
       },
       {
         name: '采集本页',
-        action: 'collect-this-page'
+        action: 'collect-current-page'
       }
     ]
   }
@@ -250,5 +217,3 @@ export const RIGHT_MENU = [
     ]
   }
 ]
-=======
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56

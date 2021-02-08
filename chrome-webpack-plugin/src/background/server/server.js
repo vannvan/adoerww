@@ -1,12 +1,8 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
 import { isEmpty } from '@/lib/utils'
-<<<<<<< HEAD
-import { ERP_LOGIN_URL } from '@/lib/env.conf'
-=======
 import { ERP_SYSTEM } from '@/lib/env.conf'
 const ERP_LOGIN_URL = ERP_SYSTEM[process.env.NODE_ENV]
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request && request.sign === 'signShope') {
@@ -50,6 +46,29 @@ export const backEvent = {
       localStorage.setItem('brandData', '[]')
       statusData.brandData = localStorage.getItem('brandData')
       return call(statusData)
+
+      /*$.ajax({
+        url: CONFIGINFO.url.BrandAPI(),
+        type: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + obj.token,
+        },
+        timeout: 30000,
+        success: function (res) {
+          localStorage.setItem('brandData', JSON.stringify(res.data))
+          statusData.brandData = localStorage.getItem('brandData')
+          return call(statusData)
+        },
+        complete: function (XMLHttpRequest, status) {
+          if (status == 'timeout') {
+            tt < 3
+              ? init(t, tt + 1)
+              : $.fn.message({ type: 'error', msg: '请求超时，请稍后重试！' })
+          } else if (status == 'error') {
+            $.fn.message({ type: 'error', msg: '请求出错，请联系管理员！' })
+          }
+        },
+      })*/
     } else {
       statusData.status = false
       $('#topLoginDiv').hide()
@@ -143,7 +162,7 @@ export const backEvent = {
         if (status == 'error') {
           call({ code: -1, msg: '请求出错' })
         } else if (status == 'parsererror') {
-          call({ code: -1, msg: '请先登录采集助手账号' })
+          call({ code: -1, msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号` })
         } else if (status == 'timeout') {
           call({ code: 0, msg: '请求超时' })
         }
@@ -189,7 +208,7 @@ export const backEvent = {
         if (status == 'error') {
           call({ code: -1, msg: '请求出错' })
         } else if (status == 'parsererror') {
-          call({ code: -1, msg: '请先登录采集助手账号' })
+          call({ code: -1, msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号` })
         } else if (status == 'timeout') {
           call({ code: 0, msg: '请求超时' })
         }

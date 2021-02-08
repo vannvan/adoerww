@@ -69,10 +69,7 @@ export function getTabUrl(callback) {
 
 //获取所有标签页
 export function getAllTabs(callback) {
-<<<<<<< HEAD
   if (typeof callback != 'function') return
-=======
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
   chrome.windows.getAll({ populate: true }, function(windows) {
     windows.forEach(function(window) {
       //   window.tabs.forEach(function(tab) {
@@ -84,7 +81,6 @@ export function getAllTabs(callback) {
   })
 }
 
-<<<<<<< HEAD
 //打开指定标签页
 export function gotoSomeTab(windowId, tabIndex, callback) {
   if (typeof callback != 'function') return
@@ -109,8 +105,6 @@ export function gotoErp(callback) {
   })
 }
 
-=======
->>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
 //storage
 export function getItem(values, callback) {
   if (!chrome.storage) {

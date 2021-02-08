@@ -25,7 +25,7 @@ var sendMessageToBackground = function(action, options, callback) {
 var progress_timeout
 
 //progress进度条
-function notifyProgress(sum, succNum, failNum) {
+export function notifyProgress(sum, succNum, failNum) {
   var progressHtml =
     '<div class="sellerwant-progress-box"><p class="ellerwant-progress-txt"></p><div class="sellerwant-progress-inner"><span></span><div class="sellerwant-progress-bg"></div></div><p class="sellerwant-progress-results"><span class="sellerwant-progress-results-success"></span><span class="sellerwant-progress-results-failure"></span></p></div>'
   clearTimeout(progress_timeout)
@@ -66,7 +66,9 @@ function notifyProgress(sum, succNum, failNum) {
       .text('100%')
     $('.sellerwant-progress-box')
       .find('.ellerwant-progress-txt')
-      .text('采集完成')
+      .html(
+        `已加入采集箱，可到<a style="margin: 0 15px; color: blue !important;" target="_blank" href="${ERP_LOGIN_URL}goods/collect">采集箱</a>查看采集商品`
+      )
     $('.sellerwant-progress-box')
       .find('.sellerwant-progress-bg')
       .css({ width: '100%' })
@@ -258,7 +260,12 @@ function insertFetchBtn($a, url, status) {
 
   var $crawlBg = $('<div class="emalacca-plugin-mask"></div>')
   var $firstImg = $a.find('img:first-child')
-  var href = ''
+  let hrefItem = $a.attr('href')
+  const hrefReg = /^#/
+  // 判断href是否正确
+  if (hrefReg.test(hrefItem)) {
+    return
+  }
   var linkruleHref = getRule(location.href)
   var CONFIG_OBJ = JSON.parse(linkruleHref)
   var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
@@ -577,7 +584,7 @@ var batchGatherObj = {
 }
 var batchTimer = null // 延时器
 // 批量采集提示2
-function hintNotifyProgress(isSucc) {
+export function hintNotifyProgress(isSucc, batchGatherObj = batchGatherObj) {
   window.clearTimeout(batchTimer)
   batchGatherObj.batchGatherSum++
   if (isSucc) {
@@ -602,7 +609,7 @@ function hintNotifyProgress(isSucc) {
 }
 
 // 在图片上直接采集
-function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
+export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
   var imageCrawlEnd = function(data) {
     if (!data.status) {
       $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
@@ -765,7 +772,7 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
                 if (confirm('该产品在系统后台已有采集记录，是否继续采集？')) {
                   data.repeatCheck = 0
                   Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(results) {
-                    if (results.code == '00') {
+                    if (results.code == '0') {
                       if ($span)
                         $span
                           .addClass('emalacca-plugin-success')
@@ -1031,7 +1038,7 @@ function debounce(func, wait, immediate) {
 }
 
 //获取登录状态
-function checkLoginStatus(call) {
+export function checkLoginStatus(call) {
   var checkLoginStatusEnd = function(data) {
     call(data)
   }
