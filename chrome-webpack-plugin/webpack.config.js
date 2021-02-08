@@ -11,6 +11,7 @@ const getPagesWebpackPluginConfigs = require('./build/page-entry')
 const webpack = require('webpack')
 
 const modules = require('./build/modules')
+const packJSON = require('./package.json')
 
 const isDev = process.env.NODE_ENV == 'development'
 
@@ -76,8 +77,9 @@ module.exports = {
     //写入环境变量
     new webpack.DefinePlugin({
       PRODUCTION: JSON.stringify(true),
-      VERSION: JSON.stringify('5fa3b9'),
-      BROWSER_SUPPORTS_HTML5: true,
+      VERSION: JSON.stringify(packJSON.version),
+      APPNAME: JSON.stringify('马六甲虾皮助手'),
+      MESSAGEPRIFIX: JSON.stringify('【马六甲虾皮助手】: '),
       'typeof window': JSON.stringify('object'),
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV)

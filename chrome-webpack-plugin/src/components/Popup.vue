@@ -1,7 +1,6 @@
 <template>
   <div class="emalacca-popup-wrap">
     <div class="emalacca-popup-header">
-      <!-- <img src="@/assets/images/logo-white.png" alt="" /> -->
       <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
       <b class="emalacca-plugin-name">{{ pluginName }}</b>
       <img
@@ -23,7 +22,9 @@
         </div>
         <div class="user-info-item border-top">
           <span class="user-info-title">正在采集数量：30</span>
-          <span class="user-info-value link" @click="handleToCollect()">采集箱</span>
+          <span class="user-info-value link" @click="handleOpenPage('publish/collect', 'erp')"
+            >采集箱</span
+          >
         </div>
       </template>
       <template v-else>
@@ -47,22 +48,50 @@
           <a class="link" href="https://www.emalacca.com/" target="_blank">了解更多功能请查看</a>
         </p>
       </template>
-
-      <span class="emalacca-popup-login-button" @click="handleLogin()">{{
+      <span class="emalacca-popup-login-button" @click="handleOpenPage('', 'erp')">{{
         userInfo ? '马六甲ERP' : '注册/登录'
       }}</span>
+      <!-- 登录后显示 -->
+      <div class="emalacca-popup-site-list-wrap" v-if="userInfo">
+        <p>采集站点</p>
+        <div class="emalacca-popup-site-list-content">
+          <li v-for="item in collectSites" :key="item.link">
+            <img
+              :src="item.logo"
+              :alt="item.name"
+              :title="item.name"
+              class="emalacca-popup-site-logo"
+              @click="handleOpenPage(item.link)"
+            />
+          </li>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { ERP_SYSTEM } from '@/lib/env.conf'
+import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
-const packJSON = require('../../package.json')
+import { getTabUrl, getAllTabs, gotoErp } from '@/lib/chrome'
 function sendMessageToContentScript(message, callback) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, message, function(response) {
-      if (callback) callback(response)
+  getTabUrl(url => {
+    // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
+    getAllTabs(urls => {
+      urls.map(el => {
+        if (el.url.search(ERP_SYSTEM[process.env.NODE_ENV]) > -1) {
+          chrome.tabs.sendMessage(el.id, message, function(response) {
+            if (callback) {
+              callback(response)
+              //关闭标签
+              chrome.tabs.remove(el.id, function(e) {
+                console.log(e)
+              })
+            }
+          })
+        }
+      })
     })
   })
 }
@@ -71,28 +100,37 @@ export default {
   data() {
     return {
       userInfo: null,
-      pluginName: '马六甲虾皮助手 V' + packJSON.version
+      pluginName: APPNAME + ' V' + VERSION,
+      collectSites: COLLECT_SITES
     }
   },
   mounted() {
     this.userInfo = getStorage('pt-plug-access-user')
       ? getStorage('pt-plug-access-user').userInfo
       : null
+    gotoErp(function(e) {
+      console.log(e)
+    })
   },
   methods: {
-    handleLogin() {
-      window.open(ERP_SYSTEM[process.env.NODE_ENV])
-    },
     handleExit() {
-      sendMessageToContentScript({ cmd: 'logout', type: 'ERP_LOGOUT' }, function(response) {
+      sendMessageToContentScript({ cmd: 'erp-logout', type: 'ERP_LOGOUT' }, function(response) {
         console.log(response)
-        localStorage.setItem('pt-plug-access-user', null)
-        window.close() //关闭popup
       })
+      // 不管erp系统是否完成退出，插件都要退出
+      localStorage.setItem('pt-plug-access-user', null)
+      setTimeout(() => {
+        window.close() //关闭popup
+      }, 500)
     },
 
-    handleToCollect() {
-      window.open(ERP_SYSTEM[process.env.NODE_ENV] + 'publish/collect')
+    // erp 或者外链
+    handleOpenPage(link, type = 'site') {
+      if (type == 'erp') {
+        window.open(ERP_SYSTEM[process.env.NODE_ENV] + link)
+      } else {
+        window.open(link)
+      }
     }
   }
 }
@@ -139,16 +177,19 @@ body {
     }
   }
   .emalacca-popup-content {
-    padding: 12px 20px;
+    padding: 12px 20px 0;
     .user-info-item {
       display: flex;
       justify-content: space-between;
       line-height: 30px;
       &.border-top {
         border-top: 1px #e7e7e7 solid;
-        margin: 16px auto;
-        padding-top: 16px;
         font-weight: 600;
+        padding: 14px 20px;
+        width: calc(100% + 40px);
+        margin-left: -20px;
+        box-sizing: border-box;
+        margin-top: 10px;
       }
       .user-info-title {
         color: #303031;
@@ -194,6 +235,26 @@ body {
       line-height: 40px;
       color: #fff;
       border-radius: 4px;
+    }
+  }
+  .emalacca-popup-site-list-wrap {
+    padding-top: 12px;
+    margin: auto;
+    .emalacca-popup-site-list-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      li {
+        width: 30px;
+        height: 40px;
+        line-height: 30px;
+        list-style: none;
+        .emalacca-popup-site-logo {
+          width: 26px;
+          height: 26px;
+          cursor: pointer;
+        }
+      }
     }
   }
 }

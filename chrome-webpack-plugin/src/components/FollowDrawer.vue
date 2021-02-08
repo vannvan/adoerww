@@ -264,9 +264,8 @@
 import Drawer from './Drawer'
 import Follow from '@/inject/shopee'
 import $ from 'jquery'
-import { WEBSITES, ERROR } from '../lib/conf'
-const packJSON = require('../../package.json')
-import { isEmpty } from '../lib/utils'
+import { WEBSITES, MESSAGE } from '@/lib/conf'
+import { isEmpty } from '@/lib/utils'
 function getTime() {
   return new Date().toTimeString().substring(0, 8)
 }
@@ -343,7 +342,7 @@ export default {
         }
         if (newVal && !this.cookieSyncStatus) {
           this.$Notice.error({
-            content: ERROR.syncLoginStatusFail
+            content: MESSAGE.error.syncLoginStatusFail
           })
         }
       }
@@ -421,7 +420,7 @@ export default {
         })
         .catch(() => {
           this.$Notice.error({
-            content: ERROR.syncLoginStatusFail
+            content: MESSAGE.error.syncLoginStatusFail
           })
         })
     })
@@ -436,12 +435,12 @@ export default {
       Follow.sendCsrfToken() //每次切换都把当前页面的token更新到background
       this.currentTab = index
       Follow.syncShoppeBaseInfo().then(res => {
-        if (res && res.result) {
+        if (res.code == 0 && res.result) {
           this.currentStoreId = res.result.storeId
           this.countryCode = res.result.country
           if (!this.countryCode) {
             this.$Notice.error({
-              content: ERROR.didNotGetToSiteInformation
+              content: MESSAGE.error.didNotGetToSiteInformation
             })
             this.$emit('update:display', false)
             return
@@ -452,11 +451,16 @@ export default {
           if (this.currentTab == 2) {
             window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
           } else if (countryWebSite.front != window.location.href) {
-            window.location.replace(countryWebSite.front)
+            this.$Notice.info({
+              content: '将带你去首页寻找合适的店铺获取粉丝哦！！！'
+            })
+            setTimeout(() => {
+              window.location.replace(countryWebSite.front)
+            }, 3000)
           }
         } else {
           this.$Notice.error({
-            content: ERROR.syncLoginStatusFail
+            content: MESSAGE.error.syncLoginStatusFail
           })
         }
       })
@@ -497,7 +501,7 @@ export default {
             this.countryCode = country
           } else {
             this.$Notice.error({
-              content: ERROR.pleaseCheckWhetherHaveAuthoriz
+              content: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz
             })
           }
         }
@@ -618,7 +622,7 @@ export default {
             $('#ResultContent').prepend(htmlStr)
             this.resultCount.fail += 1
             this.$Notice.error({
-              content: ERROR.abnormalSituation
+              content: MESSAGE.error.abnormalSituation
             })
             this.handleCancel()
           } else {

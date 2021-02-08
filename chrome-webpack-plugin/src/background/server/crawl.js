@@ -361,160 +361,6 @@ export const Crawl = {
         })
     }
   },
-  categoryCrawl: function(uid, url, crawlCategory, type, brandData) {
-    if (type == 'category') {
-      var crawlObj = Crawl.getCrawlObject('category', url)
-    } else if (type == 'sortlist') {
-      var crawlObj = Crawl.getCrawlObject('sortlist', url)
-    }
-    var allBrandList = [] // 含品牌词的url数组
-    var lastPage = '' // 总页数
-    var smtCurrentPage = '' // 速卖通的页数需要手动传入++
-    if (url.indexOf('youhui.pinduoduo.com') > -1) {
-      Crawl.PinduoduoBatchCrawl(uid, url, crawlObj, brandData)
-    } else {
-      Crawl.categoryCrawlProcess(
-        uid,
-        url,
-        crawlObj,
-        crawlCategory,
-        brandData,
-        allBrandList,
-        lastPage,
-        smtCurrentPage
-      )
-    }
-  },
-  // 采集进度条
-  categoryCrawlProcess: function(
-    uid,
-    url,
-    crawlObj,
-    crawlCategory,
-    brandData,
-    allBrandList,
-    lastPage,
-    smtCurrentPage
-  ) {
-    crawlObj &&
-      crawlObj.crawl(
-        url,
-        function(data) {
-          // 回调函数
-          if (data.brandList) {
-            allBrandList.push(...data.brandList)
-          }
-          if (data.list && data.list.length > 0) {
-            if (url.indexOf('aliexpress.com') > 0) {
-              if (data.lastPage) {
-                smtCurrentPage = data.currentPage
-              }
-              for (var i in data.list) {
-                setTimeout(function() {
-                  Crawl.singleCrawl(
-                    uid,
-                    data.list[jj],
-                    jj == data.list.length - 1,
-                    true,
-                    crawlCategory
-                  ) // 标志分类采集已经结束
-                  jj++
-                  if (jj == data.list.length) {
-                    jj = 0
-                  }
-                }, i * 100)
-              }
-            } else {
-              // 判断是否结束需要两个条件 是否是最后一个+是否还有下一页
-              for (var i in data.list) {
-                ;(function(j) {
-                  //淘宝折扣价
-                  if (data.salePriceObj) {
-                    setTimeout(function() {
-                      Crawl.singleCrawl(
-                        uid,
-                        data.list[j],
-                        j == data.list.length - 1,
-                        !data.next,
-                        crawlCategory,
-                        true,
-                        brandData,
-                        data.salePriceObj
-                      )
-                    }, 100 * j)
-                  } else {
-                    setTimeout(function() {
-                      Crawl.singleCrawl(
-                        uid,
-                        data.list[j],
-                        j == data.list.length - 1,
-                        !data.next,
-                        crawlCategory,
-                        true,
-                        brandData
-                      )
-                    }, 100 * j)
-                  }
-                })(i)
-              }
-            }
-          } else {
-            if (!crawlCategory) {
-              $('#failDetailDiv').show()
-              $('#failDetail').append('<p>采集结果为空，请检查是否为分类采集！</p>')
-              Crawl.displayCrawlResult(false)
-            }
-          }
-          if (crawlCategory) {
-            if ($('.TotalNum').text() > 0) {
-              $('.TotalNum').text(+$('.TotalNum').text() + data.list.length)
-            }
-            if ($('.TotalNum').text() == 0) {
-              $('.TotalNum').text(data.list.length)
-            }
-          }
-
-          if (data.lastPage !== '') {
-            lastPage = data.lastPage
-          }
-          if (data.next) {
-            Crawl.categoryCrawlProcess(
-              uid,
-              data.next,
-              crawlObj,
-              crawlCategory,
-              brandData,
-              allBrandList,
-              lastPage,
-              smtCurrentPage
-            )
-          }
-          if (
-            (data.currentPage !== '' && lastPage !== '') ||
-            (data.next == '' && data.currentPage == '' && lastPage == '')
-          ) {
-            if (data.currentPage == lastPage) {
-              if (allBrandList.length > 0) {
-                allBrandList = [...new Set(allBrandList)]
-                var brandHtml = ''
-                allBrandList.forEach(item => {
-                  brandHtml +=
-                    "<div class='brandLink crawlClass crawlFail' >" +
-                    "<div class='plinkDiv'><p class='pLink'>" +
-                    item +
-                    "</p><button class='brandCrawlBtn' type='button'>采  集</button></div></div>"
-                })
-                $('#brandModel #failDetail').append(brandHtml)
-                $('#brandModel #allBrandCount').text('共 ' + allBrandList.length + ' 条数据')
-                ShopeModal.show('#brandModel')
-              }
-            }
-          }
-        },
-        brandData,
-        smtCurrentPage
-      )
-  },
   // 拼多多采集
   PinduoduoBatchCrawl: function(uid, url, crawlObj, brandData) {
     crawlObj &&
@@ -544,20 +390,6 @@ export const Crawl = {
               Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {}, true)
             }
           })
-          // 显示品牌词的链接
-          if (res.brandList.length > 0) {
-            var brandHtml = ''
-            res.brandList.forEach(item => {
-              brandHtml +=
-                "<div class='brandLink crawlClass crawlFail' >" +
-                "<div class='plinkDiv'><p class='pLink'>" +
-                item +
-                "</p><button class='brandCrawlBtn' type='button'>采  集</button></div></div>"
-            })
-            $('#brandModel #failDetail').append(brandHtml)
-            $('#brandModel #allBrandCount').text('共 ' + res.brandList.length + ' 条数据')
-            ShopeModal.show('#brandModel')
-          }
         },
         brandData
       )
@@ -601,20 +433,6 @@ export const Crawl = {
               }
             })
           }
-          // 显示品牌词的链接
-          if (brandList.length > 0) {
-            var brandHtml = ''
-            res.brandList.forEach(item => {
-              brandHtml +=
-                "<div class='brandLink crawlClass crawlFail' >" +
-                "<div class='plinkDiv'><p class='pLink'>" +
-                item +
-                "</p><button class='brandCrawlBtn' type='button'>采  集</button></div></div>"
-            })
-            $('#brandModel #failDetail').append(brandHtml)
-            $('#brandModel #allBrandCount').text('共 ' + res.brandList.length + ' 条数据')
-            ShopeModal.show('#brandModel')
-          }
         },
         brandData
       )
@@ -647,76 +465,6 @@ export const Crawl = {
               '<div>' + '原因：' + data.msg + '</div>' + '<div>  采集地址: ' + url + '</div>'
             )
           }
-        }
-      }
-    } else {
-      // 分类采集
-      if (repeat != 1) {
-        var successNum = parseInt($('#msgModal .f-blue').text())
-        var failNum = parseInt($('#msgModal .Fail').text())
-        if (data.code == '000') {
-          if (isNaN(successNum)) {
-            successNum = 0
-          }
-          successNum += 1
-          $('#msgModal .completionNum').text(successNum)
-          $('#msgModal .f-blue').text(successNum)
-          if (+$('#msgModal .Count').text() > 0) {
-            $('#msgModal .craw-progress-bar.progress-bar-success').css(
-              'width',
-              ((+$('#msgModal .f-blue').text() + +$('#msgModal .Fail').text()) /
-                $('#msgModal .Count').text()) *
-                100 +
-                '%'
-            )
-          } else {
-            $('#msgModal .craw-progress-bar.progress-bar-success').css(
-              'width',
-              ((+$('#msgModal .f-blue').text() + +$('#msgModal .Fail').text()) /
-                $('.totalNum').text()) *
-                100 +
-                '%'
-            )
-          }
-        } else {
-          if (isNaN(failNum)) {
-            failNum = 0
-          }
-          failNum += 1
-          $('#msgModal .Fail').text(failNum)
-          failsUrls += url + '\\\n'
-          if (+$('#msgModal .Count').text() > 0) {
-            $('#msgModal .craw-progress-bar.progress-bar-success').css(
-              'width',
-              ($('#msgModal .f-blue').text() +
-                $('#msgModal .Fail').text() / $('#msgModal .Count').text()) *
-                100 +
-                '%'
-            )
-          } else {
-            $('#msgModal .craw-progress-bar.progress-bar-success').css(
-              'width',
-              ((+$('#msgModal .f-blue').text() + +$('#msgModal .Fail').text()) /
-                $('.totalNum').text()) *
-                100 +
-                '%'
-            )
-          }
-        }
-        if (
-          +$('#msgModal .f-blue').text() + +$('#msgModal .Fail').text() ===
-            +$('.totalNum').text() ||
-          +$('#msgModal .f-blue').text() + +$('#msgModal .Fail').text() ==
-            $('#msgModal .Count').text()
-        ) {
-          $('#CopyUrl').val(failsUrls)
-          failsUrls = ''
-          $('.cateCrwal').text('采集完成')
-          $('.modal-head-title').text('采集完成')
-          $('#myModalLabel').text('采集成功')
-          $('#msgModal .f-blue').text($('#msgModal .f-blue').text())
-          $('#msgModal .Fail').text($('#msgModal .Fail').text())
-          $('#msgModal .m-top10.m-bottom10').show()
         }
       }
     }

@@ -4,15 +4,12 @@
     <div :class="mainClass" :style="mainStyle" class="main overflow-y">
       <div class="drawer-head">
         <span>{{ title }}</span>
-        <!-- <span class="close-btn" v-show="closable" @click="closeByButton">
-          <img src="@/assets/icon/close.png" alt="" />
-        </span> -->
-        <span
+        <!-- <span
           class="icon iconfont icon-close close-btn"
           v-show="closable"
           @click="closeByButton"
         >
-        </span>
+        </span> -->
       </div>
       <div class="drawer-body">
         <slot />
@@ -26,67 +23,67 @@ export default {
   props: {
     // 是否打开
     display: {
-      type: Boolean,
+      type: Boolean
     },
 
     // 标题
     title: {
       type: String,
-      default: '标题',
+      default: '标题'
     },
 
     // 是否显示关闭按钮
     closable: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
     // 是否显示遮罩
     mask: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
     // 是否点击遮罩关闭
     maskClosable: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
     // 宽度
     width: {
       type: String,
-      default: '400px',
+      default: '400px'
     },
 
     // 是否在父级元素中打开
     inner: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   computed: {
     maskClass: function() {
       return {
         'mask-show': this.mask && this.display,
         'mask-hide': !(this.mask && this.display),
-        inner: this.inner,
+        inner: this.inner
       }
     },
     mainClass: function() {
       return {
         'main-show': this.display,
         'main-hide': !this.display,
-        inner: this.inner,
+        inner: this.inner
       }
     },
     mainStyle: function() {
       return {
         width: this.width,
         right: this.display ? '0' : `-${this.width}`,
-        borderLeft: this.mask ? 'none' : '1px solid #eee',
+        borderLeft: this.mask ? 'none' : '1px solid #eee'
       }
-    },
+    }
   },
   mounted() {
     if (this.inner) {
@@ -100,8 +97,8 @@ export default {
     },
     closeByButton() {
       this.$emit('update:display', false)
-    },
-  },
+    }
+  }
 }
 </script>
 

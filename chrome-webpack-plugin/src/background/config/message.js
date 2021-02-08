@@ -5,22 +5,7 @@
   $.fn.extend({
     message: function(options) {
       options.className = options.type || 'info'
-      switch (options.type) {
-        case 'warning':
-          options.title = '系统信息：'
-          break
-        case 'success':
-          options.title = '温馨提示：'
-          break
-        case 'danger':
-          options.title = '错误提醒：'
-          break
-        case 'error':
-          options.title = '错误提醒：'
-          break
-        case 'info':
-          options.title = ''
-      }
+      options.title = MESSAGEPRIFIX
       options = $.extend(
         {
           //type : options.type,

@@ -28,7 +28,7 @@ function toZip(name) {
   compressing.zip
     .compressDir(resolve(__dirname, `${packName}/`), `${name}.zip`)
     .then(() => {
-      shell.mv(packName, 'bak') //把未压缩的备份
+      shell.mv(packName, `bak/${time}`) //把未压缩的备份
       console.log(symbols.success, chalk.green(`${name}.zip` + '已保存至项目目录！'))
       process.exit()
     })

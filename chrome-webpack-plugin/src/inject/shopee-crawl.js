@@ -1,11 +1,11 @@
 import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
 import { CONFIGINFO } from '@/background/config.js'
+import { MESSAGE } from '../lib/conf'
 
 //获取登录状态
 function checkLoginStatus(call) {
   var checkLoginStatusEnd = function(data) {
-    
     call(data)
   }
   sendMessageToBackground('checkLoginStatus', '', checkLoginStatusEnd)
@@ -27,8 +27,7 @@ var sendMessageToBackground = function(action, options, callback) {
 export function solidCrawl(url, callback) {
   var imageCrawlEnd = function(data) {
     if (!data.status) {
-      $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
-      $('.fetch-btn').text('请登录')
+      $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
       return
     }
     let uid = data.data.token
@@ -52,7 +51,7 @@ export function solidCrawl(url, callback) {
     } else if (url.indexOf('https') === -1) {
       url = url.replace('http', 'https')
     }
-    
+
     crawlObj &&
       crawlObj.crawl(url, function(data) {
         let baseURL = CONFIGINFO.url.ApiUrl

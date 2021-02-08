@@ -1,49 +1,19 @@
 //粉丝关注相关
-import Vue from 'vue'
 import $ from 'jquery'
 import { getCookie, debounce, isEmpty } from '@/lib/utils'
-import { getRule } from '@/lib/rules'
-import { dragApp } from './drag'
 import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
-import Home from '@/components/Home.vue'
-import WUI from '@/components/index'
-import '@/wui-theme/src/index.scss'
 import { dataViewElementTemplate, operationPanelTemplate, collectText } from './template'
 import { solidCrawl } from './shopee-crawl'
+import { MESSAGE } from '../lib/conf'
 require('@/background/config/message')
 
 const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
 const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
 
-const ClassPrefix = 'emalacca-plugin'
-
-var CONFIG = null //站点规则
-
-//初始化虾皮网站的基础脚本
-if (/shopee|xiapibuy/.test(window.location.host)) {
-  let rightFixed = document.createElement('div')
-  rightFixed.id = 'ShoppeFollow'
-  document.body.appendChild(rightFixed)
-
-  setTimeout(() => {
-    Vue.use(WUI)
-    new Vue({
-      el: '#ShoppeFollow',
-      render: createElement => {
-        return createElement(Home)
-      }
-    })
-    Follow.init()
-    Follow.sendCsrfToken()
-  }, 500)
-}
-
 //添加操作面板
 const debounceHandleActions = debounce(function() {
-  if (CONFIG && CONFIG.detail) {
-    Follow.setGoodDetailInfoToPanel()
-    Follow.insertAction(CONFIG.detail)
-  }
+  Follow.setGoodDetailInfoToPanel()
+  Follow.insertAction()
 }, 800)
 
 //粉丝关注
@@ -51,49 +21,48 @@ const Follow = {
   domain: window.location.origin,
   goodsMap: new Map(), //页面可操作商品映射，属性名为urlId ，值为采集状态  默认采集商品 -> 采集中 -> 采集成功
   preload: function() {
-    let linkrule = getRule(location.href)
     try {
-      CONFIG = JSON.parse(linkrule)
-      Follow.insertAction(CONFIG.detail)
+      Follow.insertAction()
       $(window).scroll(debounceHandleActions)
     } catch (e) {
       return
     }
   },
 
-  //粉丝关注应用初始化
+  //应用初始化
   init: function() {
     // console.log(this.domain, 'domain')
     let followActionWrap = operationPanelTemplate()
     $('body').append(followActionWrap)
-
     Follow.initPanelEvent()
-    dragApp()
   },
 
   //给a标签添加操作面板
-  insertAction: function(type) {
+  insertAction: function() {
     $.each(document.links, function(index, a) {
       $(a).mouseenter(function(param) {
         let storeId = $(this)[0].href.split('-i.')[1]
         if (isEmpty(storeId)) return
-
-        let firstImg = $(this).find('img:first-child')
-        let contentOffsetLeft = $(this).offset().left
-          ? $(this).offset().left
-          : firstImg.offset().left
-        let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
-        let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
-        // 操作面板显示
-        let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
-        actionListElement.attr('data-store-id', storeId)
-        actionListElement.attr('data-store-url', $(this)[0].href)
-        actionListElement.css({
-          top: contentOffsetTop + 30,
-          left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
-          opacity: 1,
-          'pointer-events': 'auto'
-        })
+        try {
+          let firstImg = $(this).find('img:first-child')
+          let contentOffsetLeft = $(this).offset().left
+            ? $(this).offset().left
+            : firstImg.offset().left
+          let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
+          let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
+          // 操作面板显示
+          let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
+          actionListElement.attr('data-store-id', storeId) //粉丝关注用
+          actionListElement.attr('data-store-url', $(this)[0].href) //采集用
+          actionListElement.css({
+            top: contentOffsetTop + 30,
+            left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
+            opacity: 1,
+            'pointer-events': 'auto'
+          })
+        } catch (error) {
+          console.log(error)
+        }
 
         // 鼠标进入
         $(EmalaccaPluginGoodsPanelWrapClass).mouseenter(function() {
@@ -126,15 +95,15 @@ const Follow = {
       if (isEmpty(storeId)) return
       let realStoreId = storeId ? storeId.split('.')[0] : null
       if (!realStoreId) {
-        $.fn.message({ type: 'warning', msg: '【马六甲插件】:未获取到商品信息' })
+        $.fn.message({ type: 'warning', msg: MESSAGE.error.faildGetGoodsInfo })
         return false
       }
       switch (actionType) {
         //   粉丝关注
         case 'follow':
           Follow.syncShoppeBaseInfo().then(res => {
-            if (res.result && res.result.error == -1) {
-              $.fn.message({ type: 'warning', msg: '【马六甲插件】:请登录虾皮卖家中心' })
+            if (res.code == -1) {
+              $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
             } else {
               window.open(`/shop/${realStoreId}/followers?other=true`)
             }
@@ -151,17 +120,20 @@ const Follow = {
           Follow.syncSolidCrawl(collectUrl).then(
             res => {
               Follow.goodsMap.set(storeId, 'success')
-              $.fn.message({ type: 'success', msg: '采集成功' })
+              $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
             },
             err => {
               Follow.goodsMap.set(storeId, 'fail')
-              $.fn.message({ type: 'danger', msg: err.msg || '采集错误' })
+              $.fn.message({
+                type: 'error',
+                msg: err.msg || MESSAGE.error.collectExceptionEncounter
+              })
             }
           )
           break
         //   查看店铺
         case 'view':
-          window.open(`shop/${realStoreId}`)
+          window.open(`${window.location.origin}/shop/${realStoreId}`)
           break
         default:
           break
@@ -182,28 +154,25 @@ const Follow = {
         $('a').each(function() {
           let href = $(this)[0].href
           if (href.search('buyer') > 0) return
-          let test = new Function('url', CONFIG.detail)(href) //链接是否匹配
+
           let storeId = $(this)[0].href.split('-i.')[1]
+
           if (isEmpty(storeId)) return
+
           let itemId = storeId ? storeId.split('.')[1] : null
-          //   console.log(storeId)
+
           let storeInfo = items.find(el => el.itemid == itemId)
-          if ($(this)[0].href && test && storeInfo) {
+          if ($(this)[0].href && storeInfo && !$(this).attr('data-view')) {
             let dataViewElement = dataViewElementTemplate(storeId, storeInfo)
-            let aElExit = $(this)
-              .children()
-              .is(EmalaccaPluginGoodsDataViewClass)
-            let subElElExit = $(this)
-              .children()
-              .children()
-              .children()
-              .is(EmalaccaPluginGoodsDataViewClass)
+            $(this).attr('data-view', true) //添加过的打上标记
+
             // 如果当前a标签有高度就在下一级添加
-            if ($(this).height() > 0 && !aElExit) {
+            if ($(this).height() > 0) {
               $(this).append(dataViewElement)
             }
+
             // 如果当前a标签没有高度就在下下一级添加
-            if ($(this).height() == 0 && !subElElExit) {
+            if ($(this).height() == 0) {
               $(this)
                 .children()
                 .children()
@@ -223,7 +192,9 @@ const Follow = {
         { domain: this.domain, goodsList: goodsList || [] },
         'GET_SHOPPE_ITEM_LIST_INFO',
         data => {
-          resolve(data)
+          if (data) {
+            resolve(data)
+          }
         }
       )
     })
@@ -321,7 +292,5 @@ const Follow = {
     window.open(getURL('options/options.html'))
   }
 }
-
-Follow.preload()
 
 export default Follow

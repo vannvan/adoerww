@@ -1,6 +1,8 @@
 const manifest_version = 2
 const manifest = require('../src/manifest.json')
 const packJSON = require('../package.json')
+const path = require('path')
+const jsonfile = require('jsonfile')
 const defaultConfig = {
   version: packJSON.version,
   permissions: [
@@ -15,8 +17,6 @@ const defaultConfig = {
   ]
 }
 
-const path = require('path')
-const jsonfile = require('jsonfile')
 const env = process.env.NODE_ENV
 module.exports = function() {
   const config = Object.assign(defaultConfig, manifest)

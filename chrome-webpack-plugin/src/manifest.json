@@ -10,6 +10,9 @@
     },
     "content_scripts": [
         {
+            "exclude_matches": [
+                "*://*.tmall.com/shop/view_shop.htm*"
+            ],
             "matches": [
                 "http://*.aliexpress.com/",
                 "https://*.aliexpress.com/",
@@ -17,7 +20,6 @@
                 "http://*.alibaba.com/",
                 "https://*.taobao.com/",
                 "http://*.taobao.com/",
-                "https://*.tmall.com/",
                 "http://*.ebay.com/",
                 "http://*.ebaydesc.com/",
                 "*://*.jd.com/*",
@@ -104,6 +106,7 @@
         "activeTab",
         "storage",
         "cookies",
+        "history",
         "tabs",
         "contextMenus",
         "webNavigation",
@@ -128,7 +131,6 @@
         "https://www.chinabrands.cn/",
         "https://www.chinabrands.com/",
         "http://127.0.0.1/",
-        "*://192.168.50.112/*",
         "*://*.emalacca.com/*",
         "*://*.shopee.tw/*",
         "*://shopee.tw/*",

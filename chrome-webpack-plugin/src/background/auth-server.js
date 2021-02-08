@@ -1,9 +1,10 @@
 //授权相关
 // -1 接口错误 -2 数据错误
 // import $ from 'jquery'
-import { getMatchSite } from '@/lib/conf'
+import { WEBSITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
-import { Request } from './follow-back'
+import { Request } from './shopee-server'
+
 // import { backEvent } from './server/server'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -62,6 +63,7 @@ export const Auth = {
   // 配置虾皮平台信息
   syncShoppeBaseInfo: function(params, type, call) {
     console.log(params, type)
+    const countryList = WEBSITES.map(el => el.key)
     Request.handleLoginShopee(params, type)
       .then(res => {
         if (res) {
@@ -69,16 +71,17 @@ export const Auth = {
         }
       })
       .catch(() => {
-        call({ type: type, error: -1 })
+        call({ type: type, code: -1 })
       })
       .finally(() => {
         let userInfo = getStorage('userInfo', {})
         call({
           type: type,
+          code: 0,
           result: {
             storeId: userInfo.shopid,
             username: userInfo.username,
-            country: getMatchSite(params.domain) ? getMatchSite(params.domain).key : null
+            country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw'
           }
         })
       })

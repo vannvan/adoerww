@@ -1,0 +1,82 @@
+.emalacca-goods-btn:focus,
+.emalacca-goods-btn:active {
+	outline: none;
+}
+
+/*  列表
+    遮罩层 */
+.emalacca-plugin-mask {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	background: rgba(255, 255, 255, 0.5);
+	z-index: 10;
+	pointer-events: none;
+	opacity: 0.8;
+	display: none;
+	cursor: none;
+}
+
+.emalacca-plugin-goods-acquisition-supply {
+	background: rgba(#ccc, 0.2);
+	position: absolute !important;
+	z-index: 15;
+	display: none;
+
+	.emalacca-goods-btn {
+		display: block;
+		width: 100px;
+		height: 30px;
+		font-size: 14px;
+		line-height: 30px;
+		text-align: center;
+		color: #fff;
+		background-color: rgba(#ee4d2d, 0.8);
+		cursor: pointer;
+		margin: 0 auto;
+		border-top: 1px solid #ccc;
+
+		&:first-child {
+			border-top: none;
+		}
+	}
+}
+
+.emalacca-plugin-goods-acquisition-select {
+	position: absolute;
+	cursor: pointer;
+	display: none;
+	z-index: 9999;
+	width: 28px;
+	height: 28px;
+	right: 5px;
+	top: 5px;
+	color: rgb(255, 255, 255);
+	text-align: center;
+	box-shadow: rgb(17, 17, 17) 0px 0px 8px 2px;
+	pointer-events: auto;
+	border-radius: 50%;
+	background-color: #fff;
+	border-width: 2px;
+	border-style: solid;
+	border-color: rgba(255, 255, 255, 0.5);
+	border-image: initial;
+
+	.emalacca-goods-icon-select {
+		margin: 0 !important;
+		color: rgba(238, 77, 45, 0.8) !important;
+		float: none !important;
+		font-size: 30px !important;
+		text-indent: -0.5px !important;
+		line-height: 1 !important;
+		display: none;
+	}
+}
+/* 采集成功 */
+.emalacca-plugin-success {
+	color: #fff;
+	background-color: #67c23a;
+	border-color: #67c23a;
+  }

@@ -5,3 +5,5 @@ export const ERP_SYSTEM = {
   preproduction: 'https://pre-erp.emalacca.com/',
   production: 'https://erp.emalacca.com/'
 }
+
+export const ERP_LOGIN_URL = ERP_SYSTEM[process.env.NODE_ENV]

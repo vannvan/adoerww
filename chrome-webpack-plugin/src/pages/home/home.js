@@ -4,6 +4,7 @@ import '@styles/home.less'
 import '@fonts/iconfont.css'
 import '@styles/iview/iview.css'
 
+
 export default new Vue({
   components: {
     Home

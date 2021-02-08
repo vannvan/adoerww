@@ -1,6 +1,7 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
 import { isEmpty } from '@/lib/utils'
+import { ERP_LOGIN_URL } from '@/lib/env.conf'
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request && request.sign === 'signShope') {
@@ -44,29 +45,6 @@ export const backEvent = {
       localStorage.setItem('brandData', '[]')
       statusData.brandData = localStorage.getItem('brandData')
       return call(statusData)
-
-      /*$.ajax({
-        url: CONFIGINFO.url.BrandAPI(),
-        type: 'POST',
-        headers: {
-          Authorization: 'Bearer ' + obj.token,
-        },
-        timeout: 30000,
-        success: function (res) {
-          localStorage.setItem('brandData', JSON.stringify(res.data))
-          statusData.brandData = localStorage.getItem('brandData')
-          return call(statusData)
-        },
-        complete: function (XMLHttpRequest, status) {
-          if (status == 'timeout') {
-            tt < 3
-              ? init(t, tt + 1)
-              : $.fn.message({ type: 'error', msg: '请求超时，请稍后重试！' })
-          } else if (status == 'error') {
-            $.fn.message({ type: 'error', msg: '请求出错，请联系管理员！' })
-          }
-        },
-      })*/
     } else {
       statusData.status = false
       $('#topLoginDiv').hide()
@@ -93,11 +71,6 @@ export const backEvent = {
         call({ html: data })
       },
       complete: function(XMLHttpRequest, status) {
-        /*let { code } = XMLHttpRequest.responseJSON
-        if (/300/.test(code)) {
-          call({ code: -1, msg: '授权过期，请重新登录' })
-          return
-        }*/
         if (status == 'timeout') {
           try_times >= 3
             ? call({ html: '' })
@@ -141,9 +114,7 @@ export const backEvent = {
       success: function(data) {
         call({
           code: -1,
-          msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-            'presentation/presentation.html'
-          )}">登录</a>`
+          msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
         })
         // data.msg = '采集成功！'
         // call(data)
@@ -160,9 +131,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }
@@ -208,9 +177,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }
@@ -248,9 +215,7 @@ export const backEvent = {
         if (/300/.test(code)) {
           call({
             code: -1,
-            msg: `授权过期，请重新<a href="${chrome.extension.getURL(
-              'presentation/presentation.html'
-            )}">登录</a>`
+            msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
           })
           return
         }

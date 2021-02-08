@@ -1,16 +1,13 @@
-// chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-//     var html = $("html").html();
-//     var url = message.url;
-//     var data = { url: url, html: html, type: "rightCrawl", repeatCheck: 1 };
-//     imageCrawl(url, null); //采集操作
-// });
 import $ from 'jquery'
 import { getRule } from '@/lib/rules'
-import { closeRepeatCrawl, submitRepeatCrawl } from '@/background/config/repeat'
 import { CONFIGINFO } from '@/background/config.js'
 import { ShopeModal } from '@/background/config/modal.js'
 import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
+import { taobaoTranslationUrl, albbTranslationUrl } from '@/lib/handle-url'
+import { operationPanelTemplate, operationSelectTemplate, collectText } from './content-template'
+import { MESSAGE } from '../lib/conf'
+// import { setItem, getItem } from '@/lib/chrome'
 
 var sendMessageToBackground = function(action, options, callback) {
   chrome.runtime.sendMessage(
@@ -23,10 +20,6 @@ var sendMessageToBackground = function(action, options, callback) {
     callback
   )
 }
-
-$(function() {
-  $('#submitRepeatCrawl').on('click', submitRepeatCrawl)
-})
 //显示通知
 //msg 消息内容
 var progress_timeout
@@ -260,13 +253,10 @@ function insertFetchBtn($a, url, status) {
   var $body = $('body')
   $a.addClass('link') //头部悬浮01
   //$a.parent().addClass('link-box');
-  var $crawl = $(
-    '<div class="solid-else-box"><span class="link-next" data-salePrice="" data-url=""><span class="link-con-box LinkConBox"><span class="link-con LinkCon">开始采集</span></span></span><div class="cheap-supply-goods" data-href="">低价货源</div></div>'
-  )
-  var $crawlSelect = $(
-    '<div class="link-sellSelectBox" data-selected="0" data-selecturl=""><span class="icon iconfont link-sellSelect">&#x9e69;</span></div>'
-  )
-  var $crawlBg = $('<div class="link-sellMask"></div>')
+  let $crawlPanel = operationPanelTemplate()
+  let $crawlSelect = operationSelectTemplate()
+
+  var $crawlBg = $('<div class="emalacca-plugin-mask"></div>')
   var $firstImg = $a.find('img:first-child')
   var href = ''
   var linkruleHref = getRule(location.href)
@@ -275,7 +265,6 @@ function insertFetchBtn($a, url, status) {
   var sumaitongShowArr = ['category', 'sortlist']
   var imgALBBUrl =
     'https://s.1688.com/youyuan/index.htm?tab=imageSearch&imageType=https://cbu01.alicdn.com&imageAddress='
-
   // 1688
   if (url.indexOf('1688.com') > -1 && $firstImg.length == 0) {
     $firstImg = $a.find('.img:first-child')
@@ -287,7 +276,7 @@ function insertFetchBtn($a, url, status) {
       styleString.replace(/\/img\/.*?(\.(png|jpg|gif|jpeg|webp))/, function(items, item) {
         imgALBBUrl = imgALBBUrl + items
       })
-      $crawl.find('.cheap-supply-goods').attr({
+      $crawlPanel.find('.emalacca-goods-btn[data-type=view]').attr({
         'data-href': imgALBBUrl
       })
     } else {
@@ -307,16 +296,15 @@ function insertFetchBtn($a, url, status) {
       srcString.replace(/\/img\/.*?(\.(png|jpg|gif|jpeg|webp))/, function(items, item) {
         imgALBBUrl = imgALBBUrl + items
       })
-      $crawl.find('.cheap-supply-goods').attr({
+      $crawlPanel.find('.emalacca-goods-btn[data-type=view]').attr({
         'data-href': imgALBBUrl
       })
     }
   }
   // 隐藏div
   var hideCreationDiv = function() {
-    $crawl.css({
-      display: 'none',
-      'pointer-events': 'none'
+    $crawlPanel.css({
+      display: 'none'
     })
     $crawlSelect.css({
       'pointer-events': 'none'
@@ -357,10 +345,11 @@ function insertFetchBtn($a, url, status) {
     $crawlSelect.attr({
       'data-selecturl': url
     })
+    // 列表引入
     if (sumaitongShowArr.includes(pageType)) {
       if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
         $a.after($crawlBg)
-        $a.after($crawl)
+        $('body').append($crawlPanel)
       }
 
       $a.after($crawlSelect)
@@ -375,29 +364,23 @@ function insertFetchBtn($a, url, status) {
       })
     }
   }
+  //非列表页
   if (!sumaitongShowArr.includes(pageType)) {
-    $crawl.insertAfter($body)
+    // $crawl.insertAfter($body)
     // shopee&&xiapi不显示
     if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
-      $crawl.insertAfter($body)
+      $('body').append($crawlPanel)
     }
     // 隐藏div
     $a.on('mouseleave', function() {
-      $crawl.css({
-        display: 'none',
-        'pointer-events': 'none'
+      $crawlPanel.css({
+        display: 'none'
       })
     })
-    $crawl.on('mouseenter', function() {
+
+    $crawlPanel.on('mouseleave', function() {
       $(this).css({
-        'pointer-events': 'auto',
-        display: 'block'
-      })
-    })
-    $crawl.on('mouseleave', function() {
-      $(this).css({
-        display: 'none',
-        'pointer-events': 'none'
+        display: 'none'
       })
     })
   }
@@ -409,25 +392,65 @@ function insertFetchBtn($a, url, status) {
         $isShowImgGather = $(this).find('.img:first-child')
       }
       if ($isShowImgGather.length > 0) {
-        $crawl.find('.link-next').each(function() {
-          $(this).attr({
-            'data-url': href
-          })
-        })
-        $crawl.find('.link-next').css({
-          'pointer-events': 'auto',
-          display: 'block',
-          padding: '5px 0px'
-        })
-        $crawl.css({
-          display: 'block'
-        })
         $crawlSelect.css({
           'pointer-events': 'auto',
           display: 'block'
         })
         $crawlBg.css('display', 'block')
       }
+
+      var href = '',
+        crawlTop,
+        crawlLeft,
+        firstImgTop,
+        firstImgLeft,
+        top,
+        left
+      if (status == 'hy') $isShowImgGather = $a
+      href = $(this).attr('href')
+      crawlTop = $crawlPanel.offset().top
+      crawlLeft = $crawlPanel.offset().left
+      if ($isShowImgGather.length > 0) {
+        firstImgTop = $isShowImgGather.offset().top
+        firstImgLeft = $isShowImgGather.offset().left
+      } else {
+        firstImgTop = $a.offset().top
+        firstImgLeft = $a.offset().left
+      }
+      firstImgLeft ? (left = firstImgLeft) : (left = crawlLeft)
+      firstImgTop ? (top = firstImgTop) : (top = crawlTop)
+      let contentWidth = $(this).width() ? $(this).width() : $isShowImgGather.width()
+      let contentHeight = $(this).height() ? $(this).height() : $isShowImgGather.height()
+      $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
+        $(this).attr({
+          'data-url': href
+        })
+      })
+
+      $crawlPanel.css({
+        top: top + parseInt(contentHeight / 2),
+        left: left + parseInt(contentWidth / 2),
+        transform: 'translateY(-50%) translateX(-50%)',
+        display: 'block'
+      })
+      let $that = $(this)
+      $crawlPanel.on('mouseenter', function() {
+        $(this).css({
+          display: 'block'
+        })
+        $that
+          .parent()
+          .find('.emalacca-plugin-goods-acquisition-select')
+          .css({
+            display: 'block'
+          })
+        $that
+          .parent()
+          .find('.emalacca-plugin-mask')
+          .css({
+            display: 'block'
+          })
+      })
     } else {
       // 活动页
       // shopee&&xiapi不显示
@@ -440,13 +463,12 @@ function insertFetchBtn($a, url, status) {
         crawlLeft,
         firstImgTop,
         firstImgLeft,
-        pos,
         top,
         left
       if (status == 'hy') $firstImg = $a
       href = $a.attr('href')
-      crawlTop = $crawl.offset().top
-      crawlLeft = $crawl.offset().left
+      crawlTop = $crawlPanel.offset().top
+      crawlLeft = $crawlPanel.offset().left
       if ($firstImg.length > 0) {
         firstImgTop = $firstImg.offset().top
         firstImgLeft = $firstImg.offset().left
@@ -457,18 +479,19 @@ function insertFetchBtn($a, url, status) {
       firstImgLeft ? (left = firstImgLeft) : (left = crawlLeft)
       firstImgTop ? (top = firstImgTop) : (top = crawlTop)
 
-      $crawl.find('.link-next').each(function() {
+      let contentWidth = $(this).width() ? $(this).width() : $firstImg.width()
+      let contentHeight = $(this).height() ? $(this).height() : $firstImg.height()
+
+      $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
         $(this).attr({
           'data-url': href
         })
       })
-      $crawl.css({
-        // top: top + 5,
-        // left: left + 50,
-        top: top,
-        left: left,
-        display: 'block',
-        'pointer-events': 'auto'
+      $crawlPanel.css({
+        top: top + parseInt(contentHeight / 2),
+        left: left + parseInt(contentWidth / 2),
+        transform: 'translateY(-50%) translateX(-50%)',
+        display: 'block'
       })
     }
     // 1688添加低价货源
@@ -478,100 +501,11 @@ function insertFetchBtn($a, url, status) {
         display: 'block',
         padding: '5px 0px'
       })
+    } else {
+      $crawlPanel.find('.emalacca-goods-btn[data-type=view]').css({
+        display: 'none'
+      })
     }
-
-    // 淘宝店铺获取折扣价格  天猫店铺获取折扣价格
-    try {
-      if (
-        document.location.href.includes('taobao.com/search.htm?spm') ||
-        document.location.href.includes('tmall.com/search.htm') ||
-        !!$a
-          .parent()
-          .parent()
-          .find('.c-price').length > 0
-      ) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .find('.c-price')
-            .text()
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          } else if (
-            $a
-              .parent()
-              .parent()
-              .find('.s-price')
-              .text()
-          ) {
-            salePrice = $a
-              .parent()
-              .parent()
-              .find('.s-price')
-              .text()
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-        // 淘宝搜索获取折扣价
-      } else if (document.location.href.includes('s.taobao.com')) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .parent()
-            .parent()
-            .find('.g_price-highlight')
-            .find('strong')
-            .text()
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-        // 天猫搜索获取折扣价
-      } else if (document.location.href.includes('tmall.com/search_product')) {
-        try {
-          let salePrice = $a
-            .parent()
-            .parent()
-            .find('.productPrice')
-            .find('em')
-            .attr('title')
-          if (salePrice) {
-            $crawl.attr({
-              'data-salePrice': salePrice
-            })
-            $crawlSelect.attr({
-              'data-salePrice': salePrice
-            })
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-      }
-    } catch (e) {
-      // console.log(e)
-    }
-    return false
   })
   // 选中商品
   $crawlSelect.on('click', function() {
@@ -582,7 +516,7 @@ function insertFetchBtn($a, url, status) {
         'border-width': '0'
       })
       $(this)
-        .find('.link-sellSelect')
+        .find('.emalacca-goods-icon-select')
         .css({
           display: 'block'
         })
@@ -595,7 +529,7 @@ function insertFetchBtn($a, url, status) {
         'border-width': '2px'
       })
       $(this)
-        .find('.link-sellSelect')
+        .find('.emalacca-goods-icon-select')
         .css({
           display: 'none'
         })
@@ -606,23 +540,20 @@ function insertFetchBtn($a, url, status) {
     }
   })
 
-  // 隐藏div
-  // $a.on('mouseleave', function() {
-  //     hideCreationDiv()
-  // });
   // 单采
-  $crawl.find('.link-next').on('click', function() {
+  $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').on('click', function() {
     if ($('.alert').length > 0) $('.alert').remove()
     isBatchGather = false // 取消采集选中的状态
-    var $span = $(this)
-    if (!$span.hasClass('success')) {
-      $span.find('.LinkConBox .LinkCon').text('采集中...')
-      imageCrawl(url, $span, 1) //采集操作
+    if (!$(this).hasClass('success')) {
+      $(this)
+        .find('.emalacca-goods-btn[data-type=collect]')
+        .text('采集中...')
+      imageCrawl(url, $(this), 1) //采集操作
     }
     return false
   })
   // 1688低价货源
-  $crawl.find('.cheap-supply-goods').on('click', function() {
+  $crawlPanel.find('.emalacca-goods-btn[data-type=view]').on('click', function() {
     var hrefString = $(this).attr('data-href')
     window.open(hrefString)
     return false
@@ -655,6 +586,7 @@ function hintNotifyProgress(isSucc) {
     batchGatherObj.batchErrorNum++
   }
   var num = (batchGatherObj.batchGatherSum / batchGatherObj.batchGatherLength).toFixed(2)
+
   num = parseInt(num * 100)
 
   if (batchGatherObj.batchGatherSum == batchGatherObj.batchGatherLength) {
@@ -673,56 +605,17 @@ function hintNotifyProgress(isSucc) {
 function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
   var imageCrawlEnd = function(data) {
     if (!data.status) {
-      $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
-      $('.fetch-btn').text('请登录')
-      if ($span) $span.find('.LinkConBox .LinkCon').text('请登录')
+      $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
+      if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('请登录')
       return
     }
     uid = data.data.token
     urls = window.location.href
     // brandData = JSON.parse(data.brandData)
-    //Amazon其他站点
-    if (url.indexOf('/gp/product/') != -1 && url.indexOf('https://www.amazon.') != -1) {
-      url = url
-      //Amazon美国站
-    } else if (
-      (url.indexOf('/gp/') != -1 || url.indexOf('/dp/') != -1) &&
-      urls.indexOf('www.amazon.com/') != -1 &&
-      url.indexOf('www.amazon.com') == -1
-    ) {
-      url = 'https://www.amazon.com' + url
-    }
-    // 英国站的
-    if (
-      urls.indexOf('www.amazon.co.uk/') != -1 &&
-      url.indexOf('/dp/') != -1 &&
-      url.indexOf('www.amazon.co.uk') == -1
-    ) {
-      url = 'https://www.amazon.co.uk' + url
-    }
-    if (
-      (url.indexOf('/gp/') != -1 || url.indexOf('/dp/') != -1) &&
-      url.indexOf('www.amazon.') == -1 &&
-      urls.indexOf('www.amazon.') != -1
-    ) {
-      urls = urls.substring(urls.indexOf('https://') + 8)
-      urls = 'https://' + urls.substring(0, urls.indexOf('/') + 1)
-      url = urls.substring(0, urls.length - 1) + url
-    }
+
     //天猫处理
     if (url.indexOf('tmall.hk') !== -1) url = url.replace('tmall.hk', 'tmall.com')
-    //易选品处理
-    if (location.href.indexOf('yixuanpin.cn') !== -1 && url.indexOf('yixuanpin.cn') === -1) {
-      url = 'https://yixuanpin.cn' + url
-      if (location.href.indexOf('www.') !== -1) url = 'https://www.yixuanpin.cn' + url
-    }
-    if (url.indexOf('/en/products/') !== -1) {
-      if (url.indexOf('https://www.joom.com') !== -1) {
-        url = url
-      } else {
-        url = 'https://www.joom.com' + url
-      }
-    }
+
     //shopee
     if (location.href.indexOf('shopee.') !== -1 && url.indexOf('shopee.') === -1) {
       url = 'https://' + location.host + url
@@ -792,10 +685,10 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
         } else if (result.code == 0) {
           if ($span) {
             $span
-              .addClass('linkSuccess')
-              .find('.LinkConBox .LinkCon')
+              .addClass('emalacca-plugin-success')
+              .find('.emalacca-goods-btn[data-type=collect]')
               .text('采集成功')
-            $.fn.message({ type: 'success', msg: '采集成功' })
+            $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
           }
         } else {
           $.fn.message({ type: 'error', msg: result.msg })
@@ -825,21 +718,21 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
 
         // 判断是否是1688登录地址
         if (data.detailUrl.includes('https://login.1688.com/')) {
-          $.fn.message({ type: 'error', msg: '请先登录1688后再采集' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLogin1688 })
           return
         }
         if (data.detailUrl.includes('https://login.tmall.com/')) {
-          $.fn.message({ type: 'error', msg: '请先登录天猫后再采集' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginTmall })
 
           return
         }
         if (data.detailUrl.includes('https://login.taobao.com/')) {
-          $.fn.message({ type: 'error', msg: '请先登录淘宝后再采集' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginTaobao })
 
           return
         }
         if (data.detailUrl.includes('https://login.aliexpress.com/')) {
-          $.fn.message({ type: 'error', msg: '请先登录速卖通后再采集' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginAliexpress })
           return
         }
         try {
@@ -875,45 +768,42 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
                     if (results.code == '00') {
                       if ($span)
                         $span
-                          .addClass('linkSuccess')
-                          .find('.LinkConBox .LinkCon')
+                          .addClass('emalacca-plugin-success')
+                          .find('.emalacca-goods-btn[data-type=collect]')
                           .text('采集成功')
-                      $.fn.message({ type: 'success', msg: '已添加到采集任务' })
+                      $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
                     }
                   })
                 } else {
-                  if ($span) $span.find('.LinkConBox .LinkCon').text('采到后台')
+                  if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('采到后台')
                 }
               } else {
                 if (!noBrandDetect) {
                   //正常过滤提示
-                  if ($span)
+                  if ($span) {
                     $span
-                      .addClass('linkSuccess')
-                      .find('.LinkConBox .LinkCon')
+                      .addClass('emalacca-plugin-success')
+                      .find('.emalacca-goods-btn[data-type=collect]')
                       .text('采集成功')
+                  }
+
                   if (crawlType === 'detail') {
                     $('.fetch').show()
                     $('.fetch-btn.FetchDetailBtn').text('重新采集')
                   }
-                  if ($span)
-                    $span
-                      .addClass('linkSuccess')
-                      .find('.LinkConBox .LinkCon')
-                      .text('采集成功')
                 } else {
                   //不过滤弹框
-                  $span.addClass('linkSuccess').html('采集成功')
+                  $span.addClass('emalacca-plugin-success').html('采集成功')
                   $('.fetch').show()
                 }
                 if (!isSuccessPrompt) {
-                  $.fn.message({ type: 'success', msg: '采集成功' })
+                  $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
                 }
               }
             } else {
               // 后台返回错误信息
               if (!noBrandDetect) {
-                if ($span) $span.find('.LinkConBox .LinkCon').text('重新采集')
+                if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
                 $('.fetch-btn.FetchDetailBtn').text('重新采集')
               } else {
                 $span.html('重新采集')
@@ -923,7 +813,7 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
           })
         } else {
           // 含有品牌词
-          if ($span) $span.find('.LinkConBox .LinkCon').text('重新采集')
+          if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
           $('.fetch-btn.FetchDetailBtn').text('重新采集')
           $.fn.message({
             type: 'warning',
@@ -941,19 +831,6 @@ function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt)
       })
   }
   checkLoginStatus(imageCrawlEnd)
-}
-
-function checkSiblingAllA($a) {
-  var doms = $a.siblings()
-  if (doms.length <= 2) return false
-  var $el, el
-  for (var i = 0, len = doms.length; i < len; i++) {
-    el = doms[i]
-    var $el = $(el)
-    if ($el.hasClass('link-next')) continue
-    if (el.tagName.toLowerCase() !== 'a') return false
-  }
-  return true
 }
 
 function fetchHide(url) {
@@ -995,20 +872,20 @@ function showTip(type, url) {
       var showTipCategoryEnd = function(data) {
         if (!data.status) {
           // $('.fetch-btn').text('请登录');
-          $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
           return
         }
         isBatchGather = true
         batchGatherObj = {
           batchGatherSum: 0,
-          batchGatherLength: $('.link-sellSelectBox').length,
+          batchGatherLength: $('.emalacca-plugin-goods-acquisition-select').length,
           batchSuccessNum: 0,
           batchErrorNum: 0
         }
         $('.fetch .FetchBtn').css('pointer-events', 'none')
         $('.fetch .fetch-selectBtn').css('pointer-events', 'none')
         $('.fetch .FetchBtn').html('采集中...')
-        $('.link-sellSelectBox').each(function(index) {
+        $('.emalacca-plugin-goods-acquisition-select').each(function(index) {
           if (index === 0) {
             // 批量采集，显示进度条
             notifyProgress(0)
@@ -1023,21 +900,21 @@ function showTip(type, url) {
     $('.fetch .fetch-selectBtn').on('click', function() {
       var showTipCategorySelect = function(data) {
         if (!data.status) {
-          $.fn.message({ type: 'error', msg: '您还未登录，请登录采集插件' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
           return
         }
         var selectNum = 0
-        $('.link-sellSelectBox').each(function() {
+        $('.emalacca-plugin-goods-acquisition-select').each(function() {
           if ($(this).attr('data-selected') === '1') {
             ++selectNum
           }
         })
         if (selectNum === 0) {
-          $.fn.message({ type: 'error', msg: '请选择需要采集的商品' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseSelectSomeGoods })
           return
         }
         if (selectNum > 50) {
-          $.fn.message({ type: 'error', msg: '批量采集不能超过50条' })
+          $.fn.message({ type: 'error', msg: MESSAGE.error.beyondMaximumLimit })
           return
         }
         isBatchGather = true
@@ -1051,7 +928,7 @@ function showTip(type, url) {
         $('.fetch .FetchBtn').css('pointer-events', 'none')
         $('.fetch .fetch-selectBtn').html('采集中...')
         var num = 0 // 是否是第一个
-        $('.link-sellSelectBox').each(function() {
+        $('.emalacca-plugin-goods-acquisition-select').each(function() {
           if ($(this).attr('data-selected') === '1') {
             if (num === 0) {
               // 批量采集，显示进度条
@@ -1068,16 +945,16 @@ function showTip(type, url) {
     // 全选
     $('.fetch .fetch-selectAllBtn').on('click', function() {
       // 选中商品
-      $('.link-sellSelectBox').attr({
+      $('.emalacca-plugin-goods-acquisition-select').attr({
         'data-selected': '1'
       })
-      $('.link-sellSelectBox').css({
+      $('.emalacca-plugin-goods-acquisition-select').css({
         'border-width': '0',
         'pointer-events': 'auto',
         display: 'block'
       })
-      $('.link-sellSelectBox')
-        .find('.link-sellSelect')
+      $('.emalacca-plugin-goods-acquisition-select')
+        .find('.emalacca-goods-icon-select')
         .css({
           display: 'block'
         })
@@ -1159,72 +1036,4 @@ function checkLoginStatus(call) {
     call(data)
   }
   sendMessageToBackground('checkLoginStatus', '', checkLoginStatusEnd)
-}
-
-// 登录
-function login() {}
-
-// 处理淘宝列表里的广告url
-function taobaoTranslationUrl($a, url) {
-  var id = $a.attr('data-nid') || '' // 获取商品ID
-  var $parents = $a.parents('.item.J_MouserOnverReq.item-ad') // 获取商品的祖父级
-  var isTM = false
-  if ($parents.length > 0) {
-    var divTM = $parents.find('.icon-service-tianmao') // 判断祖父级里是否有天猫图标
-    isTM = divTM.length > 0
-  }
-  var newUrl = ''
-  // 列表内的广告
-  if (isTM && id) {
-    newUrl = 'https://detail.tmall.com/item.htm?id=' + id
-  } else if (!isTM && id) {
-    newUrl = 'https://item.taobao.com/item.htm?id=' + id
-  } else {
-    /*
-        g_page_config：  p4pdata
-        RESOURCEID 有值，URL不一定有值
-        
-        // 右侧广告栏(父级没有id, 参数都在g_page_config)
-        var headObj = document.head || document.getElementsByTagName("head")[0] || document.documentElement;
-        var headString = headObj.textContent;
-        // 获取g_page_config值
-        var startNum = headString.indexOf('g_page_config');
-        var endNum = headString.indexOf('g_srp_loadCss');
-        var configString = headString.slice(startNum, endNum);  // g_page_config参数
-        var itemsArr = configString.match(/"RESOURCEID.*?CUSTOMERID/g, '');
-        console.log(itemsArr, 'itemsArr')
-        var codeArr = url.split('&e='); // 广告url处理
-        var code = codeArr[codeArr.length - 1]; // 获取url中的code
-        var re = new RegExp(code+ '.*?"CUSTOMERID','ig'); // 动态正则的code
-        // 获取对应的url参数
-        var urlCodeString = ''
-        configString.replace(re,function(items, item){    //configString全参数找出对应的参数
-            urlCodeString = items;
-        });
-        urlCodeString.replace(/(http|https):.*?u003d\d+/,function(items, item){    //正则匹配出url
-             // 处理编译后的url
-            var urlCode = items.replace(/\\/g, '');
-            newUrl = urlCode.replace('u003d', '=');
-        });
-        */
-  }
-  return newUrl
-}
-
-// 处理1688列表里的广告url
-function albbTranslationUrl($a) {
-  var id = ''
-  var $parents = $a.parents('.ad-item')
-  if ($parents.length > 0) {
-    var string = $parents.attr('data-aplus-report')
-    var arrId = string.match(/object_id@\w.+?\^/gi, '')
-    if (arrId.length > 0) {
-      id = arrId[0].replace(/\D/gi, '')
-    }
-  }
-  var url = ''
-  if (id) {
-    url = 'https://detail.1688.com/offer/' + id + '.html'
-  }
-  return url
 }

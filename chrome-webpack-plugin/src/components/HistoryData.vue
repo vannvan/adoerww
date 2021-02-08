@@ -72,7 +72,7 @@ import echarts from '@/lib/echarts'
 import History from '@/inject/history-data'
 import dayjs from 'dayjs'
 import { division } from '@/lib/utils'
-import { ERROR } from '../lib/conf'
+import { MESSAGE } from '../lib/conf'
 
 export default {
   data() {
@@ -158,7 +158,7 @@ export default {
           this.goodsInfo = res.result.item
         } else {
           this.$Notice.error({
-            content: ERROR.failedToGetShopeeData
+            content: MESSAGE.error.failedToGetShopeeData
           })
         }
       })
@@ -289,6 +289,4 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>
