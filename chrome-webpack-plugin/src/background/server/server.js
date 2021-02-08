@@ -1,7 +1,12 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
 import { isEmpty } from '@/lib/utils'
+<<<<<<< HEAD
 import { ERP_LOGIN_URL } from '@/lib/env.conf'
+=======
+import { ERP_SYSTEM } from '@/lib/env.conf'
+const ERP_LOGIN_URL = ERP_SYSTEM[process.env.NODE_ENV]
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request && request.sign === 'signShope') {

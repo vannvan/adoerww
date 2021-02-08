@@ -3,6 +3,10 @@ import $ from 'jquery'
 
 const ClassPrefix = 'emalacca-plugin'
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
 export const collectText = {
   collect: {
     name: '采集商品',
@@ -25,6 +29,7 @@ export const collectText = {
 export const operationPanelTemplate = (collectStatus = 'collect') => {
   return $(`
     <div class="${ClassPrefix}-goods-acquisition-supply">
+<<<<<<< HEAD
 			<span class="emalacca-goods-acquisition-btn emalacca-goods-btn" data-type="collect" style="background:${collectText[collectStatus].color}">${collectText[collectStatus].name}</span>
 			<span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="view">低价货源</span> 
     </div>
@@ -36,6 +41,14 @@ export const operationSelectTemplate = () => {
   return $(`
     <div class="${ClassPrefix}-goods-acquisition-select" data-selected="0">
 			<span class="icon iconfont emalacca-goods-icon-select">&#x9e69;</span>
+=======
+			<div class="emalacca-goods-btn">
+				<span class="emalacca-goods-acquisition-btn emalacca-goods-btn" data-type="collect" style="background:${collectText[collectStatus].color}">${collectText[collectStatus].name}</span>
+				<span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="view">低价货源</span> 
+			</div>
+			<div class="emalacca-goods-acquisition-select" data-selected="0"><span class="icon iconfont emalacca-goods-icon-select">&#x9e69;</span>
+			</div>
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
     </div>
    `)
 }

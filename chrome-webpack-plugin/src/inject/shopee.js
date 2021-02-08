@@ -10,6 +10,33 @@ require('@/background/config/message')
 const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
 const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
 
+<<<<<<< HEAD
+=======
+const ClassPrefix = 'emalacca-plugin'
+
+var CONFIG = null //站点规则
+
+//初始化虾皮网站的基础脚本
+if (/shopee|xiapibuy/.test(window.location.host)) {
+  let rightFixed = document.createElement('div')
+  rightFixed.id = 'ShoppeFollow'
+  document.body.appendChild(rightFixed)
+
+  setTimeout(() => {
+    Vue.use(WUI)
+    new Vue({
+      el: '#ShoppeFollow',
+      render: createElement => {
+        return createElement(Home)
+      }
+    })
+    Follow.init()
+    Follow.sendCsrfToken()
+    Follow.preload()
+  }, 500)
+}
+
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
 //添加操作面板
 const debounceHandleActions = debounce(function() {
   Follow.setGoodDetailInfoToPanel()
@@ -102,8 +129,13 @@ const Follow = {
         //   粉丝关注
         case 'follow':
           Follow.syncShoppeBaseInfo().then(res => {
+<<<<<<< HEAD
             if (res.code == -1) {
               $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
+=======
+            if (res && res.code == -1) {
+              $.fn.message({ type: 'warning', msg: '【马六甲插件】:请登录虾皮卖家中心' })
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
             } else {
               window.open(`/shop/${realStoreId}/followers?other=true`)
             }
@@ -162,7 +194,11 @@ const Follow = {
           let itemId = storeId ? storeId.split('.')[1] : null
 
           let storeInfo = items.find(el => el.itemid == itemId)
+<<<<<<< HEAD
           if ($(this)[0].href && storeInfo && !$(this).attr('data-view')) {
+=======
+          if ($(this)[0].href && test && storeInfo && !$(this).attr('data-view')) {
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
             let dataViewElement = dataViewElementTemplate(storeId, storeInfo)
             $(this).attr('data-view', true) //添加过的打上标记
 
@@ -192,9 +228,14 @@ const Follow = {
         { domain: this.domain, goodsList: goodsList || [] },
         'GET_SHOPPE_ITEM_LIST_INFO',
         data => {
+<<<<<<< HEAD
           if (data) {
             resolve(data)
           }
+=======
+          console.log(data)
+          resolve(data)
+>>>>>>> a15dd05e7b36518510e1d4604177f9e1e733be56
         }
       )
     })
