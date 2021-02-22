@@ -51,27 +51,29 @@
         <p class="emalacca-plugin-quick-action-title">{{ isExpand ? '收起' : '展开' }}</p>
       </div>
     </div>
-    <drawer
-      :title="drawerTitle"
-      :display.sync="display"
-      :inner="true"
-      :width="drawerWidth"
-      :mask="false"
-    >
-      <FollowDrawer :display.sync="display"></FollowDrawer>
-    </drawer>
+    <template v-if="isShopee">
+      <drawer
+        :title="drawerTitle"
+        :display.sync="display"
+        :inner="true"
+        :width="drawerWidth"
+        :mask="false"
+      >
+        <FollowDrawer :display.sync="display"></FollowDrawer>
+      </drawer>
+    </template>
   </div>
 </template>
 
 <script>
 import $ from 'jquery'
-import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE } from '@/lib/conf'
+import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE, COMMON_COLLECT_DETAIL } from '@/lib/conf'
 import { getRule } from '@/lib/rules'
 import BatchCollect from '@/inject/batch-collect'
 import FollowDrawer from './FollowDrawer'
 import Drawer from './Drawer'
 import Follow from '@/inject/shopee'
-
+const ItemHeight = 48 //每个菜单项的高度
 export default {
   components: {
     Drawer,
@@ -87,7 +89,9 @@ export default {
       isExpand: true,
       isStorePage: false, //是否在店铺页面
       initHoldUpMarginTop: 0, //收起按钮初始marginTop
-      isCheckAll: false //采集全选
+      isCheckAll: false, //采集全选
+      isShopee: false, //是否虾皮网站
+      pageType: '' // 当前网站类型 'category', 'sortlist', 'detail'
     }
   },
 
@@ -113,22 +117,21 @@ export default {
    * 3. observer 的作用是监听页面切换，主要用于虾皮网站，因为虾皮网站页面切换并不会重新初始化主程序
    */
   mounted() {
+    this.getPageType()
     this.loadMenuAction()
-
     // 监听页面链接更新，加载不同的侧栏工具
     let oldHref = location.href
     let _this = this
     let bodyList = document.querySelector('body'),
       observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-          if (oldHref != location.href) {
-            oldHref = location.href
-            let linkRule = getRule(location.href)
-            let siteConfig = JSON.parse(linkRule)
-            _this.isStorePage = new Function('url', siteConfig.detail)(location.href) //如果是某店铺的页面
-            _this.loadMenuAction()
-          }
-        })
+        if (oldHref != location.href) {
+          oldHref = location.href
+          let linkRule = getRule(location.href)
+          let siteConfig = JSON.parse(linkRule)
+          _this.isStorePage = new Function('url', siteConfig.detail)(location.href) //如果是某店铺的页面
+          _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
+          _this.loadMenuAction()
+        }
       })
     let config = {
       childList: true,
@@ -154,7 +157,7 @@ export default {
               padding: '4px'
             })
           }, 500)
-          let targetTop = $('.emalacca-plugin-quick-action-item').length * 48 + 8 + 'px'
+          let targetTop = $('.emalacca-plugin-quick-action-item').length * ItemHeight + 8 + 'px'
           $(this).animate(
             {
               'margin-top': targetTop
@@ -181,7 +184,7 @@ export default {
             )
           }
         })
-        let targetTop = 48 * fixedLen + 8 + 'px'
+        let targetTop = ItemHeight * fixedLen + 8 + 'px'
         $('.toggle-menu-action').animate(
           {
             'margin-top': targetTop
@@ -204,6 +207,7 @@ export default {
     //快捷操作功能分发
     // mainActionId 主体方法id action  操作类型
     quickActionHandler(mainActionId, action) {
+      console.log(mainActionId, 'mainActionId')
       switch (mainActionId) {
         //   快捷操作
         case 'EmalaccaQuick':
@@ -232,49 +236,50 @@ export default {
             }
           })
           break
+        // 采集操作: 'category', 'sortlist'
         case 'EmalaccaCollect':
-          this.isCheckAll = !this.isCheckAll
           const actionOption = {
             'select-all': 'handleSelectAll',
             'collect-selected': 'handleCollectSelected',
             'collect-current-page': 'handleCollectCurrPage'
           }
+          if (action == 'select-all') {
+            this.isCheckAll = !this.isCheckAll
+          }
           BatchCollect[actionOption[action]]({ isCheck: this.isCheckAll })
+          break
+        // 采集操作: 'detail'
+        case 'EmalaccaCollectDetail':
+          BatchCollect.handleCollectCurrPageDetail()
+          break
         default:
           break
       }
     },
 
-    // 去取关页面
-    handleGotoUnfollow() {
-      Follow.syncShoppeBaseInfo().then(res => {
-        console.log(res)
-      })
-    },
-
     //匹配各个站点的列表页，以判断是否显示采集
-    isListOrCate() {
+    getPageType() {
       let siteConfig = JSON.parse(getRule(location.href))
-      let pageType = new Function('url', siteConfig.detect)(location.href)
-      let showPageArr = ['category', 'sortlist']
-      if (showPageArr.includes(pageType)) {
-        console.log('是列表页')
-        return true
-      }
-      return false
+      this.pageType = new Function('url', siteConfig.detect)(location.href)
     },
 
     //加载程序菜单
     loadMenuAction() {
+      let showPageArr = ['category', 'sortlist'] // 列表&分类页面
       if (/shopee|xiapibuy/.test(location.host)) {
+        this.isShopee = true
         this.isStorePage = location.href.search('-i.') >= 0
-        if (this.isListOrCate()) {
+        if (showPageArr.includes(this.pageType)) {
           this.rightMenu = [...RIGHT_MENU, ...COMMON_COLLECT]
+        } else if (this.pageType === 'detail') {
+          this.rightMenu = [...RIGHT_MENU, ...COMMON_COLLECT_DETAIL]
         } else {
           this.rightMenu = RIGHT_MENU
         }
-      } else if (this.isListOrCate()) {
+      } else if (showPageArr.includes(this.pageType)) {
         this.rightMenu = COMMON_COLLECT
+      } else if (this.pageType === 'detail') {
+        this.rightMenu = COMMON_COLLECT_DETAIL
       } else {
         this.rightMenu = []
       }

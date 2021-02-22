@@ -142,10 +142,8 @@ export const Crawl = {
     uid,
     urls,
     checkFinish,
-    haveNext,
     crawlCategory,
     sync,
-    brandData,
     salePriceObj
   ) {
     var urlArr = []

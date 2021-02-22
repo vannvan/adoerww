@@ -2,26 +2,7 @@ import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
 import { CONFIGINFO } from '@/background/config.js'
 import { MESSAGE } from '../lib/conf'
-
-//获取登录状态
-function checkLoginStatus(call) {
-  var checkLoginStatusEnd = function(data) {
-    call(data)
-  }
-  sendMessageToBackground('checkLoginStatus', '', checkLoginStatusEnd)
-}
-
-var sendMessageToBackground = function(action, options, callback) {
-  chrome.runtime.sendMessage(
-    '',
-    {
-      sign: 'signShope',
-      action: action,
-      data: options
-    },
-    callback
-  )
-}
+import { getLoginInfo } from '@/lib/chrome-client'
 
 // 在图片上直接采集
 export function solidCrawl(url, callback) {
@@ -63,5 +44,7 @@ export function solidCrawl(url, callback) {
         })
       })
   }
-  checkLoginStatus(imageCrawlEnd)
+  getLoginInfo(data => {
+    imageCrawlEnd(data)
+  })
 }

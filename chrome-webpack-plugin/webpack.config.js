@@ -94,5 +94,5 @@ module.exports = {
         filename: 'manifest.json'
       })
   ].concat(getPagesWebpackPluginConfigs('html')),
-  mode: 'development'
+  mode: 'production'
 }

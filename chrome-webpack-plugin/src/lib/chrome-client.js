@@ -36,4 +36,15 @@ export const sendMessageToBackground = function(action, options, type, callback)
   }
 }
 
-export function setlStorage(key, v) {}
+// 获取background: pt-plug-access-user缓存信息 && brandData 采集数据的data(目前没用到)
+export const getLoginInfo = function(callback) {
+  if (chrome.runtime.sendMessage && typeof chrome.app.isInstalled !== undefined) {
+    return new Promise(resolve => {
+      chrome.runtime.sendMessage(
+        '',
+        { action: 'checkLoginStatus', sign: 'signShope' },
+        callback.bind(resolve)
+      )
+    })
+  }
+}

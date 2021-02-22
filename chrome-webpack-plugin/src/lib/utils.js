@@ -1,3 +1,16 @@
+import _ from 'lodash'  // https://www.lodashjs.com/docs/lodash.cloneDeep
+
+
+//深拷贝 
+export function cloneDeep(value) {
+  return _.cloneDeep(value)
+}
+
+//检查 value 是否是 null 或者 undefined; 如果是，返回为true，否则为false
+export function isNil(value) {
+  return _.isNil(value)
+}
+
 //节流
 export function throttle(fn, wait) {
   var timer = null

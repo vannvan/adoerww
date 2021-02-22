@@ -40,26 +40,3 @@ export const operationSelectTemplate = () => {
    `)
 }
 
-// 右下角悬浮操作模板
-export const suspensionBottomTemplate = (pageType = 'detail') => {
-	let template = null
-	if (pageType === 'detail') {
-		template = $(`
-			<div class="${ClassPrefix}-goods-suspension">
-				<span class="emalacca-goods-gather-page-btn emalacca-goods-btn">采集本页</span>
-				<span	title="关闭" class="emalacca-goods-close-btn">×</span>
-			</div>
-		`)
-	} else if (['sortlist','category'].includes(pageType) &&
-	url.indexOf('yangkeduo.com') === -1) {
-		template = $(`
-			<div class="${ClassPrefix}-goods-suspension">
-				<span class="emalacca-goods-gather-select-btn emalacca-goods-btn">采集选中</span>
-				<span class="emalacca-goods-gather-page-btn emalacca-goods-btn">采集本页</span>
-				<span class="emalacca-goods-select-all-btn emalacca-goods-btn">全选</span>
-				<span	title="关闭" class="emalacca-goods-close-btn">×</span>
-			</div>
-			`)
-	}
-	return template
-}

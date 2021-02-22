@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   }
 
   // 同步虾皮用户信息
-  if (action == 'auth' && type == 'SYNC_SHOPPE_BASE_INFO') {
+  if (action == 'auth' && type == 'SYNC_SHOPEE_BASE_INFO') {
     Auth.syncShoppeBaseInfo(options, type, sendResponse)
     return true
   }

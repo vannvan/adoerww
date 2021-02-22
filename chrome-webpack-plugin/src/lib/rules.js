@@ -27,7 +27,7 @@ const ruleInfo = {
       "}",
   'taobao.com': "{\n" +
       "\"detect\": \"\\n\if (url.indexOf('taobao.com/list') !== -1 || url.indexOf('//s.taobao.com/search') !== -1) {\\n    return 'sortlist';\\n}\\n\\nif (url.indexOf('item.taobao.com/item.htm') !== -1) {\\n   return 'detail';\\n}\\n\\nif (url.indexOf('taobao.com/category') !== -1 || url.indexOf('taobao.com/search.htm?spm') !== -1) {\\n    return 'category';\\n}\\n\",\n" +
-      "\"detail\": \"if (url.indexOf('item.taobao.com/item.htm') !== -1 || url.indexOf('srd.simba.taobao.com/rd')  !== -1) {\\n    return true;\\n} if(url.indexOf('tmall.com/item.htm') !== -1){return true;}if(url.indexOf('click.simba.taobao.com/cc_im') !== -1){return true;}\",\n" +
+      "\"detail\": \"if (url.indexOf('item.taobao.com/item.htm') !== -1 || url.indexOf('srd.simba.taobao.com/rd')  !== -1) {\\n    return true;\\n}  if (url.indexOf('click.mz.simba.taobao.com/necpm') !== -1)  {\\n      return true;\\n  } if(url.indexOf('tmall.com/item.htm') !== -1){return true;}if(url.indexOf('click.simba.taobao.com/cc_im') !== -1){return true;}\",\n" +
       "\"map\": {\n" +
       "\"detail\": \"single\",\n" +
       "\"category\": \"category\"\n" +
@@ -51,7 +51,7 @@ const ruleInfo = {
       "}",
   'tmall.com': "{\n" +
       "\"detect\": \"if (url.indexOf('tmall.com/search_product') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('item.htm') !== -1 || url.indexOf('tmall.hk/hk/item') !== -1) {\\n  return 'detail';\\n}\\nif (url.indexOf('tmall.com/category') !== -1 || url.indexOf('tmall.com/search.htm') !== -1 ) {\\n  return 'category';\\n}\",\n" +
-      "\"detail\": \"if (url.indexOf('tmall.com/item.htm?id') !== -1 || url.indexOf('item.taobao.com/item.htm?spm') !== -1 || url.indexOf('tmall.com/item.htm?spm=') !== -1) {\\n  return true;\\n}\",\n" +
+      "\"detail\": \"if (url.indexOf('tmall.hk/item') !== -1) {\\n  return true;\\n}\\n if (url.indexOf('item.taobao.com/item.htm') !== -1 || url.indexOf('srd.simba.taobao.com/rd')  !== -1) {\\n  return true;\\n}\\n if (url.indexOf('tmall.com/item.htm') !== -1) {\\n  return true;\\n}\\n if (url.indexOf('click.simba.taobao.com/cc_im') !== -1) {\\n  return true;\\n}\",\n" +
       "\"map\": {\n" +
       "\"detail\": \"single\",\n" +
       "\"shopcategory\": \"category\",\n" +

@@ -268,7 +268,7 @@ const Follow = {
   //同步虾皮基础信息
   syncShoppeBaseInfo: function() {
     return new Promise(resolve => {
-      sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPPE_BASE_INFO', data => {
+      sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPEE_BASE_INFO', data => {
         resolve(data)
       })
     })

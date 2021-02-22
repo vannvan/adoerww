@@ -128,7 +128,7 @@ export const MESSAGE = {
   },
   success: {
     collectSuccess: '采集成功',
-    savehaveBeenAdd: '已添加至采集任务，请到采集箱查看采集结果'
+    savehaveBeenAdd: `已添加至采集任务，请到<a href="${ERP_LOGIN_URL}goods/collect" target="_blank">采集箱</a>查看采集结果`
   }
 }
 
@@ -158,7 +158,7 @@ export const COLLECT_SITES = [
   }
 ]
 
-// 公共采集侧栏工具
+// 公共采集侧栏工具 页面类型'category', 'sortlist'
 export const COMMON_COLLECT = [
   {
     name: '采集',
@@ -181,6 +181,22 @@ export const COMMON_COLLECT = [
     ]
   }
 ]
+// 公共采集侧栏工具 页面类型'detail'
+export const COMMON_COLLECT_DETAIL = [
+  {
+    name: '采集',
+    icon: 'icon-collect',
+    id: 'EmalaccaCollectDetail',
+    fixed: true,
+    children: [
+      {
+        name: '采集本页',
+        action: 'collect-current-page'
+      }
+    ]
+  }
+]
+
 
 // 虾皮网站专用侧栏工具
 export const RIGHT_MENU = [

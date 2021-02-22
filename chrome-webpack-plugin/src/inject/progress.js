@@ -5,43 +5,46 @@ let batchGatherObj = {
   batchSuccessNum: 0, // 成功数
   batchErrorNum: 0 // 失败数
 }
-let batchTimer = null
-var progress_timeout
+let batchTimer, progress_timeout = null
 
 export function hintNotifyProgress(isSucc) {
   window.clearTimeout(batchTimer)
+  
   batchGatherObj.batchGatherSum++
-
-  let { batchGatherSum, batchGatherLength, batchSuccessNum, batchErrorNum } = batchGatherObj
-
   if (isSucc) {
     batchGatherObj.batchSuccessNum++
   } else {
     batchGatherObj.batchErrorNum++
   }
-
+  let { batchGatherLength, batchSuccessNum, batchErrorNum, batchGatherSum } = batchGatherObj
   var num = (batchGatherSum / batchGatherLength).toFixed(2)
 
   num = parseInt(num * 100)
-
+  
   if (batchGatherSum == batchGatherLength) {
     notifyProgress({ percent: 100, success: batchSuccessNum, faild: batchErrorNum })
   } else {
     notifyProgress({ percent: num, success: batchSuccessNum, faild: batchErrorNum })
     batchTimer = window.setTimeout(function() {
-      batchErrorNum = batchGatherLength - batchSuccessNum
-      notifyProgress({ percent: 100, success: batchSuccessNum, faild: batchErrorNum })
+      let errorNum = batchGatherLength - batchSuccessNum
+      notifyProgress({ percent: 100, success: batchSuccessNum, faild: errorNum })
     }, 10000)
   }
 }
 
 //progress进度条
 export function notifyProgress({ percent, success, faild, count }) {
-  batchGatherObj.batchGatherLength = count || batchGatherObj.batchGatherLength
   var progressHtml =
     '<div class="sellerwant-progress-box"><p class="ellerwant-progress-txt"></p><div class="sellerwant-progress-inner"><span></span><div class="sellerwant-progress-bg"></div></div><p class="sellerwant-progress-results"><span class="sellerwant-progress-results-success"></span><span class="sellerwant-progress-results-failure"></span></p></div>'
   clearTimeout(progress_timeout)
   if (percent == 0) {
+    // 初始化赋值
+    batchGatherObj = {
+      batchGatherSum: 0, // 请求完的总数
+      batchGatherLength: count || batchGatherObj.batchGatherLength, // 需要请求的总数
+      batchSuccessNum: 0, // 成功数
+      batchErrorNum: 0 // 失败数
+    }
     $(progressHtml).appendTo('body')
     $('.sellerwant-progress-box').fadeTo(1000, 1)
     $('.sellerwant-progress-box')

@@ -1,100 +1,17 @@
 import $ from 'jquery'
 import { getRule } from '@/lib/rules'
 import { CONFIGINFO } from '@/background/config.js'
-import { ShopeModal } from '@/background/config/modal.js'
 import { Html } from '@/background/server/html.js'
 import { Crawl } from '@/background/server/crawl.js'
 import { taobaoTranslationUrl, albbTranslationUrl } from '@/lib/handle-url'
 import { operationPanelTemplate, operationSelectTemplate, collectText } from './content-template'
 import { MESSAGE } from '../lib/conf'
-// import { setItem, getItem } from '@/lib/chrome'
-
-var sendMessageToBackground = function(action, options, callback) {
-  chrome.runtime.sendMessage(
-    '',
-    {
-      sign: 'signShope',
-      action: action,
-      data: options
-    },
-    callback
-  )
-}
-//显示通知
-//msg 消息内容
-var progress_timeout
-
-//progress进度条
-export function notifyProgress(sum, succNum, failNum) {
-  var progressHtml =
-    '<div class="sellerwant-progress-box"><p class="ellerwant-progress-txt"></p><div class="sellerwant-progress-inner"><span></span><div class="sellerwant-progress-bg"></div></div><p class="sellerwant-progress-results"><span class="sellerwant-progress-results-success"></span><span class="sellerwant-progress-results-failure"></span></p></div>'
-  clearTimeout(progress_timeout)
-  if (sum == 0) {
-    $(progressHtml).appendTo('body')
-    $('.sellerwant-progress-box').fadeTo(1000, 1)
-    $('.sellerwant-progress-box')
-      .find('.ellerwant-progress-txt')
-      .text('采集中')
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-inner>span')
-      .text('0%')
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-bg')
-      .css({ width: '0' })
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-success')
-      .text('成功 0')
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-failure')
-      .text('失败 0')
-  } else if (sum !== 100) {
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-inner>span')
-      .text(sum + '%')
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-bg')
-      .css({ width: sum + '%' })
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-success')
-      .text('成功 ' + succNum)
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-failure')
-      .text('失败 ' + failNum)
-  } else if (sum == 100) {
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-inner>span')
-      .text('100%')
-    $('.sellerwant-progress-box')
-      .find('.ellerwant-progress-txt')
-      .html(
-        `已加入采集箱，可到<a style="margin: 0 15px; color: blue !important;" target="_blank" href="${ERP_LOGIN_URL}goods/collect">采集箱</a>查看采集商品`
-      )
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-bg')
-      .css({ width: '100%' })
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-success')
-      .text('成功 ' + succNum)
-    $('.sellerwant-progress-box')
-      .find('.sellerwant-progress-results>.sellerwant-progress-results-failure')
-      .text('失败 ' + failNum)
-    progress_timeout = setTimeout(function() {
-      $('.sellerwant-progress-box').fadeOut(3000, function() {
-        $('.sellerwant-progress-box').remove()
-        // 采集完成清除样式
-        hintBatch()
-      })
-    }, 3000)
-  }
-}
+import locationBtn from '@/lib/location-btn'
+import { getLoginInfo } from '@/lib/chrome-client'
 
 //----------------------------------------------新增内容---------------------------------------------
-var CONFIG,
-  OPTIONS = {}
-//分类采集使用的url
-var urls = ''
-var uid = ''
-var dataArr = [] //存放重复的采集数据
+var CONFIG = {}
+
 chrome.extension.onMessage.addListener(function(message, sender, callback) {
   if (message.ID !== 'content') {
     return
@@ -109,32 +26,6 @@ chrome.extension.onMessage.addListener(function(message, sender, callback) {
   }
 })
 
-var shopeeCrawlSetTime, //定时控制shoppe采集，初始化时间
-  shopeeUrl = window.location.href,
-  timed
-
-function timedCount() {
-  shopeeUrl = window.location.href
-  timed = setTimeout('timedCount()', 1000)
-  if (
-    shopeeUrl.indexOf('shopee.') === -1 ||
-    shopeeUrl.indexOf('tw.shopeesz.com') === -1 ||
-    shopeeUrl.indexOf('xiapibuy.com') === -1
-  ) {
-    clearTimeout(timed)
-  } else if (
-    (shopeeUrl.indexOf('shopee.') !== -1 ||
-      shopeeUrl.indexOf('tw.shopeesz.com') !== -1 ||
-      shopeeUrl.indexOf('xiapibuy.com') !== -1) &&
-    shopeeUrl.indexOf('-i.') !== -1
-  ) {
-    $('.fetch').remove()
-    preload()
-    clearTimeout(timed)
-  }
-}
-timedCount()
-
 if (document.contentType === 'text/html') {
   chrome.storage.sync.get(
     {
@@ -142,30 +33,14 @@ if (document.contentType === 'text/html') {
       showProductFetchBtn: true
     },
     function(data) {
-      OPTIONS = data
-      if (
-        shopeeUrl.indexOf('shopee.') !== -1 ||
-        shopeeUrl.indexOf('tw.shopeesz.com') !== -1 ||
-        shopeeUrl.indexOf('xiapibuy.com') !== -1
-      ) {
-        $('.fetch').remove()
-        $(document)
-          .off('DOMNodeInserted', '#main')
-          .on('DOMNodeInserted', '#main', function() {
-            if (typeof shopeeCrawlSetTime !== undefined) {
-              clearTimeout(shopeeCrawlSetTime)
-              shopeeCrawlSetTime = null
-            }
-            shopeeCrawlSetTime = setTimeout(function() {
-              $('.fetch').remove()
-              preload()
-            }, 500)
-          })
-      }
       preload()
+      new MutationObserver(function(mutations) {
+        preload()
+      })
     }
   )
 }
+
 var debounceHandleLinks = debounce(function() {
   if (CONFIG && CONFIG.detail) {
     handleLinks(CONFIG.detail)
@@ -178,8 +53,6 @@ function preload() {
   try {
     CONFIG = JSON.parse(linkrule)
     handleLinks(CONFIG.detail)
-    var test = new Function('url', CONFIG.detect)(location.href)
-    showTip(test, location.href)
     $(window).scroll(debounceHandleLinks)
   } catch (e) {
     return
@@ -188,7 +61,6 @@ function preload() {
 //过滤超链接，将满足条件的图片上加上采集按钮
 //fnBody 过滤方法的方法体
 function handleLinks(fnBody) {
-  if (!OPTIONS.showProductFetchBtn) return
   //遍历页面所有的链接,如果满足条件，则加上导入按钮
   $.each(document.links, function(index, a) {
     if (a.dataset.sm) return
@@ -374,10 +246,7 @@ function insertFetchBtn($a, url, status) {
   //非列表页
   if (!sumaitongShowArr.includes(pageType)) {
     // $crawl.insertAfter($body)
-    // shopee&&xiapi不显示
-    if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
-      $('body').append($crawlPanel)
-    }
+    
     // 隐藏div
     $a.on('mouseleave', function() {
       $crawlPanel.css({
@@ -405,7 +274,6 @@ function insertFetchBtn($a, url, status) {
         })
         $crawlBg.css('display', 'block')
       }
-
       var href = '',
         crawlTop,
         crawlLeft,
@@ -459,56 +327,33 @@ function insertFetchBtn($a, url, status) {
           })
       })
     } else {
-      // 活动页
+      // 非列表页
       // shopee&&xiapi不显示
-      if (/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+      if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+        $('body').append($crawlPanel)
+      } else {
         return
       }
-      var $firstImg = $a.find('img:first-child'),
-        href = '',
-        crawlTop,
-        crawlLeft,
-        firstImgTop,
-        firstImgLeft,
-        top,
-        left
-      if (status == 'hy') $firstImg = $a
-      href = $a.attr('href')
-      crawlTop = $crawlPanel.offset().top
-      crawlLeft = $crawlPanel.offset().left
-      if ($firstImg.length > 0) {
-        firstImgTop = $firstImg.offset().top
-        firstImgLeft = $firstImg.offset().left
-      } else {
-        firstImgTop = $a.offset().top
-        firstImgLeft = $a.offset().left
-      }
-      firstImgLeft ? (left = firstImgLeft) : (left = crawlLeft)
-      firstImgTop ? (top = firstImgTop) : (top = crawlTop)
-
-      let contentWidth = $(this).width() ? $(this).width() : $firstImg.width()
-      let contentHeight = $(this).height() ? $(this).height() : $firstImg.height()
-
-      $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
-        $(this).attr({
-          'data-url': href
+      locationBtn($(this),  $crawlPanel)
+      // $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
+      //   $(this).attr({
+      //     'data-url': href
+      //   })
+      // })
+      // $crawlPanel.css({
+      //   top: top + parseInt(contentHeight / 2),
+      //   left: left + parseInt(contentWidth / 2),
+      //   transform: 'translateY(-50%) translateX(-50%)',
+      //   display: 'block'
+      // })
+      $crawlPanel.on('mouseenter', function() {
+        $(this).css({
+          display: 'block'
         })
-      })
-      $crawlPanel.css({
-        top: top + parseInt(contentHeight / 2),
-        left: left + parseInt(contentWidth / 2),
-        transform: 'translateY(-50%) translateX(-50%)',
-        display: 'block'
       })
     }
     // 1688添加低价货源
-    if (url.indexOf('1688.com') > -1) {
-      $crawl.find('.cheap-supply-goods').css({
-        'pointer-events': 'auto',
-        display: 'block',
-        padding: '5px 0px'
-      })
-    } else {
+    if (url.indexOf('1688.com') === -1) {
       $crawlPanel.find('.emalacca-goods-btn[data-type=view]').css({
         display: 'none'
       })
@@ -550,7 +395,6 @@ function insertFetchBtn($a, url, status) {
   // 单采
   $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').on('click', function() {
     if ($('.alert').length > 0) $('.alert').remove()
-    isBatchGather = false // 取消采集选中的状态
     if (!$(this).hasClass('success')) {
       $(this)
         .find('.emalacca-goods-btn[data-type=collect]')
@@ -566,47 +410,6 @@ function insertFetchBtn($a, url, status) {
     return false
   })
 }
-// 批量采集提示
-function hintBatch() {
-  $('.fetch .FetchBtn').css('pointer-events', 'auto')
-  $('.fetch .fetch-selectBtn').css('pointer-events', 'auto')
-  $('.fetch .fetch-selectBtn').html('采集选中')
-  $('.fetch .FetchBtn').html('采集本页')
-  isBatchGather = false
-}
-// 是否批量采集选中
-var isBatchGather = false
-var batchGatherObj = {
-  batchGatherSum: 0, // 请求完的总数
-  batchGatherLength: 0, // 需要请求的总数
-  batchSuccessNum: 0, // 成功数
-  batchErrorNum: 0 // 失败数
-}
-var batchTimer = null // 延时器
-// 批量采集提示2
-export function hintNotifyProgress(isSucc, batchGatherObj = batchGatherObj) {
-  window.clearTimeout(batchTimer)
-  batchGatherObj.batchGatherSum++
-  if (isSucc) {
-    batchGatherObj.batchSuccessNum++
-  } else {
-    batchGatherObj.batchErrorNum++
-  }
-  var num = (batchGatherObj.batchGatherSum / batchGatherObj.batchGatherLength).toFixed(2)
-
-  num = parseInt(num * 100)
-
-  if (batchGatherObj.batchGatherSum == batchGatherObj.batchGatherLength) {
-    notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-  } else {
-    notifyProgress(num, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-    batchTimer = window.setTimeout(function() {
-      batchGatherObj.batchErrorNum =
-        batchGatherObj.batchGatherLength - batchGatherObj.batchSuccessNum
-      notifyProgress(100, batchGatherObj.batchSuccessNum, batchGatherObj.batchErrorNum)
-    }, 10000)
-  }
-}
 
 // 在图片上直接采集
 export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
@@ -616,9 +419,8 @@ export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccess
       if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('请登录')
       return
     }
-    uid = data.data.token
-    urls = window.location.href
-    // brandData = JSON.parse(data.brandData)
+    let uid = data.data.token
+    let urls = window.location.href
 
     //天猫处理
     if (url.indexOf('tmall.hk') !== -1) url = url.replace('tmall.hk', 'tmall.com')
@@ -686,13 +488,12 @@ export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccess
         url: url
       }
       Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, function(result) {
-        if (isBatchGather) {
-          var isSucc = result.code == '0'
-          hintNotifyProgress(isSucc)
-        } else if (result.code == 0) {
+        if (result.code == 0) {
           if ($span) {
-            $span
-              .addClass('emalacca-plugin-success')
+            $span.css({
+              color: '#fff',
+              backgroundColor: '#67c23a',
+              borderColor: '#67c23a'}).html('采集成功')
               .find('.emalacca-goods-btn[data-type=collect]')
               .text('采集成功')
             $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
@@ -712,7 +513,7 @@ export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccess
         data.baseURL = baseURL
         data.repeatCheck = 1 //必须查重
         // 淘宝广告页处理(获取正确的url)
-        if (urls.indexOf('huodong.taobao') > -1) {
+        if (urls.indexOf('taobao.com') > -1) {
           var realUrl = ''
           data.html.replace(/\<link rel="canonical".*?\/>/g, function(items) {
             items.replace(/(http|https).*?id=\d+/g, function(item) {
@@ -722,122 +523,28 @@ export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccess
           data.detailUrl = realUrl
           data.url = realUrl
         }
-
-        // 判断是否是1688登录地址
-        if (data.detailUrl.includes('https://login.1688.com/')) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLogin1688 })
-          return
-        }
-        if (data.detailUrl.includes('https://login.tmall.com/')) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginTmall })
-
-          return
-        }
-        if (data.detailUrl.includes('https://login.taobao.com/')) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginTaobao })
-
-          return
-        }
-        if (data.detailUrl.includes('https://login.aliexpress.com/')) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginAliexpress })
-          return
-        }
-        try {
-          if ($span && !!$span.attr('data-saleprice')) {
-            data.price = $span.attr('data-saleprice')
-          }
-        } catch (e) {
-          // console.log(e)
-        }
-
-        var hsaBrand = false
-        if (!noBrandDetect) {
-          //不过滤
-          // brandData.forEach(item => {
-          //     if (data.productTitle.toLowerCase().includes(item.toLowerCase())) return hsaBrand = true
-          // })
-        }
-        if (!hsaBrand) {
-          Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {
-            if (isBatchGather) {
-              var isSucc = result.code == '0'
-              hintNotifyProgress(isSucc)
-            } else if (result.code == '0') {
-              var objCrawl = result.repeatCrawlProduct
-              var isRepeat = 0
-              // if (type != '1') $('.fetch').hide();
-              if (objCrawl) isRepeat = objCrawl.repeatCrawl
-              //判断是够重复
-              if (isRepeat == 1) {
-                if (confirm('该产品在系统后台已有采集记录，是否继续采集？')) {
-                  data.repeatCheck = 0
-                  Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(results) {
-                    if (results.code == '0') {
-                      if ($span)
-                        $span
-                          .addClass('emalacca-plugin-success')
-                          .find('.emalacca-goods-btn[data-type=collect]')
-                          .text('采集成功')
-                      $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
-                    }
-                  })
-                } else {
-                  if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('采到后台')
-                }
-              } else {
-                if (!noBrandDetect) {
-                  //正常过滤提示
-                  if ($span) {
-                    $span
-                      .addClass('emalacca-plugin-success')
-                      .find('.emalacca-goods-btn[data-type=collect]')
-                      .text('采集成功')
-                  }
-
-                  if (crawlType === 'detail') {
-                    $('.fetch').show()
-                    $('.fetch-btn.FetchDetailBtn').text('重新采集')
-                  }
-                } else {
-                  //不过滤弹框
-                  $span.addClass('emalacca-plugin-success').html('采集成功')
-                  $('.fetch').show()
-                }
-                if (!isSuccessPrompt) {
-                  $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
-                }
-              }
+        Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {
+          if (result.code == '0') {
+            $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
+            $span.css({
+              color: '#fff',
+              backgroundColor: '#67c23a',
+              borderColor: '#67c23a'}).html('采集成功')
+          } else {
+            // 后台返回错误信息
+            if (!noBrandDetect) {
+              if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
             } else {
-              // 后台返回错误信息
-              if (!noBrandDetect) {
-                if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
-                $('.fetch-btn.FetchDetailBtn').text('重新采集')
-              } else {
-                $span.html('重新采集')
-              }
-              $.fn.message({ type: 'success', msg: result.msg })
+              $span.html('重新采集')
             }
-          })
-        } else {
-          // 含有品牌词
-          if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
-          $('.fetch-btn.FetchDetailBtn').text('重新采集')
-          $.fn.message({
-            type: 'warning',
-            msg: `该产品包含品牌词信息 <button id="singleRightNowCrawl" data-url="${data.detailUrl}"  type="button" class="brandBtn">确认采集</button>`
-          })
-
-          // 忽略品牌词直接采集
-          $('#singleRightNowCrawl').on('click', function() {
-            //去对应的链接
-            var url = data.detailUrl
-            imageCrawl(url, $(this), '', 'detail', true, true)
-            $(this).html('采集中...')
-          })
-        }
+            $.fn.message({ type: 'success', msg: result.msg })
+          }
+        })
       })
   }
-  checkLoginStatus(imageCrawlEnd)
+  getLoginInfo(data => {
+    imageCrawlEnd(data)
+  })
 }
 
 function fetchHide(url) {
@@ -848,169 +555,6 @@ function fetchHide(url) {
   return FetchType
 }
 
-function showTip(type, url) {
-  // 不是列表和详情页的隐藏【采集本页】按钮
-  var isShowPageArr = ['category', 'sortlist', 'detail']
-  var fetchHideType = fetchHide(url)
-  if (fetchHideType && type == 'detail') {
-    // 详情页
-    $(
-      '<div class="fetch Fetch"><span class="fetch-con FetchCon"></span><button  class=" btn btn-primaryMy fetch-btn FetchBtn FetchDetailBtn" action="fetch" href="javascript:">采集本页</button><span class="close Close" title="关闭" action="Close">×</span></div>'
-    ).appendTo('body')
-  } else if (
-    fetchHideType &&
-    (type == 'category' || type == 'sortlist') &&
-    url.indexOf('yangkeduo.com') === -1
-  ) {
-    // 列表页
-    $(
-      '<div class="fetch Fetch" id="sellerwant-gather-list"><div><button  class="btn fetch-btn fetch-selectBtn" action="fetch" href="javascript:">采集选中</button></div><div><button  class=" btn fetch-btn FetchBtn" action="fetch" href="javascript:">采集本页</button></div><div><button  class=" btn fetch-selectAllBtn" action="fetch" href="javascript:">全选</button></div><span class="close Close" title="关闭" action="Close">×</span></div>'
-    ).appendTo('body')
-  }
-  // else if (fetchHideType && !isShowPageArr.includes(type)) {    // 列表页
-  //     $('<div class="fetch Fetch" id="sellerwant-gather-list"><div><button  class="btn fetch-btn fetch-selectBtn" action="fetch" href="javascript:">采集选中</button></div><div><button  class=" btn fetch-selectAllBtn" action="fetch" href="javascript:">全选</button></div><span class="close Close" title="关闭" action="Close">×</span></div>').appendTo('body');
-  // }
-  $('.fetch').hide()
-  if (type == 'category' || type == 'sortlist' || !isShowPageArr.includes(type)) {
-    $('.fetch').show()
-    $('.source').hide()
-    // 采集本页
-    $('.fetch .FetchBtn').on('click', function() {
-      var showTipCategoryEnd = function(data) {
-        if (!data.status) {
-          // $('.fetch-btn').text('请登录');
-          $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
-          return
-        }
-        isBatchGather = true
-        batchGatherObj = {
-          batchGatherSum: 0,
-          batchGatherLength: $('.emalacca-plugin-goods-acquisition-select').length,
-          batchSuccessNum: 0,
-          batchErrorNum: 0
-        }
-        $('.fetch .FetchBtn').css('pointer-events', 'none')
-        $('.fetch .fetch-selectBtn').css('pointer-events', 'none')
-        $('.fetch .FetchBtn').html('采集中...')
-        $('.emalacca-plugin-goods-acquisition-select').each(function(index) {
-          if (index === 0) {
-            // 批量采集，显示进度条
-            notifyProgress(0)
-          }
-          var urlString = $(this).attr('data-selecturl')
-          imageCrawl(urlString, $(this), 1) //采集操作
-        })
-      }
-      checkLoginStatus(showTipCategoryEnd)
-    })
-    // 采集选中
-    $('.fetch .fetch-selectBtn').on('click', function() {
-      var showTipCategorySelect = function(data) {
-        if (!data.status) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
-          return
-        }
-        var selectNum = 0
-        $('.emalacca-plugin-goods-acquisition-select').each(function() {
-          if ($(this).attr('data-selected') === '1') {
-            ++selectNum
-          }
-        })
-        if (selectNum === 0) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseSelectSomeGoods })
-          return
-        }
-        if (selectNum > 50) {
-          $.fn.message({ type: 'error', msg: MESSAGE.error.beyondMaximumLimit })
-          return
-        }
-        isBatchGather = true
-        batchGatherObj = {
-          batchGatherSum: 0,
-          batchGatherLength: selectNum,
-          batchSuccessNum: 0,
-          batchErrorNum: 0
-        }
-        $('.fetch .fetch-selectBtn').css('pointer-events', 'none')
-        $('.fetch .FetchBtn').css('pointer-events', 'none')
-        $('.fetch .fetch-selectBtn').html('采集中...')
-        var num = 0 // 是否是第一个
-        $('.emalacca-plugin-goods-acquisition-select').each(function() {
-          if ($(this).attr('data-selected') === '1') {
-            if (num === 0) {
-              // 批量采集，显示进度条
-              notifyProgress(0)
-            }
-            num++
-            var urlString = $(this).attr('data-selecturl')
-            imageCrawl(urlString, $(this), 1) //采集操作
-          }
-        })
-      }
-      checkLoginStatus(showTipCategorySelect)
-    })
-    // 全选
-    $('.fetch .fetch-selectAllBtn').on('click', function() {
-      // 选中商品
-      $('.emalacca-plugin-goods-acquisition-select').attr({
-        'data-selected': '1'
-      })
-      $('.emalacca-plugin-goods-acquisition-select').css({
-        'border-width': '0',
-        'pointer-events': 'auto',
-        display: 'block'
-      })
-      $('.emalacca-plugin-goods-acquisition-select')
-        .find('.emalacca-goods-icon-select')
-        .css({
-          display: 'block'
-        })
-    })
-  } else if (type == 'detail') {
-    isBatchGather = false
-    $('.fetch').show()
-    $('.fetch-con').text('单品采集')
-    $('.fetch-btn').on('click', function() {
-      $(this).html('采集中...')
-      imageCrawl(url, null, '', 'detail')
-    })
-  }
-  //文档载入之后执行
-  $('.fetch .close').on('click', function(e) {
-    if (e && e.preventDefault) {
-      //非IE浏览器
-      e.preventDefault()
-    } else {
-      //IE浏览器(IE11以下)
-      window.event.returnValue = false
-    }
-    $('.fetch').hide()
-    ShopeModal.hide('#repeatCrawlModal')
-    return false //取消冒泡行为
-  })
-}
-
-$(function() {
-  $('.repeatCrawDefaultBtn').on('click', function() {
-    ShopeModal.hide('#repeatCrawlModal')
-  })
-  $("input[name='curPage']").on('click', function() {
-    if (this.checked) {
-      $("input[name='sourceUrlRepeat']").each(function() {
-        $(this).prop('checked', true)
-      })
-    } else {
-      $("input[name='sourceUrlRepeat']").each(function() {
-        $(this).prop('checked', false)
-      })
-    }
-  })
-  $(document).off('click', '#checkUrl')
-  $(document).on('click', '#checkUrl', function() {
-    $('#CopyUrl').select()
-    document.execCommand('copy')
-  })
-})
 //当前链接是否为有效链接
 function validArea(a) {
   var $a = $(a)
@@ -1037,10 +581,3 @@ function debounce(func, wait, immediate) {
   }
 }
 
-//获取登录状态
-export function checkLoginStatus(call) {
-  var checkLoginStatusEnd = function(data) {
-    call(data)
-  }
-  sendMessageToBackground('checkLoginStatus', '', checkLoginStatusEnd)
-}
