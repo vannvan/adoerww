@@ -162,7 +162,7 @@ export const COLLECT_SITES = [
 export const COMMON_COLLECT = [
   {
     name: '采集',
-    icon: 'icon-collect',
+    icon: 'em-icon-collect',
     id: 'EmalaccaCollect',
     fixed: true,
     children: [
@@ -185,24 +185,23 @@ export const COMMON_COLLECT = [
 export const COMMON_COLLECT_DETAIL = [
   {
     name: '采集',
-    icon: 'icon-collect',
+    icon: 'em-icon-collect',
     id: 'EmalaccaCollectDetail',
     fixed: true,
     children: [
       {
-        name: '采集本页',
+        name: '采集当前商品',
         action: 'collect-current-page'
       }
     ]
   }
 ]
 
-
 // 虾皮网站专用侧栏工具
 export const RIGHT_MENU = [
   {
     name: '粉丝',
-    icon: 'icon-fans',
+    icon: 'em-icon-fans',
     id: 'EmalaccaFollower',
     fixed: true,
     children: [
@@ -218,7 +217,7 @@ export const RIGHT_MENU = [
   },
   {
     name: '快捷',
-    icon: 'icon-menu',
+    icon: 'em-icon-menu',
     id: 'EmalaccaQuick',
     fixed: true,
     children: [

@@ -15,14 +15,14 @@ const defaults = {
   type: null,
   iconType: null,
   name: 0,
-  closable: true,
+  closable: true
 }
 
 const typeMap = {
-  info: 'icon iconfont icon-iconfontguanyu1x',
-  error: 'icon iconfont icon-icomoonheartbroken',
-  warning: 'icon iconfont icon-iconstopwatch',
-  success: 'icon iconfont icon-checkmark-outline',
+  info: 'icon em-iconfont em-icon-em-iconfontguanyu1x',
+  error: 'icon em-iconfont em-icon-icomoonheartbroken',
+  warning: 'icon em-iconfont em-icon-iconstopwatch',
+  success: 'icon em-iconfont em-icon-checkmark-outline'
 }
 
 const Notification = (options = {}) => {
@@ -38,7 +38,7 @@ const Notification = (options = {}) => {
 
   let instance = new NotificationConstructor({
     el: document.createElement('div'),
-    data: options,
+    data: options
   })
 
   instance.$mount()
@@ -51,8 +51,8 @@ const Notification = (options = {}) => {
   setTimeout(function() {
     let verticalOffset = options.offset || 0
     instances
-      .filter((item) => item.position === position)
-      .forEach((item) => {
+      .filter(item => item.position === position)
+      .forEach(item => {
         verticalOffset += item.$el.offsetHeight + 16
       })
     verticalOffset += 16
@@ -63,11 +63,11 @@ const Notification = (options = {}) => {
   return instance
 }
 
-Object.keys(typeMap).forEach((key) => {
-  Notification[key] = (options) => {
+Object.keys(typeMap).forEach(key => {
+  Notification[key] = options => {
     if (typeof options === 'string') {
       options = {
-        content: options,
+        content: options
       }
     }
     // console.log(options)
@@ -98,8 +98,7 @@ Notification.close = function(id, userOnClose) {
   let removedHeight = instance.$el.offsetHeight
   for (let i = index; i < len - 1; i++) {
     if (instances[i].position === position) {
-      instances[i].verticalOffset =
-        instances[i].verticalOffset - removedHeight - 16
+      instances[i].verticalOffset = instances[i].verticalOffset - removedHeight - 16
     }
   }
 }

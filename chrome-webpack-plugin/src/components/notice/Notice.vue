@@ -1,15 +1,7 @@
 <template>
   <transition name="notice-fade">
-    <div
-      class="wui__notice"
-      :class="[prefixCls + '__box']"
-      :style="positionStyle"
-      v-if="visible"
-    >
-      <span
-        :class="[prefixCls + '__icon--' + type, iconType]"
-        v-show="iconType"
-      ></span>
+    <div class="wui__notice" :class="[prefixCls + '__box']" :style="positionStyle" v-if="visible">
+      <span :class="[prefixCls + '__em-icon--' + type, iconType]" v-show="iconType"></span>
       <div :class="[prefixCls + '__content']">
         <h3 :class="[prefixCls + '__content--title', type]" v-if="title">
           {{ title }}
@@ -18,7 +10,7 @@
       </div>
 
       <span
-        class="icon iconfont icon-close"
+        class="icon em-iconfont em-icon-close"
         @click.stop="close()"
         v-if="closable"
         :class="[prefixCls + '__closeIcon']"
@@ -38,7 +30,7 @@ export default {
       verticalOffset: 0,
       timer: null,
       closed: false,
-      position: 'top-right',
+      position: 'top-right'
     }
   },
   watch: {
@@ -47,7 +39,7 @@ export default {
         this.visible = false
         this.$el.addEventListener('transitionend', this.destroyElement)
       }
-    },
+    }
   },
   computed: {
     verticalProperty() {
@@ -55,9 +47,9 @@ export default {
     },
     positionStyle() {
       return {
-        [this.verticalProperty]: `${this.verticalOffset}px`,
+        [this.verticalProperty]: `${this.verticalOffset}px`
       }
-    },
+    }
   },
   mounted() {
     // if closable is false means it's can't close ,set duration = 0
@@ -83,8 +75,8 @@ export default {
       if (typeof this.onClose === 'function') {
         this.onClose()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

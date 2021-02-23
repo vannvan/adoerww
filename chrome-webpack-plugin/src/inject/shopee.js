@@ -40,16 +40,14 @@ const Follow = {
   //给a标签添加操作面板
   insertAction: function() {
     $.each(document.links, function(index, a) {
-      $(a).mouseenter(function(param) {
+      $(a).mouseenter(function() {
         let storeId = $(this)[0].href.split('-i.')[1]
         if (isEmpty(storeId)) return
         try {
           let firstImg = $(this).find('img:first-child')
-          let contentOffsetLeft = $(this).offset().left
-            ? $(this).offset().left
-            : firstImg.offset().left
-          let contentOffsetTop = $(this).offset().top ? $(this).offset().top : firstImg.offset().top
-          let contentWidth = $(this).width() ? $(this).width() : firstImg.width()
+          let contentOffsetLeft = $(this).offset().left || firstImg.offset().left
+          let contentOffsetTop = $(this).offset().top || firstImg.offset().top
+          let contentWidth = $(this).width() || firstImg.width() || 190
           // 操作面板显示
           let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
           actionListElement.attr('data-store-id', storeId) //粉丝关注用
@@ -167,12 +165,18 @@ const Follow = {
             $(this).attr('data-view', true) //添加过的打上标记
 
             // 如果当前a标签有高度就在下一级添加
-            if ($(this).height() > 0) {
+            if ($(this).height() > 0 && $(this).height() > 200) {
               $(this).append(dataViewElement)
             }
 
             // 如果当前a标签没有高度就在下下一级添加
-            if ($(this).height() == 0) {
+            if (
+              $(this).height() == 0 &&
+              $(this)
+                .children()
+                .children()
+                .height() > 200
+            ) {
               $(this)
                 .children()
                 .children()

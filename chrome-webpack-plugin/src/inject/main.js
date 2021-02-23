@@ -30,5 +30,3 @@ setTimeout(() => {
   })
   APP.init()
 }, 500)
-
-console.log(VERSION)

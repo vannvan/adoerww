@@ -3,7 +3,7 @@
     <div class="emalacca-plugin-action-wrap" draggable="false">
       <!-- 可以拖动的节点 -->
       <div class="emalacca-plugin-action-toggle">
-        <span class="icon iconfont icon-erp-logo"></span>
+        <span class="icon em-iconfont em-icon-erp-logo"></span>
       </div>
 
       <ul class="follow-quick-action-wrap" id="emalaccaRightMenu">
@@ -15,11 +15,11 @@
           :id="item.id"
           :style="{ 'pointer-events': isExpand && !item.fixed ? 'auto' : 'none' }"
         >
-          <span class="icon iconfont" :class="item.icon"></span>
+          <span class="icon em-iconfont" :class="item.icon"></span>
           <p class="emalacca-plugin-quick-action-title">{{ item.name }}</p>
           <div class="emalacca-plugin-quick-action-content">
             <span
-              class="icon iconfont icon-nail"
+              class="icon em-iconfont em-icon-nail"
               @click="changeSkin(item)"
               :style="{ color: item.fixed ? '#ff720d' : '#fff' }"
             ></span>
@@ -38,7 +38,7 @@
           class="emalacca-plugin-quick-action-item dark help"
           :style="{ 'pointer-events': isExpand ? 'auto' : 'none' }"
         >
-          <span class="icon iconfont icon-question"></span>
+          <span class="icon em-iconfont em-icon-question"></span>
           <p class="emalacca-plugin-quick-action-title">帮助</p>
         </li>
       </ul>
@@ -47,7 +47,10 @@
         class="emalacca-plugin-fold-dark toggle-menu-action"
         :style="{ marginTop: initHoldUpMarginTop }"
       >
-        <span class="icon iconfont" :class="isExpand ? 'icon-pick-up' : 'icon-pick-down'"></span>
+        <span
+          class="icon em-iconfont"
+          :class="isExpand ? 'em-icon-pick-up' : 'em-icon-pick-down'"
+        ></span>
         <p class="emalacca-plugin-quick-action-title">{{ isExpand ? '收起' : '展开' }}</p>
       </div>
     </div>

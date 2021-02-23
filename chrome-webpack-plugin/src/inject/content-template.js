@@ -35,8 +35,7 @@ export const operationPanelTemplate = (collectStatus = 'collect') => {
 export const operationSelectTemplate = () => {
   return $(`
     <div class="${ClassPrefix}-goods-acquisition-select" data-selected="0">
-			<span class="icon iconfont emalacca-goods-icon-select">&#x9e69;</span>
+			<span class="icon em-iconfont emalacca-goods-icon-select">&#x9e69;</span>
     </div>
    `)
 }
-

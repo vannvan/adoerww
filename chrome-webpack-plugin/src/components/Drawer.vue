@@ -5,7 +5,7 @@
       <div class="drawer-head">
         <span>{{ title }}</span>
         <!-- <span
-          class="icon iconfont icon-close close-btn"
+          class="icon em-iconfont em-icon-close close-btn"
           v-show="closable"
           @click="closeByButton"
         >

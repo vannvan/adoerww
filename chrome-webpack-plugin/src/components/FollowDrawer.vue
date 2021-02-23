@@ -14,7 +14,7 @@
         <p>
           <a class="hand" @click="followHelpVisible = !followHelpVisible">粉丝关注步骤说明 </a>
           <span
-            class="icon iconfont icon-right arrow-right"
+            class="icon em-iconfont em-icon-right arrow-right"
             :class="followHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'"
           ></span>
           <a @click="handleGotoDemo()" class="hand">演示动画</a>
@@ -45,7 +45,7 @@
         <p>
           <a class="hand" @click="unFollowHelpVisible = !unFollowHelpVisible">取关粉丝步骤说明 </a>
           <span
-            class="icon iconfont icon-right arrow-right"
+            class="icon em-iconfont em-icon-right arrow-right"
             :class="unFollowHelpVisible ? 'arrow-rotate' : 'arrow-rotate-back'"
           ></span>
           <a @click="handleGotoDemo()" class="hand">演示动画</a>
@@ -666,11 +666,15 @@ export default {
       let matchStep1 = follower_count >= followsTimes //和关注数
       let matchStep2 = parseInt((timestamp - mtime) / 86400) <= lastLoginTime //限制上次登录
       let matchStep3 = item_count >= sellerGoodsCount //限制商品数
-      let matchStep5 = is_seller == false
+      let matchStep5 = is_seller == false //是否是卖家
       let matchStep6 = rateCount >= commentsTimes //限制评价次数
-      //   如果不过滤卖家
+      //  不过滤卖家时， 如果当前用户是卖家且限制了商品数，就需要同时满足，如果只是买家，就不用限制商品数
       if (!isFilterSeller) {
-        return matchStep1 && matchStep2 && matchStep3 && matchStep6
+        if (is_seller) {
+          return matchStep1 && matchStep2 && matchStep6 && matchStep3
+        } else {
+          return matchStep1 && matchStep2 && matchStep6
+        }
       } else {
         return matchStep1 && matchStep2 && matchStep3 && matchStep5 && matchStep6
       }
