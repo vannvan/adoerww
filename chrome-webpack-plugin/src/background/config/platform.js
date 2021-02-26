@@ -66,7 +66,7 @@ export const Platform = {
       return url
     },
     crawl: function (url, callback, sync) {
-      var orgUrl = url
+      var orgUrl = url      
       if (url.indexOf('dj.1688.com/ci_king')>-1) {
         superagent.get(url).end(function (err, res) {
           if (res.status == 200) {
@@ -122,6 +122,10 @@ export const Platform = {
           0,
           function (data) {
             data.url = orgUrl
+            // url取最后一次重定向url请求（广告）
+            if (orgUrl !== data.responseURL) {
+              data.url = data.responseURL
+            }
             if (data.html) {
               // data.desc = desc.html
               callback(data)
@@ -208,130 +212,76 @@ export const Platform = {
     },
     crawl: function (url, callback, sync) {
       var orgUrl = url
-        // console.log("orgUrl:"+orgUrl)
-      if (url.indexOf('click.simba.taobao.com') > -1) {
-        superagent.get(url).end(function (err, res) {
-          if (res.status == 200) {
-            orgUrl = res.xhr.responseURL
+       
+      Html.getHtml(
+        orgUrl,
+        0,
+        function (data) {
+          data.url = orgUrl
+          // url取最后一次重定向url请求（广告）
+          // 例：在天猫首页中的天猫超市，商品链接是淘宝，重定向2次后是天猫;
+          if (orgUrl !== data.responseURL) {
+            data.url = data.responseURL
+          }
+          data.reqCookie = document.cookie
+          data.pageDocHtml = "<html>"+document.body.innerHTML+"</html>";
+          // 在当前页采集
+          try {
+            if (document.getElementById('J_PromoPriceNum') !== null) {
+              let salePrice = document.getElementById('J_PromoPriceNum')
+                .innerHTML
+              if (!!salePrice) {
+                data.price = salePrice
+              }
+            } else if (
+              document.getElementsByClassName('tb-rmb-num').length > 0
+            ) {
+              let salePrice = document
+                .getElementsByClassName('tb-rmb-num')[0]
+                .innerHTML.split('-')[0]
+              if (!!salePrice) {
+                data.price = salePrice
+              }
+            }
+          } catch (e) {
+            data.price = ''
+          }
+
+          if (data.html) {
+            var descUrl = Platform.TaobaoCrawl.getDescUrl(data.html)
+            // 取描述信息
             Html.getHtml(
-              orgUrl,
+              descUrl,
               0,
-              function (data) {
-                data.url = orgUrl
-                  data.reqCookie = document.cookie
-                // 在当前页采集
+              function (desc) {
+                data.productTitle = ''
+                var div = $('<div></div>')
+                div.html(data.html)
+                var productTitleBack = $(div).find('title')[0].innerText
+                var productTitle = ''
                 try {
-                  let salePrice = document.getElementById('J_PromoPriceNum')
-                    .innerHTML
-                  if (!!salePrice) {
-                    data.price = salePrice
-                  }
-                } catch (e) {
-                  data.price = ''
+                  productTitle = $(div).find('.tb-main-title')[0].innerText
+                } catch (error) {
+                  productTitle = ''
                 }
-                if (data.html) {
-                  console.log(Platform, 'Platform')
-                  var descUrl = Platform.TaobaoCrawl.getDescUrl(data.html)
-                  // 取描述信息
-                  Html.getHtml(
-                    descUrl,
-                    0,
-                    function (desc) {
-                      // 获取标题
-                      data.productTitle = ''
-                      var div = $('<div></div>')
-                      div.html(data.html)
-                      var productTitleBack = $(div).find('title')[0].innerText
-                      var productTitle = ''
-                      try {
-                        productTitle = $(div).find('.tb-main-title')[0].innerText
-                      } catch (error) {
-                        productTitle = ''
-                      }
-                      if (!!productTitle) {
-                        data.productTitle = productTitle
-                      } else {
-                        data.productTitle = productTitleBack
-                      }
-                      data.desc = desc.html
-                      callback(data)
-                    },
-                    sync
-                  )
+                if (!!productTitle) {
+                  data.productTitle = productTitle
                 } else {
-                  data.html = ''
-                  callback(data)
+                  data.productTitle = productTitleBack
                 }
+                data.desc = desc.html
+                callback(data)
               },
               sync
             )
+          } else {
+            data.html = ''
+            callback(data)
           }
-        })
-      } else {
-        Html.getHtml(
-          orgUrl,
-          0,
-          function (data) {
-            data.url = orgUrl
-              data.reqCookie = document.cookie
-              data.pageDocHtml = "<html>"+document.body.innerHTML+"</html>";
-            // 在当前页采集
-            try {
-              if (document.getElementById('J_PromoPriceNum') !== null) {
-                let salePrice = document.getElementById('J_PromoPriceNum')
-                  .innerHTML
-                if (!!salePrice) {
-                  data.price = salePrice
-                }
-              } else if (
-                document.getElementsByClassName('tb-rmb-num').length > 0
-              ) {
-                let salePrice = document
-                  .getElementsByClassName('tb-rmb-num')[0]
-                  .innerHTML.split('-')[0]
-                if (!!salePrice) {
-                  data.price = salePrice
-                }
-              }
-            } catch (e) {
-              data.price = ''
-            }
-
-            if (data.html) {
-              var descUrl = Platform.TaobaoCrawl.getDescUrl(data.html)
-              // 取描述信息
-              Html.getHtml(
-                descUrl,
-                0,
-                function (desc) {
-                  data.productTitle = ''
-                  var div = $('<div></div>')
-                  div.html(data.html)
-                  var productTitleBack = $(div).find('title')[0].innerText
-                  var productTitle = ''
-                  try {
-                    productTitle = $(div).find('.tb-main-title')[0].innerText
-                  } catch (error) {
-                    productTitle = ''
-                  }
-                  if (!!productTitle) {
-                    data.productTitle = productTitle
-                  } else {
-                    data.productTitle = productTitleBack
-                  }
-                  data.desc = desc.html
-                  callback(data)
-                },
-                sync
-              )
-            } else {
-              data.html = ''
-              callback(data)
-            }
-          },
-          sync
-        )
-      }
+        },
+        sync
+      )
+      
     },
   },
   //
@@ -354,6 +304,10 @@ export const Platform = {
         0,
         function (data) {
           data.url = url
+          // url取最后一次重定向url请求（广告）
+          if (url !== data.responseURL) {
+            data.url = data.responseURL
+          }
           if (data.html) {
             var descUrl = Platform.TmallCrawl.getDescUrl(data.html)
 
@@ -2250,6 +2204,7 @@ export const Platform = {
           div.html(data.html)
           data.next = ''
           data.list = []
+          data.reqCookie = document.cookie
           data.brandList = []
           // console.log($(div).find('script'))
           try {
@@ -2700,7 +2655,6 @@ export const Platform = {
           try {
             productTitle = div.find('.prod-info-title')[0].innerText.split('#')[0]
           } catch (e) {
-            console.log(url)
             productTitle = $(div).find('title').text()
           }
           data.productTitle = productTitle

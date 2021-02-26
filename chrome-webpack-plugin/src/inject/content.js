@@ -1,16 +1,16 @@
 import $ from 'jquery'
 import { getRule } from '@/lib/rules'
-import { CONFIGINFO } from '@/background/config.js'
-import { Html } from '@/background/server/html.js'
-import { Crawl } from '@/background/server/crawl.js'
-import { taobaoTranslationUrl, albbTranslationUrl } from '@/lib/handle-url'
-import { operationPanelTemplate, operationSelectTemplate, collectText } from './content-template'
+import { operationPanelTemplate, operationSelectTemplate } from './content-template'
 import { MESSAGE } from '../lib/conf'
+import { debounce } from '@/lib/utils'
+import Follow from './shopee'
+import { imageCrawl } from './crawl-handler'
 import locationBtn from '@/lib/location-btn'
-import { getLoginInfo } from '@/lib/chrome-client'
 
 //----------------------------------------------新增内容---------------------------------------------
-var CONFIG = {}
+const linkrule = getRule(location.href)
+
+const CONFIG = linkrule ? JSON.parse(linkrule) : null
 
 chrome.extension.onMessage.addListener(function(message, sender, callback) {
   if (message.ID !== 'content') {
@@ -26,38 +26,17 @@ chrome.extension.onMessage.addListener(function(message, sender, callback) {
   }
 })
 
-if (document.contentType === 'text/html') {
-  chrome.storage.sync.get(
-    {
-      showPageFetchBar: true,
-      showProductFetchBtn: true
-    },
-    function(data) {
-      preload()
-      new MutationObserver(function(mutations) {
-        preload()
-      })
-    }
-  )
-}
-
-var debounceHandleLinks = debounce(function() {
+const debounceHandleLinks = debounce(function() {
   if (CONFIG && CONFIG.detail) {
     handleLinks(CONFIG.detail)
   }
 }, 800)
-//获取当前域名配置信息
-function preload() {
-  var linkrule = getRule(location.href)
 
-  try {
-    CONFIG = JSON.parse(linkrule)
-    handleLinks(CONFIG.detail)
-    $(window).scroll(debounceHandleLinks)
-  } catch (e) {
-    return
-  }
+if (CONFIG) {
+  handleLinks(CONFIG.detail)
+  $(window).scroll(debounceHandleLinks)
 }
+
 //过滤超链接，将满足条件的图片上加上采集按钮
 //fnBody 过滤方法的方法体
 function handleLinks(fnBody) {
@@ -124,7 +103,6 @@ function handleLinks(fnBody) {
  url 超链接地址
  */
 function insertFetchBtn($a, url, status) {
-  var $body = $('body')
   $a.addClass('link') //头部悬浮01
   //$a.parent().addClass('link-box');
   let $crawlPanel = operationPanelTemplate()
@@ -144,15 +122,12 @@ function insertFetchBtn($a, url, status) {
   var sumaitongShowArr = ['category', 'sortlist']
   var imgALBBUrl =
     'https://s.1688.com/youyuan/index.htm?tab=imageSearch&imageType=https://cbu01.alicdn.com&imageAddress='
-  // 1688
+  // 1688 商品图片处理
   if (url.indexOf('1688.com') > -1 && $firstImg.length == 0) {
-    $firstImg = $a.find('.img:first-child')
-    var styleString = ''
+    $firstImg = $a.find('.img')
     if ($firstImg.length > 0) {
-      $firstImg.each(function() {
-        styleString = $(this).prop('style').backgroundImage
-      })
-      styleString.replace(/\/img\/.*?(\.(png|jpg|gif|jpeg|webp))/, function(items, item) {
+      let divImgString = $firstImg.css('background-image')
+      divImgString.replace(/\/img\/.*?(\.(png|jpg|gif|jpeg|webp))/, function(items, item) {
         imgALBBUrl = imgALBBUrl + items
       })
       $crawlPanel.find('.emalacca-goods-btn[data-type=view]').attr({
@@ -179,6 +154,9 @@ function insertFetchBtn($a, url, status) {
         'data-href': imgALBBUrl
       })
     }
+  } else if (/(shopee\.)|(xiapibuy\.)/.test(url)) {
+    let storeId = url.split('-i.')[1]
+    $crawlPanel.attr({ 'data-store-id': storeId }) // 虾皮整上storeid
   }
   // 隐藏div
   var hideCreationDiv = function() {
@@ -199,20 +177,6 @@ function insertFetchBtn($a, url, status) {
   }
   // 列表页显示
   if ($firstImg.length > 0) {
-    // 淘宝列表采集(广告商品需要改url)
-    if (sumaitongShowArr.includes(pageType) && url.indexOf('click.simba.taobao.com/cc') > -1) {
-      url = taobaoTranslationUrl($a, url)
-      if (url === '') {
-        return
-      }
-    }
-    // 1688列表采集(广告商品需要改url)
-    if (sumaitongShowArr.includes(pageType) && url.indexOf('dj.1688.com/ci_') > -1) {
-      url = albbTranslationUrl($a)
-      if (url === '') {
-        return
-      }
-    }
     // lazada列表采集(小图不显示采集按钮)
     if (sumaitongShowArr.includes(pageType) && url.indexOf('www.lazada.') > -1) {
       var classString = $a.attr('class')
@@ -226,10 +190,10 @@ function insertFetchBtn($a, url, status) {
     })
     // 列表引入
     if (sumaitongShowArr.includes(pageType)) {
-      if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
-        $a.after($crawlBg)
-        $('body').append($crawlPanel)
-      }
+      //   if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+      $a.after($crawlBg)
+      $('body').append($crawlPanel)
+      //   }
 
       $a.after($crawlSelect)
 
@@ -246,7 +210,8 @@ function insertFetchBtn($a, url, status) {
   //非列表页
   if (!sumaitongShowArr.includes(pageType)) {
     // $crawl.insertAfter($body)
-    
+    // 非列表页
+
     // 隐藏div
     $a.on('mouseleave', function() {
       $crawlPanel.css({
@@ -261,11 +226,12 @@ function insertFetchBtn($a, url, status) {
     })
   }
   $a.on('mouseenter', function() {
+    //   如果是列表
     if (sumaitongShowArr.includes(pageType)) {
       // 列表页显示
       var $isShowImgGather = $(this).find('img:first-child')
       if (url.indexOf('1688.com') > -1 && $isShowImgGather.length == 0) {
-        $isShowImgGather = $(this).find('.img:first-child')
+        $isShowImgGather = $(this).find('.img')
       }
       if ($isShowImgGather.length > 0) {
         $crawlSelect.css({
@@ -274,40 +240,8 @@ function insertFetchBtn($a, url, status) {
         })
         $crawlBg.css('display', 'block')
       }
-      var href = '',
-        crawlTop,
-        crawlLeft,
-        firstImgTop,
-        firstImgLeft,
-        top,
-        left
-      if (status == 'hy') $isShowImgGather = $a
-      href = $(this).attr('href')
-      crawlTop = $crawlPanel.offset().top
-      crawlLeft = $crawlPanel.offset().left
-      if ($isShowImgGather.length > 0) {
-        firstImgTop = $isShowImgGather.offset().top
-        firstImgLeft = $isShowImgGather.offset().left
-      } else {
-        firstImgTop = $a.offset().top
-        firstImgLeft = $a.offset().left
-      }
-      firstImgLeft ? (left = firstImgLeft) : (left = crawlLeft)
-      firstImgTop ? (top = firstImgTop) : (top = crawlTop)
-      let contentWidth = $(this).width() ? $(this).width() : $isShowImgGather.width()
-      let contentHeight = $(this).height() ? $(this).height() : $isShowImgGather.height()
-      $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
-        $(this).attr({
-          'data-url': href
-        })
-      })
-
-      $crawlPanel.css({
-        top: top + parseInt(contentHeight / 2),
-        left: left + parseInt(contentWidth / 2),
-        transform: 'translateY(-50%) translateX(-50%)',
-        display: 'block'
-      })
+      // 单采按钮显示
+      locationBtn($(this), $crawlPanel)
       let $that = $(this)
       $crawlPanel.on('mouseenter', function() {
         $(this).css({
@@ -328,33 +262,37 @@ function insertFetchBtn($a, url, status) {
       })
     } else {
       // 非列表页
-      // shopee&&xiapi不显示
-      if (!/(shopee\.)|(xiapibuy\.)/.test(window.location.host)) {
+      if (!$(this).attr('data-emalacca-btn') !== '1') {
         $('body').append($crawlPanel)
-      } else {
-        return
+        $(this).attr('data-emalacca-btn', '1')
       }
-      locationBtn($(this),  $crawlPanel)
-      // $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').each(function() {
-      //   $(this).attr({
-      //     'data-url': href
-      //   })
-      // })
-      // $crawlPanel.css({
-      //   top: top + parseInt(contentHeight / 2),
-      //   left: left + parseInt(contentWidth / 2),
-      //   transform: 'translateY(-50%) translateX(-50%)',
-      //   display: 'block'
-      // })
+      // 单采按钮显示
+      locationBtn($(this), $crawlPanel)
+
       $crawlPanel.on('mouseenter', function() {
         $(this).css({
           display: 'block'
+        })
+      })
+      $crawlPanel.on('mouseleave', function() {
+        $(this).css({
+          display: 'none'
         })
       })
     }
     // 1688添加低价货源
     if (url.indexOf('1688.com') === -1) {
       $crawlPanel.find('.emalacca-goods-btn[data-type=view]').css({
+        display: 'none'
+      })
+    }
+
+    // 查看店铺，获取粉丝, 只有虾皮才显示
+    if (!/(shopee\.)|(xiapibuy\.)/.test(url)) {
+      $crawlPanel.find('.emalacca-goods-btn[data-type=view-store]').css({
+        display: 'none'
+      })
+      $crawlPanel.find('.emalacca-goods-btn[data-type=get-follower]').css({
         display: 'none'
       })
     }
@@ -392,7 +330,7 @@ function insertFetchBtn($a, url, status) {
     }
   })
 
-  // 单采
+  // 采集商品
   $crawlPanel.find('.emalacca-goods-btn[data-type=collect]').on('click', function() {
     if ($('.alert').length > 0) $('.alert').remove()
     if (!$(this).hasClass('success')) {
@@ -403,156 +341,45 @@ function insertFetchBtn($a, url, status) {
     }
     return false
   })
+
   // 1688低价货源
   $crawlPanel.find('.emalacca-goods-btn[data-type=view]').on('click', function() {
-    var hrefString = $(this).attr('data-href')
+    let hrefString = $(this).attr('data-href')
     window.open(hrefString)
     return false
   })
-}
 
-// 在图片上直接采集
-export function imageCrawl(url, $span, type, crawlType, noBrandDetect, isSuccessPrompt) {
-  var imageCrawlEnd = function(data) {
-    if (!data.status) {
-      $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
-      if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('请登录')
-      return
+  //查看店铺
+  $crawlPanel.find('.emalacca-goods-btn[data-type=view-store]').on('click', function() {
+    let storeId = $(this)
+      .parent()
+      .attr('data-store-id')
+    let realStoreId = storeId ? storeId.split('.')[0] : null
+    if (!realStoreId) {
+      $.fn.message({ type: 'warning', msg: MESSAGE.error.faildGetGoodsInfo })
+      return false
     }
-    let uid = data.data.token
-    let urls = window.location.href
-
-    //天猫处理
-    if (url.indexOf('tmall.hk') !== -1) url = url.replace('tmall.hk', 'tmall.com')
-
-    //shopee
-    if (location.href.indexOf('shopee.') !== -1 && url.indexOf('shopee.') === -1) {
-      url = 'https://' + location.host + url
-    } else if (
-      type &&
-      +type === 1 &&
-      location.href.indexOf('tw.shopeesz.com') !== -1 &&
-      url.indexOf('tw.shopeesz.com') === -1
-    ) {
-      url = 'https://tw.shopeesz.com' + url
-    } else if (location.href.indexOf('xiapibuy.com') !== -1 && url.indexOf('xiapibuy.com') === -1) {
-      url = 'https://' + location.host + url
-    }
-    if (urls.indexOf('www.wish.com/') !== -1) {
-      urls = urls.substring(0, urls.indexOf('com/') + 3)
-      if (url.indexOf('https://') === -1) {
-        url = urls + url
-      }
-    }
-
-    //速卖通 将旧版链接直接修改为新版采集
-    if (url) {
-      if (url.indexOf('aliexpress.com/item/') !== -1 && url.indexOf('.html') !== -1) {
-        var itemId = url.substring(url.indexOf('aliexpress.com/item/') + 20, url.indexOf('.html'))
-        if (itemId && itemId.indexOf('/') !== -1) {
-          itemId = itemId.substring(0, itemId.indexOf('/') + 1)
-          url = url.replace(itemId, '')
-        }
-      } else if (
-        url.indexOf('.aliexpress.com/store/product/') !== -1 &&
-        url.indexOf('.html') !== -1
-      ) {
-        url = url.substring(0, url.indexOf('.html') + 5)
-        if (url) {
-          var urlHost = url.substring(0, url.indexOf('/store/product/'))
-          var itemStr = url.substring(url.lastIndexOf('/'), url.indexOf('.html'))
-          if (itemStr && itemStr.indexOf('_') > -1) {
-            url = urlHost + '/item/' + itemStr.split('_')[1] + '.html'
-          }
-        }
-      }
-    }
-    var crawlObj = Crawl.getCrawlObject('single', url)
-    if (url.indexOf('http') === -1) {
-      url = 'https:' + url
-    } else if (url.indexOf('https') === -1) {
-      url = url.replace('http', 'https')
-    }
-    //lazada
-    // 判断当前地址是否是列表
-    var linkruleHref = getRule(location.href)
-    var CONFIG_OBJ = JSON.parse(linkruleHref)
-    var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
-    var sumaitongShowArr = ['category', 'sortlist']
-    // lazada列表页不调用html
-    if (url.indexOf('www.lazada.') > -1 && sumaitongShowArr.includes(pageType)) {
-      var params = {
-        baseURL: CONFIGINFO.url.ApiUrl,
-        token: uid,
-        detailUrl: url,
-        url: url
-      }
-      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, function(result) {
-        if (result.code == 0) {
-          if ($span) {
-            $span.css({
-              color: '#fff',
-              backgroundColor: '#67c23a',
-              borderColor: '#67c23a'}).html('采集成功')
-              .find('.emalacca-goods-btn[data-type=collect]')
-              .text('采集成功')
-            $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
-          }
-        } else {
-          $.fn.message({ type: 'error', msg: result.msg })
-        }
-      })
-      return
-    }
-
-    crawlObj &&
-      crawlObj.crawl(url, function(data) {
-        let baseURL = CONFIGINFO.url.ApiUrl
-        data.detailUrl = data.url
-        data.token = uid
-        data.baseURL = baseURL
-        data.repeatCheck = 1 //必须查重
-        // 淘宝广告页处理(获取正确的url)
-        if (urls.indexOf('taobao.com') > -1) {
-          var realUrl = ''
-          data.html.replace(/\<link rel="canonical".*?\/>/g, function(items) {
-            items.replace(/(http|https).*?id=\d+/g, function(item) {
-              realUrl = item
-            })
-          })
-          data.detailUrl = realUrl
-          data.url = realUrl
-        }
-        Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {
-          if (result.code == '0') {
-            $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
-            $span.css({
-              color: '#fff',
-              backgroundColor: '#67c23a',
-              borderColor: '#67c23a'}).html('采集成功')
-          } else {
-            // 后台返回错误信息
-            if (!noBrandDetect) {
-              if ($span) $span.find('.emalacca-goods-btn[data-type=collect]').text('重新采集')
-            } else {
-              $span.html('重新采集')
-            }
-            $.fn.message({ type: 'success', msg: result.msg })
-          }
-        })
-      })
-  }
-  getLoginInfo(data => {
-    imageCrawlEnd(data)
+    window.open(`${window.location.origin}/shop/${realStoreId}`)
   })
-}
 
-function fetchHide(url) {
-  var FetchType = true
-  if (url.indexOf('kj.1688.com/') !== -1 || url.indexOf('seller.shopee') !== -1) {
-    FetchType = false
-  }
-  return FetchType
+  // 获取粉丝
+  $crawlPanel.find('.emalacca-goods-btn[data-type=get-follower]').on('click', function() {
+    let storeId = $(this)
+      .parent()
+      .attr('data-store-id')
+    let realStoreId = storeId ? storeId.split('.')[0] : null
+    if (!realStoreId) {
+      $.fn.message({ type: 'warning', msg: MESSAGE.error.faildGetGoodsInfo })
+      return false
+    }
+    Follow.syncShoppeBaseInfo().then(res => {
+      if (res.code == -1) {
+        $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
+      } else {
+        window.open(`/shop/${realStoreId}/followers?other=true`)
+      }
+    })
+  })
 }
 
 //当前链接是否为有效链接
@@ -564,20 +391,3 @@ function validArea(a) {
     $a.html().indexOf('background') !== -1
   )
 }
-
-function debounce(func, wait, immediate) {
-  var timeout
-  return function() {
-    var context = this,
-      args = arguments
-    var later = function() {
-      timeout = null
-      if (!immediate) func.apply(context, args)
-    }
-    var callNow = immediate && !timeout
-    clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
-    if (callNow) func.apply(context, args)
-  }
-}
-

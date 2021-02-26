@@ -27,6 +27,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
   }
 })
+// 设置ajax请求 获取重定向接口最后一个url
+const xhr = new XMLHttpRequest();
 
 export const backEvent = {
   //获取用户登录状态
@@ -89,10 +91,14 @@ export const backEvent = {
       type: 'GET',
       async: sync,
       timeout: 60000,
+      xhr: function() {
+        return xhr;
+      },
       data: {},
       success: function(data) {
         typeof data == 'object' && (data = JSON.stringify(data))
-        call({ html: data })
+        // xhr.responseURL 重定向接口最后一个url
+        call({ html: data, responseURL: xhr.responseURL })
       },
       complete: function(XMLHttpRequest, status) {
         if (status == 'timeout') {

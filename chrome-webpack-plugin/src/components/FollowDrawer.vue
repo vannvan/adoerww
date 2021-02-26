@@ -128,7 +128,7 @@
               />
               <small class="error-info" ref="lastLoginTime">请输入上次登录时间 </small>
             </span>
-            <span class="sub-item">
+            <!-- <span class="sub-item">
               <input
                 type="number"
                 placeholder=">=0次"
@@ -136,22 +136,23 @@
                 v-enterNumberMin="-1"
               />
               <small class="error-info" ref="commentsTimes">请输入评价次数 </small>
-            </span>
-          </li>
-          <li>
-            <span class="sub-item">最少关注数</span>
-          </li>
-          <li>
+            </span> -->
             <span class="sub-item">
               <input
                 type="number"
-                placeholder=">=0次"
+                placeholder=">=0"
                 v-model="filterParams.followsTimes"
                 v-enterNumberMin="-1"
               />
               <small class="error-info" ref="followsTimes">请输入关注人数 </small>
             </span>
           </li>
+          <!-- <li>
+            <span class="sub-item">最少关注数</span>
+          </li>
+          <li>
+            
+          </li> -->
           <li>
             <span class="sub-item">过滤卖家</span>
             <span class="sub-item" v-if="!filterParams.isFilterSeller">
@@ -650,11 +651,11 @@ export default {
         rating_normal
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
-      //   console.log(
-      //     `上次登录: ${new Date(
-      //       mtime * 1000
-      //     ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
-      //   )
+      console.log(
+        `上次登录: ${new Date(
+          mtime * 1000
+        ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
+      )
       let {
         lastLoginTime, //上次登录时间
         commentsTimes, //评价次数

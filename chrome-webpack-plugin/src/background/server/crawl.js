@@ -3,11 +3,8 @@ import { Platform } from '../config/platform.js'
 import { CONFIGINFO } from '../config.js'
 import { ShopeModal } from '../config/modal.js'
 import { Html } from '@/background/server/html.js'
-const qweQWE = require('@/background/config/platform')
 var dataArr = [] // 存放重复的采集数据
 var contentObj = $('#repeatCrawlModalContent .RepeatBox')
-var jj = 0
-var failsUrls = ''
 
 export const Crawl = {
   config: {
@@ -138,14 +135,7 @@ export const Crawl = {
     }
     return null
   },
-  singleCrawl: function(
-    uid,
-    urls,
-    checkFinish,
-    crawlCategory,
-    sync,
-    salePriceObj
-  ) {
+  singleCrawl: function(uid, urls, checkFinish, crawlCategory, sync, salePriceObj) {
     var urlArr = []
     if (urls) urlArr = urls.split('\n')
     var total = urlArr.length

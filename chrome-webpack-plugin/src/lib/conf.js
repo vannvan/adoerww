@@ -190,7 +190,7 @@ export const COMMON_COLLECT_DETAIL = [
     fixed: true,
     children: [
       {
-        name: '采集当前商品',
+        name: '采集该商品',
         action: 'collect-current-page'
       }
     ]

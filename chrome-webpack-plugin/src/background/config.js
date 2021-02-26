@@ -42,6 +42,11 @@ export const CONFIGINFO = {
     // 采购订单已退款
     refundOrderPur: function() {
       return this.ApiUrl + 'orderPurchase/refundOrderPur'
+    },
+
+    // 获取采集统计数据
+    getCrawlCount: function() {
+      return this.ApiUrl + 'product/crawl/count'
     }
   }
 }

@@ -21,8 +21,8 @@
           <span class="user-info-value">{{ userInfo.memberNO }}</span>
         </div>
         <div class="user-info-item border-top">
-          <span class="user-info-title">正在采集数量：30</span>
-          <span class="user-info-value link" @click="handleOpenPage('publish/collect', 'erp')"
+          <span class="user-info-title">正在采集数量：{{ collecting }}</span>
+          <span class="user-info-value link" @click="handleOpenPage('goods/collect', 'erp')"
             >采集箱</span
           >
         </div>
@@ -75,6 +75,8 @@ import { ERP_SYSTEM } from '@/lib/env.conf'
 import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
 import { getTabUrl, getAllTabs, gotoErp } from '@/lib/chrome'
+import { CONFIGINFO } from '../background/config'
+import $ from 'jquery'
 function sendMessageToContentScript(message, callback) {
   getTabUrl(url => {
     // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
@@ -95,22 +97,24 @@ function sendMessageToContentScript(message, callback) {
     })
   })
 }
-
 export default {
   data() {
     return {
       userInfo: null,
       pluginName: APPNAME + ' V' + VERSION,
-      collectSites: COLLECT_SITES
+      collectSites: COLLECT_SITES,
+      collecting: 0
     }
   },
   mounted() {
     this.userInfo = getStorage('pt-plug-access-user')
       ? getStorage('pt-plug-access-user').userInfo
-      : null
-    gotoErp(function(e) {
-      console.log(e)
-    })
+      : gotoErp(function(e) {
+          console.log(e)
+        })
+    if (this.userInfo) {
+      this.getCollecting()
+    }
   },
   methods: {
     handleExit() {
@@ -131,6 +135,23 @@ export default {
       } else {
         window.open(link)
       }
+    },
+
+    //获取正在采集数量
+    getCollecting() {
+      $.ajax({
+        url: CONFIGINFO.url.getCrawlCount(),
+        type: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + getStorage('pt-plug-access-user').token
+        },
+        dataType: 'json',
+        success: function(res) {
+          if (res.code == 0) {
+            this.collecting = res.data
+          }
+        }
+      })
     }
   }
 }

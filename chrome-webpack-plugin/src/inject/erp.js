@@ -24,10 +24,10 @@ export const ERP = {
               let { userInfo } = authInfo
               let { memberNO = '' } = userInfo.userInfo
               console.log('Information synchronization successful')
-              $.fn.message({
-                type: 'success',
-                msg: `用户${memberNO}同步授权成功`
-              })
+              //   $.fn.message({
+              //     type: 'success',
+              //     msg: `用户${memberNO}同步授权成功`
+              //   })
               clearInterval(timer)
             }
           }

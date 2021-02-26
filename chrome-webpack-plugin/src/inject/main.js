@@ -12,7 +12,7 @@ document.body.appendChild(rightFixed)
 const APP = {
   init: function() {
     if (/shopee|xiapibuy/.test(window.location.host)) {
-      Follow.init()
+      //   Follow.init()
       Follow.sendCsrfToken()
       Follow.preload()
     }

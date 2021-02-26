@@ -22,11 +22,13 @@ export const collectText = {
   }
 }
 // 操作面板节点模板
-export const operationPanelTemplate = (collectStatus = 'collect') => {
+export const operationPanelTemplate = (collectStatus = 'collect', origin) => {
   return $(`
     <div class="${ClassPrefix}-goods-acquisition-supply">
 			<span class="emalacca-goods-acquisition-btn emalacca-goods-btn" data-type="collect" style="background:${collectText[collectStatus].color}">${collectText[collectStatus].name}</span>
-			<span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="view">低价货源</span> 
+			<span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="view">低价货源</span>
+            <span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="view-store">查看店铺</span>
+            <span class="emalacca-goods-supply-btn emalacca-goods-btn" data-type="get-follower">获取粉丝</span>
     </div>
    `)
 }

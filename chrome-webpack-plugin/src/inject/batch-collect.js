@@ -7,10 +7,12 @@ import { Html } from '@/background/server/html.js'
 // import { hintNotifyProgress, notifyProgress } from './progress'
 import { MESSAGE } from '../lib/conf'
 
-export function imageCrawl(url, data) {
+export function imageCrawl(url, data) {    
   let uid = data.data.token
   let urls = window.location.href
-
+  //天猫处理
+  if (url.indexOf('tmall.hk') !== -1) url = url.replace('tmall.hk', 'tmall.com')
+  console.log(url ,data)
   //速卖通 将旧版链接直接修改为新版采集
   if (url) {
     if (url.indexOf('aliexpress.com/item/') !== -1 && url.indexOf('.html') !== -1) {
@@ -53,7 +55,7 @@ export function imageCrawl(url, data) {
       detailUrl: url,
       url: url
     }
-    Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, result => {
+    Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), params, 0, (result) => {
       // let isSucc = result.code == '0'
       // hintNotifyProgress(isSucc)
     })
@@ -61,7 +63,7 @@ export function imageCrawl(url, data) {
   }
 
   crawlObj &&
-    crawlObj.crawl(url, data => {
+    crawlObj.crawl(url, (data) => {
       let baseURL = CONFIGINFO.url.ApiUrl
       data.detailUrl = data.url
       data.token = uid
@@ -70,8 +72,8 @@ export function imageCrawl(url, data) {
       // 淘宝广告页处理(获取正确的url)
       if (urls.indexOf('taobao.com') > -1) {
         let realUrl = ''
-        data.html.replace(/\<link rel="canonical".*?\/>/g, items => {
-          items.replace(/(http|https).*?id=\d+/g, item => {
+        data.html.replace(/\<link rel="canonical".*?\/>/g, (items) => {
+          items.replace(/(http|https).*?id=\d+/g, (item) => {
             realUrl = item
           })
         })
@@ -79,16 +81,16 @@ export function imageCrawl(url, data) {
         data.url = realUrl
       }
 
-      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, result => {
+      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, (result) => {
         // let isSucc = result.code == '0'
         // hintNotifyProgress(isSucc)
+        
       })
     })
+
 }
 
-// 批量采集操作
 const BatchCollect = {
-  // 全选和全不选
   handleSelectAll({ isCheck = true }) {
     // 选中商品
     $('.emalacca-plugin-goods-acquisition-select').attr({
@@ -105,10 +107,10 @@ const BatchCollect = {
         display: isCheck ? 'block' : 'none'
       })
   },
-  // 采集选中
+
   handleCollectSelected() {
     console.log('采集选中')
-    let handleSelectChange = data => {
+    let handleSelectChange = (data) => {
       let selectedLen = [
         ...document.querySelectorAll('.emalacca-plugin-goods-acquisition-select')
       ].filter(item => item.getAttribute('data-selected') == 1).length
@@ -136,11 +138,12 @@ const BatchCollect = {
       }
       handleSelectChange(data)
     })
+    
   },
-  //  采集本页
+
   handleCollectCurrPage() {
     console.log('列表&分类采集本页')
-    let handleCurrPageChange = data => {
+    let handleCurrPageChange = (data) => {
       // let pageGoodsLen = [...document.querySelectorAll('.emalacca-plugin-goods-acquisition-select')]
       // .length
       $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
@@ -162,10 +165,9 @@ const BatchCollect = {
       handleCurrPageChange(data)
     })
   },
-
   handleCollectCurrPageDetail() {
     console.log('详情采集本页')
-    let handleCurrPageChange = data => {
+    let handleCurrPageChange = (data) => {
       $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
       imageCrawl(location.href, data) //采集操作
     }
