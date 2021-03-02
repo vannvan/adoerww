@@ -17,8 +17,10 @@
     "author": "GitHub",
     "license": "CC0-1.0",
     "devDependencies": {
+        "axios": "^0.21.1",
         "electron": "^11.3.0",
         "electron-store": "^7.0.2",
-        "needle": "^2.6.0"
-    }
+        "request": "^2.88.2"
+    },
+    "dependencies": {}
 }

@@ -2,19 +2,66 @@
 const {
   app,
   BrowserWindow,
-  //   BrowserView,
+  BrowserView,
   session,
   ipcMain,
   net,
 } = require('electron')
-const needle = require('needle')
+// const axios = require('axios')
+
+const googleTr = require('./utils/google-translate-server')
+
+const request = require('request')
+
+var currentStoreId = 338011596 // 当前店铺Id
 
 const Store = require('electron-store')
+let store = new Store()
+
 var mainWindow = null // 声明要打开的主窗口
 var webView = null //装在外部web页面
 
 const path = require('path')
 const fs = require('fs')
+
+/**
+ * 获得
+ */
+let getCookies = () => {
+  session.defaultSession.cookies.get(
+    { url: 'https://seller.shopee.com.my/webchat/conversations' },
+    function (error, cookies) {
+      console.log(cookies)
+      //   if (cookies.length > 0) {
+      //     let name = document.getElementById('name')
+      //     name.value = cookies[0].value
+      //     let password = document.getElementById('password')
+      //     password.value = cookies[1].value
+      //   }
+    }
+  )
+}
+
+/**
+ * 保存cookie
+ * @param name  cookie名称
+ * @param value cookie值
+ */
+let setCookie = (name, value) => {
+  let Days = 30
+  let exp = new Date()
+  let date = Math.round(exp.getTime() / 1000) + Days * 24 * 60 * 60
+  const cookie = {
+    domain: 'seller.shopee.com.my',
+    name: name,
+    value: value,
+    expirationDate: date,
+    path: '/',
+  }
+  session.defaultSession.cookies.set(cookie, (error) => {
+    if (error) console.error(error)
+  })
+}
 
 app.on('ready', () => {
   // 设置窗口的高度和宽度
@@ -24,11 +71,17 @@ app.on('ready', () => {
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
+      webSecurity: false,
+      contextIsolation: false,
       //   devTools: false,
     },
   })
-  mainWindow.loadURL(`file://${__dirname}/index.html`)
-  mainWindow.loadURL('https://seller.my.shopee.cn/webchat/conversations')
+  mainWindow.loadURL(
+    'https://seller.my.shopee.cn/webchat/conversations?' + new Date().getTime()
+  )
+
+  //   getCookies()
+
   mainWindow.webContents.on('did-finish-load', function () {
     console.log('load script ...')
     const js = fs
@@ -39,30 +92,14 @@ app.on('ready', () => {
       .toString()
     mainWindow.webContents.executeJavaScript(js)
     mainWindow.webContents.insertCSS(css)
+
+    setTimeout(() => {
+      mainWindowNotifier('SET_PAGE_COOKIES', {
+        cookies: store.get(currentStoreId),
+        storeId: currentStoreId,
+      })
+    }, 100)
   })
-
-  //   var postData = JSON.stringify({
-  //     test: '111',
-  //   })
-  var data = {
-    file: '/home/johnlennon/walrus.png',
-    content_type: 'image/png',
-  }
-
-  // the callback is optional, and needle returns a `readableStream` object
-  // that triggers a 'done' event when the request/response process is complete.
-  needle
-    .post(
-      'https://seller.shopee.com.my/api/v2/login/?SPC_CDS=c9882470-fcc1-4c6a-a297-7605cf841f03&SPC_CDS_VER=2',
-      data,
-      { multipart: true }
-    )
-    .on('readable', function (res) {
-      //   console.log(res)
-    })
-    .on('done', function (err, resp) {
-      console.log('Ready-o!', resp)
-    })
 
   mainWindow.webContents.openDevTools()
 })
@@ -71,14 +108,38 @@ app.on('ready', () => {
 ipcMain.on('inject-message', (e, args) => {
   console.log('inject message', 'params:', args)
   let { type, params } = args
+  let store = new Store()
   switch (type) {
     case 'LOAD_PAGE':
-      mainWindow.loadURL(`https://${params}/webchat/conversations`)
+      currentStoreId = params.storeId
+      console.log(currentStoreId, 'currentStoreId')
+      mainWindow.loadURL(
+        `https://${params.host}/webchat/conversations?'${new Date().getTime()}`
+      )
+      //   https://seller.shopee.com.my/account/signin?next=%2Fwebchat%2Fconversations
       break
     case 'SET_COOKIES':
-      let store = new Store()
-      store.set(params.key, params.cookies)
+      if (params.key) {
+        store.set(params.key, params.cookies)
+        currentStoreId = params.key
+      }
+    case 'GET_COOKIES':
+      let storeId = params.storeId
+      //   console.log('storeId', storeId)
+      break
+    case 'TRANSLATION':
+      let { sourceText, sourceLang } = params
+      googleTr(sourceText, sourceLang).then((res) => {
+        mainWindowNotifier('TRANSLATION_RESULT', { targetText: res })
+      })
     default:
       break
   }
 })
+
+function mainWindowNotifier(type, params) {
+  mainWindow.webContents.send('mainWindow-message', {
+    type: type,
+    params: params,
+  })
+}
