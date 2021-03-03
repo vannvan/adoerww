@@ -44,8 +44,8 @@ const getGoogleTK = function (a, TKK = _TKK) {
 
 /**
  * @param text 源文本
- * @param targetLang 目标语言
  * @param sourceLang 源语言
+ * @param targetLang 目标语言
  *
  */
 

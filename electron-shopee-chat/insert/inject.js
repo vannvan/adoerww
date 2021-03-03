@@ -123,37 +123,6 @@ if (/account\/signin/.test(location.href)) {
   }, 200)
 }
 
-// 如果在聊天页面
-if (/webchat\/conversations/.test(location.href)) {
-  setTimeout(() => {
-    document.querySelector(
-      'textarea'
-    ).parentNode.innerHTML += `<div class="emalacca-client-translate-msg-bottom">
-        <button class="emalacca-client-translate-button" >翻译并发送</button>
-    </div>
-   `
-    document
-      .querySelector('.emalacca-client-translate-button')
-      .addEventListener('click', function () {
-        //翻译
-        console.log('翻译')
-
-        localforage
-          .getItem('session')
-          .then(function (value) {
-            // 当离线仓库中的值被载入时，此处代码运行
-            let { token } = value
-            console.log(token)
-            sendMessage(token)
-          })
-          .catch(function (err) {
-            // 当出错时，此处代码运行
-            console.log(err)
-          })
-      })
-  }, 1000)
-}
-
 function autoLogin() {
   if (document.querySelector('.shopee-modal__footer-buttons')) {
     document.querySelector('.shopee-modal__footer-buttons').children[0].click()
@@ -215,13 +184,13 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
     case 'SET_PAGE_COOKIES':
       document.cookie = 'shopee-store-id=' + params.storeId
       document.cookie = `SPC_SC_UD=${params.storeId};domain=shopee.com.my;expires=2021-03-08T10:58:22.158Z`
-      logout()
+      //   logout()
       ipcNotice({
         type: 'SET_COOKIES',
         params: { key: getCookie('SPC_U'), cookies: document.cookie },
       })
       break
-    case 'TRANSLATION_RESULT':
+    case 'TRANSLATION_RESULT': // 翻译结果替换
       let messageEl = [...document.querySelectorAll('pre')]
       messageEl.map((el) => {
         console.log(JSON.stringify(params.targetText))
@@ -233,6 +202,13 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
           el.innerHTML = `${params.targetText.map((el) => el[0]).join('')}`
         }
       })
+      break
+    case 'CHECKED_SOMEBODY': //选中某人
+      appendTranslateButton(params)
+      break
+    case 'CLEAR_TEXTAREA': //清除文本框
+      document.querySelector('textarea').value = ''
+      break
     default:
       break
   }
@@ -249,26 +225,45 @@ function logout() {
     })
 }
 
-// 发送消息
-function sendMessage(token) {
-  let data = {
-    request_id: '9599694b-ccd1-46c8-b82c-441997b3c413443',
-    to_id: 341561079,
-    type: 'text',
-    content: { text: '你好' },
-    chat_send_option: {
-      force_send_cancel_order_warning: false,
-      comply_cancel_order_warning: false,
-    },
+// 添加翻译按钮
+function appendTranslateButton(params) {
+  let { buyer_id } = params
+  if (document.querySelector('.emalacca-client-translate-msg-botto')) {
+    return false
   }
-  axios({
-    method: 'post',
-    data: data,
-    url: location.origin + '/webchat/api/v1.2/messages',
-    headers: {
-      Authorization: 'Bearer ' + token,
-    },
-  }).then((res) => {
-    console.log(res)
-  })
+  setTimeout(() => {
+    document.querySelector(
+      'textarea'
+    ).parentNode.innerHTML += `<div class="emalacca-client-translate-msg-bottom">
+                    <button class="emalacca-client-translate-button">翻译并发送</button>
+                </div>
+               `
+    let translationButton = document.querySelector(
+      '.emalacca-client-translate-button'
+    )
+    translationButton.addEventListener('click', function () {
+      //翻译
+      console.log('翻译')
+      localforage
+        .getItem('session')
+        .then(function (value) {
+          // 当离线仓库中的值被载入时，此处代码运行
+          let { token } = value
+          console.log(token)
+          ipcNotice({
+            type: 'SEND_MESSAGE',
+            params: {
+              host: location.host,
+              token: token,
+              messageText: document.querySelector('textarea').value,
+              to_id: buyer_id,
+            },
+          })
+        })
+        .catch(function (err) {
+          // 当出错时，此处代码运行
+          console.log(err)
+        })
+    })
+  }, 1000)
 }
