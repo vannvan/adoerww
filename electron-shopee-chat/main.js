@@ -5,7 +5,7 @@ const {
   BrowserView,
   session,
   ipcMain,
-  net,
+  shell,
 } = require('electron')
 // const axios = require('axios')
 
@@ -42,6 +42,21 @@ let getCookies = () => {
   )
 }
 
+function openExternal(url) {
+  const HTTP_REGEXP = /^https?:\/\//
+  // 非http协议不打开，防止出现自定义协议等导致的安全问题
+  if (!HTTP_REGEXP) {
+    return false
+  }
+  try {
+    shell.openExternal(url, options)
+    return true
+  } catch (error) {
+    console.error('open external error: ', error)
+    return false
+  }
+}
+
 /**
  * 保存cookie
  * @param name  cookie名称
@@ -69,6 +84,7 @@ app.on('ready', () => {
     width: 1260,
     height: 780,
     autoHideMenuBar: true,
+    show: false,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
@@ -76,10 +92,30 @@ app.on('ready', () => {
       //   devTools: false,
     },
   })
+
   mainWindow.loadURL(
     'https://seller.my.shopee.cn/webchat/conversations?' + new Date().getTime()
   )
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+  })
 
+  // 创建窗口监听
+  mainWindow.webContents.on(
+    'new-window',
+    (event, url, frameName, disposition) => {
+      //   if (disposition === 'foreground-tab') {
+      //     // 阻止鼠标点击链接
+      //     event.preventDefault()
+      //     openExternal(url)
+      //   }
+      if (disposition == 'new-window') {
+        console.log('new window', disposition, url)
+        event.preventDefault()
+        shell.openExternal(url)
+      }
+    }
+  )
   //   getCookies()
 
   mainWindow.webContents.on('did-finish-load', function () {

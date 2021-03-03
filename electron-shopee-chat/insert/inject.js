@@ -3,6 +3,8 @@ const axios = require('axios')
 // alert(JSON.stringify(document))
 const { ipcRenderer } = require('electron')
 
+const localforage = require('localforage')
+
 var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
 
@@ -126,35 +128,28 @@ if (/webchat\/conversations/.test(location.href)) {
   setTimeout(() => {
     document.querySelector(
       'textarea'
-    ).parentNode.innerHTML += `<div class="emalacca-client-chat-wrap">
-    <div class="emalacca-client-msg-wrap" contenteditable="true"></div>
-    <div class="emalacca-client-translate-msg-bottom">
-        <span class="emalacca-client-translate-tip">按 Shift + Enter 换行</span><i class="_3kEAcT1Mk5 _22jqVmopYC emalacca-client-clone-shopee-button" style="float: none; vertical-align: middle; cursor: pointer;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="chat-icon"><path d="M4 14.497v3.724L18.409 12 4 5.779v3.718l10 2.5-10 2.5zM2.698 3.038l18.63 8.044a1 1 0 010 1.836l-18.63 8.044a.5.5 0 01-.698-.46V3.498a.5.5 0 01.698-.459z"></path></svg></i>
-        <button class="emalacca-client-translate-button" style="margin-left: 12px;">翻译并发送</button>
-      </div>
-    </div>`
+    ).parentNode.innerHTML += `<div class="emalacca-client-translate-msg-bottom">
+        <button class="emalacca-client-translate-button" >翻译并发送</button>
+    </div>
+   `
     document
       .querySelector('.emalacca-client-translate-button')
       .addEventListener('click', function () {
-        let data = {
-          request_id: '9599694b-ccd1-46c8-b82c-441997b3c412',
-          to_id: 338011596,
-          type: 'text',
-          content: { text: '你好' },
-          chat_send_option: {
-            force_send_cancel_order_warning: false,
-            comply_cancel_order_warning: false,
-          },
-        }
-        let url =
-          'https://seller.shopee.com.my/webchat/api/v1.2/messages?_uid=0-341561079&csrf_token=S2ZxB3s6Eeu87fBj%2Bd9zsQ%3D%3D'
-        axios({
-          method: 'post',
-          url: url,
-          data: data,
-        }).then((res) => {
-          console.log(res)
-        })
+        //翻译
+        console.log('翻译')
+
+        localforage
+          .getItem('session')
+          .then(function (value) {
+            // 当离线仓库中的值被载入时，此处代码运行
+            let { token } = value
+            console.log(token)
+            sendMessage(token)
+          })
+          .catch(function (err) {
+            // 当出错时，此处代码运行
+            console.log(err)
+          })
       })
   }, 1000)
 }
@@ -192,13 +187,13 @@ window.onmousewheel = function (e) {
   let messageEl = [...document.querySelectorAll('pre')]
   messageEl.map((el, index) => {
     if (!el.getAttribute('flag')) {
-      el.innerHTML += `<p><button>翻译</button></p>`
+      el.innerHTML += `<button  class="emalacca-client-trans-button-mini">译</button>`
       el.setAttribute('flag', true)
       el.setAttribute('data-node-id', index + 1)
     }
     el.addEventListener('click', function (e) {
       if (e.target.nodeName == 'BUTTON') {
-        let text = e.target.parentNode.parentNode.innerText.replace('翻译', '')
+        let text = e.target.parentNode.parentNode.innerText.replace('译', '')
         console.log('文本', text)
         currentTransNodeIndex = el.getAttribute('data-node-id')
         ipcNotice({
@@ -245,11 +240,35 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
 
 function logout() {
   axios
-    .get('https://seller.shopee.com.my/api/v1/logout/')
+    .get(location.origin + '/api/v1/logout/')
     .then((res) => {
       console.log(res, '退出成功')
     })
     .catch((err) => {
       console.log(err)
     })
+}
+
+// 发送消息
+function sendMessage(token) {
+  let data = {
+    request_id: '9599694b-ccd1-46c8-b82c-441997b3c413443',
+    to_id: 341561079,
+    type: 'text',
+    content: { text: '你好' },
+    chat_send_option: {
+      force_send_cancel_order_warning: false,
+      comply_cancel_order_warning: false,
+    },
+  }
+  axios({
+    method: 'post',
+    data: data,
+    url: location.origin + '/webchat/api/v1.2/messages',
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+  }).then((res) => {
+    console.log(res)
+  })
 }

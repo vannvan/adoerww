@@ -87,44 +87,15 @@ body {
 }
 
 /* 覆盖虾皮聊天输入区域 */
-.emalacca-client-chat-wrap {
-  background: #fff;
-  z-index: 1000000001;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  margin-top: -90px;
-  position: relative;
-}
-
-.emalacca-client-msg-wrap {
-  font-family: Helvetica Neue, Helvetica, Roboto, Droid Sans, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  font-size: 14px;
-  color: #000;
-  letter-spacing: 0;
-  line-height: 1.14em;
-  -webkit-box-direction: normal;
-  overflow-wrap: break-word;
-  -webkit-line-break: after-white-space;
-  width: 100%;
-  -webkit-box-flex: 1;
-  flex-grow: 1;
-  overflow-y: auto;
-  outline: none;
-  -webkit-user-modify: read-write-plaintext-only;
-}
 
 .emalacca-client-translate-msg-bottom {
   text-align: right;
   letter-spacing: 0;
   line-height: 1.14em;
+  position: absolute;
+  bottom: 8px;
+  right: 15px;
+  background: #fff;
 }
 
 .emalacca-client-translate-button {
@@ -133,5 +104,21 @@ body {
   background: rgb(255, 114, 13);
   color: #fff;
   border-radius: 3px;
+  cursor: pointer;
+}
+
+/* 聊天文本的 翻译按钮 */
+.emalacca-client-trans-button-mini {
+  color: rgb(255, 114, 13);
+  position: absolute;
+  top: -12px;
+  right: -6px;
+  padding: 0;
+  height: 20px;
+  width: 20px;
+  line-height: 20px;
+  font-size: 12px;
+  border-radius: 10px;
+  border: 1px solid rgb(255, 114, 13);
   cursor: pointer;
 }
