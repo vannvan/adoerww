@@ -1,10 +1,30 @@
-console.log('this is inject.js')
 const axios = require('axios')
-// alert(JSON.stringify(document))
 const { ipcRenderer } = require('electron')
-
 const localforage = require('localforage')
 
+const Site = {
+  shopeeSeller: {
+    my: { host: 'seller.shopee.com.my', lang: 'en' },
+    br: { host: 'seller.shopee.com.br', lang: 'br' },
+    id: { host: 'seller.shopee.co.id', lang: 'id' },
+    th: { host: 'seller.shopee.co.th', lang: 'th' },
+    sg: { host: 'seller.shopee.sg', lang: 'sg' },
+    ph: { host: 'seller.shopee.ph', lang: 'ph' },
+    vn: { host: 'seller.shopee.vn', lang: 'vn' },
+    tw: { host: 'seller.shopee.tw', lang: 'tw' },
+  },
+  siteOption: [
+    { name: '马来aimiao.my', key: 'my', storeId: '341561079' },
+    { name: '马来mailing.my', key: 'my', storeId: '338011596' },
+    { name: '菲律宾', key: 'ph', key: 'ph' },
+    { name: '泰国', key: 'th' },
+    { name: '新加坡', key: 'sg' },
+    { name: '台湾', key: 'tw' },
+    { name: '巴西', key: 'br' },
+    { name: '印度尼西亚', key: 'id' },
+    { name: '越南', key: 'vn' },
+  ],
+}
 var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
 
@@ -23,47 +43,6 @@ function getCookie(cname) {
   }
   return ''
 }
-function clearAllCookie() {
-  var date = new Date()
-  date.setTime(date.getTime() - 10000)
-  var keys = document.cookie.match(/[^ =;]+(?=\=)/g)
-  console.log('需要删除的cookie名字：' + keys)
-  if (keys) {
-    for (var i = keys.length; i--; ) document.cookie = keys[i] + '=0; max-age=0'
-  }
-}
-
-const shopeeHosts = {
-  my: 'seller.shopee.com.my',
-  br: 'seller.shopee.com.br',
-  id: 'seller.shopee.co.id',
-  th: 'seller.shopee.co.th',
-  sg: 'seller.shopee.sg',
-  ph: 'seller.shopee.ph',
-  vn: 'seller.shopee.vn',
-  tw: 'seller.shopee.tw',
-}
-const siteOption = [
-  { name: '马来aimiao.my', key: 'my', storeId: 341561079 },
-  { name: '马来mailing.my', key: 'my', storeId: 338011596 },
-  { name: '菲律宾', key: 'ph' },
-  { name: '泰国', key: 'th' },
-  { name: '新加坡', key: 'sg' },
-  { name: '台湾', key: 'tw' },
-  { name: '巴西', key: 'br' },
-  { name: '印度尼西亚', key: 'id' },
-]
-
-const account = {
-  341561079: {
-    name: 'aimiao.my',
-    password: 'Fm123456',
-  },
-  338011596: {
-    name: 'mailing.my',
-    password: 'maiwang123456',
-  },
-}
 
 window.inputValue = function (dom, st) {
   var evt = new InputEvent('input', {
@@ -79,8 +58,9 @@ window.inputValue = function (dom, st) {
 let headerFixed = document.createElement('div')
 headerFixed.className = 'emalacca-client-header-fixed'
 
-siteOption.map((el) => {
-  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}" data-store="${el.storeId}">${el.name}</div>`
+Site.siteOption.map((el) => {
+  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}" data-store="${el.storeId}" 
+  }">${el.name}</div>`
 })
 
 document.body.prepend(headerFixed)
@@ -90,65 +70,87 @@ document
   .addEventListener('click', (e) => {
     let key = e.target.getAttribute('data-key')
     let storeId = e.target.getAttribute('data-store')
-    logout()
+    console.log(storeId)
+    handleLogout()
     ipcNotice({
       type: 'LOAD_PAGE',
-      params: { host: shopeeHosts[key], storeId: storeId },
+      params: { host: Site.shopeeSeller[key].host, storeId: storeId, key: key },
     })
   })
 
-setTimeout(() => {
-  ipcNotice({
-    type: 'GET_COOKIES',
-    params: { storeId: getCookie('SPC_U') },
+if (/webchat\/conversations/.test(location.pathname)) {
+  setTimeout(() => {
+    // 高亮当前店铺
+
+    let userInfo = sessionStorage.getItem('userInfo')
+      ? JSON.parse(sessionStorage.getItem('userInfo'))
+      : null
+    if (userInfo) {
+      ;[
+        ...document.querySelector('.emalacca-client-header-fixed').children,
+      ].map((el) => {
+        if (el.dataset.store == userInfo.storeId) {
+          el.style.background = '#ffc069'
+        }
+      })
+    }
+  }, 200)
+  //   把shopee的用户授权信息存起来
+  localforage.getItem('session').then((res) => {
+    console.log('session', res)
+    ipcNotice({ type: 'SET_SHOPEE_AUTH_INFO', params: res })
   })
-}, 1000)
+}
 
 // console.log(document.cookie)
 
 //如果在登录页面，把自动点击取消按钮
 if (/account\/signin/.test(location.href)) {
   console.log('在登录页面')
-  document.querySelector(
-    'body'
-  ).innerHTML += `<div class="emalacca-client-mask">
-    <div class="shoppe-loading-wrap">
-        <div class="inside"></div>
-        <div class="back"></div>
-    </div> 
-  </div>`
   document.querySelector('body').style.overflow = 'hidden'
-  globalTimer = setInterval(() => {
-    autoLogin()
-  }, 200)
+
+  let userInfo = sessionStorage.getItem('userInfo')
+    ? JSON.parse(sessionStorage.getItem('userInfo'))
+    : null
+  if (userInfo) {
+    document.querySelector(
+      'body'
+    ).innerHTML += `<div class="emalacca-client-mask">
+          <div class="shoppe-loading-wrap">
+              <div class="inside"></div>
+              <div class="back"></div>
+          </div>
+        </div>`
+    globalTimer = setInterval(() => {
+      autoLogin()
+    }, 200)
+  }
 }
 
 function autoLogin() {
-  if (document.querySelector('.shopee-modal__footer-buttons')) {
-    document.querySelector('.shopee-modal__footer-buttons').children[0].click()
+  let userInfo = sessionStorage.getItem('userInfo')
+    ? JSON.parse(sessionStorage.getItem('userInfo'))
+    : null
+  if (userInfo) {
+    if (document.querySelector('.shopee-modal__footer-buttons')) {
+      document
+        .querySelector('.shopee-modal__footer-buttons')
+        .children[0].click()
+    }
+
+    if (document.querySelector('form')) {
+      window.inputValue(document.querySelectorAll('input')[0], userInfo.name)
+      window.inputValue(
+        document.querySelectorAll('input')[1],
+        userInfo.password
+      )
+
+      document.querySelectorAll('.shopee-button--primary')[0].click()
+      clearInterval(globalTimer)
+    }
+  } else {
+    ipcNotice('ERROR_DIALOG', { content: '用户授权信息同步失败，请重新登录' })
   }
-
-  let cookiesStoreId = getCookie('shopee-store-id')
-  if (document.querySelector('form')) {
-    window.inputValue(
-      document.querySelectorAll('input')[0],
-      account[cookiesStoreId].name
-    )
-    window.inputValue(
-      document.querySelectorAll('input')[1],
-      account[cookiesStoreId].password
-    )
-
-    document.querySelectorAll('.shopee-button--primary')[0].click()
-    clearInterval(globalTimer)
-  }
-}
-
-// 向主线程发送消息
-function ipcNotice({ type, params }) {
-  //   return new Promise((resolve,reject) => {
-  ipcRenderer.send('inject-message', { type: type, params: params })
-  //   })
 }
 
 window.onmousewheel = function (e) {
@@ -184,7 +186,8 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
     case 'SET_PAGE_COOKIES':
       document.cookie = 'shopee-store-id=' + params.storeId
       document.cookie = `SPC_SC_UD=${params.storeId};domain=shopee.com.my;expires=2021-03-08T10:58:22.158Z`
-      //   logout()
+      // 把主线程对应的当前用户信息存在storage
+      sessionStorage.setItem('userInfo', JSON.stringify(params.accountInfo))
       ipcNotice({
         type: 'SET_COOKIES',
         params: { key: getCookie('SPC_U'), cookies: document.cookie },
@@ -214,7 +217,7 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
   }
 })
 
-function logout() {
+function handleLogout() {
   axios
     .get(location.origin + '/api/v1/logout/')
     .then((res) => {
@@ -243,27 +246,47 @@ function appendTranslateButton(params) {
     )
     translationButton.addEventListener('click', function () {
       //翻译
-      console.log('翻译')
-      localforage
-        .getItem('session')
-        .then(function (value) {
-          // 当离线仓库中的值被载入时，此处代码运行
-          let { token } = value
-          console.log(token)
-          ipcNotice({
-            type: 'SEND_MESSAGE',
-            params: {
-              host: location.host,
-              token: token,
-              messageText: document.querySelector('textarea').value,
-              to_id: buyer_id,
-            },
-          })
-        })
-        .catch(function (err) {
-          // 当出错时，此处代码运行
-          console.log(err)
-        })
+      handleTranslation(buyer_id)
     })
+    document.onkeydown = function (event) {
+      //回车事件
+      if (event.keyCode == 13) {
+        handleTranslation(buyer_id)
+      }
+    }
   }, 1000)
+}
+
+// 翻译操作
+function handleTranslation(buyer_id) {
+  console.log('翻译')
+  let currentPageCountry = document
+    .querySelector('html')
+    .className.toLocaleLowerCase() //当前页面获取到的国家
+  localforage
+    .getItem('session')
+    .then(function (value) {
+      // 当离线仓库中的值被载入时，此处代码运行
+      let { token } = value
+      console.log(token)
+      ipcNotice({
+        type: 'SEND_MESSAGE',
+        params: {
+          host: location.host,
+          token: token,
+          messageText: document.querySelector('textarea').value,
+          to_id: buyer_id,
+          targetLang: Site.shopeeSeller[currentPageCountry].lang,
+        },
+      })
+    })
+    .catch(function (err) {
+      // 当出错时，此处代码运行
+      console.log(err)
+    })
+}
+
+// 向主线程发送消息
+function ipcNotice({ type, params }) {
+  ipcRenderer.send('inject-message', { type: type, params: params })
 }
