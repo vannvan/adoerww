@@ -1,17 +1,28 @@
 body {
   /* background:red !important; */
   z-index: -1;
+  display: flex !important;
+  justify-content: flex-end !important;
 }
-
+#root {
+  width: calc(100% - 218px) !important;
+  height: calc(100% + 62px) !important;
+  transform: translateY(-62px) !important;
+}
+/* 隐藏虾皮登录界面的头部导航 */
+.shopee-header-bar {
+  display: none !important;
+}
 .emalacca-client-header-fixed {
-  height: 64px;
-  width: 100%;
+  height: 100vh;
+  width: 218px;
   background: #dedede;
   position: fixed;
   z-index: 10000000;
   line-height: 64px;
-  display: flex;
+  /* display: flex; */
   top: 0;
+  left: 0;
   font-size: 14px !important;
   padding: 0;
   margin: 0;

@@ -6,22 +6,14 @@
 // process.
 
 // // console.log(document)
+const { ipcRenderer } = require('electron')
+
 // const ipcRenderer = require('electron').ipcRenderer
-// console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
 function getData() {
   console.log('渲染进程')
-  ipcRenderer.send('master-close', 'render-index')
+  ipcRenderer.send('inject-message', { type: 'IS_LOGIN' })
 }
 
 document.querySelector('#btnEd').addEventListener('click', () => {
   getData()
 })
-
-//在渲染器进程 (网页) 中。
-const { ipcRenderer } = require('electron')
-// console.log(ipcRenderer.sendSync('synchronous-message', 'ping')) // prints "pong"
-
-ipcRenderer.on('asynchronous-reply', (event, arg) => {
-  console.log(arg) // prints "pong"
-})
-// ipcRenderer.send('asynchronous-message', 'ping')

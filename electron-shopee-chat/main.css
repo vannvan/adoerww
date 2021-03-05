@@ -1,0 +1,12 @@
+.left-menu-wrap {
+  width: 218px;
+  height: 100vh;
+  background: #ccc;
+}
+* {
+  padding: 0;
+  margin: 0;
+}
+body {
+  height: 100vh;
+}

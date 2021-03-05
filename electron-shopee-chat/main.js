@@ -7,6 +7,7 @@ const {
   ipcMain,
   shell,
   dialog,
+  Notification,
 } = require('electron')
 const axios = require('axios')
 const log = require('electron-log')
@@ -52,7 +53,7 @@ const Store = require('electron-store')
 let store = new Store()
 
 var mainWindow = null // 声明要打开的主窗口
-// var webView = null //装在外部web页面
+var webView = null //装在外部web页面
 
 /**
  * 获得
@@ -72,13 +73,19 @@ let getCookies = () => {
   )
 }
 
+app.on('login', (event, webContents, details, authInfo, callback) => {
+  event.preventDefault()
+  callback('username', 'secret')
+})
+
 app.on('ready', () => {
   // 设置窗口的高度和宽度
   mainWindow = new BrowserWindow({
-    width: 1260,
-    height: 780,
+    width: 520,
+    height: 540,
     autoHideMenuBar: true,
     show: false,
+    title: '马六甲虾皮聊聊客户端',
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
@@ -86,8 +93,8 @@ app.on('ready', () => {
       //   devTools: false,
     },
   })
-
-  mainWindow.loadURL('https://seller.shopee.com.my/webchat/conversations?')
+  //   mainWindow.loadURL('https://erp.emalacca.com/auth/login')
+  mainWindow.loadFile('index.html')
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -110,7 +117,7 @@ app.on('ready', () => {
     }
   )
 
-  //   // 响应介入
+  //响应介入
   session.defaultSession.webRequest.onCompleted(filter, (details, callback) => {
     // if (/login/.test(details.url)) {
     //   log.info('response: login', details)
@@ -119,23 +126,56 @@ app.on('ready', () => {
 
   mainWindow.webContents.on('did-finish-load', function () {
     log.info('load script ...')
-    const js = fs
-      .readFileSync(path.join(__dirname, './insert/inject.js'))
-      .toString()
-    const css = fs
-      .readFileSync(path.join(__dirname, './insert/inject.css'))
-      .toString()
-    mainWindow.webContents.executeJavaScript(js)
-    mainWindow.webContents.insertCSS(css)
+    log.info('did-finish-load hook', mainWindow.webContents.getURL())
+    let currentUrl = mainWindow.webContents.getURL()
+    // 在虾皮网站需要植入的脚本
+    if (/seller.shopee/.test(currentUrl)) {
+      const js = fs
+        .readFileSync(path.join(__dirname, './insert/inject.js'))
+        .toString()
+      const css = fs
+        .readFileSync(path.join(__dirname, './insert/inject.css'))
+        .toString()
+      mainWindow.webContents.executeJavaScript(js)
+      mainWindow.webContents.insertCSS(css)
+      setTimeout(() => {
+        mainWindowNotifier('SET_PAGE_COOKIES', {
+          cookies: store.get(storage.getItem('storeId')),
+          storeId: storage.getItem('storeId'),
+          accountInfo: storage.getItem('accountList')[
+            storage.getItem('storeId')
+          ],
+        })
+        loopSyncTask()
+      }, 100)
+    }
 
-    setTimeout(() => {
-      mainWindowNotifier('SET_PAGE_COOKIES', {
-        cookies: store.get(storage.getItem('storeId')),
-        storeId: storage.getItem('storeId'),
-        accountInfo: storage.getItem('accountList')[storage.getItem('storeId')],
+    mainWindow.flashFrame(true)
+
+    const myNotification = new Notification('Title', {
+      body: 'Notification from the Renderer process',
+    })
+
+    myNotification.onclick = () => {
+      console.log('Notification clicked')
+    }
+  })
+
+  mainWindow.on('resize', function () {
+    log.info('is login go to shopee')
+    mainWindow.loadFile('index.html')
+    mainWindow
+      .loadURL('https://seller.shopee.com.my/webchat/conversations?')
+      .then(() => {
+        log.info('shopee is loaded')
       })
-      loopSyncTask()
-    }, 100)
+    // webView = new BrowserView()
+    // mainWindow.setBrowserView(webView)
+    // webView.setBounds({ x: 300, y: 60, width: 500, height: 500 })
+    // webView.webContents.loadURL(
+    //   'https://seller.shopee.com.my/webchat/conversations?'
+    // )
+    // webView.webContents.openDevTools()
   })
 
   // 创建窗口监听
@@ -150,16 +190,6 @@ app.on('ready', () => {
     }
   )
 
-  //   const top = new BrowserWindow()
-  const child = new BrowserWindow({ parent: mainWindow, show: false })
-  child.loadURL('https://www.baidu.com/')
-  child.on('ready-to-show', function (param) {
-    log.info('child is ready show')
-  })
-  child.webContents.on('did-finish-load', function () {
-    //
-  })
-
   mainWindow.webContents.openDevTools()
 })
 
@@ -167,9 +197,12 @@ app.on('ready', () => {
 ipcMain.on('inject-message', (e, args) => {
   log.info('inject message', 'params:', args)
   let { type, params } = args
-
   let store = new Store()
   switch (type) {
+    case 'IS_LOGIN':
+      mainWindow.setSize(1366, 780)
+      mainWindow.center()
+      break
     case 'LOAD_PAGE':
       storage.setItem('storeId', params.storeId) // 更新当前操作的店铺ID
       log.info('storage storeId', storage.getItem('storeId'))
@@ -223,7 +256,7 @@ ipcMain.on('inject-message', (e, args) => {
         } = params
         storage.setItem(id, params)
       }
-
+      break
     default:
       break
   }
