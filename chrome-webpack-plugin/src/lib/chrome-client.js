@@ -48,3 +48,16 @@ export const getLoginInfo = function(callback) {
     })
   }
 }
+
+// 发送消息到server.js, 请求后端接口
+export const sendMessageToServer = function(action, options, callback) {
+  if (chrome.runtime.sendMessage && typeof chrome.app.isInstalled !== undefined) {
+    return new Promise(resolve => {
+      chrome.runtime.sendMessage(
+        '',
+        { sign: 'signShope', action: action, data: options },
+        callback.bind(resolve)
+      )
+    })
+  }
+}

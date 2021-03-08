@@ -1,5 +1,5 @@
 import '@/inject/content'
 import '@/inject/main'
 import '@/inject/erp'
-// import './inject/history-data'
+import '@/inject/erp-goods-collection'
 require('@/background/config/message')

@@ -91,16 +91,28 @@ export const getMatchSite = host => {
 }
 
 // 获取卖家前台/卖家中心/取关页面地址
-export const getSiteLink = (type, host) => {
+/**
+ *
+ * @param {*} type 需要的链接类型
+ * @param {*} host 当前站点
+ * @param {*} cn  是否强制需要cn站点
+ * @returns
+ */
+export const getSiteLink = (type, host, cn = false) => {
   let webHost = host || window.location.host
   const countryList = WEBSITES.map(el => el.key)
   try {
     let currentCountryCode = countryList.find(item => webHost.match(new RegExp(item))) || 'tw' //当前站点标识，如果没有匹配到绝对踏马是台湾
     let countrySite = WEBSITES.find(item => item.key == currentCountryCode)
-    // 如果满足，一定是跨境店
-    if (/xiapibuy.com/.test(webHost) || /shopee.cn/.test(webHost)) {
+    // // 如果满足，一定是跨境店
+    if (/xiapibuy.com/.test(webHost) || /shopee.cn/.test(webHost) || cn) {
       type = 'cn' + type
     }
+    // 如果是获取取关页面地址，不管是跨境店还是本土店，统一到跨境地址 也就是cn地址，因为数据及操作结果相同，cn地址更稳定
+    if (type == 'mall') {
+      type = 'cn' + type
+    }
+    console.log(type, 'ahahahaha ')
     return countrySite[type]
   } catch (error) {
     console.log(error)
@@ -117,6 +129,8 @@ export const MESSAGE = {
     requestTimeout: '请求超时，请稍后重试',
     notSupport: '当前页面不支持该操作',
     checkIsAuthedERP: `您还未登录，请<a href="${ERP_LOGIN_URL}" target="_blank">登录</a>采集插件`,
+    pleaseLoginPinDuoDuo:
+      '请先<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
     pleaseLogin1688: '请先登录1688后再采集',
     pleaseLoginTmall: '请先登录天猫再采集',
     pleaseLoginTaobao: '请先登录淘宝再采集',
@@ -128,7 +142,7 @@ export const MESSAGE = {
   },
   success: {
     collectSuccess: '采集成功',
-    savehaveBeenAdd: `已添加至采集任务，请到<a href="${ERP_LOGIN_URL}goods/collect" target="_blank">采集箱</a>查看采集结果`
+    savehaveBeenAdd: `已添加至<a href="${ERP_LOGIN_URL}goods/collect" target="_blank">采集箱</a>`
   }
 }
 
@@ -164,7 +178,7 @@ export const COMMON_COLLECT = [
     name: '采集',
     icon: 'em-icon-collect',
     id: 'EmalaccaCollect',
-    fixed: true,
+    fixed: false,
     children: [
       {
         name: '全选',
@@ -187,7 +201,7 @@ export const COMMON_COLLECT_DETAIL = [
     name: '采集',
     icon: 'em-icon-collect',
     id: 'EmalaccaCollectDetail',
-    fixed: true,
+    fixed: false,
     children: [
       {
         name: '采集该商品',
@@ -203,7 +217,7 @@ export const RIGHT_MENU = [
     name: '粉丝',
     icon: 'em-icon-fans',
     id: 'EmalaccaFollower',
-    fixed: true,
+    fixed: false,
     children: [
       {
         name: '关注店铺粉丝',
@@ -219,7 +233,7 @@ export const RIGHT_MENU = [
     name: '快捷',
     icon: 'em-icon-menu',
     id: 'EmalaccaQuick',
-    fixed: true,
+    fixed: false,
     children: [
       {
         name: '卖家中心',

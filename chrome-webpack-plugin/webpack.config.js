@@ -34,16 +34,6 @@ module.exports = {
     path: resolve(__dirname, isDev ? DevOutPutPath : 'dist/'),
     publicPath: '../'
   },
-  devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://www.baidu.com/',
-        pathRewrite: { '^/api': '' },
-        changeOrigin: true, // target是域名的话，需要这个参数，
-        secure: false // 设置支持https协议的代理
-      }
-    }
-  },
 
   module: {
     rules: modules
@@ -89,8 +79,8 @@ module.exports = {
     new webpack.DefinePlugin({
       PRODUCTION: JSON.stringify(true),
       VERSION: JSON.stringify(packJSON.version),
-      APPNAME: JSON.stringify('马六甲虾皮助手'),
-      MESSAGEPRIFIX: JSON.stringify('【马六甲虾皮助手】: '),
+      APPNAME: JSON.stringify('马六甲跨境助手'),
+      MESSAGEPRIFIX: JSON.stringify('【马六甲跨境助手】: '),
       'typeof window': JSON.stringify('object'),
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV)

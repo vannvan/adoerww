@@ -1,6 +1,6 @@
 import { ERP_SYSTEM } from '@/lib/env.conf'
 const SITEAPI = ERP_SYSTEM[process.env.NODE_ENV] + '/api/'
-const COLLECT = ERP_SYSTEM[process.env.NODE_ENV] + '/publish/collect'
+const COLLECT = ERP_SYSTEM[process.env.NODE_ENV] + '/goods/collect'
 console.log(process.env.NODE_ENV)
 export const CONFIGINFO = {
   url: {
@@ -47,6 +47,14 @@ export const CONFIGINFO = {
     // 获取采集统计数据
     getCrawlCount: function() {
       return this.ApiUrl + 'product/crawl/count'
+    },
+    // 获取商品是否已采集
+    postHasCrawl: function() {
+      return this.ApiUrl + 'product/crawl/has-crawl'
+    },
+    // 上传地址
+    handleUploadImages: function() {
+      return this.ApiUrl + 'basic/config/platform/uploadImage'
     }
   }
 }

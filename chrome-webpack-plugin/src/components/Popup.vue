@@ -74,9 +74,10 @@
 import { ERP_SYSTEM } from '@/lib/env.conf'
 import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
-import { getTabUrl, getAllTabs, gotoErp } from '@/lib/chrome'
+import { getTabUrl, getAllTabs, gotoErp, setStorageLocal } from '@/lib/chrome'
 import { CONFIGINFO } from '../background/config'
 import $ from 'jquery'
+
 function sendMessageToContentScript(message, callback) {
   getTabUrl(url => {
     // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
@@ -103,26 +104,28 @@ export default {
       userInfo: null,
       pluginName: APPNAME + ' V' + VERSION,
       collectSites: COLLECT_SITES,
-      collecting: 0
+      collecting: 0,
+      collectingTime: null
     }
   },
   mounted() {
     this.userInfo = getStorage('pt-plug-access-user')
       ? getStorage('pt-plug-access-user').userInfo
-      : gotoErp(function(e) {
-          console.log(e)
-        })
+      : null
     if (this.userInfo) {
       this.getCollecting()
     }
+    
   },
   methods: {
     handleExit() {
       sendMessageToContentScript({ cmd: 'erp-logout', type: 'ERP_LOGOUT' }, function(response) {
         console.log(response)
       })
+      
       // 不管erp系统是否完成退出，插件都要退出
       localStorage.setItem('pt-plug-access-user', null)
+      setStorageLocal({'isLogin': false})  // ERP登出或者插件登出，保存false
       setTimeout(() => {
         window.close() //关闭popup
       }, 500)
@@ -139,6 +142,7 @@ export default {
 
     //获取正在采集数量
     getCollecting() {
+      clearInterval(this.collectingTime)
       $.ajax({
         url: CONFIGINFO.url.getCrawlCount(),
         type: 'POST',
@@ -146,13 +150,25 @@ export default {
           Authorization: 'Bearer ' + getStorage('pt-plug-access-user').token
         },
         dataType: 'json',
-        success: function(res) {
+        success: (res) => {
           if (res.code == 0) {
-            this.collecting = res.data
+            this.collecting = res.data.doingCount
+            if (this.collecting > 0) {
+              this.collectingTime = 
+              this.collectingTime = setInterval(() => {
+                this.getCollecting()
+              }, 500)
+            } else {
+              clearInterval(this.collectingTime)
+            }
           }
         }
       })
     }
+  },
+  beforeDestroy() {
+    //清除定时器
+    clearInterval(this.collectingTime)
   }
 }
 </script>

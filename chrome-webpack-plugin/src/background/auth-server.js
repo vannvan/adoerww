@@ -64,9 +64,20 @@ export const Auth = {
   syncShoppeBaseInfo: function(params, type, call) {
     console.log(params, type)
     const countryList = WEBSITES.map(el => el.key)
+    // 如果当前是站点时cn站点并且userInfo的country和当前匹配，就直接用存下的
+    let userInfo = getStorage('userInfo', {})
+    let currentCountryCode = countryList.find(item => params.domain.match(new RegExp(item)))
+    // if (userInfo.countryCode == currentCountryCode ) {
+    //   call({
+    //     type: type,
+    //     code: 0
+    //   })
+    //   return false
+    // }
     Request.handleLoginShopee(params, type)
       .then(res => {
         if (res) {
+          res.countryCode = currentCountryCode
           localStorage.setItem('userInfo', JSON.stringify(res))
         }
       })
@@ -74,14 +85,15 @@ export const Auth = {
         call({ type: type, code: -1 })
       })
       .finally(() => {
-        let userInfo = getStorage('userInfo', {})
         call({
           type: type,
           code: 0,
           result: {
             storeId: userInfo.shopid,
             username: userInfo.username,
-            country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw'
+            country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw',
+            // 这里需要把 cs_token 送给前台 作为前台cookies中的 SPC_EC 同步用户状态
+            cs_token: userInfo.cs_token
           }
         })
       })

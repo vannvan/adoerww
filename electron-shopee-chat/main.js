@@ -61,7 +61,7 @@ var webView = null //装在外部web页面
 let getCookies = () => {
   session.defaultSession.cookies.get(
     { url: 'https://seller.shopee.com.my/webchat/conversations' },
-    function (error, cookies) {
+    function(error, cookies) {
       log.info(cookies)
       //   if (cookies.length > 0) {
       //     let name = document.getElementById('name')
@@ -124,7 +124,7 @@ app.on('ready', () => {
     // }
   })
 
-  mainWindow.webContents.on('did-finish-load', function () {
+  mainWindow.webContents.on('did-finish-load', function() {
     log.info('load script ...')
     log.info('did-finish-load hook', mainWindow.webContents.getURL())
     let currentUrl = mainWindow.webContents.getURL()
@@ -161,7 +161,7 @@ app.on('ready', () => {
     }
   })
 
-  mainWindow.on('resize', function () {
+  mainWindow.on('resize', function() {
     log.info('is login go to shopee')
     mainWindow.loadFile('index.html')
     mainWindow

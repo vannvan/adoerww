@@ -11,7 +11,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     Request.getGoodDetailInfo(options, type, sendResponse)
     return true
   }
+  if (action == 'request' && type == 'GET_COMMERCE_COOKIES') {
+    Request.getCommerceCookies(sendResponse)
+    return true
+  }
 })
+
 
 const Request = {
   getDynamicPrices: function(params, type, call) {
@@ -37,5 +42,12 @@ const Request = {
       dataType: 'json',
       ...requestResult(type, call)
     })
+  },
+
+  // 获取电商平台的cookies
+  getCommerceCookies: (call) => {
+    chrome.cookies.getAll({}, function(cookies) {
+      call(cookies)
+    });
   }
 }

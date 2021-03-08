@@ -1,12 +1,13 @@
 {
     "name": "shoppe-fans-follow",
-    "version": "1.1.1",
+    "version": "1.2.2",
     "description": "",
     "main": "index.js",
     "scripts": {
         "start": "nodemon ./build/start.js --mode development",
         "build": "cross-env NODE_ENV=production node ./build/start.js && node zip production",
         "build:test": "cross-env NODE_ENV=testing node ./build/start.js && node zip test",
+        "build:test2": "cross-env NODE_ENV=testing2 node ./build/start.js && node zip test2",
         "build:dev": "cross-env NODE_ENV=development node ./build/start.js && node zip development",
         "build:pre": "cross-env NODE_ENV=preproduction node ./build/start.js && node zip preproduction"
     },
@@ -30,6 +31,7 @@
         "html-webpack-plugin": "^4.0.0-beta.5",
         "html-withimg-loader": "^0.1.16",
         "jquery": "^3.5.1",
+        "js-cookie": "^2.2.1",
         "jsonfile": "^5.0.0",
         "less": "^3.9.0",
         "less-loader": "^5.0.0",
@@ -38,6 +40,7 @@
         "optimize-css-assets-webpack-plugin": "^5.0.4",
         "ora": "^5.3.0",
         "sass-loader": "^10.1.1",
+        "shelljs": "^0.8.4",
         "superagent": "^6.1.0",
         "uglifyjs-webpack-plugin": "^2.2.0",
         "url-loader": "^1.1.2",

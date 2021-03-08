@@ -1,6 +1,8 @@
 // const chrome = {}
 const contextMenus = {}
-import { ERP_SYSTEM } from '@/lib/env.conf'
+import {
+  ERP_SYSTEM
+} from '@/lib/env.conf'
 
 // 右键菜单
 export function contextMenu(config) {
@@ -18,7 +20,9 @@ export function insertCss(tabId, link) {
     return
   }
 
-  chrome.tab.insertCss(tabId, { file: link.match(/\/?(\w+\.?-?\w+\.css)$/)[1] })
+  chrome.tab.insertCss(tabId, {
+    file: link.match(/\/?(\w+\.?-?\w+\.css)$/)[1]
+  })
 }
 // 插入js
 export function exceScript(tabId, linkOrCode) {
@@ -29,31 +33,41 @@ export function exceScript(tabId, linkOrCode) {
 
   chrome.tab.exceScript(
     tabId,
-    linkOrCode.match(/\.js$/)
-      ? { file: linkOrCode.match(/\/?(\w+\.?-?\w+\.js$)/)[1] }
-      : { code: linkOrCode }
+    linkOrCode.match(/\.js$/) ?
+    {
+      file: linkOrCode.match(/\/?(\w+\.?-?\w+\.js$)/)[1]
+    } :
+    {
+      code: linkOrCode
+    }
   )
 }
 
 // 获取当前窗口的ID
 export function getCurrent(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getCurrent(function(currentWindow) {
+  chrome.windows.getCurrent(function (currentWindow) {
     callback && callback(currentWindow.id)
   })
 }
 // 获取当前tabID
 export function getTabId(callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function (tabs) {
     callback && callback(tabs.length ? tabs[0].id : null)
   })
 }
 // 获取当前tabID2
 export function getTabId2(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getCurrent(function(currentWindow) {
-    chrome.tabs.query({ active: true, windowId: currentWindow.id }, function(tabs) {
+  chrome.windows.getCurrent(function (currentWindow) {
+    chrome.tabs.query({
+      active: true,
+      windowId: currentWindow.id
+    }, function (tabs) {
       if (callback) callback(tabs.length ? tabs[0].id : null)
     })
   })
@@ -62,7 +76,7 @@ export function getTabId2(callback) {
 //获取当前tab的url
 export function getTabUrl(callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.getSelected(null, function(tab) {
+  chrome.tabs.getSelected(null, function (tab) {
     callback(tab.url)
   })
 }
@@ -70,8 +84,10 @@ export function getTabUrl(callback) {
 //获取所有标签页
 export function getAllTabs(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getAll({ populate: true }, function(windows) {
-    windows.forEach(function(window) {
+  chrome.windows.getAll({
+    populate: true
+  }, function (windows) {
+    windows.forEach(function (window) {
       //   window.tabs.forEach(function(tab) {
       //     //collect all of the urls here, I will just log them instead
       //     console.log(tab.url)
@@ -84,7 +100,10 @@ export function getAllTabs(callback) {
 //打开指定标签页
 export function gotoSomeTab(windowId, tabIndex, callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.highlight({ windowId: windowId, tabs: tabIndex }, function(tab) {
+  chrome.tabs.highlight({
+    windowId: windowId,
+    tabs: tabIndex
+  }, function (tab) {
     callback(tab)
   })
 }
@@ -93,10 +112,10 @@ export function gotoSomeTab(windowId, tabIndex, callback) {
 export function gotoErp(callback) {
   const currentErpSystem = ERP_SYSTEM[process.env.NODE_ENV]
   let reg = new RegExp(currentErpSystem)
-  getAllTabs(function(tabs) {
+  getAllTabs(function (tabs) {
     for (let i = 0; i < tabs.length; i++) {
       if (reg.test(tabs[i].url)) {
-        gotoSomeTab(tabs[i].windowId, tabs[i].index, function(res) {
+        gotoSomeTab(tabs[i].windowId, tabs[i].index, function (res) {
           callback(res)
         })
         break
@@ -105,21 +124,100 @@ export function gotoErp(callback) {
   })
 }
 
-//storage
-export function getItem(values, callback) {
+//storage.sync 获取数据
+export function getStorageSync(values, callback) {
   if (!chrome.storage) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-
-  chrome.storage.sync.get(values, function(items) {
+  chrome.storage.sync.get(values, function (items) {
     callback && callback(items)
   })
 }
 
-// storage 保存数据
-export function setItem(values, callback) {
-  chrome.storage.sync.set(values, function() {
+// storage.sync 保存数据
+export function setStorageSync(values, callback) {
+  if (!chrome.storage) {
+    console.log('Sorry, maybe you dont have storage permission')
+    return
+  }
+  chrome.storage.sync.set(values, function () {
     typeof callback == 'function' && callback(values)
   })
+}``
+
+// storage.sync 删除指定key的一个或多个数据项
+export function removeStorageSync(values, callback) {
+  if (!chrome.storage) {
+    console.log('Sorry, maybe you dont have storage permission')
+    return
+  }
+  chrome.storage.sync.remove(values, function () {
+    typeof callback == 'function' && callback(values)
+  })
+}
+
+// storage.sync 清空存储的所有数据项
+export function clearStorageSync(callback) {
+  if (!chrome.storage) {
+    console.log('Sorry, maybe you dont have storage permission')
+    return
+  }
+  chrome.storage.sync.clear(function () {
+    typeof callback == 'function' && callback(values)
+  })
+}
+
+//storage.local 获取数据
+export function getStorageLocal(values, callback) {
+  if (!chrome.storage) {
+    console.log('Sorry, maybe you dont have storage permission')
+    return
+  }
+  chrome.storage.local.get(values, function (items) {
+    callback && callback(items)
+  })
+}
+
+// storage.local 保存数据
+export function setStorageLocal(values, callback) {
+  if (!chrome.storage) {
+    console.log('Sorry, maybe you dont have storage permission')
+    return
+  }
+  chrome.storage.local.set(values, function () {
+    typeof callback == 'function' && callback(values)
+  })
+}
+
+//  存储事件触发,当一项或多项更改时触发。
+/**
+* @export
+ * @param {object} changes  
+Object mapping each key that changed to its corresponding StorageChange for that item.
+ * @param {string} namespace "sync"，"local"或"managed"
+ */
+export function storageChanged() {
+  chrome.storage.onChanged.addListener(function (changes, namespace) {
+    for (var key in changes) {
+      var storageChange = changes[key];
+      console.log('Storage key "%s" in namespace "%s" changed. ' +
+        'Old value was "%s", new value is "%s".',
+        key,
+        namespace,
+        storageChange.oldValue,
+        storageChange.newValue);
+    }
+  });
+}
+
+// storage.local 保存数据
+export function getAllCookies(values, callback) {
+  if (!chrome.cookies) {
+    chrome.cookies = chrome.experimental.cookies;
+  }
+  chrome.cookies.getAll(values, function () {
+    callback && callback(items)
+  })
+  
 }

@@ -13,7 +13,7 @@
           class="emalacca-plugin-quick-action-item"
           :class="item.fixed ? 'fixed' : ''"
           :id="item.id"
-          :style="{ 'pointer-events': isExpand && !item.fixed ? 'auto' : 'none' }"
+          :style="{ 'pointer-events': (!isShrink || (isShrink && item.fixed)) ? 'auto' : 'none' }"
         >
           <span class="icon em-iconfont" :class="item.icon"></span>
           <p class="emalacca-plugin-quick-action-title">{{ item.name }}</p>
@@ -36,7 +36,8 @@
         </li>
         <li
           class="emalacca-plugin-quick-action-item dark help"
-          :style="{ 'pointer-events': isExpand ? 'auto' : 'none' }"
+          :style="{ 'pointer-events': !isShrink ? 'auto' : 'none' }"
+          @click="helpClick"
         >
           <span class="icon em-iconfont em-icon-question"></span>
           <p class="emalacca-plugin-quick-action-title">帮助</p>
@@ -49,9 +50,9 @@
       >
         <span
           class="icon em-iconfont"
-          :class="isExpand ? 'em-icon-pick-up' : 'em-icon-pick-down'"
+          :class="!isShrink ? 'em-icon-pick-up' : 'em-icon-pick-down'"
         ></span>
-        <p class="emalacca-plugin-quick-action-title">{{ isExpand ? '收起' : '展开' }}</p>
+        <p class="emalacca-plugin-quick-action-title">{{ !isShrink ? '收起' : '展开' }}</p>
       </div>
     </div>
     <template v-if="isShopee">
@@ -71,10 +72,13 @@
 <script>
 import $ from 'jquery'
 import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE, COMMON_COLLECT_DETAIL } from '@/lib/conf'
+import { setStorageSync, getStorageSync } from '@/lib/chrome'
+import { isEmpty } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import BatchCollect from '@/inject/batch-collect'
 import FollowDrawer from './FollowDrawer'
 import Drawer from './Drawer'
+import { ERP_LOGIN_URL } from '@/lib/env.conf'
 import Follow from '@/inject/shopee'
 const ItemHeight = 48 //每个菜单项的高度
 export default {
@@ -89,9 +93,9 @@ export default {
       display: false,
       drawerWidth: '400px',
       rightMenu: [],
-      isExpand: true,
+      isShrink: false,
       isStorePage: false, //是否在店铺页面
-      initHoldUpMarginTop: 0, //收起按钮初始marginTop
+      initHoldUpMarginTop: '56px', //收起按钮初始marginTop
       isCheckAll: false, //采集全选
       isShopee: false, //是否虾皮网站
       pageType: '' // 当前网站类型 'category', 'sortlist', 'detail'
@@ -120,6 +124,7 @@ export default {
    * 3. observer 的作用是监听页面切换，主要用于虾皮网站，因为虾皮网站页面切换并不会重新初始化主程序
    */
   mounted() {
+    this.initData() // 初始化页面
     this.getPageType()
     this.loadMenuAction()
     // 监听页面链接更新，加载不同的侧栏工具
@@ -128,6 +133,7 @@ export default {
     let bodyList = document.querySelector('body'),
       observer = new MutationObserver(function(mutations) {
         if (oldHref != location.href) {
+          _this.initPage()
           oldHref = location.href
           let linkRule = getRule(location.href)
           let siteConfig = JSON.parse(linkRule)
@@ -144,12 +150,25 @@ export default {
     this.initToggleAction()
   },
   methods: {
+    // 初始化页面
+    initData() {
+      let oldHref = location.href
+      // 内部平台不显示
+      if (oldHref.indexOf('emalacca.com') > -1 || oldHref.indexOf('192.168.') > -1) {
+        $('#emalaccaRightApp').css({'display': 'none'})
+        return;
+      } else {
+        $('#emalaccaRightApp').css({'display': 'block'})
+      }
+    },
     initToggleAction() {
       let _this = this
       $('.toggle-menu-action').click(function() {
-        _this.isExpand = !_this.isExpand
+        _this.isShrink = !_this.isShrink
+        // 保存用户操作，固定当前按钮
+        setStorageSync({emalacca_isShrink: _this.isShrink})
         let fixedLen = $('.emalacca-plugin-quick-action-item.fixed').length //此时的length和下面的不一样
-        if (!_this.isExpand) {
+        if (_this.isShrink) {
           _this.handleHoldUp($('.emalacca-plugin-quick-action-item'), fixedLen)
         } else {
           $('.emalacca-plugin-quick-action-item').each(function() {
@@ -200,8 +219,12 @@ export default {
     //只有取消固定才会触发
     changeSkin(item) {
       item.fixed = !item.fixed
-      if (!item.fixed) {
-        this.isExpand = false
+      // 保存用户操作，固定当前按钮
+      let obj = {}
+      obj[item.id + '_isfixed'] = item.fixed
+      setStorageSync(obj)
+      // 判断是否收起状态，如果是，则隐藏
+      if (!item.fixed && this.isShrink) {
         let fixedLen = $('.emalacca-plugin-quick-action-item.fixed').length - 1
         this.handleHoldUp($('.emalacca-plugin-quick-action-item'), fixedLen)
       }
@@ -269,6 +292,7 @@ export default {
     //加载程序菜单
     loadMenuAction() {
       let showPageArr = ['category', 'sortlist'] // 列表&分类页面
+
       if (/shopee|xiapibuy/.test(location.host)) {
         this.isShopee = true
         this.isStorePage = location.href.search('-i.') >= 0
@@ -286,16 +310,56 @@ export default {
       } else {
         this.rightMenu = []
       }
-      this.$nextTick(() => {
-        let fixedLen = $('.emalacca-plugin-quick-action-item.fixed').length
-        this.initHoldUpMarginTop = fixedLen * 48 + 56 + 'px'
-      })
+      // 从缓存中获取用户操作习惯, _isfixed是否为固定
+      // 当前操作按钮是否已经固定
+      let arrKey = ['emalacca_isShrink'] // 记录侧栏工具id && 展开状态
+      if (this.rightMenu.length > 0) {
+        this.rightMenu.forEach(item => {
+          let key = item.id + '_isfixed'
+          arrKey.push(key)
+        })
+        // 获取缓存：用户操作习惯信息
+        getStorageSync(arrKey, (data) => {
+          if (!isEmpty(data)) {
+            this.rightMenu.forEach(item => {
+              let key = item.id + '_isfixed'
+              if (data[key]) {
+                item.fixed = data[key]
+              }
+            })
+          }
+          // 页面dom加载完执行
+          // 侧栏工具状态和位置更新
+          this.$nextTick(() => {
+            let fixedLen = 0
+            if (!data['emalacca_isShrink']) {
+              fixedLen = $('.emalacca-plugin-quick-action-item').length
+              this.isShrink = false
+            } else {
+              this.isShrink = true
+              fixedLen = $('.emalacca-plugin-quick-action-item.fixed').length
+              this.handleHoldUp($('.emalacca-plugin-quick-action-item'), fixedLen)
+            }
+            let distNum = !this.isShrink ? 8 : 56
+            this.initHoldUpMarginTop = fixedLen * 48 + distNum + 'px'
+          })
+        })
+      }
     },
-
+    // 初始化页面
+    initPage() {
+      // 清除之前角标
+      if ($('.emalacca-plugin-goods-acquisition-spidered').length > 0) {
+        $('.emalacca-plugin-goods-acquisition-spidered').css({display: 'none'})
+      }
+    },
     openPage(path) {
       if (/http/.test(path)) {
         window.open(path)
       }
+    },
+    helpClick() {
+      window.open(ERP_LOGIN_URL + 'welcome')
     }
   }
 }

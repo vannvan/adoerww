@@ -1,7 +1,8 @@
 import $ from 'jquery'
 import { ShopeModal } from '../config/modal.js'
-import { isEmpty } from '@/lib/utils'
+import { isEmpty, getStorage, getBase64, dataURLtoFile } from '@/lib/utils'
 import { ERP_SYSTEM } from '@/lib/env.conf'
+import { CONFIGINFO } from '@/background/config.js'
 const ERP_LOGIN_URL = ERP_SYSTEM[process.env.NODE_ENV]
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -24,11 +25,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (request.action === 'check1688') {
       backEvent.check1688Verify(request.data, sendResponse)
       return true
+    } else if (request.action === 'postHasCrawl') {
+      backEvent.postHasCrawl(request.data, sendResponse)
+      return true
+    } else if (request.action === 'handleUploadImages') {
+      backEvent.handleUploadImages(request.data, sendResponse)
+      return true
     }
   }
 })
-// 设置ajax请求 获取重定向接口最后一个url
-const xhr = new XMLHttpRequest();
 
 export const backEvent = {
   //获取用户登录状态
@@ -85,25 +90,31 @@ export const backEvent = {
       try_times = data.try_times,
       callback = data.callback,
       sync = data.sync == 'false' ? false : true
-
+    // 设置ajax请求 获取重定向接口最后一个url
+    const xhr = new XMLHttpRequest()
     $.ajax({
       url: url,
       type: 'GET',
       async: sync,
       timeout: 60000,
       xhr: function() {
-        return xhr;
+        return xhr
       },
       data: {},
       success: function(data) {
         typeof data == 'object' && (data = JSON.stringify(data))
-        // xhr.responseURL 重定向接口最后一个url
-        call({ html: data, responseURL: xhr.responseURL })
+        // xhr.responseURL 重定向接口最后一个url, responseURL: xhr.responseURL
+        call({
+          html: data,
+          responseURL: xhr.responseURL
+        })
       },
       complete: function(XMLHttpRequest, status) {
         if (status == 'timeout') {
           try_times >= 3
-            ? call({ html: '' })
+            ? call({
+                html: ''
+              })
             : setTimeout(function() {
                 var dataNew = {
                   url: url,
@@ -114,9 +125,13 @@ export const backEvent = {
               }, 5000)
         } else if (status == 'parsererror') {
           var data = XMLHttpRequest.responseText
-          call({ html: data })
+          call({
+            html: data
+          })
         } else if (status == 'error') {
-          call({ html: '' })
+          call({
+            html: ''
+          })
         }
       }
     })
@@ -166,11 +181,20 @@ export const backEvent = {
           return
         }
         if (status == 'error') {
-          call({ code: -1, msg: '请求出错' })
+          call({
+            code: -1,
+            msg: '请求出错'
+          })
         } else if (status == 'parsererror') {
-          call({ code: -1, msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号` })
+          call({
+            code: -1,
+            msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号`
+          })
         } else if (status == 'timeout') {
-          call({ code: 0, msg: '请求超时' })
+          call({
+            code: 0,
+            msg: '请求超时'
+          })
         }
       }
     })
@@ -212,11 +236,20 @@ export const backEvent = {
           return
         }
         if (status == 'error') {
-          call({ code: -1, msg: '请求出错' })
+          call({
+            code: -1,
+            msg: '请求出错'
+          })
         } else if (status == 'parsererror') {
-          call({ code: -1, msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号` })
+          call({
+            code: -1,
+            msg: `请先<a target="_blank" href="${ERP_LOGIN_URL}">登录</a>采集助手账号`
+          })
         } else if (status == 'timeout') {
-          call({ code: 0, msg: '请求超时' })
+          call({
+            code: 0,
+            msg: '请求超时'
+          })
         }
       }
     })
@@ -234,8 +267,11 @@ export const backEvent = {
       data: {},
       async: false,
       success: function(data) {
+        console.log(data, 'dat2222')
         typeof data == 'object' && (data = JSON.stringify(data))
-        call({ html: data })
+        call({
+          html: data
+        })
       },
       complete: function(XMLHttpRequest, status) {
         let code = ''
@@ -251,7 +287,9 @@ export const backEvent = {
         }
         if (status == 'timeout') {
           try_times >= 3
-            ? call({ html: '' })
+            ? call({
+                html: ''
+              })
             : setTimeout(function() {
                 var dataNew = {
                   url: url,
@@ -262,9 +300,13 @@ export const backEvent = {
               }, 5000)
         } else if (status == 'parsererror') {
           var data = XMLHttpRequest.responseText
-          call({ html: data })
+          call({
+            html: data
+          })
         } else if (status == 'error') {
-          call({ html: '' })
+          call({
+            html: ''
+          })
         }
       }
     })
@@ -284,9 +326,15 @@ export const backEvent = {
       success: function(data) {
         if (data.code == 0) {
           if (data.data == 0) {
-            call({ code: 0, msg: '认证成功' })
+            call({
+              code: 0,
+              msg: '认证成功'
+            })
           } else if (data.data == 1) {
-            call({ code: 1, msg: '注意: 1688未授权或授权到期' })
+            call({
+              code: 1,
+              msg: '注意: 1688未授权或授权到期'
+            })
           }
         }
       },
@@ -296,11 +344,72 @@ export const backEvent = {
       },
       complete: function(XMLHttpRequest, status) {
         if (status == 'error') {
-          call({ code: -1, msg: '请求出错' })
+          call({
+            code: -1,
+            msg: '请求出错'
+          })
         } else if (status == 'timeout') {
-          call({ code: 0, msg: '请求超时' })
+          call({
+            code: 0,
+            msg: '请求超时'
+          })
         }
       }
+    })
+  },
+  // 商品是否已采集
+  postHasCrawl: function(data, call) {
+    let params = {
+      link: data.url
+    }
+    let userInfo = getStorage('pt-plug-access-user')
+    // 没有登录时，不请求
+    if (isEmpty(userInfo)) {
+      call(false)
+      return
+    }
+    $.ajax({
+      url: CONFIGINFO.url.postHasCrawl(),
+      type: 'POST',
+      timeout: 3000,
+      data: JSON.stringify(params),
+      contentType: 'application/json',
+      dataType: 'json',
+      headers: {
+        Authorization: 'Bearer ' + userInfo.token
+      },
+      success: function(res) {
+        call(res.data)
+      }
+    })
+  },
+  // 上传图片到阿里云
+  handleUploadImages: function(data, call) {
+    getBase64(data.url).then(res => {
+      let file = dataURLtoFile(res, 'text')
+      let formData = new FormData()
+      formData.append('file', file)
+      let userInfo = getStorage('pt-plug-access-user')
+      // 没有登录时，不请求
+      if (isEmpty(userInfo)) {
+        call({ code: -1 })
+        return
+      }
+      $.ajax({
+        url: CONFIGINFO.url.handleUploadImages(),
+        type: 'POST',
+        timeout: 3000,
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        headers: {
+          Authorization: 'Bearer ' + userInfo.token
+        },
+        success: function(res) {
+          call(res.data)
+        }
+      })
     })
   }
 }
@@ -317,23 +426,3 @@ var tabId = null
 chrome.tabs.onRemoved.addListener(function(tid) {
   tid === tabId && (tabId = null)
 })
-
-chrome.contextMenus.create({
-  type: 'normal',
-  title: '采集此产品',
-  contexts: ['all'],
-  id: 'menuCrawl',
-  onclick: menuCrawl
-})
-
-function menuCrawl(info, tab) {
-  var url
-  if (info.linkUrl == undefined) {
-    url = info.pageUrl
-  } else {
-    url = info.linkUrl
-  }
-  chrome.tabs.sendMessage(tab.id, { url: url }, function(response) {
-    // console.log('response::' + response)
-  })
-}

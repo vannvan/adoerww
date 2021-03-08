@@ -35,7 +35,7 @@ const ruleInfo = {
   'taobao.com':
     '{\n' +
     "\"detect\": \"\\nif (url.indexOf('taobao.com/list') !== -1 || url.indexOf('//s.taobao.com/search') !== -1) {\\n    return 'sortlist';\\n}\\n\\nif (url.indexOf('item.taobao.com/item.htm') !== -1) {\\n   return 'detail';\\n}\\n\\nif (url.indexOf('taobao.com/category') !== -1 || url.indexOf('taobao.com/search.htm?spm') !== -1) {\\n    return 'category';\\n}\\n\",\n" +
-    "\"detail\": \"if (url.indexOf('item.taobao.com/item.htm') !== -1 || url.indexOf('srd.simba.taobao.com/rd')  !== -1) {\\n    return true;\\n}  if (url.indexOf('click.mz.simba.taobao.com/necpm') !== -1)  {\\n      return true;\\n  } if(url.indexOf('tmall.com/item.htm') !== -1){return true;}if(url.indexOf('click.simba.taobao.com/cc_im') !== -1){return true;}\",\n" +
+    "\"detail\": \"if (url.indexOf('item.taobao.com/item.htm') !== -1 ) {\\n    return true;\\n}  if (url.indexOf('click.mz.simba.taobao.com/necpm') !== -1)  {\\n      return true;\\n  } if(url.indexOf('tmall.com/item.htm') !== -1){return true;}if(url.indexOf('click.simba.taobao.com/cc_im') !== -1){return true;}\",\n" +
     '"map": {\n' +
     '"detail": "single",\n' +
     '"category": "category"\n' +
@@ -235,9 +235,9 @@ const ruleInfo = {
     '}\n' +
     '}',
 
-  'yangkeduo.com':
+  'mobile.yangkeduo.com':
     '{\n' +
-    "\"detect\": \"if ((url.indexOf('search_result') !== -1 || url.indexOf('search_catgoods') !== -1) && url.indexOf('/goods.html?') === -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/goods.html?') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
+    "\"detect\": \"if (url.indexOf('/goods.html?') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
     '"detail": "if (url.indexOf(\'yangkeduo.com\')!==-1) {\\n  return true;\\n}",\n' +
     '"map": {\n' +
     '"detail": "single",\n' +
@@ -245,7 +245,16 @@ const ruleInfo = {
     '"globalcategory": "category"\n' +
     '}\n' +
     '}',
-
+  'pifa.pinduoduo.com':
+    '{\n' +
+    "\"detect\": \"if (url.indexOf('pinduoduo.com/search?') !== -1) {\\n  return 'false';\\n}\\nif (url.indexOf('pinduoduo.com/goods/detail/?gid') !== -1) {\\n  return 'detail';\\n}\",\n" +
+    "\"detail\": \"if (url.indexOf('goods/detail/?gid') !== -1) {\\n  return false;\\n}\",\n" +
+    '"map": {\n' +
+    '"detail": "single",\n' +
+    '"shopcategory": "category",\n' +
+    '"globalcategory": "category"\n' +
+    '}\n' +
+    '}',
   'lightinthebox.com':
     '{\n' +
     "\"detect\": \"if (url.indexOf('search_in_description') !== -1 || url.indexOf('/c/') !== -1 || url.indexOf('/promotions/') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('/en/p/') !== -1 ) {\\n  return 'detail';\\n}\",\n" +

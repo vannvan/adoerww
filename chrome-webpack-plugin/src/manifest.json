@@ -1,5 +1,4 @@
 {
-    "name": "马六甲虾皮助手",
     "manifest_version": 2,
     "description": "https://erp.emalacca.com/ ",
     "homepage_url": "https://erp.emalacca.com/",
@@ -74,7 +73,8 @@
                 "*://*.aliexpress.com/*",
                 "*://*.xiapibuy.com/*",
                 "*://*.17zwd.com/*",
-                "*://*.yangkeduo.com/*"
+                "*://mobile.yangkeduo.com/*",
+                "*://pifa.pinduoduo.com/*"
             ],
             "js": [
                 "./inject/inject.js"
@@ -97,19 +97,15 @@
     ],
     "browser_action": {
         "default_icon": "icon/app.png",
-        "default_title": "马六甲虾皮助手",
+        "default_title": "马六甲跨境助手",
         "default_popup": "popup/popup.html"
     },
     "permissions": [
         "downloads",
-        "notifications",
         "activeTab",
         "storage",
         "cookies",
-        "history",
         "tabs",
-        "contextMenus",
-        "webNavigation",
         "https://desc.alicdn.com/",
         "http://dsc.taobaocdn.com/",
         "http://*.aliexpress.com/",
@@ -175,7 +171,7 @@
         "*://*.aliexpress.com/*",
         "*://*.xiapibuy.com/*",
         "*://*.17zwd.com/*",
-        "*://*.yangkeduo.com/*"
+        "*://mobile.yangkeduo.com/*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

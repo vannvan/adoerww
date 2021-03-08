@@ -59,8 +59,7 @@ let headerFixed = document.createElement('div')
 headerFixed.className = 'emalacca-client-header-fixed'
 
 Site.siteOption.map((el) => {
-  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}" data-store="${el.storeId}" 
-  }">${el.name}</div>`
+  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}" data-store="${el.storeId}">${el.name}</div>`
 })
 
 document.body.prepend(headerFixed)

@@ -3,8 +3,6 @@
  * 采集提示信息
  */
 import $ from 'jquery'
-import { ShopeModal } from './modal.js'
-import { Html } from '@/background/server/html.js'
 
 //全选复选框
 export const selAllCurrPage = (obj, name) => {
@@ -12,12 +10,6 @@ export const selAllCurrPage = (obj, name) => {
   isChecked
     ? $("input[name='" + name + "']").prop('checked', true)
     : $("input[name='" + name + "']").prop('checked', false)
-}
-
-//跳过
-export const closeRepeatCrawl = () => {
-  ShopeModal.hide('#repeatCrawlModal')
-  Crawl.displayCrawlResult(true)
 }
 
 

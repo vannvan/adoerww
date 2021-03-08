@@ -114,29 +114,20 @@
             </span>
           </li>
           <li>
-            <span class="sub-item">上次登录时间</span>
-            <span class="sub-item">最少评价次数</span>
+            <span class="sub-item">最近活跃时间(以内)</span>
+            <span class="sub-item">用户关注数量</span>
           </li>
           <li>
             <span class="sub-item">
               <input
                 type="number"
-                placeholder="<=30天"
+                placeholder="如：30"
                 v-model="filterParams.lastLoginTime"
-                v-enterNumberMax="30"
                 v-enterNumberMin="-1"
               />
-              <small class="error-info" ref="lastLoginTime">请输入上次登录时间 </small>
+              <small class="error-info" ref="lastLoginTime">请输入最近活跃时间 </small>
             </span>
-            <!-- <span class="sub-item">
-              <input
-                type="number"
-                placeholder=">=0次"
-                v-model="filterParams.commentsTimes"
-                v-enterNumberMin="-1"
-              />
-              <small class="error-info" ref="commentsTimes">请输入评价次数 </small>
-            </span> -->
+
             <span class="sub-item">
               <input
                 type="number"
@@ -162,7 +153,7 @@
           <li>
             <span class="sub-item">
               <input type="checkbox" class="check-box" v-model="filterParams.isFilterSeller" />
-              {{ filterParams.isFilterSeller ? '是' : '否' }}
+              {{ filterParams.isFilterSeller ? '全部过滤' : '部分过滤' }}
             </span>
             <span class="sub-item" v-if="!filterParams.isFilterSeller">
               <input type="number" placeholder=">=50" v-model="filterParams.sellerGoodsCount" />
@@ -283,7 +274,6 @@ export default {
         startIndex: 1, //自动开始位置
         limitFollowNumber: '', //自动关注数量
         lastLoginTime: '', //上次登录时间
-        commentsTimes: '', //评价次数
         followsTimes: '', //关注数
         isFilterSeller: false, //是否过滤卖家
         sellerGoodsCount: null //卖家商品数
@@ -311,7 +301,8 @@ export default {
       countryCode: null, //当前国家
       currentStoreId: null, //当前用户自己的店铺id
       followHelpVisible: false,
-      unFollowHelpVisible: false
+      unFollowHelpVisible: false,
+      scrollTimer: null //自动滚动定时器
     }
   },
   props: {
@@ -330,14 +321,14 @@ export default {
   watch: {
     display: {
       handler(newVal) {
-        let { pathname } = window.location
+        let { pathname } = location
         if (!/followers|following/.test(pathname) && newVal) {
           //   this.handleToggleTabs(2)
           this.currentTab = 1
         } else {
-          if (/following/.test(window.location.href)) {
+          if (/following/.test(location.href)) {
             this.currentTab = 2
-          } else if (/followers/.test(window.location.href)) {
+          } else if (/followers/.test(location.href)) {
             this.currentTab = 1
           }
         }
@@ -393,11 +384,13 @@ export default {
     }
   },
   mounted() {
-    this.isOther = window.location.search.search('other') == 1
+    console.log(global, '_rc_set')
+    //   把页面整体左移，避免小分辨率右侧操作栏遮挡主体
+    $('.middle-centered-div').css('transform', 'translateX(-50%)')
+    this.isOther = /followers/.test(location.pathname)
     this.currentTab = this.isOther ? 1 : 2
     this.buttonText = this.isOther ? '开启关注' : '开启取关'
-    let _this = this
-    let { pathname } = window.location
+    let { pathname } = location
     if (/followers|following/.test(pathname)) {
       this.$emit('update:display', true)
       let storeId = pathname.replace(/[^0-9]/gi, '')
@@ -406,7 +399,6 @@ export default {
           this.storeInfo = res.result.data
         }
       })
-      _this.scrollTo()
     } else {
       //获取虾皮的店铺ID,除了以上两个页面
       this.getCurrentStoreId()
@@ -450,13 +442,13 @@ export default {
           let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
           this.$emit('update:display', false)
           if (this.currentTab == 2) {
-            window.location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
-          } else if (countryWebSite.front != window.location.href) {
+            location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
+          } else if (countryWebSite.front != location.href) {
             this.$Notice.info({
               content: '将带你去首页寻找合适的店铺获取粉丝哦！！！'
             })
             setTimeout(() => {
-              window.location.replace(countryWebSite.front)
+              location.replace(countryWebSite.front)
             }, 3000)
           }
         } else {
@@ -468,13 +460,14 @@ export default {
     },
 
     handleScroll() {
+      $('.middle-centered-div').css('transform', 'translateX(-50%)')
       this.countFollowers = $('.clickable_area.middle-centered-div').length
     },
 
     scrollTo() {
-      let timer = setInterval(() => {
+      this.scrollTimer = setInterval(() => {
         if (this.lastOffsetHeight >= document.body.offsetHeight) {
-          clearTimeout(timer)
+          clearTimeout(this.scrollTimer)
         } else {
           window.scrollTo(0, document.body.offsetHeight)
           this.lastOffsetHeight = document.body.offsetHeight
@@ -515,15 +508,14 @@ export default {
         this.handleCancel()
         return
       }
+      this.scrollTo() //开始滚
       //如果没有填,给一波默认值
       this.filterParams.limitFollowNumber = this.filterParams.limitFollowNumber || 100
       this.filterParams.lastLoginTime = this.filterParams.lastLoginTime || 30
-      this.filterParams.commentsTimes = this.filterParams.commentsTimes || 1
       this.filterParams.followsTimes = this.filterParams.followsTimes || 1
       if (!this.validate()) return
       let htmlStr = `<li>[${getTime()}] 任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
-
       this.getStoreFollowers(actionType)
     },
 
@@ -533,6 +525,7 @@ export default {
         this.handleCancel()
         return
       }
+      clearInterval(this.scrollTimer) //停止滚
       if (!this.validate()) return
       let htmlStr = `<li>[${getTime()}] 取关任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
@@ -601,6 +594,7 @@ export default {
       }
       return true
     },
+
     //关注或取关，传送给后台
     handleNotifyToBack(actionType, shopid, name) {
       //   console.log('操作过的用户', this.actionedUserList)
@@ -643,41 +637,40 @@ export default {
       // item_count是商品数
       let {
         account: { is_seller },
-        mtime,
+        last_active_time,
         item_count,
         follower_count,
         rating_bad,
         rating_good,
-        rating_normal
+        rating_normal,
+        name
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
       console.log(
         `上次登录: ${new Date(
-          mtime * 1000
+          last_active_time * 1000
         ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
       )
       let {
         lastLoginTime, //上次登录时间
-        commentsTimes, //评价次数
         followsTimes, //关注数
         isFilterSeller, //是否过滤卖家
         sellerGoodsCount //卖家商品数
       } = this.filterParams
       let timestamp = Math.round(new Date().getTime() / 1000).toString()
       let matchStep1 = follower_count >= followsTimes //和关注数
-      let matchStep2 = parseInt((timestamp - mtime) / 86400) <= lastLoginTime //限制上次登录
+      let matchStep2 = parseInt((timestamp - last_active_time) / 86400) <= lastLoginTime //限制上次登录
       let matchStep3 = item_count >= sellerGoodsCount //限制商品数
       let matchStep5 = is_seller == false //是否是卖家
-      let matchStep6 = rateCount >= commentsTimes //限制评价次数
       //  不过滤卖家时， 如果当前用户是卖家且限制了商品数，就需要同时满足，如果只是买家，就不用限制商品数
       if (!isFilterSeller) {
         if (is_seller) {
-          return matchStep1 && matchStep2 && matchStep6 && matchStep3
+          return matchStep1 && matchStep2 && matchStep3
         } else {
-          return matchStep1 && matchStep2 && matchStep6
+          return matchStep1 && matchStep2
         }
       } else {
-        return matchStep1 && matchStep2 && matchStep3 && matchStep5 && matchStep6
+        return matchStep1 && matchStep2 && matchStep3 && matchStep5
       }
     },
 
@@ -700,6 +693,7 @@ export default {
       this.isRequest = false
       this.buttonText = '重新开始'
       clearInterval(this.globalTimer)
+      clearInterval(this.scrollTimer)
     }
   }
 }

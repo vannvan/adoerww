@@ -1,5 +1,6 @@
 // erp系统植入脚本
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
+import { getStorageLocal, setStorageLocal } from '@/lib/chrome.js'
 
 export const ERP = {
   syncAuthStatus: function() {
@@ -15,23 +16,36 @@ export const ERP = {
           ? JSON.parse(window.localStorage.getItem('erp')).auth
           : null
         if (!authInfo) return
-        sendMessageToBackground(
-          'auth',
-          { origin: document.location.origin, authInfo: authInfo },
-          'SYNC_ERP_AUTH_INFO',
-          data => {
-            if (data && data.result) {
-              let { userInfo } = authInfo
-              let { memberNO = '' } = userInfo.userInfo
-              console.log('Information synchronization successful')
-              //   $.fn.message({
-              //     type: 'success',
-              //     msg: `用户${memberNO}同步授权成功`
-              //   })
-              clearInterval(timer)
-            }
+        if (!authInfo['access_token']) {
+          setStorageLocal({'isLogin': false})  // ERP登出，保存false
+        }
+        // 在storage.local获取erp用户是否登录
+        getStorageLocal(['isLogin'], (res) => {
+          // 未登录，则定时发送消息获取用户信息
+          if (!res['isLogin']) {
+            sendMessageToBackground(
+              'auth',
+              { origin: document.location.origin, authInfo: authInfo },
+              'SYNC_ERP_AUTH_INFO',
+              data => {
+                if (data && data.result) {
+                  let { userInfo } = authInfo
+                  let { memberNO = '' } = userInfo.userInfo
+                  setStorageLocal({'isLogin': true})  // 获取用户信息成功，保存到缓存storage.local
+                  $.fn.message({
+                    type: 'success',
+                    msg: `用户${memberNO}同步授权成功`
+                  })
+                  clearInterval(timer)
+                }
+              }
+            )
+          } else {
+            // 已经登录且已有数据，则清除定时器
+            clearInterval(timer)
           }
-        )
+        })
+        
       }
     } catch (error) {
       console.log(error)

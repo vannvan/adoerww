@@ -41,3 +41,12 @@ export const operationSelectTemplate = () => {
     </div>
    `)
 }
+
+// 已采集标识 (默认不显示)
+export const operationSpideredTemplate = () => {
+  return $(`
+    <div class="${ClassPrefix}-goods-acquisition-spidered" data-selected="0">
+			<div class="emalacca-goods-spidered-text">已采集</div>
+    </div>
+   `)
+}

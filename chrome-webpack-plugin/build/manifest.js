@@ -3,7 +3,10 @@ const manifest = require('../src/manifest.json')
 const packJSON = require('../package.json')
 const path = require('path')
 const jsonfile = require('jsonfile')
+const env = process.env.NODE_ENV
+let namePostfix = env !== 'production' ? env : ''
 const defaultConfig = {
+  name: '马六甲跨境助手' + namePostfix,
   version: packJSON.version,
   permissions: [
     'contextMenus', // 右键菜单
@@ -17,7 +20,7 @@ const defaultConfig = {
   ]
 }
 
-const env = process.env.NODE_ENV
+
 module.exports = function() {
   const config = Object.assign(defaultConfig, manifest)
   const pathname =

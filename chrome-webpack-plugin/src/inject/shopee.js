@@ -4,8 +4,10 @@ import { getCookie, debounce, isEmpty } from '@/lib/utils'
 import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
 import { dataViewElementTemplate, operationPanelTemplate, collectText } from './template'
 import { solidCrawl } from './shopee-crawl'
-import { MESSAGE } from '../lib/conf'
+import { MESSAGE, getSiteLink } from '../lib/conf'
 require('@/background/config/message')
+
+const Cookies = require('js-cookie')
 
 const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
 const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
@@ -103,7 +105,8 @@ const Follow = {
             if (res.code == -1) {
               $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
             } else {
-              window.open(`/shop/${realStoreId}/followers?other=true`)
+              //   window.open(`/shop/${realStoreId}/followers?other=true`)
+              window.open(`${getSiteLink('cnfront')}/shop/${realStoreId}/followers`)
             }
           })
           break
@@ -237,7 +240,7 @@ const Follow = {
     return new Promise(resolve => {
       sendMessageToBackground(
         'auth',
-        { csrfToken: getCookie('csrftoken') },
+        { csrfToken: getCookie('csrftoken') || window.csrf, domain: this.domain },
         'SET_SHOPPE_CRSF_TOKEN',
         data => {
           resolve(data)
@@ -261,18 +264,23 @@ const Follow = {
   },
 
   //获取当前登录的店铺id
-  getCurrentStoreId: function() {
-    return new Promise(resolve => {
-      sendMessageToBackground('request', { domain: this.domain }, 'GET_CURRENT_STORE_ID', data => {
-        resolve(data)
-      })
-    })
-  },
+  //   getCurrentStoreId: function() {
+  //     return new Promise(resolve => {
+  //       sendMessageToBackground('request', { domain: this.domain }, 'GET_CURRENT_STORE_ID', data => {
+  //         resolve(data)
+  //       })
+  //     })
+  //   },
 
   //同步虾皮基础信息
   syncShoppeBaseInfo: function() {
     return new Promise(resolve => {
       sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPEE_BASE_INFO', data => {
+        console.log('SYNC_SHOPEE_BASE_INFO', data)
+        if (data.code == 0) {
+          //   document.cookie = `SPC_EC=${data.result.cs_token}`
+          Cookies.set('SPC_EC', data.result.cs_token, { expires: 7 })
+        }
         resolve(data)
       })
     })

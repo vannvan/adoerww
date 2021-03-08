@@ -1,10 +1,5 @@
-var sendMessageToBackground = function (action, options, callback) {
-  chrome.runtime.sendMessage(
-    '',
-    { sign: 'signShope', action: action, data: options },
-    callback
-  )
-}
+import { sendMessageToServer } from '@/lib/chrome-client'
+
 export const Html = {
   //根据传入的url获取到页面信息
   getHtml: function (url, try_times, callback, sync, outHtml) {
@@ -19,7 +14,7 @@ export const Html = {
     var getHtmlEnd = function (data) {
       callback(data)
     }
-    sendMessageToBackground('getHtml', data, getHtmlEnd)
+    sendMessageToServer('getHtml', data, getHtmlEnd)
   },
   getData: function (url, try_times, callback) {
     var data = {
@@ -30,7 +25,7 @@ export const Html = {
     var getDataEnd = function (data) {
       callback(data)
     }
-    sendMessageToBackground('getData', data, getDataEnd)
+    sendMessageToServer('getData', data, getDataEnd)
   },
   getCrawlHtml: function (url, params, try_times, callback, sync) {
     var data = {
@@ -43,7 +38,7 @@ export const Html = {
     var getCrawlHtmlEnd = function (data) {
       callback(data)
     }
-    sendMessageToBackground('getCrawlHtml', data, getCrawlHtmlEnd)
+    sendMessageToServer('getCrawlHtml', data, getCrawlHtmlEnd)
   },
   postCrawlHtml: function (url, params, try_times, callback, sync) {
     var data = {
@@ -56,7 +51,7 @@ export const Html = {
     var postCrawlHtmlEnd = function (data) {
       callback(data)
     }
-    sendMessageToBackground('postCrawlHtml', data, postCrawlHtmlEnd)
+    sendMessageToServer('postCrawlHtml', data, postCrawlHtmlEnd)
   },
   // 验证1688是否认证成功
   check1688Verify: function (url, params, try_times, callback, sync) {
@@ -70,6 +65,6 @@ export const Html = {
     var check1688End = function (data) {
       callback(data)
     }
-    sendMessageToBackground('check1688', data, check1688End)
+    sendMessageToServer('check1688', data, check1688End)
   },
 }

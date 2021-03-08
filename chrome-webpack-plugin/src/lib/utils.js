@@ -186,3 +186,41 @@ export const requestResult = (type, callback) => {
     }
   }
 }
+
+//图片转base64
+export const getBase64 = (url) => {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest()
+    xhr.open('get', url, true)
+    xhr.responseType = 'blob'
+    xhr.onload = function() {
+      if (this.status === 200) {
+        var blob = this.response
+        var fileReader = new FileReader()
+        fileReader.onloadend = function(e) {
+          var result = e.target.result
+          resolve(result)
+        }
+        fileReader.readAsDataURL(blob)
+      }
+    }
+    xhr.onerror = function() {
+      reject()
+    }
+    xhr.send()
+  })
+}
+
+//base64转file对象
+export const dataURLtoFile = (dataurl, filename) => {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n)
+  filename = `${filename}.jpg`
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}

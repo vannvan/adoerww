@@ -6,7 +6,7 @@ let batchGatherObj = {
   batchErrorNum: 0 // 失败数
 }
 let batchTimer, progress_timeout = null
-
+// 计算采集状态数量
 export function hintNotifyProgress(isSucc) {
   window.clearTimeout(batchTimer)
   
