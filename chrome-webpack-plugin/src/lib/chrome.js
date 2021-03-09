@@ -125,26 +125,30 @@ export function gotoErp(callback) {
 }
 
 //storage.sync 获取数据
-export function getStorageSync(values, callback) {
+export function getStorageSync(values) {
   if (!chrome.storage) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.sync.get(values, function (items) {
-    callback && callback(items)
+  return new Promise(resolve => {
+    chrome.storage.sync.get(values, (items) => {
+      resolve(items)
+    })
   })
 }
 
 // storage.sync 保存数据
-export function setStorageSync(values, callback) {
+export function setStorageSync(values) {
   if (!chrome.storage) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.sync.set(values, function () {
-    typeof callback == 'function' && callback(values)
+  return new Promise(resolve => {
+    chrome.storage.sync.set(values, () => {
+      resolve()
+    })
   })
-}``
+}
 
 // storage.sync 删除指定key的一个或多个数据项
 export function removeStorageSync(values, callback) {

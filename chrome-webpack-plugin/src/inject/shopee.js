@@ -9,137 +9,55 @@ require('@/background/config/message')
 
 const Cookies = require('js-cookie')
 
-const EmalaccaPluginGoodsPanelWrapClass = '.emalacca-plugin-goods-panel-wrap' //操作面板容器
-const EmalaccaPluginGoodsDataViewClass = '.emalacca-plugin-goods-data-view' //数据展示容器
+var curTs = Date.now
+  ? function() {
+      return Date.now()
+    }
+  : function() {
+      return +new Date()
+    }
+var rStringChoices = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+function _rc_set(key, len, domain, expires) {
+  var oldV = null
+  // Note: To avoid breaking server-rendered csrf logic, we should always use the one in the cookie if possible. Otherwise server-rendered FORMs with CRSF inside them will break.
+  if (oldV) return oldV
+  var newV = randomString(len)
+  //   $.cookie(key, newV, { path: '/', domain: domain, expires: expires })
+  return newV
+}
+function randomString(length, chars) {
+  chars = _defaultFor(chars, rStringChoices)
+  var result = ''
+  for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))]
+  return result
+}
+
+function _defaultFor(arg, val) {
+  return typeof arg !== 'undefined' ? arg : val
+}
+
+// 两个cookies重点方法，解决关注功能403的问题
+Cookies.set('csrftoken', _rc_set('SPC_F', 32, null, new Date(curTs() + 86400 * 1000 * 365 * 20)), {
+  expires: 7
+})
+
+// Cookies.remove('_gcl_au')
+Cookies.remove('_gcl_au', { path: '' }) // removed!
 
 //添加操作面板
 const debounceHandleActions = debounce(function() {
   Follow.setGoodDetailInfoToPanel()
-  Follow.insertAction()
 }, 800)
 
 //粉丝关注
 const Follow = {
   domain: window.location.origin,
-  goodsMap: new Map(), //页面可操作商品映射，属性名为urlId ，值为采集状态  默认采集商品 -> 采集中 -> 采集成功
   preload: function() {
     try {
-      Follow.insertAction()
       $(window).scroll(debounceHandleActions)
     } catch (e) {
       return
     }
-  },
-
-  //应用初始化
-  init: function() {
-    // console.log(this.domain, 'domain')
-    let followActionWrap = operationPanelTemplate()
-    $('body').append(followActionWrap)
-    Follow.initPanelEvent()
-  },
-
-  //给a标签添加操作面板
-  insertAction: function() {
-    $.each(document.links, function(index, a) {
-      $(a).mouseenter(function() {
-        let storeId = $(this)[0].href.split('-i.')[1]
-        if (isEmpty(storeId)) return
-        try {
-          let firstImg = $(this).find('img:first-child')
-          let contentOffsetLeft = $(this).offset().left || firstImg.offset().left
-          let contentOffsetTop = $(this).offset().top || firstImg.offset().top
-          let contentWidth = $(this).width() || firstImg.width() || 190
-          // 操作面板显示
-          let actionListElement = $(EmalaccaPluginGoodsPanelWrapClass)
-          actionListElement.attr('data-store-id', storeId) //粉丝关注用
-          actionListElement.attr('data-store-url', $(this)[0].href) //采集用
-          actionListElement.css({
-            top: contentOffsetTop + 30,
-            left: contentOffsetLeft + parseInt((contentWidth - 150) / 2),
-            opacity: 1,
-            'pointer-events': 'auto'
-          })
-        } catch (error) {
-          console.log(error)
-        }
-
-        // 鼠标进入
-        $(EmalaccaPluginGoodsPanelWrapClass).mouseenter(function() {
-          let targetCollectStatus = Follow.goodsMap.get(storeId) || 'collect'
-          //   给当前商品对应的状态赋值
-          $(this)
-            .find('span')
-            .eq(1)
-            .text(collectText[targetCollectStatus].name)
-            .css({ background: collectText[targetCollectStatus].color, opacity: 1 })
-        })
-        //鼠标离开
-        $(EmalaccaPluginGoodsPanelWrapClass).mouseleave(function() {
-          $(this).css('opacity', 0)
-        })
-      })
-    })
-  },
-
-  //操作面板点击事件初始化
-  initPanelEvent: function() {
-    $(EmalaccaPluginGoodsPanelWrapClass).on('click', 'span', function(e) {
-      let actionType = e.target.getAttribute('data-type')
-      let storeId = $(this)
-        .parent()
-        .attr('data-store-id')
-      let collectUrl = $(this)
-        .parent()
-        .attr('data-store-url')
-      if (isEmpty(storeId)) return
-      let realStoreId = storeId ? storeId.split('.')[0] : null
-      if (!realStoreId) {
-        $.fn.message({ type: 'warning', msg: MESSAGE.error.faildGetGoodsInfo })
-        return false
-      }
-      switch (actionType) {
-        //   粉丝关注
-        case 'follow':
-          Follow.syncShoppeBaseInfo().then(res => {
-            if (res.code == -1) {
-              $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
-            } else {
-              //   window.open(`/shop/${realStoreId}/followers?other=true`)
-              window.open(`${getSiteLink('cnfront')}/shop/${realStoreId}/followers`)
-            }
-          })
-          break
-        //   采集商品
-        case 'collect':
-          $(EmalaccaPluginGoodsPanelWrapClass)
-            .find('span')
-            .eq(1)
-            .text(collectText['pending'].name)
-            .css({ background: collectText['pending'].color })
-          Follow.goodsMap.set(storeId, 'pending')
-          Follow.syncSolidCrawl(collectUrl).then(
-            res => {
-              Follow.goodsMap.set(storeId, 'success')
-              $.fn.message({ type: 'success', msg: MESSAGE.success.collectSuccess })
-            },
-            err => {
-              Follow.goodsMap.set(storeId, 'fail')
-              $.fn.message({
-                type: 'error',
-                msg: err.msg || MESSAGE.error.collectExceptionEncounter
-              })
-            }
-          )
-          break
-        //   查看店铺
-        case 'view':
-          window.open(`${window.location.origin}/shop/${realStoreId}`)
-          break
-        default:
-          break
-      }
-    })
   },
 
   //获取数据展示面板需要的数据，并赋值
@@ -279,6 +197,7 @@ const Follow = {
         console.log('SYNC_SHOPEE_BASE_INFO', data)
         if (data.code == 0) {
           //   document.cookie = `SPC_EC=${data.result.cs_token}`
+          //   虾皮的xiapibuy.com的登录状态需要这个cookies值才能同步给页面
           Cookies.set('SPC_EC', data.result.cs_token, { expires: 7 })
         }
         resolve(data)

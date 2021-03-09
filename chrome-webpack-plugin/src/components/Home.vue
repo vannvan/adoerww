@@ -13,7 +13,7 @@
           class="emalacca-plugin-quick-action-item"
           :class="item.fixed ? 'fixed' : ''"
           :id="item.id"
-          :style="{ 'pointer-events': (!isShrink || (isShrink && item.fixed)) ? 'auto' : 'none' }"
+          :style="{ 'pointer-events': !isShrink || (isShrink && item.fixed) ? 'auto' : 'none' }"
         >
           <span class="icon em-iconfont" :class="item.icon"></span>
           <p class="emalacca-plugin-quick-action-title">{{ item.name }}</p>
@@ -73,7 +73,7 @@
 import $ from 'jquery'
 import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE, COMMON_COLLECT_DETAIL } from '@/lib/conf'
 import { setStorageSync, getStorageSync } from '@/lib/chrome'
-import { isEmpty } from '@/lib/utils'
+import { isEmpty, getCookie } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import BatchCollect from '@/inject/batch-collect'
 import FollowDrawer from './FollowDrawer'
@@ -81,6 +81,20 @@ import Drawer from './Drawer'
 import { ERP_LOGIN_URL } from '@/lib/env.conf'
 import Follow from '@/inject/shopee'
 const ItemHeight = 48 //每个菜单项的高度
+// 判断是否匹配某店铺首页但不是自己的店铺
+const isShopMainPageAndNotSelfStore = () => {
+  let isStorePage = /shop(.*?)/.test(location.pathname)
+  if (isStorePage) {
+    return (
+      location.pathname.match(/shop(.*?)/).input.replace(/[^0-9]/gi, '') !=
+      String(getCookie('SPC_U'))
+    )
+  } else {
+    return false
+  }
+}
+// ES6 async await兼容
+const regeneratorRuntime = require('@/assets/js/runtime.js')
 export default {
   components: {
     Drawer,
@@ -91,7 +105,7 @@ export default {
     return {
       drawerTitle: APPNAME + ' V' + VERSION,
       display: false,
-      drawerWidth: '400px',
+      drawerWidth: '480px',
       rightMenu: [],
       isShrink: false,
       isStorePage: false, //是否在店铺页面
@@ -117,56 +131,68 @@ export default {
   },
 
   /**
-   * 1. 如果是虾皮网站，对于当前页面链接首次加载如果匹配到 -i.表示在某一店铺，则需要用isStorePage标记用以开启“关注店铺粉丝”操作
+   * 1. 如果是虾皮网站，对于当前页面链接首次加载如果匹配到 -i.表示在某一店铺，/shop(.*?)/.test(location.pathname) 表示在某一店铺，则需要用isStorePage标记用以开启“关注店铺粉丝”操作
    *    同时，需要检测是否是列表页或搜索页，如果匹配则显示批量采集操作
    * 2. 如果不是虾皮网站，则只需对是否显示批量采集操作进行判断，如果匹配则显示
    *
    * 3. observer 的作用是监听页面切换，主要用于虾皮网站，因为虾皮网站页面切换并不会重新初始化主程序
    */
   mounted() {
-    this.initData() // 初始化页面
-    this.getPageType()
-    this.loadMenuAction()
-    // 监听页面链接更新，加载不同的侧栏工具
-    let oldHref = location.href
-    let _this = this
-    let bodyList = document.querySelector('body'),
-      observer = new MutationObserver(function(mutations) {
-        if (oldHref != location.href) {
-          _this.initPage()
-          oldHref = location.href
-          let linkRule = getRule(location.href)
-          let siteConfig = JSON.parse(linkRule)
-          _this.isStorePage = new Function('url', siteConfig.detail)(location.href) //如果是某店铺的页面
-          _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
-          _this.loadMenuAction()
-        }
-      })
-    let config = {
-      childList: true,
-      subtree: true
-    }
-    observer.observe(bodyList, config)
-    this.initToggleAction()
+    // 初始化页面
+    this.initPageData()
   },
   methods: {
-    // 初始化页面
-    initData() {
+    // 初始化页面和数据
+    async initPageData() {
       let oldHref = location.href
+      let isHide = false
+      await getStorageSync('isDisabledPlug').then(response => {
+        if (response['isDisabledPlug']) {
+          isHide = response['isDisabledPlug']
+        }
+      })
       // 内部平台不显示
-      if (oldHref.indexOf('emalacca.com') > -1 || oldHref.indexOf('192.168.') > -1) {
-        $('#emalaccaRightApp').css({'display': 'none'})
-        return;
+      if (oldHref.indexOf('emalacca.com') > -1 || oldHref.indexOf('192.168.') > -1 || isHide) {
+        $('#emalaccaRightApp').css({ display: 'none' })
+        return
       } else {
-        $('#emalaccaRightApp').css({'display': 'block'})
+        $('#emalaccaRightApp').css({ display: 'block' })
       }
+      await this.initData()
+    },
+    initData() {
+      this.getPageType()
+      this.loadMenuAction()
+      // 监听页面链接更新，加载不同的侧栏工具
+      let oldHref = location.href
+      let _this = this
+      let bodyList = document.querySelector('body'),
+        observer = new MutationObserver(function(mutations) {
+          if (oldHref != location.href) {
+            _this.initPage()
+            oldHref = location.href
+            let linkRule = getRule(location.href)
+            let siteConfig = JSON.parse(linkRule)
+            _this.isStorePage =
+              new Function('url', siteConfig.detail)(location.href) ||
+              isShopMainPageAndNotSelfStore() //如果是某店铺的页面
+            _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
+            _this.loadMenuAction()
+          }
+        })
+      let config = {
+        childList: true,
+        subtree: true
+      }
+      observer.observe(bodyList, config)
+      this.initToggleAction()
     },
     initToggleAction() {
       let _this = this
       $('.toggle-menu-action').click(function() {
         _this.isShrink = !_this.isShrink
         // 保存用户操作，固定当前按钮
-        setStorageSync({emalacca_isShrink: _this.isShrink})
+        setStorageSync({ emalacca_isShrink: _this.isShrink })
         let fixedLen = $('.emalacca-plugin-quick-action-item.fixed').length //此时的length和下面的不一样
         if (_this.isShrink) {
           _this.handleHoldUp($('.emalacca-plugin-quick-action-item'), fixedLen)
@@ -252,7 +278,13 @@ export default {
                 window.open(getSiteLink('mall').replace('ID', selfStoreId))
               } else if (this.isStorePage && 'follow') {
                 try {
-                  let storeId = currentPageLink.split('-i.')[1].split('.')[0]
+                  let storeId =
+                    currentPageLink.search('-i.') >= 0
+                      ? currentPageLink.split('-i.')[1].split('.')[0]
+                      : null
+                  if (isShopMainPageAndNotSelfStore()) {
+                    storeId = location.pathname.match(/shop(.*?)/).input.replace(/[^0-9]/gi, '')
+                  }
                   window.open(`/shop/${storeId}/followers?other=true`)
                 } catch (error) {
                   $.fn.message({ type: 'warning', msg: MESSAGE.error.notSupport })
@@ -295,7 +327,7 @@ export default {
 
       if (/shopee|xiapibuy/.test(location.host)) {
         this.isShopee = true
-        this.isStorePage = location.href.search('-i.') >= 0
+        this.isStorePage = location.href.search('-i.') >= 0 || isShopMainPageAndNotSelfStore()
         if (showPageArr.includes(this.pageType)) {
           this.rightMenu = [...RIGHT_MENU, ...COMMON_COLLECT]
         } else if (this.pageType === 'detail') {
@@ -319,7 +351,7 @@ export default {
           arrKey.push(key)
         })
         // 获取缓存：用户操作习惯信息
-        getStorageSync(arrKey, (data) => {
+        getStorageSync(arrKey).then(data => {
           if (!isEmpty(data)) {
             this.rightMenu.forEach(item => {
               let key = item.id + '_isfixed'
@@ -350,7 +382,7 @@ export default {
     initPage() {
       // 清除之前角标
       if ($('.emalacca-plugin-goods-acquisition-spidered').length > 0) {
-        $('.emalacca-plugin-goods-acquisition-spidered').css({display: 'none'})
+        $('.emalacca-plugin-goods-acquisition-spidered').css({ display: 'none' })
       }
     },
     openPage(path) {

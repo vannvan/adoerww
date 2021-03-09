@@ -67,13 +67,6 @@ export const Auth = {
     // 如果当前是站点时cn站点并且userInfo的country和当前匹配，就直接用存下的
     let userInfo = getStorage('userInfo', {})
     let currentCountryCode = countryList.find(item => params.domain.match(new RegExp(item)))
-    // if (userInfo.countryCode == currentCountryCode ) {
-    //   call({
-    //     type: type,
-    //     code: 0
-    //   })
-    //   return false
-    // }
     Request.handleLoginShopee(params, type)
       .then(res => {
         if (res) {

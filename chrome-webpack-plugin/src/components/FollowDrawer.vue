@@ -86,86 +86,81 @@
             <span class="sub-item"><b>关注中：</b>{{ storeInfo.account.following_count }}</span>
           </li>
         </div>
-        <div class="info-item">
-          <p>关注粉丝</p>
-          <li>
-            <span class="sub-item">自动关注的开始位置</span>
-            <span class="sub-item">自动关注的数量</span>
-          </li>
-          <li>
-            <span class="sub-item">
-              <input
-                type="number"
-                placeholder="默认从第一个开始"
-                v-model="filterParams.startIndex"
-                v-enterNumberMin="0"
-              />
-              <small class="error-info" ref="startIndex">请输入开始位置</small>
-            </span>
-
-            <span class="sub-item">
-              <input
-                type="number"
-                placeholder="100"
-                v-model="filterParams.limitFollowNumber"
-                v-enterNumberMin="0"
-              />
-              <small class="error-info" ref="limitFollowNumber">请输入关注数量</small>
-            </span>
-          </li>
-          <li>
-            <span class="sub-item">最近活跃时间(以内)</span>
-            <span class="sub-item">用户关注数量</span>
-          </li>
-          <li>
-            <span class="sub-item">
-              <input
-                type="number"
-                placeholder="如：30"
-                v-model="filterParams.lastLoginTime"
-                v-enterNumberMin="-1"
-              />
-              <small class="error-info" ref="lastLoginTime">请输入最近活跃时间 </small>
-            </span>
-
-            <span class="sub-item">
-              <input
-                type="number"
-                placeholder=">=0"
-                v-model="filterParams.followsTimes"
-                v-enterNumberMin="-1"
-              />
-              <small class="error-info" ref="followsTimes">请输入关注人数 </small>
-            </span>
-          </li>
-          <!-- <li>
-            <span class="sub-item">最少关注数</span>
-          </li>
-          <li>
-            
-          </li> -->
-          <li>
-            <span class="sub-item">过滤卖家</span>
-            <span class="sub-item" v-if="!filterParams.isFilterSeller">
-              卖家商品数
-            </span>
-          </li>
-          <li>
-            <span class="sub-item">
-              <input type="checkbox" class="check-box" v-model="filterParams.isFilterSeller" />
-              {{ filterParams.isFilterSeller ? '全部过滤' : '部分过滤' }}
-            </span>
-            <span class="sub-item" v-if="!filterParams.isFilterSeller">
-              <input type="number" placeholder=">=50" v-model="filterParams.sellerGoodsCount" />
-            </span>
-          </li>
+        <div class="filter-wrap">
+          <p class="title">关注粉丝</p>
+          <div class="filter-wrap-item">
+            <li>
+              <span class="title">
+                自动关注数量
+              </span>
+              <span class="value">
+                <input
+                  type="number"
+                  v-model="filterParams.limitFollowNumber"
+                  v-enterNumberMin="0"
+                />个
+              </span>
+            </li>
+          </div>
+          <!-- 折叠 -->
+          <div class="holdon-action" @click="followActionMoreVisible = !followActionMoreVisible">
+            {{ followActionMoreVisible ? '收起' : '更多' }}
+          </div>
+          <!-- 更多筛选 -->
+          <div class="filter-wrap-item" v-if="followActionMoreVisible">
+            <li>
+              <span class="title">
+                开始关注位置
+              </span>
+              <span class="value">
+                从第<input type="number" v-model="filterParams.startIndex" v-enterNumberMin="0" />位
+              </span>
+            </li>
+            <li>
+              <span class="title">
+                最近活跃时间
+              </span>
+              <span class="value">
+                <input
+                  type="number"
+                  v-model="filterParams.lastLoginTime"
+                  v-enterNumberMin="-1"
+                />天以内
+              </span>
+            </li>
+            <li>
+              <span class="title">
+                用户关注数量
+              </span>
+              <span class="value">
+                大于<input
+                  type="number"
+                  v-model="filterParams.followsTimes"
+                  v-enterNumberMin="-1"
+                />个
+              </span>
+            </li>
+            <li>
+              <span class="title">
+                是否跳过卖家
+              </span>
+              <span class="value">
+                <input type="checkbox" class="check-box" v-model="filterParams.isFilterSeller" />
+                {{ filterParams.isFilterSeller ? '全部跳过' : '部分跳过' }}
+              </span>
+            </li>
+            <li v-if="!filterParams.isFilterSeller">
+              <span class="title">卖家商品数</span>
+              <span class="value"> 大于<input type="number" />个 </span>
+            </li>
+          </div>
         </div>
       </div>
       <!-- 操作 -->
       <div class="footer-action-wrap">
         <button
           @click="handleStart('follow')"
-          :style="{ background: isRequest ? '#747d8c' : '#ee4d2d' }"
+          :style="{ background: isRequest ? '#f5222d' : '#ee4d2d', color: '' }"
         >
           {{ buttonText }}
         </button>
@@ -197,23 +192,25 @@
             <span class="sub-item"><b>关注中：</b>{{ storeInfo.account.following_count }}</span>
           </li>
         </div>
-        <div class="info-item">
-          <p>关注粉丝</p>
-          <li>
-            <span class="sub-item">取消关注</span>
-          </li>
-          <li>
-            <span class="sub-item">
-              <input
-                type="number"
-                v-enterNumberMin="0"
-                v-enterNumberMax="countFollowers"
-                v-model="unfollowMaxNumber"
-                placeholder="取消关注的数量"
-              />
-            </span>
-          </li>
+        <div class="filter-wrap">
+          <div class="filter-wrap-item">
+            <p class="title">取关粉丝</p>
+            <li>
+              <span class="title">
+                取消关注的数量
+              </span>
+              <span class="value">
+                <input
+                  type="number"
+                  v-enterNumberMin="0"
+                  v-enterNumberMax="countFollowers"
+                  v-model="unfollowMaxNumber"
+                />
+              </span>
+            </li>
+          </div>
         </div>
+
         <div class="footer-action-wrap">
           <button
             @click="handleCancelFollow()"
@@ -258,6 +255,8 @@ import Follow from '@/inject/shopee'
 import $ from 'jquery'
 import { WEBSITES, MESSAGE } from '@/lib/conf'
 import { isEmpty } from '@/lib/utils'
+import dayjs from 'dayjs'
+
 function getTime() {
   return new Date().toTimeString().substring(0, 8)
 }
@@ -302,6 +301,7 @@ export default {
       currentStoreId: null, //当前用户自己的店铺id
       followHelpVisible: false,
       unFollowHelpVisible: false,
+      followActionMoreVisible: false, //关注操作更多是否可见
       scrollTimer: null //自动滚动定时器
     }
   },
@@ -384,7 +384,6 @@ export default {
     }
   },
   mounted() {
-    console.log(global, '_rc_set')
     //   把页面整体左移，避免小分辨率右侧操作栏遮挡主体
     $('.middle-centered-div').css('transform', 'translateX(-50%)')
     this.isOther = /followers/.test(location.pathname)
@@ -509,10 +508,13 @@ export default {
         return
       }
       this.scrollTo() //开始滚
-      //如果没有填,给一波默认值
+      //如果没有填,并且把更多展开了，给一波默认值
       this.filterParams.limitFollowNumber = this.filterParams.limitFollowNumber || 100
-      this.filterParams.lastLoginTime = this.filterParams.lastLoginTime || 30
-      this.filterParams.followsTimes = this.filterParams.followsTimes || 1
+      if (this.followActionMoreVisible) {
+        this.filterParams.lastLoginTime = this.filterParams.lastLoginTime || 30
+        this.filterParams.followsTimes = this.filterParams.followsTimes || 1
+      }
+
       if (!this.validate()) return
       let htmlStr = `<li>[${getTime()}] 任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
@@ -551,13 +553,18 @@ export default {
           Follow.getStoreFollowers(this.currentUserName).then(res => {
             if (res.code == 0) {
               let { shopid } = res.result.data
-              if (actionType == 'follow' && this.filterMatch(res.result.data)) {
+              if (actionType == 'follow' && this.filterMatch(res.result.data).match) {
                 this.handleNotifyToBack(actionType, shopid, this.currentUserName)
               } else if (actionType == 'unfollow') {
                 this.handleNotifyToBack(actionType, shopid, this.currentUserName)
               } else {
+                let reasonText = this.filterMatch(res.result.data).reason
+                  ? this.filterMatch(res.result.data).reason.reason
+                  : ''
                 this.resultCount.skip += 1
-                let htmlStr = `<li>[${getTime()}] ${this.currentUserName}跳过</li>`
+                let htmlStr = `<li>[${getTime()}] ${
+                  this.currentUserName
+                }跳过,原因：<small>${reasonText}</small></li>`
                 $('#ResultContent').prepend(htmlStr)
               }
             }
@@ -647,9 +654,9 @@ export default {
       } = source
       let rateCount = rating_bad + rating_good + rating_normal //评价次数
       console.log(
-        `上次登录: ${new Date(
-          last_active_time * 1000
-        ).toLocaleDateString()},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
+        `上次登录: ${dayjs(last_active_time * 1000).format(
+          'YYYY-MM-DD'
+        )},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
       )
       let {
         lastLoginTime, //上次登录时间
@@ -663,21 +670,39 @@ export default {
       let matchStep3 = item_count >= sellerGoodsCount //限制商品数
       let matchStep5 = is_seller == false //是否是卖家
       //  不过滤卖家时， 如果当前用户是卖家且限制了商品数，就需要同时满足，如果只是买家，就不用限制商品数
+      const reasonOpt = [
+        { key: 'matchStep1', match: matchStep1, reason: `用户关注数量不匹配,${follower_count}个` },
+        {
+          key: 'matchStep2',
+          match: matchStep2,
+          reason: `最近活跃时间不匹配,${dayjs(last_active_time * 1000).format('YYYY-MM-DD')}`
+        },
+        { key: 'matchStep3', match: matchStep3, reason: `卖家商品数量不匹配,${item_count}个` },
+        { key: 'matchStep5', match: matchStep5, reason: '当前用户是卖家' }
+      ]
+      let faildReason = reasonOpt.find(el => !el.match)
+      console.log(faildReason)
+      if (!this.followActionMoreVisible) {
+        //如果没有展开更多，就全通过
+        return { match: true }
+      }
       if (!isFilterSeller) {
         if (is_seller) {
-          return matchStep1 && matchStep2 && matchStep3
+          let isMatch = matchStep1 && matchStep2 && matchStep3
+          return { match: isMatch, result: isMatch ? '' : faildReason }
         } else {
-          return matchStep1 && matchStep2
+          let isMatch = matchStep1 && matchStep2
+          return { match: isMatch, reason: isMatch ? '' : faildReason }
         }
       } else {
-        return matchStep1 && matchStep2 && matchStep3 && matchStep5
+        let isMatch = matchStep1 && matchStep2 && matchStep3 && matchStep5
+        return { match: isMatch, reason: isMatch ? '' : faildReason }
       }
     },
 
     validate() {
       let validQueue = []
       Object.keys(this.filterParams).forEach(key => {
-        const exclude = ['isFilterSeller', 'sellerGoodsCount']
         if (!this.filterParams[key] && this.$refs[key]) {
           this.$refs[key].style.display = 'block'
           validQueue.push(false)
@@ -757,12 +782,61 @@ export default {
   .follow-info-wrap {
     width: 90%;
     margin: 0 auto;
+    .filter-wrap {
+      margin-bottom: 25px;
+      p {
+        font-weight: bold;
+        font-size: 16px;
+        &.title {
+          margin: 5px 0;
+        }
+      }
+      .filter-wrap-item {
+        li {
+          display: flex;
+          list-style: none;
+          height: 38px;
+          line-height: 38px;
+          .title {
+            margin-right: 15px;
+          }
+          input[type='number'] {
+            border: none;
+            border: 1px solid #666;
+            outline: none;
+            width: 80px;
+            padding-left: 8px;
+            margin-right: 8px;
+          }
+        }
+      }
+
+      .holdon-action {
+        text-align: right;
+        position: relative;
+        width: 100%;
+        display: inline-block;
+        color: #e74c3c;
+        margin-top: 10px;
+        cursor: pointer;
+        &::before {
+          content: '';
+          display: block;
+          height: 1px;
+          width: calc(100% - 50px);
+          background: #e74c3c;
+          position: absolute;
+          left: 0;
+          top: 8px;
+        }
+      }
+    }
     .info-item {
       p {
         font-weight: bold;
         font-size: 16px;
       }
-      margin-bottom: 20px;
+
       li {
         height: 38px;
         line-height: 38px;
@@ -775,24 +849,6 @@ export default {
 
           b {
             color: #ee4d2d;
-          }
-          input {
-            border: none;
-            border-bottom: 1px solid #000;
-            outline: none;
-            width: 80%;
-
-            &.check-box {
-              width: 20px;
-            }
-          }
-          .error-info {
-            position: absolute;
-            bottom: -18px;
-            left: 0;
-            color: #f00;
-            display: none;
-            pointer-events: none;
           }
         }
       }
@@ -843,7 +899,8 @@ export default {
     li {
       line-height: 30px;
       text-align: left;
-      padding-left: 70px;
+      padding-left: 20px;
+      white-space: nowrap;
     }
   }
   .count-info {

@@ -3,12 +3,22 @@
     <div class="emalacca-popup-header">
       <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
       <b class="emalacca-plugin-name">{{ pluginName }}</b>
+      
       <img
         class="emalacca-pupup-header-exit"
         src="@/assets/icon/exit.png"
         @click="handleExit()"
         v-if="userInfo"
       />
+      <div :class="isShowMessage ? 'malacca-pupup-hint-box' : 'malacca-pupup-header-switches-box'">
+        <switches class="malacca-pupup-header-switches" v-model="isDisabled" text-enabled="启用" text-disabled="停用" @input="switchesChange"></switches>
+        <div class="malacca-pupup-mask-layer"></div>
+        <div class="malacca-pupup-message-box">
+          <div class="malacca-pupup-message-content">插件已停用，点击启用插件</div>
+          <div class="malacca-pupup-message-bottom" @click="isShowMessage = false">我知道了</div>
+        </div>
+      </div>
+      
     </div>
     <div class="emalacca-popup-content">
       <template v-if="userInfo">
@@ -74,38 +84,42 @@
 import { ERP_SYSTEM } from '@/lib/env.conf'
 import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
-import { getTabUrl, getAllTabs, gotoErp, setStorageLocal } from '@/lib/chrome'
+import { setStorageSync, getStorageSync, getTabUrl, getAllTabs, gotoErp, setStorageLocal } from '@/lib/chrome'
 import { CONFIGINFO } from '../background/config'
+import Switches from './Switches'
 import $ from 'jquery'
 
 function sendMessageToContentScript(message, callback) {
-  getTabUrl(url => {
-    // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
-    getAllTabs(urls => {
-      urls.map(el => {
-        if (el.url.search(ERP_SYSTEM[process.env.NODE_ENV]) > -1) {
-          chrome.tabs.sendMessage(el.id, message, function(response) {
-            if (callback) {
-              callback(response)
-              //关闭标签
-              chrome.tabs.remove(el.id, function(e) {
-                console.log(e)
-              })
-            }
-          })
-        }
-      })
+  // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
+  getAllTabs(urls => {
+    urls.map(el => {
+      if (el.url.search(ERP_SYSTEM[process.env.NODE_ENV]) > -1) {
+        chrome.tabs.sendMessage(el.id, message, function(response) {
+          if (callback) {
+            callback(response)
+            //关闭标签
+            chrome.tabs.remove(el.id, function(e) {
+              console.log(e)
+            })
+          }
+        })
+      }
     })
   })
 }
 export default {
+  components: {
+    Switches
+  },
   data() {
     return {
       userInfo: null,
       pluginName: APPNAME + ' V' + VERSION,
       collectSites: COLLECT_SITES,
       collecting: 0,
-      collectingTime: null
+      collectingTime: null,
+      isDisabled: false,  // 是否停用插件
+      isShowMessage: false  // 是否显示提示窗
     }
   },
   mounted() {
@@ -115,12 +129,19 @@ export default {
     if (this.userInfo) {
       this.getCollecting()
     }
-    
+
+    // 从缓存中获取是否禁用插件
+    getStorageSync('isDisabledPlug').then(data => {
+      this.isDisabled = data['isDisabledPlug'] || false
+      if (this.isDisabled) {
+        this.isShowMessage = true
+      }
+    })
   },
   methods: {
     handleExit() {
       sendMessageToContentScript({ cmd: 'erp-logout', type: 'ERP_LOGOUT' }, function(response) {
-        console.log(response)
+        console.log(response, 'response')
       })
       
       // 不管erp系统是否完成退出，插件都要退出
@@ -164,6 +185,24 @@ export default {
           }
         }
       })
+    },
+    // 开关
+    switchesChange(value) {
+      this.isDisabled = value
+      this.isShowMessage = false
+      setStorageSync({'isDisabledPlug': value}).then( ()=> {
+        // 更新全部匹配的页面
+        this.handleUpDate({ type: 'UPDATE_PAGE' })
+      })
+      
+    },
+    handleUpDate(message) {
+      // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
+      getAllTabs(urls => {
+        urls.map(el => {
+          chrome.tabs.sendMessage(el.id, message)
+        })
+      })
     }
   },
   beforeDestroy() {
@@ -200,13 +239,14 @@ body {
       vertical-align: middle;
       margin-right: 5px;
     }
-
     .emalacca-pupup-header-exit {
       float: right;
       height: 16px;
       width: 16px;
       cursor: pointer;
       vertical-align: middle;
+      margin-left: 5px;
+      margin-top: 4px;
     }
 
     .emalacca-plugin-name {
@@ -291,6 +331,69 @@ body {
           height: 26px;
           cursor: pointer;
         }
+      }
+    }
+  }
+  .malacca-pupup-header-switches-box{
+    float: right;
+    margin-right: 10px;
+    .malacca-pupup-mask-layer{
+      display: none;
+    }
+    .malacca-pupup-message-box{
+      display: none;
+    }
+  }
+  
+  .malacca-pupup-hint-box{
+    position: relative;
+    float: right;
+    display: block;
+    margin-right: 0;
+    .malacca-pupup-header-switches{
+      position: absolute;
+      left: -88px;
+      top: -8px;
+      width: 88px;
+      height: 40px;
+      z-index: 7;
+      border-radius: 5px;
+      padding: 8px 10px;
+      background: #fff;
+    }
+    .malacca-pupup-mask-layer{
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 5;
+      background: rgb(100, 96, 96);
+      opacity: 0.4;
+      display: block;
+    }
+    .malacca-pupup-message-box{
+      position: absolute;
+      right: 0;
+      top: 48px;
+      min-width: 120px;
+      min-height: 60px;
+      z-index: 7;
+      display: block;
+      border-radius: 5px;
+      background: #fff;
+      .malacca-pupup-message-content{
+        text-align: center;
+        padding: 10px 15px;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+      .malacca-pupup-message-bottom{
+        color: #ff720d;
+        text-align: center;
+        border-top: 1px solid #ccc;
+        cursor: pointer;
+        padding: 7px 0;
       }
     }
   }

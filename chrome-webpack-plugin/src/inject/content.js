@@ -17,6 +17,7 @@ import {
 } from './crawl-handler'
 import getBtnLocationItems from '@/lib/location-btn'
 import { getLoginInfo } from '@/lib/chrome-client'
+import { getStorageSync } from '@/lib/chrome'
 //----------------------------------------------新增内容---------------------------------------------
 const linkrule = getRule(location.href)
 
@@ -46,8 +47,13 @@ const debounceHandleLinks = debounce(function() {
 }, 800)
 
 if (CONFIG) {
-  $(document).ready(handleLinks(CONFIG.detail))
-  $(window).scroll(debounceHandleLinks)
+  //
+  getStorageSync('isDisabledPlug').then(data => {
+    if (!data['isDisabledPlug']) {
+      $(document).ready(handleLinks(CONFIG.detail))
+      $(window).scroll(debounceHandleLinks)
+    }
+  })
 }
 
 //过滤超链接，将满足条件的图片上加上采集按钮

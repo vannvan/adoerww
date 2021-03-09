@@ -68,3 +68,12 @@ if (/emalacca|192/.test(document.location.origin)) {
     return true
   })
 }
+
+// 监听前台消息，popup与前台通信
+chrome.runtime.onMessage.addListener(function(request, sender) {
+  if (request.type == 'UPDATE_PAGE') {
+    location.reload()
+    return true
+  }
+  return true
+})

@@ -52,4 +52,4 @@ function csrf_set() {
 }
 
 spc_f_set()
-csrf_set()
+csrf_set
