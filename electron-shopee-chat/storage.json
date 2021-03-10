@@ -1,1 +1,31 @@
-{"338011596":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVfdGltZSI6MTYxNDk0MTMxOCwiaWQiOiI1N2E4MzRkMC03ZGEwLTExZWItOWZjYy1jY2JiZmU1ZGU3MzkifQ.FpkF4SLCDFjtqjiEZzoIGqmadwJ0nEZUzsml2-QuWro","p_token":"TE9YaDdzWEd0YU9oYWVJcbTYlwxH4O3+2d1N0VZlp80=","user":{"id":338011596,"uid":"0-338011596","type":"seller","avatar":"https://cf.shopee.com.my/file/3da8663fa77449b82ed98a4e8daa5216","locale":"zh-Hans","shop_id":337992021,"country":"MY","status":"normal","username":"mailing.my"},"version":3},"341561079":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVfdGltZSI6MTYxNTE5OTA3NywiaWQiOiI3YmZlZWVlYy03ZmY4LTExZWItOWFiMy1jY2JiZmUyN2Q2ZGIifQ.3XON9-_SfqkPzjo9ndYp545rA0eYvZZGtnf6J1BC6pg","p_token":"MWU0R2dqYVNldXlhZk52Wpq0Oijeoe20lpZAklxO+AM=","user":{"id":341561079,"uid":"0-341561079","type":"seller","avatar":"","locale":"zh-Hans","shop_id":341541504,"country":"MY","status":"normal","username":"aimiao.my"},"version":3},"accountList":{"338011596":{"name":"mailing.my","password":"maiwang123456","storeId":"338011596","host":"seller.shopee.com.my"},"341561079":{"name":"aimiao.my","password":"Fm123456","storeId":"341561079","host":"seller.shopee.com.my"}},"storeId":"338011596"}
+{
+    "338011596": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVfdGltZSI6MTYxNTM2NjY1MywiaWQiOiJhNzY0ZjMyNi04MTdlLTExZWItOWU3Yi1mMDYzZjk0YmYxMTUifQ.lVMoB4RL202JQCzh5KfZ7H-On4UzPGvWxpLlPzCO454",
+        "version": 4,
+    },
+    "341561079": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVfdGltZSI6MTYxNTM2NDQ2MiwiaWQiOiJkOWQ3OGE1Yy04MTc4LTExZWItODA5OS1mMDYzZjk3N2FlNGMifQ.2KUpwSSsQ5-xUm9CHWt9_H77Iq84bpLZnh6IMs2t7Ac",
+        "version": 4,
+    },
+    "isLogin": true,
+    "erpAuth": {
+        "access_token": "eyJhbGciOiJIUzUxMiJ9.eyJwbHVnRGF0YVVybCI6Imh0dHBzOi8vYXBpLmtleW91eXVuLmNvbS9sdXgvYXBpL2hpc3RvcmljYWwtZHluYW1pYy1wcmljZXMtc2FsZXMiLCJtYVR5cGUiOjIsIm1lbWJlck5PIjoiNDA5MzgzIiwibWFBY2NvdW50IjoiMTc3ODI1MjQ4NjIiLCJwbHVnVmVyc2lvbiI6IlRFU1QtMi4wLjAiLCJtZW1iZXJJZCI6NiwiZXhwaXJlIjoxNjE1OTc1MzAzMDgyfQ.EhwiFBvNGvynx3RbBKf4Fu7dYCkWvWjX88xaoZTgo0qCdwbHMX5xzOcA-BaOWU5KxDpOaK1eTaPn0AARTdPDyQ",
+        "expires_in": 604800,
+        "token_type": "bearer",
+        "userInfo": {
+            "userInfo": {
+                "id": null,
+                "maType": 2,
+                "maAccount": "17782524862",
+                "memberId": 6,
+                "memberNO": "409383",
+                "plugVersion": "TEST-2.0.0",
+                "plugDataUrl": "https://api.keyouyun.com/lux/api/historical-dynamic-prices-sales"
+            },
+            "headImgurl": null,
+            "chat": null,
+            "seller": null
+        }
+    },
+    "storeId": "338011596"
+}

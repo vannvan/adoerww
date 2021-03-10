@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
+const Cookies = require('js-cookie')
 
 const Site = {
   shopeeSeller: {
@@ -28,9 +29,9 @@ const Site = {
 var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
 
-function getCookie(cname) {
+function getCookie(cname, cookieStr) {
   var name = cname + '='
-  var decodedCookie = decodeURIComponent(document.cookie)
+  var decodedCookie = decodeURIComponent(cookieStr)
   var ca = decodedCookie.split(';')
   for (var i = 0; i < ca.length; i++) {
     var c = ca[i]
@@ -70,9 +71,11 @@ document
     let key = e.target.getAttribute('data-key')
     let storeId = e.target.getAttribute('data-store')
     console.log(storeId)
-    handleLogout()
+    Cookies.set('SPC_U', storeId)
+    Cookies.set('SPC_CDS', storeId)
+    // Cookies.set('SPC_EC', '')
     ipcNotice({
-      type: 'LOAD_PAGE',
+      type: 'CHANGE_STORE',
       params: { host: Site.shopeeSeller[key].host, storeId: storeId, key: key },
     })
   })
@@ -121,7 +124,7 @@ if (/account\/signin/.test(location.href)) {
           </div>
         </div>`
     globalTimer = setInterval(() => {
-      autoLogin()
+      //   autoLogin()
     }, 200)
   }
 }
@@ -183,14 +186,11 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
   console.log(type, params)
   switch (type) {
     case 'SET_PAGE_COOKIES':
-      document.cookie = 'shopee-store-id=' + params.storeId
-      document.cookie = `SPC_SC_UD=${params.storeId};domain=shopee.com.my;expires=2021-03-08T10:58:22.158Z`
+      // Cookies.set('SPC_U', storeId)
+      //   Cookies.set('ahah', params.cookies)
+      // Cookies.set('SPC_CDS', storeId)
       // 把主线程对应的当前用户信息存在storage
       sessionStorage.setItem('userInfo', JSON.stringify(params.accountInfo))
-      ipcNotice({
-        type: 'SET_COOKIES',
-        params: { key: getCookie('SPC_U'), cookies: document.cookie },
-      })
       break
     case 'TRANSLATION_RESULT': // 翻译结果替换
       let messageEl = [...document.querySelectorAll('pre')]
@@ -216,6 +216,7 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
   }
 })
 
+// 退出接口
 function handleLogout() {
   axios
     .get(location.origin + '/api/v1/logout/')
