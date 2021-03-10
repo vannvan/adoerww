@@ -97,36 +97,30 @@ if (/webchat\/conversations/.test(location.pathname)) {
       })
     }
   }, 200)
-  //   把shopee的用户授权信息存起来
-  localforage.getItem('session').then((res) => {
-    console.log('session', res)
-    ipcNotice({ type: 'SET_SHOPEE_AUTH_INFO', params: res })
-  })
 }
 
 // console.log(document.cookie)
 
 //如果在登录页面，把自动点击取消按钮
 if (/account\/signin/.test(location.href)) {
-  console.log('在登录页面')
-  document.querySelector('body').style.overflow = 'hidden'
-
-  let userInfo = sessionStorage.getItem('userInfo')
-    ? JSON.parse(sessionStorage.getItem('userInfo'))
-    : null
-  if (userInfo) {
-    document.querySelector(
-      'body'
-    ).innerHTML += `<div class="emalacca-client-mask">
-          <div class="shoppe-loading-wrap">
-              <div class="inside"></div>
-              <div class="back"></div>
-          </div>
-        </div>`
-    globalTimer = setInterval(() => {
-      //   autoLogin()
-    }, 200)
-  }
+  //   console.log('在登录页面')
+  //   document.querySelector('body').style.overflow = 'hidden'
+  //   let userInfo = sessionStorage.getItem('userInfo')
+  //     ? JSON.parse(sessionStorage.getItem('userInfo'))
+  //     : null
+  //   if (userInfo) {
+  //     document.querySelector(
+  //       'body'
+  //     ).innerHTML += `<div class="emalacca-client-mask">
+  //           <div class="shoppe-loading-wrap">
+  //               <div class="inside"></div>
+  //               <div class="back"></div>
+  //           </div>
+  //         </div>`
+  //     globalTimer = setInterval(() => {
+  //       //   autoLogin()
+  //     }, 200)
+  //   }
 }
 
 function autoLogin() {
