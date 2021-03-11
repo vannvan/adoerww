@@ -170,13 +170,21 @@ async function injectMessageMonitor() {
     switch (type) {
       case 'CHANGE_STORE':
         storage.setItem('storeId', params.storeId) // 更新当前操作的店铺ID
+        storage.setItem('currentSite', params.key) //当前站点
         //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
         if (params && params.storeId) {
-          mainWindow.loadURL(
-            `https://${
-              params.host
-            }/webchat/conversations?'${new Date().getTime()}`
-          )
+          mainWindow
+            .loadURL(
+              `https://${
+                params.host
+              }/webchat/conversations?'${new Date().getTime()}`
+            )
+            .then(() => {
+              log.info('load new store chat success')
+            })
+            .catch((error) => {
+              log.error(error)
+            })
         }
         break
       case 'TRANSLATION': // 翻译
@@ -341,7 +349,7 @@ app.on('ready', () => {
   createBrowserWin()
   setIntercept()
   injectMessageMonitor()
-  showNotification()
+  //   showNotification()
 })
 
 function showNotification() {

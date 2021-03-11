@@ -58,25 +58,45 @@ body {
 
     // 点击展开
     .nav-item>input:checked+.store-list-wrap {
-        padding-left: 14px;
+        // padding-left: 14px;
         height: auto;
         display: block;
     }
 
     .nav-item {
         position: relative;
-        border-bottom: 1px solid #ededed;
+        // border-bottom: 1px solid #ededed;
 
         .site-name {
             cursor: pointer;
             display: block;
             padding: 0 12px;
             overflow: hidden;
+            height: 40px;
+            line-height: 40px;
+            text-indent: 1em;
+            user-select: none;
         }
 
         li {
             position: relative;
             list-style: none;
+            cursor: pointer;
+            height: 40px;
+            line-height: 40px;
+            position: relative;
+            text-indent: 3em;
+            user-select: none;
+
+            &::after {
+                content: '';
+                position: absolute;
+                height: 1px;
+                width: 100%;
+                background: #ededed;
+                left: 0;
+                bottom: 0;
+            }
         }
 
         input {

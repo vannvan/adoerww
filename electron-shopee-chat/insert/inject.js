@@ -35,7 +35,8 @@ const Site = {
 }
 var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
-
+var currentStoreId = '341561079'
+var currentSite = 'my'
 window.inputValue = function (dom, st) {
   var evt = new InputEvent('input', {
     inputType: 'insertText',
@@ -58,16 +59,27 @@ let addStoreNode = `
 headerFixed.innerHTML += addStoreNode
 
 Site.siteOption.map((el) => {
+  let storeInfo = sessionStorage.getItem('storeInfo')
+  if (storeInfo) {
+    currentStoreId = JSON.parse(storeInfo).storeId
+    currentSite = JSON.parse(storeInfo).currentSite
+  }
   let storeListEl = ''
   if (el.storeList && el.storeList.length > 0) {
     el.storeList.map((subEl) => {
-      storeListEl += `<li class="store-item">${subEl.name}</li>`
+      let background =
+        currentStoreId == subEl.storeId ? 'rgba(255, 114, 13, 0.1)' : '#fff'
+      storeListEl += `<li class="store-item" data-store="${subEl.storeId}" style="background:${background}" data-key="${el.key}" >${subEl.name}</li>`
     })
   }
   headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}">
-    <label class="site-name" for="site-${el.key}">${el.name}</label>
+    <label class="site-name" for="site-${el.key}" style="background:${
+    currentSite == el.key ? '#FF720D' : '#fff'
+  }">${el.name}</label>
     <input type="checkbox" id="site-${el.key}" />
-    <div class="store-list-wrap">
+    <div class="store-list-wrap" style="display:${
+      currentSite == el.key ? 'block' : 'none'
+    }">
     ${storeListEl}
     </div>
   </div>`
@@ -75,24 +87,29 @@ Site.siteOption.map((el) => {
     //获取当前菜单旁边input的check状态
     $(this).next("input[type='checkbox']").is(':checked')
   })
+  $('.store-item').click(function (e) {
+    console.log(e)
+  })
 })
 
 document.body.prepend(headerFixed)
 
-// document
-//   .querySelector('.emalacca-client-menu-fixed')
-//   .addEventListener('click', (e) => {
-//     let key = e.target.getAttribute('data-key')
-//     let storeId = e.target.getAttribute('data-store')
-//     console.log(storeId)
-//     Cookies.set('SPC_U', storeId)
-//     Cookies.set('SPC_CDS', storeId)
-//     // Cookies.set('SPC_EC', '')
-//     ipcNotice({
-//       type: 'CHANGE_STORE',
-//       params: { host: Site.shopeeSeller[key].host, storeId: storeId, key: key },
-//     })
-//   })
+$('.emalacca-client-menu-fixed').click(function (e) {
+  let key = e.target.getAttribute('data-key')
+  if (key) {
+    let storeId = e.target.getAttribute('data-store')
+    let storeInfo = { storeId: storeId, currentSite: key }
+    sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
+    ipcNotice({
+      type: 'CHANGE_STORE',
+      params: {
+        host: Site.shopeeSeller[key].host,
+        storeId: storeId,
+        key: key,
+      },
+    })
+  }
+})
 
 if (/webchat\/conversations/.test(location.pathname)) {
   setTimeout(() => {
@@ -111,56 +128,6 @@ if (/webchat\/conversations/.test(location.pathname)) {
       )
     }
   }, 200)
-}
-
-// console.log(document.cookie)
-
-//如果在登录页面，把自动点击取消按钮
-if (/account\/signin/.test(location.href)) {
-  //   console.log('在登录页面')
-  //   document.querySelector('body').style.overflow = 'hidden'
-  //   let userInfo = sessionStorage.getItem('userInfo')
-  //     ? JSON.parse(sessionStorage.getItem('userInfo'))
-  //     : null
-  //   if (userInfo) {
-  //     document.querySelector(
-  //       'body'
-  //     ).innerHTML += `<div class="emalacca-client-mask">
-  //           <div class="shoppe-loading-wrap">
-  //               <div class="inside"></div>
-  //               <div class="back"></div>
-  //           </div>
-  //         </div>`
-  //     globalTimer = setInterval(() => {
-  //       //   autoLogin()
-  //     }, 200)
-  //   }
-}
-
-function autoLogin() {
-  let userInfo = sessionStorage.getItem('userInfo')
-    ? JSON.parse(sessionStorage.getItem('userInfo'))
-    : null
-  if (userInfo) {
-    if (document.querySelector('.shopee-modal__footer-buttons')) {
-      document
-        .querySelector('.shopee-modal__footer-buttons')
-        .children[0].click()
-    }
-
-    if (document.querySelector('form')) {
-      window.inputValue(document.querySelectorAll('input')[0], userInfo.name)
-      window.inputValue(
-        document.querySelectorAll('input')[1],
-        userInfo.password
-      )
-
-      document.querySelectorAll('.shopee-button--primary')[0].click()
-      clearInterval(globalTimer)
-    }
-  } else {
-    ipcNotice('ERROR_DIALOG', { content: '用户授权信息同步失败，请重新登录' })
-  }
 }
 
 window.onmousewheel = function (e) {
