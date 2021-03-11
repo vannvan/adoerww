@@ -65,12 +65,12 @@ async function createBrowserWin() {
         .readFileSync(path.join(__dirname, './insert/inject.js'))
         .toString()
       const css = fs
-        .readFileSync(path.join(__dirname, './insert/inject.css'))
+        .readFileSync(path.join(__dirname, './insert/inject.min.css'))
         .toString()
       mainWindow.webContents.executeJavaScript(js)
       mainWindow.webContents.insertCSS(css)
       setTimeout(() => {
-        loopSyncTask()
+        // loopSyncTask()
       }, 100)
     }
 
@@ -276,7 +276,7 @@ async function sendMessage(params) {
 
 // 循环同步任务
 async function loopSyncTask() {
-  await setInterval(async () => {
+  setInterval(async () => {
     let authedStore = storage.getItem('authedStore') //已授权的店铺列表
     log.info(
       '======================shopee sync message start ======================'
@@ -341,4 +341,13 @@ app.on('ready', () => {
   createBrowserWin()
   setIntercept()
   injectMessageMonitor()
+  showNotification()
 })
+
+function showNotification() {
+  const notification = {
+    title: 'Basic Notification',
+    body: 'Notification from the Main process',
+  }
+  new Notification(notification).show()
+}

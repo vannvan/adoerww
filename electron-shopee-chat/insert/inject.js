@@ -2,6 +2,7 @@ const axios = require('axios')
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
 const Cookies = require('js-cookie')
+const $ = require('jquery')
 
 const Site = {
   shopeeSeller: {
@@ -15,8 +16,14 @@ const Site = {
     tw: { host: 'seller.shopee.tw', lang: 'tw' },
   },
   siteOption: [
-    { name: '马来aimiao.my', key: 'my', storeId: '341561079' },
-    { name: '马来mailing.my', key: 'my', storeId: '338011596' },
+    {
+      name: '马来西亚',
+      key: 'my',
+      storeList: [
+        { name: 'aimiao', storeId: '341561079' },
+        { name: 'mailing', storeId: '338011596' },
+      ],
+    },
     { name: '菲律宾', key: 'ph', key: 'ph' },
     { name: '泰国', key: 'th' },
     { name: '新加坡', key: 'sg' },
@@ -28,22 +35,6 @@ const Site = {
 }
 var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
-
-function getCookie(cname, cookieStr) {
-  var name = cname + '='
-  var decodedCookie = decodeURIComponent(cookieStr)
-  var ca = decodedCookie.split(';')
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i]
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1)
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length)
-    }
-  }
-  return ''
-}
 
 window.inputValue = function (dom, st) {
   var evt = new InputEvent('input', {
@@ -57,28 +48,51 @@ window.inputValue = function (dom, st) {
 }
 
 let headerFixed = document.createElement('div')
-headerFixed.className = 'emalacca-client-header-fixed'
+headerFixed.className = 'emalacca-client-menu-fixed'
+
+let addStoreNode = `
+    <div class="emalacca-client-menu-top">
+        <span class="menu-top-button">添加店铺</span>
+    </div>
+`
+headerFixed.innerHTML += addStoreNode
 
 Site.siteOption.map((el) => {
-  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}" data-store="${el.storeId}">${el.name}</div>`
+  let storeListEl = ''
+  if (el.storeList && el.storeList.length > 0) {
+    el.storeList.map((subEl) => {
+      storeListEl += `<li class="store-item">${subEl.name}</li>`
+    })
+  }
+  headerFixed.innerHTML += `<div class="nav-item" data-key="${el.key}">
+    <label class="site-name" for="site-${el.key}">${el.name}</label>
+    <input type="checkbox" id="site-${el.key}" />
+    <div class="store-list-wrap">
+    ${storeListEl}
+    </div>
+  </div>`
+  $('.site-name').click(function () {
+    //获取当前菜单旁边input的check状态
+    $(this).next("input[type='checkbox']").is(':checked')
+  })
 })
 
 document.body.prepend(headerFixed)
 
-document
-  .querySelector('.emalacca-client-header-fixed')
-  .addEventListener('click', (e) => {
-    let key = e.target.getAttribute('data-key')
-    let storeId = e.target.getAttribute('data-store')
-    console.log(storeId)
-    Cookies.set('SPC_U', storeId)
-    Cookies.set('SPC_CDS', storeId)
-    // Cookies.set('SPC_EC', '')
-    ipcNotice({
-      type: 'CHANGE_STORE',
-      params: { host: Site.shopeeSeller[key].host, storeId: storeId, key: key },
-    })
-  })
+// document
+//   .querySelector('.emalacca-client-menu-fixed')
+//   .addEventListener('click', (e) => {
+//     let key = e.target.getAttribute('data-key')
+//     let storeId = e.target.getAttribute('data-store')
+//     console.log(storeId)
+//     Cookies.set('SPC_U', storeId)
+//     Cookies.set('SPC_CDS', storeId)
+//     // Cookies.set('SPC_EC', '')
+//     ipcNotice({
+//       type: 'CHANGE_STORE',
+//       params: { host: Site.shopeeSeller[key].host, storeId: storeId, key: key },
+//     })
+//   })
 
 if (/webchat\/conversations/.test(location.pathname)) {
   setTimeout(() => {
@@ -88,13 +102,13 @@ if (/webchat\/conversations/.test(location.pathname)) {
       ? JSON.parse(sessionStorage.getItem('userInfo'))
       : null
     if (userInfo) {
-      ;[
-        ...document.querySelector('.emalacca-client-header-fixed').children,
-      ].map((el) => {
-        if (el.dataset.store == userInfo.storeId) {
-          el.style.background = '#ffc069'
+      ;[...document.querySelector('.emalacca-client-menu-fixed').children].map(
+        (el) => {
+          if (el.dataset.store == userInfo.storeId) {
+            el.style.background = '#ffc069'
+          }
         }
-      })
+      )
     }
   }, 200)
 }

@@ -22,6 +22,7 @@
     "electron-localstorage": "^1.0.5",
     "electron-log": "^4.3.2",
     "electron-store": "^7.0.2",
+    "jquery": "^3.6.0",
     "js-cookie": "^2.2.1",
     "localforage": "^1.9.0",
     "request": "^2.88.2"
