@@ -11,6 +11,17 @@ body {
     transform: translateY(-62px) !important;
 }
 
+.rotate {
+    transform: rotate(90deg);
+    transition-duration: .5s;
+}
+
+.rotate1 {
+    transform: rotate(0deg);
+    transition-duration: .5s;
+}
+
+
 /* 隐藏虾皮登录界面的头部导航 */
 .shopee-header-bar {
     display: none !important;
@@ -22,7 +33,7 @@ body {
     background: #fff;
     border-right: 1px solid #ddd;
     position: fixed;
-    z-index: 10000000;
+    z-index: 1;
     line-height: 64px;
     /* display: flex; */
     top: 0;
@@ -56,62 +67,161 @@ body {
 
     }
 
-    // 点击展开
-    .nav-item>input:checked+.store-list-wrap {
-        // padding-left: 14px;
-        height: auto;
-        display: block;
+    //菜单列表
+    .emalacca-client-menu-list {
+        height: calc(100% - 180px);
+        overflow-y: auto;
+        overflow-x: visible;
+        width: 218px;
+
+        // 点击展开
+        .nav-item>input:checked+.store-list-wrap {
+            // padding-left: 14px;
+            height: auto;
+            display: block;
+        }
+
+        .nav-item {
+            position: relative;
+
+            .site-name {
+                cursor: pointer;
+                display: block;
+                padding: 0 12px 0 23px;
+                overflow: hidden;
+                height: 40px;
+                line-height: 40px;
+                user-select: none;
+
+                &.show-list .em-icon-right {
+                    transform: rotate(90deg);
+                }
+
+                .em-icon-right {
+                    font-size: 14px;
+                    color: #999;
+                    display: inline-block;
+                    margin-right: 8px;
+                    transition: transform .3s;
+                }
+            }
+
+
+
+            input {
+                position: absolute;
+                left: 0;
+                opacity: 0;
+                z-index: 2;
+                cursor: pointer;
+                height: 1em;
+                width: 1em;
+                top: 0;
+            }
+
+            .store-list-wrap {
+                display: none;
+
+                .store-item {
+                    position: relative;
+                    list-style: none;
+                    cursor: pointer;
+                    height: 40px;
+                    line-height: 40px;
+                    position: relative;
+                    text-indent: 3em;
+                    user-select: none;
+
+                    &.active:hover {
+                        background: #FF720D !important;
+                    }
+
+                    &:hover {
+                        background: rgba(255, 114, 13, 0.1) !important;
+                    }
+
+                    .em-icon-elipsis-v {
+                        float: right;
+                        margin-right: 18px;
+                    }
+
+
+
+
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        height: 1px;
+                        width: 100%;
+                        background: #ededed;
+                        left: 0;
+                        bottom: 0;
+                    }
+                }
+            }
+
+
+        }
     }
 
-    .nav-item {
-        position: relative;
-        // border-bottom: 1px solid #ededed;
+    //头像
+    .head-img {
+        position: fixed;
+        left: 20px;
+        bottom: 10px;
 
-        .site-name {
+        img {
+            width: 48px;
+            height: 48px;
             cursor: pointer;
-            display: block;
-            padding: 0 12px;
-            overflow: hidden;
+        }
+
+        .emalacca-logout {
+            width: 120px;
             height: 40px;
-            line-height: 40px;
-            text-indent: 1em;
-            user-select: none;
-        }
-
-        li {
-            position: relative;
-            list-style: none;
-            cursor: pointer;
-            height: 40px;
-            line-height: 40px;
-            position: relative;
-            text-indent: 3em;
-            user-select: none;
-
-            &::after {
-                content: '';
-                position: absolute;
-                height: 1px;
-                width: 100%;
-                background: #ededed;
-                left: 0;
-                bottom: 0;
-            }
-        }
-
-        input {
-            position: absolute;
-            left: 0;
-            opacity: 0;
-            z-index: 2;
-            cursor: pointer;
-            height: 1em;
-            width: 1em;
-            top: 0;
-        }
-
-        .store-list-wrap {
+            background: #FFFFFF;
+            box-shadow: 0px 0px 6px 0px rgba(129, 129, 129, 0.5);
+            border-radius: 4px;
             display: none;
+            position: absolute;
+            top: -50px;
+            right: -114px;
+            text-align: center;
+            line-height: 40px;
+            cursor: pointer;
+        }
+    }
+
+
+
+
+}
+
+//店铺操作
+.emalacca-store-operation {
+    position: absolute;
+    right: -130px;
+    top: 0;
+    width: 120px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 6px 0px rgba(129, 129, 129, 0.5);
+    background: #fff;
+    display: none;
+    height: auto;
+    z-index: 10;
+
+    span {
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        color: #000;
+        display: block;
+        text-indent: 0;
+        user-select: none;
+
+        &:hover {
+            background: rgba(255, 114, 13, 0.1);
         }
     }
 }

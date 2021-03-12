@@ -6,6 +6,7 @@ const {
   ipcMain,
   shell,
   dialog,
+  BrowserView,
   Notification,
 } = require('electron')
 const axios = require('axios')
@@ -69,6 +70,7 @@ async function createBrowserWin() {
         .toString()
       mainWindow.webContents.executeJavaScript(js)
       mainWindow.webContents.insertCSS(css)
+
       setTimeout(() => {
         // loopSyncTask()
       }, 100)
@@ -83,6 +85,13 @@ async function createBrowserWin() {
     myNotification.onclick = () => {
       console.log('Notification clicked')
     }
+  })
+
+  mainWindow.webContents.on('dom-ready', function () {
+    console.log('dom-ready')
+    mainWindowNotifier('SET_STORAGE', {
+      a: 1,
+    })
   })
 
   // 创建窗口监听
@@ -223,6 +232,8 @@ async function injectMessageMonitor() {
           mainWindow.center()
         }
         break
+      case 'ADD_STORE': //添加店铺
+      //
       default:
         break
     }
