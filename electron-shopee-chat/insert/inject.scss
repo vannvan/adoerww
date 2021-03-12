@@ -219,6 +219,13 @@ body {
         display: block;
         text-indent: 0;
         user-select: none;
+        font-size: 14px;
+        border-bottom: 1px solid #ededed;
+        cursor: pointer;
+
+        &:last-child {
+            border-bottom: none;
+        }
 
         &:hover {
             background: rgba(255, 114, 13, 0.1);
