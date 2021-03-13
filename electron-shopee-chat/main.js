@@ -8,6 +8,7 @@ const {
   dialog,
   BrowserView,
   Notification,
+  Menu,
 } = require('electron')
 const axios = require('axios')
 const log = require('electron-log')
@@ -20,19 +21,32 @@ const googleTr = require('./utils/google-translate-server')
 const storage = require('electron-localstorage')
 storage.setStoragePath(path.join(__dirname, 'storage.json')) // stoage存储路径
 // storage.setItem('accountList', account)
-//   storage.setItem('isLogin', false)
+//   storage.setItem('erpAuthStatus', false)
 log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
+
+// console.log(log.transports.file.file)  //日志路径
 
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
 var mainWindow = null // 主窗口
+// app.dock.hide() //mac隐藏菜单
+Menu.setApplicationMenu(null) //windows隐藏菜单
+
+fs.readFile(log.transports.file.file, function (err, data) {
+  if (err) {
+    return console.error(err)
+  }
+  //   console.log('异步读取: ' + data.toString())
+})
 
 async function createBrowserWin() {
   // 设置窗口的高度和宽度
   mainWindow = new BrowserWindow({
     width: 980,
     height: 640,
+    minWidth: 980,
+    minHeight: 640,
     autoHideMenuBar: true,
     show: false,
     title: '马六甲虾皮聊聊客户端',
@@ -42,7 +56,13 @@ async function createBrowserWin() {
       contextIsolation: false,
     },
   })
-  mainWindow.loadURL('https://test-erp.emalacca.com/')
+
+  if (!erpAuthValid()) {
+    storage.setItem('erpAuthStatus', 1)
+    mainWindow.loadURL('https://test-erp.emalacca.com/')
+  } else {
+    await loadDefaultStoreChat()
+  }
 
   //   mainWindow.loadFile('index.html')
   mainWindow.on('ready-to-show', () => {
@@ -50,7 +70,6 @@ async function createBrowserWin() {
   })
 
   mainWindow.webContents.on('did-finish-load', function () {
-    log.info('load script ...')
     log.info('did-finish-load hook', mainWindow.webContents.getURL())
     let currentUrl = mainWindow.webContents.getURL()
     // 在erp网站需要植入脚本
@@ -61,7 +80,7 @@ async function createBrowserWin() {
       mainWindow.webContents.executeJavaScript(erpJs)
     }
     // 在虾皮网站需要植入的脚本
-    if (/seller.shopee/.test(currentUrl)) {
+    if (/seller\.shopee/.test(currentUrl)) {
       const js = fs
         .readFileSync(path.join(__dirname, './insert/inject.js'))
         .toString()
@@ -105,6 +124,34 @@ async function createBrowserWin() {
       }
     }
   )
+
+  //   dialog.showOpenDialogSync({
+  //       title:"日志上传",
+  //       defaultPath:log.transports.file.file,
+  //       buttonLabel:'确认上传'
+  //   })
+
+  mainWindow.on('close', (e) => {
+    dialog.showMessageBox(
+      {
+        type: 'info',
+        title: 'Information',
+        defaultId: 0,
+        message: '确定要关闭吗？',
+        buttons: ['最小化', '直接退出'],
+      },
+      (index) => {
+        if (index === 0) {
+          e.preventDefault() //阻止默认行为，一定要有
+          mainWindow.minimize() //调用 最小化实例方法
+        } else {
+          mainWindow = null
+          //app.quit();	//不要用quit();试了会弹两次
+          app.exit() //exit()直接关闭客户端，不会执行quit();
+        }
+      }
+    )
+  })
 
   mainWindow.webContents.openDevTools()
 }
@@ -154,7 +201,7 @@ async function setIntercept() {
       callback({ requestHeaders: details.requestHeaders })
       if (/offer\/count/.test(details.url)) {
         //   选中了某个聊天对象
-        log.info('request: offer/count', details)
+        log.info('request: offer/count', details.url)
         let query = {}
         details.url.replace(/([^?&=]+)=([^&]+)/g, (_, k, v) => (query[k] = v))
         mainWindowNotifier('CHECKED_SOMEBODY', query)
@@ -192,6 +239,7 @@ async function injectMessageMonitor() {
               log.info('load new store chat success')
             })
             .catch((error) => {
+              dialog.showErrorBox('提示', '切换店铺失败，请稍后重试')
               log.error(error)
             })
         }
@@ -207,6 +255,7 @@ async function injectMessageMonitor() {
             mainWindowNotifier('TRANSLATION_RESULT', { targetText: resultText })
           })
           .catch((error) => {
+            dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
             log.error('translation faild:', error)
           })
         break
@@ -218,26 +267,69 @@ async function injectMessageMonitor() {
         break
       case 'SET_ERP_AUTH': //erp授权
         if (params) {
-          storage.setItem('isLogin', true)
+          storage.setItem('erpAuthStatus', 1)
+          params.expires_time = Date.parse(new Date()) / 1000 + 604800 //授权过期的具体时间
           storage.setItem('erpAuth', params)
-          mainWindow
-            .loadURL('https://seller.shopee.com.my/webchat/conversations?')
-            .then(() => {
-              log.info('shopee is loaded')
-            })
-            .catch((err) => {
-              log.error(err)
-            })
-          mainWindow.setSize(1366, 780)
-          mainWindow.center()
+          loadDefaultStoreChat()
         }
         break
+      case 'ERP_LOGOUT': // erp退出
+        storage.setItem('erpAuthStatus', -1)
+        storage.setItem('erpAuth', '')
+        session.defaultSession.clearStorageData({
+          origin: 'https://test-erp.emalacca.com',
+        })
+        mainWindow.webContents.loadURL(
+          'https://test-erp.emalacca.com/auth/login'
+        )
+        break
       case 'ADD_STORE': //添加店铺
-      //
-      default:
+        const child = new BrowserWindow({
+          parent: mainWindow,
+          show: false,
+          maximizable: false,
+          minimizable: false,
+        })
+        child.loadURL('https://www.baidu.com/')
+        child.once('ready-to-show', () => {
+          child.show()
+        })
         break
     }
   })
+}
+
+//检查erp授权状态
+function erpAuthValid() {
+  log.info('check erp auth status')
+  try {
+    let erpAuthInfo = storage.getItem('erpAuth')
+    // erpAuthInfo = JSON.parse(erpAuthInfo)
+    let { expires_time } = erpAuthInfo
+    log.info('erp auth expires_time', expires_time)
+    let currentTime = Date.parse(new Date()) / 1000
+    //说明token没过期
+    return expires_time && expires_time > currentTime
+  } catch (error) {
+    log.error(error)
+    return false
+  }
+}
+
+//加载默认聊天窗口
+async function loadDefaultStoreChat() {
+  mainWindow
+    .loadURL('https://seller.shopee.com.my/webchat/conversations?')
+    .then(() => {
+      log.info('shopee is loaded')
+    })
+    .catch((err) => {
+      dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
+      log.error(err)
+    })
+  mainWindow.setSize(1366, 780)
+  mainWindow.setMinimumSize(1366, 780)
+  mainWindow.center()
 }
 
 // 给渲染进程发送消息
@@ -289,6 +381,7 @@ async function sendMessage(params) {
         })
     })
     .catch((error) => {
+      dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
       log.error('translation faild:', error)
     })
 }

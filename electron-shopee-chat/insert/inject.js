@@ -1,9 +1,6 @@
-const axios = require('axios')
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
-const Cookies = require('js-cookie')
 const $ = require('jquery')
-const { head } = require('request')
 //加载阿里图标
 
 function addCssByLink(url) {
@@ -50,7 +47,6 @@ const Site = {
     { name: '越南', key: 'vn' },
   ],
 }
-var globalTimer = null //
 var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = '341561079'
 var currentSite = 'my'
@@ -65,30 +61,134 @@ window.inputValue = function (dom, st) {
   dom.dispatchEvent(evt)
 }
 
-let headerFixed = document.createElement('div')
-headerFixed.className = 'emalacca-client-menu-fixed'
-
-let leftMenuWrap = $(`<div class="emalacca-client-menu-fixed">
-    <div class="emalacca-client-menu-top">
-        <span class="menu-top-button add-store">添加店铺</span>
-    </div>
-    <div class="emalacca-client-menu-list"></div>
-    <div class="head-img">
-     <img src="https://s3.ax1x.com/2021/03/12/6UDVqs.png" class="emalacca-head-img"/>
-     <div class="emalacca-logout">退出登录</div>
-    </img>
-</div>`)
-
-let storeOperation = `<div class="emalacca-store-operation">
-<span>卖家中心</span>
-<span>解绑商店</span>
-<span>修改别名</span>
-</div>`
-
-$('body').append(leftMenuWrap)
-$('body').append(storeOperation)
-
 $(function () {
+  const leftMenuWrap = $(
+    `<div class="emalacca-client-menu-fixed">
+        <div class="emalacca-client-menu-top">
+            <span class="menu-top-button add-store">添加店铺</span>
+        </div>
+        <div class="emalacca-client-menu-list"></div>
+        <div class="head-img">
+            <img src="https://s3.ax1x.com/2021/03/12/6UDVqs.png" class="emalacca-head-img"/>
+        <div class="emalacca-logout">退出登录</div>
+    </div>
+    <div class="emalacca-store-operation">
+        <span>卖家中心</span>
+        <span>解绑商店</span>
+        <span>修改别名</span>
+    </div>`
+  )
+  $('body').append(leftMenuWrap)
+  Site.siteOption.map((el) => {
+    let storeInfo = sessionStorage.getItem('storeInfo')
+    if (storeInfo) {
+      currentStoreId = JSON.parse(storeInfo).storeId
+      currentSite = JSON.parse(storeInfo).currentSite
+    }
+    let storeListEl = ''
+    if (el.storeList && el.storeList.length > 0) {
+      el.storeList.map((subEl) => {
+        let background = currentStoreId == subEl.storeId ? '#FF720D' : '#fff'
+        let color = currentStoreId == subEl.storeId ? '#fff' : '#000'
+        let highlightClass = currentStoreId == subEl.storeId ? 'active' : ''
+        storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
+          <span data-store="${subEl.storeId}" data-key="${el.key}"> ${subEl.name}</span>
+          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${subEl.storeId}"></span>
+        </li>`
+      })
+    }
+    let checkBox =
+      currentSite == el.key
+        ? `<input type="checkbox" checked id="site-${el.key}"/>`
+        : `<input type="checkbox" id="site-${el.key}"/>`
+    $('.emalacca-client-menu-list').append(`<div class="nav-item" data-key="${
+      el.key
+    }">
+      <label class="site-name ${
+        currentSite == el.key ? 'show-list' : ''
+      }" for="site-${el.key}">
+          <i class="icon em-iconfont em-icon-right"></i>
+          <span> ${el.name}</span>
+          </label>
+          ${checkBox}
+          <div class="store-list-wrap" >
+              ${storeListEl}
+          </div>
+      </div>`)
+  })
+
+  // 菜单折叠
+  $('label').click(function () {
+    if (!$(this).hasClass('show-list')) {
+      $(this).addClass('show-list')
+    } else {
+      $(this).removeClass('show-list')
+    }
+  })
+
+  //店铺操作
+  $('.em-icon-elipsis-v').click(function () {
+    console.log('店铺操作')
+    let $storeOperation = $('.emalacca-store-operation')
+    let storeId = $storeOperation.attr('data-store')
+    if ($(this).attr('data-store') == storeId) {
+      $storeOperation.hide()
+      $storeOperation.attr('data-store', '')
+    } else {
+      $storeOperation.attr('data-store', $(this).attr('data-store'))
+      let offset = $(this).offset()
+      $storeOperation
+        .css({
+          left: offset.left + 52,
+          top: offset.top,
+        })
+        .show()
+    }
+  })
+
+  //
+  function handleClick(evt) {
+    if (!evt.target.closest('.em-icon-elipsis-v')) {
+      console.log('在下拉菜单区域外点击')
+      let $storeOperation = $('.emalacca-store-operation')
+      $storeOperation.hide()
+      $storeOperation.attr('data-store', '')
+    }
+  }
+  // 菜单点击
+  $('.emalacca-client-menu-fixed').click(function (e) {
+    let key = e.target.getAttribute('data-key')
+    if (key) {
+      let storeId = e.target.getAttribute('data-store')
+      let storeInfo = { storeId: storeId, currentSite: key }
+      // 如果选中的可存下的店铺相同，就不动
+      let storeEdInfo = sessionStorage.getItem('storeInfo')
+      if (storeEdInfo) {
+        currentStoreId = JSON.parse(storeEdInfo).storeId
+        if (currentStoreId && currentStoreId == storeId) {
+          return false
+        }
+      }
+      sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
+
+      ipcNotice({
+        type: 'CHANGE_STORE',
+        params: {
+          host: Site.shopeeSeller[key].host,
+          storeId: storeId,
+          key: key,
+        },
+      })
+    }
+  })
+
+  // 退出erp操作
+  $('.emalacca-logout').click(function () {
+    ipcNotice({
+      type: 'ERP_LOGOUT',
+    })
+  })
+
   //全局点击监听
   window.addEventListener('click', handleClick)
   //添加店铺操作
@@ -102,111 +202,6 @@ $(function () {
   $('.emalacca-head-img').click(function () {
     $('.emalacca-logout').toggle()
   })
-})
-
-Site.siteOption.map((el) => {
-  let storeInfo = sessionStorage.getItem('storeInfo')
-  if (storeInfo) {
-    currentStoreId = JSON.parse(storeInfo).storeId
-    currentSite = JSON.parse(storeInfo).currentSite
-  }
-  let storeListEl = ''
-  if (el.storeList && el.storeList.length > 0) {
-    el.storeList.map((subEl) => {
-      let background = currentStoreId == subEl.storeId ? '#FF720D' : '#fff'
-      let color = currentStoreId == subEl.storeId ? '#fff' : '#000'
-      let highlightClass = currentStoreId == subEl.storeId ? 'active' : ''
-      storeListEl += `<li class="store-item ${highlightClass}" data-store="${subEl.storeId}" style="background:${background};color:${color}" data-key="${el.key}" >
-        <span>${subEl.name}</span>
-        <span class="icon em-iconfont em-icon-elipsis-v"></span>
-       
-      </li>`
-    })
-  }
-  let checkBox =
-    currentSite == el.key
-      ? `<input type="checkbox" checked id="site-${el.key}"/>`
-      : `<input type="checkbox" id="site-${el.key}"/>`
-  $('.emalacca-client-menu-list').append(`<div class="nav-item" data-key="${
-    el.key
-  }">
-    <label class="site-name ${
-      currentSite == el.key ? 'show-list' : ''
-    }" for="site-${el.key}">
-        <i class="icon em-iconfont em-icon-right"></i>
-        <span> ${el.name}</span>
-        </label>
-        ${checkBox}
-        <div class="store-list-wrap" >
-            ${storeListEl}
-        </div>
-    </div>`)
-  //   $('.site-name').click(function () {
-  //     //获取当前菜单旁边input的check状态
-  //     $(this).next("input[type='checkbox']").is(':checked')
-  //   })
-})
-
-// 菜单折叠
-$('label').click(function () {
-  if (!$(this).hasClass('show-list')) {
-    $(this).addClass('show-list')
-  } else {
-    $(this).removeClass('show-list')
-  }
-})
-
-//店铺操作
-$('.em-icon-elipsis-v').click(function () {
-  console.log('店铺操作')
-  //   $('.store-operation').css('display', 'none')
-  let offset = $(this).offset()
-  $('.emalacca-store-operation').css({
-    left: offset.left + 90,
-    top: offset.top,
-    display: 'block',
-  })
-  //   $('.emalacca-store-operation').css('display', 'block')
-  //   $('.emalacca-store-operation').toggle()
-})
-
-//
-function handleClick(evt) {
-  //   if (evt.target.hasAttribute('data-dropdown-trigger')) {
-  //     console.log('在下拉菜单区域内点击')
-  //   }
-
-  if (!evt.target.closest('.em-icon-elipsis-v')) {
-    console.log('在下拉菜单区域外点击')
-    $('.emalacca-store-operation').css('display', 'none')
-    $('.handleClick').css('display', 'none')
-  }
-}
-
-$('.emalacca-client-menu-fixed').click(function (e) {
-  let key = e.target.getAttribute('data-key')
-  if (key) {
-    let storeId = e.target.getAttribute('data-store')
-    let storeInfo = { storeId: storeId, currentSite: key }
-    // 如果选中的可存下的店铺相同，就不动
-    let storeEdInfo = sessionStorage.getItem('storeInfo')
-    if (storeEdInfo) {
-      currentStoreId = JSON.parse(storeEdInfo).storeId
-      if (currentStoreId && currentStoreId == storeId) {
-        return false
-      }
-    }
-    sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
-
-    ipcNotice({
-      type: 'CHANGE_STORE',
-      params: {
-        host: Site.shopeeSeller[key].host,
-        storeId: storeId,
-        key: key,
-      },
-    })
-  }
 })
 
 if (/webchat\/conversations/.test(location.pathname)) {

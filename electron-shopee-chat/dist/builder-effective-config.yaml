@@ -1,0 +1,9 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.xxx.app
+win:
+  target:
+    - nsis
+    - zip
+electronVersion: 11.3.0

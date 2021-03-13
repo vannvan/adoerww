@@ -129,8 +129,20 @@ body {
                     height: 40px;
                     line-height: 40px;
                     position: relative;
-                    text-indent: 3em;
                     user-select: none;
+                    display: flex;
+                    justify-content: space-around;
+                    box-sizing: border-box;
+                    padding-left: 45px;
+                    padding-right: 10px;
+
+                    span {
+                        display: inline-block;
+
+                        &:nth-child(1) {
+                            flex: 1;
+                        }
+                    }
 
                     &.active:hover {
                         background: #FF720D !important;
@@ -141,8 +153,8 @@ body {
                     }
 
                     .em-icon-elipsis-v {
-                        float: right;
-                        margin-right: 18px;
+                        margin-left: auto;
+                        width: 20px;
                     }
 
 

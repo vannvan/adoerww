@@ -1,31 +1,42 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "axios": "^0.21.1",
-    "electron": "^11.3.0",
-    "electron-localstorage": "^1.0.5",
-    "electron-log": "^4.3.2",
-    "electron-store": "^7.0.2",
-    "jquery": "^3.6.0",
-    "js-cookie": "^2.2.1",
-    "localforage": "^1.9.0",
-    "request": "^2.88.2"
-  },
-  "dependencies": {}
+    "name": "electron-quick-start",
+    "version": "1.0.0",
+    "description": "A minimal Electron application",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "pack": "electron-builder --win --x64"
+    },
+    "repository": "https://github.com/electron/electron-quick-start",
+    "keywords": [
+        "Electron",
+        "quick",
+        "start",
+        "tutorial",
+        "demo"
+    ],
+    "build": {
+        "appId": "com.xxx.app",
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ]
+        }
+    },
+    "author": "GitHub",
+    "license": "CC0-1.0",
+    "devDependencies": {
+        "axios": "^0.21.1",
+        "electron": "^11.3.0",
+        "electron-builder": "^22.10.5",
+        "electron-localstorage": "^1.0.5",
+        "electron-log": "^4.3.2",
+        "electron-store": "^7.0.2",
+        "jquery": "^3.6.0",
+        "js-cookie": "^2.2.1",
+        "localforage": "^1.9.0",
+        "request": "^2.88.2"
+    },
+    "dependencies": {}
 }
