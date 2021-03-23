@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self','https://cdn.bootcdn.net'"> -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+
+
+    <style>
+        ul,
+        ol,
+        li {
+            list-style-type: none;
+            padding-inline-start: 0;
+        }
+
+        .em-tabs {
+            display: flex;
+        }
+
+        .em-tabs-items {
+            position: relative;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .em-tabs-items+.em-tabs-items {
+            margin-left: 24px;
+        }
+
+        .is-em-active {
+            color: #FF720D;
+        }
+
+        .is-em-active .is-em-active-index {
+            display: block;
+            position: absolute;
+            bottom: -1rem;
+            width: 100%;
+            left: 0;
+            border-bottom: 2px solid #FF720D;
+        }
+
+        .em-tabs-content {
+            display: none;
+        }
+
+        .em-tabs-content.is-em-content {
+            display: block;
+        }
+
+        .em-input-items+.em-input-items {
+            margin-top: 16px;
+        }
+
+        @media (min-width: 576px) {
+            .modal-dialog {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Button trigger modal -->
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+    </button> -->
+
+    <!-- Modal -->
+    <div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        style="display:block;">
+        <div class="modal-dialog" style="width:100%;max-width:100%;margin:0">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <ul class="modal-title em-tabs">
+                        <li class="em-tabs-items is-em-active" data-index="0">
+                            添加店铺
+                            <em class="is-em-active-index"></em>
+                        </li>
+                        <li class="em-tabs-items" data-index="1">
+                            批量导入
+                            <em class="is-em-active-index"></em>
+                        </li>
+                        <li class="em-tabs-items" data-index="2">
+                            云端导入
+                            <em class="is-em-active-index"></em>
+                        </li>
+                    </ul>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="em-tabs-content is-em-content">
+                        <div class="em-input-items">
+                            <select class="form-control">
+                                <option>台湾站</option>
+                                <option>越南站</option>
+                            </select>
+                        </div>
+                        <!-- is-valid成功 is-invalid错误-->
+                        <div class="em-input-items">
+                            <input type="text" placeholder="账号" class="form-control"
+                                aria-describedby="accountNumberFeedback" id="accountNumber" required>
+                            <div id="accountNumberFeedback" class="invalid-feedback">
+                                请输入账号
+                            </div>
+                        </div>
+                        <div class="em-input-items">
+                            <input type="password" placeholder="密码" class="form-control" id="validationPassword"
+                                aria-describedby="validationPasswordFeedback" required>
+                            <div id="validationPasswordFeedback" class="invalid-feedback">
+                                请输入账号密码
+                            </div>
+                        </div>
+                        <div class="em-input-items">
+                            <input type="text" placeholder="手机验证码" class="form-control" id="validationAuthCode"
+                                aria-describedby="validationAuthCodeFeedback" required>
+                            <div id="validationAuthCodeFeedback" class="invalid-feedback">
+                                请输入验证码
+                            </div>
+                        </div>
+                    </div>
+                    <div class="em-tabs-content">
+                        <div>准备店铺</div>
+                        <div>导入的内容请参考模板, 不符合规则的店铺, 将无法导入</div>
+                        <div class="">下载导入模板</div>
+
+                        <div>上传店铺文件</div>
+                        <div>目前支持文件类型为".xls, .xlsx"</div>
+                        <button type="button" class="btn btn-primary">导入文件</button>
+                    </div>
+                    <div class="em-tabs-content">
+                        <div>请选择你要导入的店铺</div>
+                        <div>店铺列表来源于马六甲ERP授权店铺, <span>查看详情</span></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="handleAuth">授权</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="bootstrap.min.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+<script>
+    $('.em-tabs-items').click(function (event) {
+        let index = $(this).attr('data-index')
+        $('.em-tabs-items.is-em-active').removeClass('is-em-active')
+        $(this).addClass('is-em-active')
+        $('.em-tabs-content.is-em-content').removeClass('is-em-content')
+        $('.em-tabs-content:eq(' + index + ')').addClass('is-em-content')
+    })
+</script>
+
+</html>

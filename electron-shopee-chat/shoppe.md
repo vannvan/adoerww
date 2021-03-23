@@ -17,3 +17,9 @@
 cookies 中有一项是和服务器 session 强关联的，所以在网站取用 cookies 时切换店铺不能将上一店铺退出，如果退出将代表当前店铺 cookies 失效，就算复制下来也没用
 
 主要用于 login 接口的 cookies 有 SPC_U SPC_EC SPC_SC_UD SPC_SC_TK 四个值
+
+### 在必要的地方打印日志，特别是错误收集，后面要考虑将错误日志上传，
+
+日志路径可 通过 console.log(log.transports.file.file)查看，
+
+### 用户授权信息保存在项目目录 storage.json 下，目前写的是固定的两个店铺信息和 erp 授权信息，后面可根据后段提供的接口进行调整

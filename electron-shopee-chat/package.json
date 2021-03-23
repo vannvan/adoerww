@@ -1,13 +1,13 @@
 {
-    "name": "electron-quick-start",
+    "name": "shopee-chat-client",
     "version": "1.0.0",
-    "description": "A minimal Electron application",
+    "description": "虾皮聊聊客户端",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
         "pack": "electron-builder --win --x64"
     },
-    "repository": "https://github.com/electron/electron-quick-start",
+    "repository": "https://gitlab.ikjzd.com/kj_erp/web/shopee-chat-client",
     "keywords": [
         "Electron",
         "quick",
@@ -27,9 +27,11 @@
     "author": "GitHub",
     "license": "CC0-1.0",
     "devDependencies": {
-        "axios": "^0.21.1",
         "electron": "^11.3.0",
-        "electron-builder": "^22.10.5",
+        "electron-builder": "^22.10.5"
+    },
+    "dependencies": {
+        "axios": "^0.21.1",
         "electron-localstorage": "^1.0.5",
         "electron-log": "^4.3.2",
         "electron-store": "^7.0.2",
@@ -37,6 +39,5 @@
         "js-cookie": "^2.2.1",
         "localforage": "^1.9.0",
         "request": "^2.88.2"
-    },
-    "dependencies": {}
+    }
 }

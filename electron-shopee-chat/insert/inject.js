@@ -1,7 +1,17 @@
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
 const $ = require('jquery')
-//加载阿里图标
+
+// 将链接中携带的店铺信息放进storage
+if (location.search) {
+  let query = {}
+  window.location.search.replace(
+    /([^?&=]+)=([^&]+)/g,
+    (_, k, v) => (query[k] = v)
+  )
+  let storeInfo = { storeId: query.storeId, currentSite: query.site }
+  sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
+}
 
 function addCssByLink(url) {
   var doc = document
@@ -13,10 +23,11 @@ function addCssByLink(url) {
   if (heads.length) heads[0].appendChild(link)
   else doc.documentElement.appendChild(link)
 }
+//加载阿里图标
 addCssByLink('//at.alicdn.com/t/font_1833787_gxwj5p5s96q.css')
 const Site = {
   shopeeSeller: {
-    my: { host: 'seller.shopee.com.my', lang: 'en' },
+    my: { host: 'seller.my.shopee.cn', lang: 'en' },
     br: { host: 'seller.shopee.com.br', lang: 'br' },
     id: { host: 'seller.shopee.co.id', lang: 'id' },
     th: { host: 'seller.shopee.co.th', lang: 'th' },
@@ -47,19 +58,16 @@ const Site = {
     { name: '越南', key: 'vn' },
   ],
 }
+//消息通知
+const MessageNotify = document.createElement('audio')
+MessageNotify.src =
+  'https://downsc.chinaz.net/Files/DownLoad/sound1/202012/13724.mp3'
+
+MessageNotify.play()
+
 var currentTransNodeIndex = null //当前翻译节点索引
-var currentStoreId = '341561079'
-var currentSite = 'my'
-window.inputValue = function (dom, st) {
-  var evt = new InputEvent('input', {
-    inputType: 'insertText',
-    data: st,
-    dataTransfer: null,
-    isComposing: false,
-  })
-  dom.value = st
-  dom.dispatchEvent(evt)
-}
+var currentStoreId = null
+var currentSite = null
 
 $(function () {
   const leftMenuWrap = $(
@@ -79,7 +87,7 @@ $(function () {
     </div>`
   )
   $('body').append(leftMenuWrap)
-  Site.siteOption.map((el) => {
+  Site.siteOption.map(el => {
     let storeInfo = sessionStorage.getItem('storeInfo')
     if (storeInfo) {
       currentStoreId = JSON.parse(storeInfo).storeId
@@ -87,7 +95,7 @@ $(function () {
     }
     let storeListEl = ''
     if (el.storeList && el.storeList.length > 0) {
-      el.storeList.map((subEl) => {
+      el.storeList.map(subEl => {
         let background = currentStoreId == subEl.storeId ? '#FF720D' : '#fff'
         let color = currentStoreId == subEl.storeId ? '#fff' : '#000'
         let highlightClass = currentStoreId == subEl.storeId ? 'active' : ''
@@ -160,7 +168,6 @@ $(function () {
     let key = e.target.getAttribute('data-key')
     if (key) {
       let storeId = e.target.getAttribute('data-store')
-      let storeInfo = { storeId: storeId, currentSite: key }
       // 如果选中的可存下的店铺相同，就不动
       let storeEdInfo = sessionStorage.getItem('storeInfo')
       if (storeEdInfo) {
@@ -169,8 +176,7 @@ $(function () {
           return false
         }
       }
-      sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
-
+      //切换店铺
       ipcNotice({
         type: 'CHANGE_STORE',
         params: {
@@ -246,18 +252,16 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
   let { type, params } = args
   console.log(type, params)
   switch (type) {
-    case 'SET_STORAGE':
-      sessionStorage.setItem('aak', JSON.stringify(params))
     case 'TRANSLATION_RESULT': // 翻译结果替换
       let messageEl = [...document.querySelectorAll('pre')]
-      messageEl.map((el) => {
+      messageEl.map(el => {
         console.log(JSON.stringify(params.targetText))
         if (
           currentTransNodeIndex == el.getAttribute('data-node-id') &&
           !el.getAttribute('trans')
         ) {
           el.setAttribute('trans', true)
-          el.innerHTML = `${params.targetText.map((el) => el[0]).join('')}`
+          el.innerHTML = `${params.targetText.map(el => el[0]).join('')}`
         }
       })
       break
@@ -267,12 +271,15 @@ ipcRenderer.on('mainWindow-message', (e, args) => {
     case 'CLEAR_TEXTAREA': //清除文本框
       document.querySelector('textarea').value = ''
       break
+    case 'NEW_MESSAGE': //新消息提醒
+      MessageNotify.play()
     default:
       break
   }
 })
 
 // 添加翻译按钮
+
 function appendTranslateButton(params) {
   let { buyer_id } = params
   if (document.querySelector('.emalacca-client-translate-msg-botto')) {

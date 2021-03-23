@@ -9,6 +9,8 @@ const {
   BrowserView,
   Notification,
   Menu,
+  Tray,
+  nativeImage,
 } = require('electron')
 const axios = require('axios')
 const log = require('electron-log')
@@ -19,9 +21,8 @@ const fs = require('fs')
 const googleTr = require('./utils/google-translate-server')
 
 const storage = require('electron-localstorage')
-storage.setStoragePath(path.join(__dirname, 'storage.json')) // stoage存储路径
-// storage.setItem('accountList', account)
-//   storage.setItem('erpAuthStatus', false)
+storage.setStoragePath(path.join(app.getAppPath(), 'storage.json')) // stoage存储路径
+
 log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
 
@@ -30,8 +31,21 @@ log.transports.console.level = true //是否输出到 控制台
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
 var mainWindow = null // 主窗口
+var childWindow = null //子窗口
+var appIcon = null //托盘
+var messageFlag = true //托盘消息提示flag
+var messageTimer //托盘消息计时
+
 // app.dock.hide() //mac隐藏菜单
 Menu.setApplicationMenu(null) //windows隐藏菜单
+
+/*
+  安全性：
+  https://www.electronjs.org/docs/tutorial/security
+  webSecurity: 禁用掉了浏览器的跨域安全特性（同源策略）, 导致报警告
+  屏蔽警告安全性提醒
+*/
+// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 fs.readFile(log.transports.file.file, function (err, data) {
   if (err) {
@@ -59,7 +73,7 @@ async function createBrowserWin() {
 
   if (!erpAuthValid()) {
     storage.setItem('erpAuthStatus', 1)
-    mainWindow.loadURL('https://test-erp.emalacca.com/')
+    mainWindow.loadURL('https://test-erp.emalacca.com/auth/login')
   } else {
     await loadDefaultStoreChat()
   }
@@ -80,7 +94,7 @@ async function createBrowserWin() {
       mainWindow.webContents.executeJavaScript(erpJs)
     }
     // 在虾皮网站需要植入的脚本
-    if (/seller\.shopee/.test(currentUrl)) {
+    if (/seller\.(\S*)\.shopee/.test(currentUrl)) {
       const js = fs
         .readFileSync(path.join(__dirname, './insert/inject.js'))
         .toString()
@@ -91,26 +105,9 @@ async function createBrowserWin() {
       mainWindow.webContents.insertCSS(css)
 
       setTimeout(() => {
-        // loopSyncTask()
+        loopSyncTask()
       }, 100)
     }
-
-    mainWindow.flashFrame(true)
-
-    const myNotification = new Notification('Title', {
-      body: 'Notification from the Renderer process',
-    })
-
-    myNotification.onclick = () => {
-      console.log('Notification clicked')
-    }
-  })
-
-  mainWindow.webContents.on('dom-ready', function () {
-    console.log('dom-ready')
-    mainWindowNotifier('SET_STORAGE', {
-      a: 1,
-    })
   })
 
   // 创建窗口监听
@@ -125,13 +122,24 @@ async function createBrowserWin() {
     }
   )
 
+  //窗口聚焦监听
+  mainWindow.on('focus', function () {
+    mainWindow.focus()
+    log.info(mainWindow.isFocused(), 'mainWindow.isFocused()')
+  })
+
+  //窗口失去焦点.
+  mainWindow.on('blur', function () {
+    //
+  })
+
   //   dialog.showOpenDialogSync({
   //       title:"日志上传",
   //       defaultPath:log.transports.file.file,
   //       buttonLabel:'确认上传'
   //   })
 
-  mainWindow.on('close', (e) => {
+  mainWindow.on('close', e => {
     dialog.showMessageBox(
       {
         type: 'info',
@@ -140,7 +148,7 @@ async function createBrowserWin() {
         message: '确定要关闭吗？',
         buttons: ['最小化', '直接退出'],
       },
-      (index) => {
+      index => {
         if (index === 0) {
           e.preventDefault() //阻止默认行为，一定要有
           mainWindow.minimize() //调用 最小化实例方法
@@ -224,37 +232,44 @@ async function injectMessageMonitor() {
     log.info('inject message', 'params:', args)
     let { type, params } = args
     switch (type) {
-      case 'CHANGE_STORE':
+      case 'CHANGE_STORE': //切换店铺
         storage.setItem('storeId', params.storeId) // 更新当前操作的店铺ID
         storage.setItem('currentSite', params.key) //当前站点
         //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
         if (params && params.storeId) {
-          mainWindow
-            .loadURL(
-              `https://${
-                params.host
-              }/webchat/conversations?'${new Date().getTime()}`
-            )
-            .then(() => {
-              log.info('load new store chat success')
-            })
-            .catch((error) => {
-              dialog.showErrorBox('提示', '切换店铺失败，请稍后重试')
-              log.error(error)
-            })
+          let exitCookies = storage.getItem('authedStore')[params.storeId]
+          if (exitCookies) {
+            mainWindow
+              .loadURL(
+                `https://${
+                  params.host
+                }/webchat/conversations?'${new Date().getTime()}&storeId=${
+                  params.storeId
+                }&site=${params.key}`
+              )
+              .then(() => {
+                log.info('load new store chat success')
+              })
+              .catch(error => {
+                dialog.showErrorBox('提示', '切换店铺失败，请稍后重试')
+                log.error(error)
+              })
+          } else {
+            dialog.showErrorBox('提示', '授权过期，请重新授权')
+          }
         }
         break
       case 'TRANSLATION': // 翻译
         let { sourceText, sourceLang } = params
         googleTr(sourceText, sourceLang)
-          .then((resultText) => {
+          .then(resultText => {
             log.info(
               'translation result:',
-              resultText.map((el) => el[0]).join('')
+              resultText.map(el => el[0]).join('')
             )
             mainWindowNotifier('TRANSLATION_RESULT', { targetText: resultText })
           })
-          .catch((error) => {
+          .catch(error => {
             dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
             log.error('translation faild:', error)
           })
@@ -284,17 +299,30 @@ async function injectMessageMonitor() {
         )
         break
       case 'ADD_STORE': //添加店铺
-        const child = new BrowserWindow({
-          parent: mainWindow,
+        childWindow = new BrowserWindow({
           show: false,
           maximizable: false,
           minimizable: false,
+          title: '添加店铺',
+          icon: '',
+          frame: false,
+          parent: mainWindow,
+          webPreferences: {
+            preload: path.join(
+              app.getAppPath(),
+              '/components/add-store/child.js'
+            ),
+          },
         })
-        child.loadURL('https://www.baidu.com/')
-        child.once('ready-to-show', () => {
-          child.show()
+        // childWindow.setAlwaysOnTop(true)
+        childWindow.loadFile('./components/add-store/addStore.html')
+        childWindow.once('ready-to-show', () => {
+          childWindow.show()
         })
+        childWindow.webContents.openDevTools()
         break
+      case 'CLOSE_CHILD_WINDOW': //关闭子窗口
+        childWindow.close()
     }
   })
 }
@@ -319,17 +347,34 @@ function erpAuthValid() {
 //加载默认聊天窗口
 async function loadDefaultStoreChat() {
   mainWindow
-    .loadURL('https://seller.shopee.com.my/webchat/conversations?')
+    .loadURL(
+      `https://seller.my.shopee.cn/webchat/conversations?storeId=338011596&site=my`
+    )
     .then(() => {
       log.info('shopee is loaded')
     })
-    .catch((err) => {
+    .catch(err => {
       dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
       log.error(err)
     })
   mainWindow.setSize(1366, 780)
   mainWindow.setMinimumSize(1366, 780)
   mainWindow.center()
+  //   const leftWindow = new BrowserWindow({
+  //     show: false,
+  //     maximizable: false,
+  //     minimizable: false,
+  //     frame: false,
+  //     // parent: mainWindow,
+  //     width: 210,
+  //     x: 0,
+  //     y: 0,
+  //     zoomToPageWidth: true,
+  //   })
+  //   leftWindow.loadFile('main.html')
+  //   leftWindow.once('ready-to-show', () => {
+  //     leftWindow.show()
+  //   })
 }
 
 // 给渲染进程发送消息
@@ -349,13 +394,13 @@ async function sendMessage(params) {
     return false
   }
   googleTr(messageText, 'zh-CN', targetLang)
-    .then((resultText) => {
-      log.info('translation result:', resultText.map((el) => el[0]).join(''))
+    .then(resultText => {
+      log.info('translation result:', resultText.map(el => el[0]).join(''))
       let data = {
         request_id: Lib.guid(),
         to_id: parseInt(to_id),
         type: 'text',
-        content: { text: resultText.map((el) => el[0]).join('') },
+        content: { text: resultText.map(el => el[0]).join('') },
         chat_send_option: {
           force_send_cancel_order_warning: false,
           comply_cancel_order_warning: false,
@@ -370,17 +415,17 @@ async function sendMessage(params) {
           Authorization: 'Bearer ' + token,
         },
       })
-        .then((res) => {
+        .then(res => {
           log.info('send afterTranslation success', res.data)
           // 清除文本框
           mainWindowNotifier('CLEAR_TEXTAREA')
         })
-        .catch((err) => {
+        .catch(err => {
           dialog.showErrorBox('提示', '发送失败，请重试')
           log.error('send afterTranslation faild', err.response.data)
         })
     })
-    .catch((error) => {
+    .catch(error => {
       dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
       log.error('translation faild:', error)
     })
@@ -394,15 +439,40 @@ async function loopSyncTask() {
       '======================shopee sync message start ======================'
     )
     let syncResult = await Promise.all(
-      Object.keys(authedStore).map(async (key) => {
-        let result = await syncShopeeMessage({
-          host: authedStore[key].host,
-          token: authedStore[key].token,
-          userInfo: authedStore[key].storeName,
-        })
+      Object.keys(authedStore).map(async key => {
+        let result = await syncShopeeMessage(authedStore[key])
         return result
       })
     )
+    messageFlag = true
+    appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
+    clearInterval(messageTimer)
+
+    try {
+      let unreadMessageCount = syncResult
+        .map(el => el.unread_message_count)
+        .reduce((prev, curr) => prev + curr)
+      // 如果未读消息大于1
+      if (unreadMessageCount > 0) {
+        mainWindowNotifier(
+          'NEW_MESSAGE',
+          syncResult,
+          '未读消息数：',
+          unreadMessageCount
+        )
+        mainWindow.flashFrame(true)
+        messageTimer = setInterval(() => {
+          messageFlag = !messageFlag
+          if (messageFlag) {
+            appIcon.setImage(nativeImage.createEmpty())
+          } else {
+            appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
+          }
+        }, 650)
+      }
+    } catch (error) {
+      log.error('unreadMessageCount error:', unreadMessageCount, error)
+    }
     log.info('sync result:', JSON.stringify(syncResult))
     log.info(
       '======================shopee sync message end   ======================'
@@ -411,8 +481,9 @@ async function loopSyncTask() {
 }
 
 // 同步用户未读消息等
-async function syncShopeeMessage({ host, token, userInfo }) {
-  log.info('sync one user message:', userInfo)
+async function syncShopeeMessage(storeInfo) {
+  let { name, token, host } = storeInfo
+  log.info('sync one user message:', name)
   return new Promise((resolve, reject) => {
     axios({
       method: 'post',
@@ -421,45 +492,54 @@ async function syncShopeeMessage({ host, token, userInfo }) {
         Authorization: 'Bearer ' + token,
       },
     })
-      .then((res) => {
+      .then(res => {
         resolve(res.data)
       })
-      .catch((error) => {
+      .catch(error => {
         reject(error)
       })
   })
 }
 
-const account = {
-  341561079: {
-    name: 'aimiao.my',
-    password: 'Fm123456',
-    storeId: '341561079',
-    host: 'seller.shopee.com.my',
-    cookies:
-      'SPC_F=nVnWUKGDbXF01TKyvvqJdXMqIRg8KMyX; SC_SSO_U=-; SPC_SC_SA_UD=; SPC_WST="FbXjM5qdFnFhr2uoiTddStgERDsi87mlaP+EOZoPd2N7TZaqjHrknzvy1gB81mx5Qajz0H/D0ISKxvUH1V9lBNI7CFa1suf3VFpl9JDuN04uhiJFghvx3jlS/xMpNTg22962SXN0Dxosqe37ExSP/g1oVPKffXe4gUD1qh9ciz4="; SPC_U=341561079; SPC_EC="FbXjM5qdFnFhr2uoiTddStgERDsi87mlaP+EOZoPd2N7TZaqjHrknzvy1gB81mx5Qajz0H/D0ISKxvUH1V9lBNI7CFa1suf3VFpl9JDuN04uhiJFghvx3jlS/xMpNTg22962SXN0Dxosqe37ExSP/g1oVPKffXe4gUD1qh9ciz4="; SPC_STK="xn9tQ452lDwvyyuKOf8pH6quECymcXQzUq//olYvA1XdXTNnDndrWAA6ADu+kZg4qRG9uclMHJSBLqRyy7/+oTCPOM0StDJRgeiglJ7DNmeF/kjBLMI8r0vvrqzopIqT3EoSPkcxn/CRt294s0JWbKZOlLK5ic2TPSzana8b1FQ="; SC_SSO=-; SPC_SC_UD=341561079; SPC_SC_TK=acec1fa29aab11ab1fe4e0677a3bcc7a; SPC_SC_SA_TK=; SC_DFP=u8JXHV5DhSB6qVcWXhJfKPFeqEB81Q5b; ',
-  },
-  338011596: {
-    name: 'mailing.my',
-    password: 'maiwang123456',
-    storeId: '338011596',
-    host: 'seller.shopee.com.my',
-    cookies:
-      'SPC_CDS=f5e4bd41-43bd-4825-870a-f4ae5bc712a5; SPC_U=338011596; SPC_EC="UxDhcBBAOu50L/7HdmHV2saKaQ4mEkBQRIbpKi5/rIoXrkGaFimUrOvvlWk6/G879RTCdkHTXQhmfEGKr2ffC42qtd+Z9z2N8anp/TP3pXfpZk9bKWC4V39FPneHA67+sJc+79V/DsKo6OqGPas3cz0kDkfQxsQqdsnSURpSfNg="; SPC_SC_UD=338011596; SPC_SC_TK=322e85911d362213ab22d5dde250cc62',
-  },
+//创建托盘
+async function createTray() {
+  try {
+    appIcon = new Tray(path.join(__dirname, 'dark-logo.png'))
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '打开聊聊',
+        click: () => {
+          mainWindow.show()
+        },
+      },
+      {
+        label: '退出',
+        click: () => {
+          mainWindow.close()
+        },
+      },
+    ])
+    appIcon.setToolTip('虾皮聊聊客户端')
+    appIcon.setContextMenu(contextMenu)
+    appIcon.on('double-click', () => {
+      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+    })
+  } catch (error) {
+    log.info('createTray error:'.error)
+  }
 }
 
-app.on('ready', () => {
-  createBrowserWin()
-  setIntercept()
-  injectMessageMonitor()
-  //   showNotification()
+app.on('ready', async () => {
+  let authedStore = storage.getItem('authedStore') //已授权的店铺列表
+  if (Object.keys(authedStore).length > 0) {
+    storage.setItem('storeId', Object.keys(authedStore)[0]) // 更新当前操作的店铺ID
+  }
+  await createBrowserWin()
+  await setIntercept()
+  await injectMessageMonitor()
+  await createTray()
 })
 
-function showNotification() {
-  const notification = {
-    title: 'Basic Notification',
-    body: 'Notification from the Main process',
-  }
-  new Notification(notification).show()
-}
+// app.on('window-all-closed', () => {
+//   if (appIcon) appIcon.destroy()
+// })
