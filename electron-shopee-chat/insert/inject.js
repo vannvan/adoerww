@@ -11,6 +11,13 @@ if (location.search) {
   )
   let storeInfo = { storeId: query.storeId, currentSite: query.site }
   sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
+  //未读消息
+  let unReadMessage = sessionStorage.getItem('unReadMessage')
+    ? JSON.parse(sessionStorage.getItem('unReadMessage'))
+    : null
+  if (unReadMessage) {
+    addNewUnReadMessageForStore(unReadMessage)
+  }
 }
 
 function addCssByLink(url) {
@@ -24,7 +31,7 @@ function addCssByLink(url) {
   else doc.documentElement.appendChild(link)
 }
 //加载阿里图标
-addCssByLink('//at.alicdn.com/t/font_1833787_gxwj5p5s96q.css')
+addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
 const Site = {
   shopeeSeller: {
     my: { host: 'seller.my.shopee.cn', lang: 'en' },
@@ -63,13 +70,12 @@ const MessageNotify = document.createElement('audio')
 MessageNotify.src =
   'https://downsc.chinaz.net/Files/DownLoad/sound1/202012/13724.mp3'
 
-MessageNotify.play()
-
 var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = null
 var currentSite = null
 
 $(function () {
+  ReceiveMasterMessage()
   const leftMenuWrap = $(
     `<div class="emalacca-client-menu-fixed">
         <div class="emalacca-client-menu-top">
@@ -102,6 +108,7 @@ $(function () {
         storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
           <span data-store="${subEl.storeId}" data-key="${el.key}"> ${subEl.name}</span>
           <span class="icon em-iconfont em-icon-elipsis-v" data-store="${subEl.storeId}"></span>
+          <span class="new-message-tip" data-store="${subEl.storeId}"></span>
         </li>`
       })
     }
@@ -227,7 +234,7 @@ window.onmousewheel = function (e) {
   let messageEl = [...document.querySelectorAll('pre')]
   messageEl.map((el, index) => {
     if (!el.getAttribute('flag')) {
-      el.innerHTML += `<button  class="emalacca-client-trans-button-mini">译</button>`
+      el.innerHTML += `<button class="emalacca-client-trans-button-mini">译</button>`
       el.setAttribute('flag', true)
       el.setAttribute('data-node-id', index + 1)
     }
@@ -237,9 +244,11 @@ window.onmousewheel = function (e) {
         console.log('文本', text)
         currentTransNodeIndex = el.getAttribute('data-node-id')
         ipcNotice({
-          type: 'TRANSLATION',
+          type: 'TRANS_TEXT',
           params: {
-            sourceText: text,
+            messageText: text,
+            type: 'receive',
+            targetLang: 'zh-CN',
           },
         })
       }
@@ -247,73 +256,143 @@ window.onmousewheel = function (e) {
   })
 }
 
-// 接收主进程的消息
-ipcRenderer.on('mainWindow-message', (e, args) => {
-  let { type, params } = args
-  console.log(type, params)
-  switch (type) {
-    case 'TRANSLATION_RESULT': // 翻译结果替换
-      let messageEl = [...document.querySelectorAll('pre')]
-      messageEl.map(el => {
-        console.log(JSON.stringify(params.targetText))
-        if (
-          currentTransNodeIndex == el.getAttribute('data-node-id') &&
-          !el.getAttribute('trans')
-        ) {
-          el.setAttribute('trans', true)
-          el.innerHTML = `${params.targetText.map(el => el[0]).join('')}`
-        }
-      })
-      break
-    case 'CHECKED_SOMEBODY': //选中某人
-      appendTranslateButton(params)
-      break
-    case 'CLEAR_TEXTAREA': //清除文本框
-      document.querySelector('textarea').value = ''
-      break
-    case 'NEW_MESSAGE': //新消息提醒
-      MessageNotify.play()
-    default:
-      break
-  }
-})
+//接收主进程的消息
+function ReceiveMasterMessage() {
+  ipcRenderer.on('mainWindow-message', (e, args) => {
+    let { type, params } = args
+    console.log(type, params)
+    switch (type) {
+      case 'TRANSLATION_RESULT': // 翻译结果替换
+        let messageEl = [...document.querySelectorAll('pre')]
+        messageEl.map(el => {
+          console.log(JSON.stringify(params.targetText))
+          if (
+            currentTransNodeIndex == el.getAttribute('data-node-id') &&
+            !el.getAttribute('trans')
+          ) {
+            el.setAttribute('trans', true)
+            el.innerHTML = `${params.targetText.map(el => el[0]).join('')}`
+          }
+        })
+        break
+      case 'CHECKED_SOMEBODY': //选中某人
+        appendTranslateButton(params)
+        break
+      case 'CLEAR_TEXTAREA': //清除文本框
+        document.querySelector('textarea').value = ''
+        break
+      case 'NEW_MESSAGE': //新消息提醒
+        MessageNotify.play()
+        addNewUnReadMessageForStore(params)
+        sessionStorage.setItem('unReadMessage', JSON.stringify(params)) //把未读存起来
+      case 'REPLACE_TEXTAREA': // 替换待发送的文本
+        $('textarea').text(params)
+        $('textarea').val(params) //替换textarea文本
+      default:
+        break
+    }
+  })
+}
+
+//新消息店铺新增未读消息数
+async function addNewUnReadMessageForStore(newMessageParams) {
+  let storeIds = newMessageParams.map(el => el.storeId) //有新消息的店铺id
+  $('.new-message-tip').each(function () {
+    if (storeIds.includes($(this).attr('data-store'))) {
+      let unReadMessageCount = newMessageParams.find(
+        el => el.storeId == $(this).attr('data-store')
+      ).unread_message_count
+      $(this).parent().find('span:eq(1)').hide() //隐藏操作
+      $(this).show().text(unReadMessageCount)
+    }
+  })
+}
 
 // 添加翻译按钮
-
 function appendTranslateButton(params) {
   let { buyer_id } = params
-  if (document.querySelector('.emalacca-client-translate-msg-botto')) {
-    return false
-  }
+  const langOptions = [
+    { lang: 'zh', langName: '中文' },
+    { lang: 'EN', currency: 'SGD', langName: '英语' },
+    { lang: 'PH', currency: 'PHP', langName: '菲律宾语' },
+    { lang: 'MY', currency: 'MYR', langName: '马来语' },
+    { lang: 'ID', currency: 'IDR', langName: '印尼语' },
+    { lang: 'TH', currency: 'THB', langName: '泰语' },
+    { lang: 'VN', currency: 'VND', langName: '越南语' },
+    { lang: 'BR', currency: 'BRL', langName: '巴西语' },
+  ]
+  const checkedLang = 'EN'
   setTimeout(() => {
+    // if (!$('.emalacca-client-translate-msg-bottom')) {
+    let langOptionsNode = ''
+    langOptions.map(el => {
+      langOptionsNode += `<li><span class="em-iconfont em-icon-right1" style="visibility:${
+        checkedLang == el.lang ? 'inherit' : 'hidden'
+      }"></span>${el.langName}</li>`
+    })
+    // $('textarea')
+    //   .parent()
+    //   .append(
     document.querySelector(
       'textarea'
     ).parentNode.innerHTML += `<div class="emalacca-client-translate-msg-bottom">
-                    <button class="emalacca-client-translate-button">翻译并发送</button>
+                    <div class="select-lang-options-wrap">
+                        <div class="lang-options">
+                          ${langOptionsNode}
+                        </div>
+                        <span class="lang-btn selected-lang">英语<span class="em-iconfont em-icon-13"></span></span>
+                    </div>
+                    <span class="lang-btn translate-btn">翻译</span>
+                    <span class="lang-btn send-btn">发送</span>
                 </div>
                `
-    let translationButton = document.querySelector(
-      '.emalacca-client-translate-button'
-    )
-    translationButton.addEventListener('click', function () {
-      //翻译
-      handleTranslation(buyer_id)
+    //   )
+    $('.selected-lang').click(function () {
+      $('.lang-options').toggle()
+      $('.lang-options').mouseleave(function () {
+        $('.lang-options').hide()
+      })
     })
-    document.onkeydown = function (event) {
-      //回车事件
-      if (event.keyCode == 13) {
-        handleTranslation(buyer_id)
+
+    $('.translate-btn').click(function () {
+      handleTranslation(buyer_id, checkedLang)
+    })
+
+    $('.send-btn').click(function () {
+      handleSendMessage(buyer_id)
+    })
+    $('textarea').keyup(function (event) {
+      if (event.shiftKey && event.keyCode == 13) {
+        return false
       }
-    }
+      if (event.keyCode == 13) {
+        event.preventDefault()
+        handleSendMessage(buyer_id)
+      }
+    })
+    $('textarea').keyup(function (e) {
+      $(this).text(e.target.value)
+      $(this).val(e.target.value)
+    })
   }, 1000)
 }
 
-// 翻译操作
-function handleTranslation(buyer_id) {
-  console.log('翻译')
-  let currentPageCountry = document
-    .querySelector('html')
-    .className.toLocaleLowerCase() //当前页面获取到的国家
+//翻译待发送的文本
+async function handleTranslation(buyer_id, targetLang) {
+  let currentPageCountry = $('html').attr('class').toLocaleLowerCase() //当前页面获取到的国家
+  targetLang = targetLang || currentPageCountry
+  ipcNotice({
+    type: 'TRANS_TEXT',
+    params: {
+      type: 'send',
+      messageText: $('textarea').val(),
+      targetLang: targetLang,
+    },
+  })
+}
+
+//发送消息
+async function handleSendMessage(buyer_id) {
   localforage
     .getItem('session')
     .then(function (value) {
@@ -325,9 +404,8 @@ function handleTranslation(buyer_id) {
         params: {
           host: location.host,
           token: token,
-          messageText: document.querySelector('textarea').value,
+          messageText: $('textarea').text(),
           to_id: buyer_id,
-          targetLang: Site.shopeeSeller[currentPageCountry].lang,
         },
       })
     })

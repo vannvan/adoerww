@@ -10,4 +10,13 @@ module.exports = Lib = {
       }
     )
   },
+  /**粗略的比较两个对象是否相等，
+    主要用于比较旧消息队列和新消息队列是否相同，减少通知提醒的频率
+ **/
+  compare: function (oldObj, newObj) {
+    if (typeof oldObj == 'object' && typeof newObj == 'object') {
+      return JSON.stringify(oldObj) == JSON.stringify(newObj)
+    }
+    return false
+  },
 }

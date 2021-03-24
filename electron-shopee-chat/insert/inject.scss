@@ -157,10 +157,21 @@ body {
                         width: 20px;
                     }
 
+                    .new-message-tip {
+                        display: inline-block;
+                        width: 18px;
+                        height: 18px;
+                        background: #F70D0D;
+                        margin-top: 10px;
+                        line-height: 18px;
+                        text-align: center;
+                        border-radius: 9px;
+                        color: #fff;
+                        display: none;
+                        transform: translateX(-4px);
+                    }
 
-
-
-
+                    // 下划线
                     &::after {
                         content: '';
                         position: absolute;
@@ -313,16 +324,86 @@ body {
     bottom: 8px;
     right: 15px;
     background: #fff;
+    display: flex;
+
+    .lang-btn {
+        height: 32px;
+        padding: 0 16px;
+        border: 1px solid rgb(255, 114, 13);
+        line-height: 32px;
+        cursor: pointer;
+        color: #FF720D;
+
+        &.translate-btn {
+            border-radius: 0 3px 3px 0;
+        }
+
+        &.selected-lang {
+            border-left: 1px solid rgb(255, 114, 13);
+            border-top: 1px solid rgb(255, 114, 13);
+            border-bottom: 1px solid rgb(255, 114, 13);
+            border-right: none !important;
+            display: inline-block;
+
+        }
+
+        &.send-btn {
+            border: none;
+            margin-left: 15px;
+            background: rgb(255, 114, 13) !important;
+            color: #fff !important;
+            padding: 0 16px;
+            border-radius: 3px;
+            height: 34px;
+        }
+
+        &.selected-lang {
+            border-radius: 3px 0 0 3px;
+        }
+
+        .em-icon-13 {
+            color: #FF720D;
+            margin-left: 8px;
+        }
+    }
+
+    .select-lang-options-wrap {
+        position: relative;
+
+        .lang-options {
+            position: absolute;
+            width: 121px;
+            height: auto;
+            background: #FFFFFF;
+            box-shadow: 0px 0px 4px 0px rgba(142, 142, 142, 0.5);
+            border: 1px solid #DBDBDB;
+            top: -295px;
+            left: -30px;
+            border-radius: 3px;
+            white-space: nowrap;
+            display: none;
+
+            .em-icon-right1 {
+                font-weight: bold;
+                margin-right: 6px;
+            }
+
+            li {
+                list-style: none;
+                height: 35px;
+                line-height: 35px;
+                text-align: left;
+                box-sizing: border-box;
+                padding-left: 20px;
+                cursor: pointer;
+                white-space: nowrap;
+            }
+
+        }
+    }
 }
 
-.emalacca-client-translate-button {
-    border: none;
-    padding: 8px 12px;
-    background: rgb(255, 114, 13);
-    color: #fff;
-    border-radius: 3px;
-    cursor: pointer;
-}
+
 
 /* 聊天文本的 翻译按钮 */
 .emalacca-client-trans-button-mini {

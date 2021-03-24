@@ -35,6 +35,7 @@ var childWindow = null //子窗口
 var appIcon = null //托盘
 var messageFlag = true //托盘消息提示flag
 var messageTimer //托盘消息计时
+var messageQuene //消息队列
 
 // app.dock.hide() //mac隐藏菜单
 Menu.setApplicationMenu(null) //windows隐藏菜单
@@ -105,7 +106,7 @@ async function createBrowserWin() {
       mainWindow.webContents.insertCSS(css)
 
       setTimeout(() => {
-        loopSyncTask()
+        // loopSyncTask()
       }, 100)
     }
   })
@@ -125,7 +126,7 @@ async function createBrowserWin() {
   //窗口聚焦监听
   mainWindow.on('focus', function () {
     mainWindow.focus()
-    log.info(mainWindow.isFocused(), 'mainWindow.isFocused()')
+    // log.info(mainWindow.isFocused(), 'mainWindow.isFocused()')
   })
 
   //窗口失去焦点.
@@ -259,20 +260,9 @@ async function injectMessageMonitor() {
           }
         }
         break
-      case 'TRANSLATION': // 翻译
-        let { sourceText, sourceLang } = params
-        googleTr(sourceText, sourceLang)
-          .then(resultText => {
-            log.info(
-              'translation result:',
-              resultText.map(el => el[0]).join('')
-            )
-            mainWindowNotifier('TRANSLATION_RESULT', { targetText: resultText })
-          })
-          .catch(error => {
-            dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
-            log.error('translation faild:', error)
-          })
+
+      case 'TRANS_TEXT': // 翻译文本
+        handleTranslation(params)
         break
       case 'SEND_MESSAGE': //发送消息操作
         sendMessage(params)
@@ -323,8 +313,43 @@ async function injectMessageMonitor() {
         break
       case 'CLOSE_CHILD_WINDOW': //关闭子窗口
         childWindow.close()
+        break
+      case 'SUCCESS_ADD_STORE': //添加店铺成功
+        setTimeout(function () {
+          childWindow.close()
+        }, 2000)
+        break
     }
   })
+}
+
+//翻译文本
+/**
+ * @param type  send|receive 发送或者接收
+ * @param messageText 待翻译的文本
+ * @param targetLang 目标语言
+ */
+async function handleTranslation({ type, messageText, targetLang }) {
+  log.info('translation start')
+  if (!messageText) {
+    dialog.showErrorBox('提示', '请输入消息内容')
+    return false
+  }
+  let sourceLang = type == 'send' ? 'zh-CN' : 'en'
+  googleTr(messageText, sourceLang, targetLang)
+    .then(resultText => {
+      log.info('translation result:', resultText.map(el => el[0]).join(''))
+      let result = resultText.map(el => el[0]).join('')
+      if (type == 'send') {
+        mainWindowNotifier('REPLACE_TEXTAREA', result) //替换textarea
+      } else {
+        mainWindowNotifier('TRANSLATION_RESULT', { targetText: resultText })
+      }
+    })
+    .catch(error => {
+      dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
+      log.error('translation faild:', error)
+    })
 }
 
 //检查erp授权状态
@@ -388,46 +413,38 @@ async function mainWindowNotifier(type, params) {
 
 // 调用虾皮发送消息接口
 async function sendMessage(params) {
-  let { messageText, to_id, token, host, targetLang = 'en' } = params
+  let { messageText, to_id, token, host } = params
   if (!messageText) {
     dialog.showErrorBox('提示', '请输入消息内容')
     return false
   }
-  googleTr(messageText, 'zh-CN', targetLang)
-    .then(resultText => {
-      log.info('translation result:', resultText.map(el => el[0]).join(''))
-      let data = {
-        request_id: Lib.guid(),
-        to_id: parseInt(to_id),
-        type: 'text',
-        content: { text: resultText.map(el => el[0]).join('') },
-        chat_send_option: {
-          force_send_cancel_order_warning: false,
-          comply_cancel_order_warning: false,
-        },
-      }
-      log.info('send afterTranslation params:', data)
-      axios({
-        method: 'post',
-        data: data,
-        url: `https://${host}/webchat/api/v1.2/messages`,
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      })
-        .then(res => {
-          log.info('send afterTranslation success', res.data)
-          // 清除文本框
-          mainWindowNotifier('CLEAR_TEXTAREA')
-        })
-        .catch(err => {
-          dialog.showErrorBox('提示', '发送失败，请重试')
-          log.error('send afterTranslation faild', err.response.data)
-        })
+  let data = {
+    request_id: Lib.guid(),
+    to_id: parseInt(to_id),
+    type: 'text',
+    content: { text: messageText },
+    chat_send_option: {
+      force_send_cancel_order_warning: false,
+      comply_cancel_order_warning: false,
+    },
+  }
+  log.info('send afterTranslation params:', data)
+  axios({
+    method: 'post',
+    data: data,
+    url: `https://${host}/webchat/api/v1.2/messages`,
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+  })
+    .then(res => {
+      log.info('send afterTranslation success', res.data)
+      // 清除文本框
+      mainWindowNotifier('CLEAR_TEXTAREA')
     })
-    .catch(error => {
-      dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
-      log.error('translation faild:', error)
+    .catch(err => {
+      dialog.showErrorBox('提示', '发送失败，请重试')
+      log.error('send afterTranslation faild', err.response.data)
     })
 }
 
@@ -444,23 +461,17 @@ async function loopSyncTask() {
         return result
       })
     )
-    messageFlag = true
-    appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
-    clearInterval(messageTimer)
 
+    let haveNewMessage = Lib.compare(messageQuene, syncResult) //本次消息和上次消息对比
     try {
       let unreadMessageCount = syncResult
         .map(el => el.unread_message_count)
         .reduce((prev, curr) => prev + curr)
-      // 如果未读消息大于1
-      if (unreadMessageCount > 0) {
-        mainWindowNotifier(
-          'NEW_MESSAGE',
-          syncResult,
-          '未读消息数：',
-          unreadMessageCount
-        )
-        mainWindow.flashFrame(true)
+
+      // 如果未读消息大于1且本次消息和上次消息不同
+      if (unreadMessageCount > 0 && !haveNewMessage) {
+        messageQuene = syncResult //覆盖上次消息
+        mainWindow.flashFrame(true) //窗口闪动
         messageTimer = setInterval(() => {
           messageFlag = !messageFlag
           if (messageFlag) {
@@ -469,6 +480,16 @@ async function loopSyncTask() {
             appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
           }
         }, 650)
+        mainWindowNotifier(
+          'NEW_MESSAGE',
+          syncResult.filter(item => item.unread_count)
+        )
+      }
+      //如果没有未读消息就停止通知
+      if (!unreadMessageCount) {
+        messageFlag = true
+        appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
+        clearInterval(messageTimer)
       }
     } catch (error) {
       log.error('unreadMessageCount error:', unreadMessageCount, error)
@@ -477,7 +498,7 @@ async function loopSyncTask() {
     log.info(
       '======================shopee sync message end   ======================'
     )
-  }, 10000)
+  }, 5000)
 }
 
 // 同步用户未读消息等
@@ -493,7 +514,8 @@ async function syncShopeeMessage(storeInfo) {
       },
     })
       .then(res => {
-        resolve(res.data)
+        let { cookies, token, password, ...storeBaseInfo } = storeInfo
+        resolve(Object.assign(storeBaseInfo, res.data))
       })
       .catch(error => {
         reject(error)
@@ -540,6 +562,6 @@ app.on('ready', async () => {
   await createTray()
 })
 
-// app.on('window-all-closed', () => {
-//   if (appIcon) appIcon.destroy()
-// })
+app.on('window-all-closed', () => {
+  if (appIcon) appIcon.destroy()
+})
