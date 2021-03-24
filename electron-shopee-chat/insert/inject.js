@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
 const $ = require('jquery')
+const { default: axios } = require('axios')
 
 // 将链接中携带的店铺信息放进storage
 if (location.search) {
@@ -18,6 +19,12 @@ if (location.search) {
   if (unReadMessage) {
     addNewUnReadMessageForStore(unReadMessage)
   }
+}
+
+function storageGet(key) {
+  return sessionStorage.getItem(key)
+    ? JSON.parse(sessionStorage.getItem(key))
+    : null
 }
 
 function addCssByLink(url) {
@@ -87,9 +94,9 @@ $(function () {
         <div class="emalacca-logout">退出登录</div>
     </div>
     <div class="emalacca-store-operation">
-        <span>卖家中心</span>
-        <span>解绑商店</span>
-        <span>修改别名</span>
+        <span action-type="seller-center">卖家中心</span>
+        <span action-type="remove-bind">解绑商店</span>
+        <span action-type="modify-alias">修改别名</span>
     </div>`
   )
   $('body').append(leftMenuWrap)
@@ -154,24 +161,25 @@ $(function () {
       let offset = $(this).offset()
       $storeOperation
         .css({
-          left: offset.left + 52,
+          left: offset.left + 46,
           top: offset.top,
         })
         .show()
+        .mouseleave(function () {
+          $storeOperation.hide()
+          $storeOperation.attr('data-store', '')
+        })
+        .click(function (e) {
+          //   console.log(e.target.getAttribute('action-type'))
+          let actionType = e.target.getAttribute('action-type')
+          dispatchStoreAction(actionType, storeId)
+        })
     }
   })
 
-  //
-  function handleClick(evt) {
-    if (!evt.target.closest('.em-icon-elipsis-v')) {
-      console.log('在下拉菜单区域外点击')
-      let $storeOperation = $('.emalacca-store-operation')
-      $storeOperation.hide()
-      $storeOperation.attr('data-store', '')
-    }
-  }
   // 菜单点击
   $('.emalacca-client-menu-fixed').click(function (e) {
+    $('textarea').val('')
     let key = e.target.getAttribute('data-key')
     if (key) {
       let storeId = e.target.getAttribute('data-store')
@@ -196,14 +204,16 @@ $(function () {
   })
 
   // 退出erp操作
-  $('.emalacca-logout').click(function () {
-    ipcNotice({
-      type: 'ERP_LOGOUT',
+  $('.emalacca-logout')
+    .click(function () {
+      ipcNotice({
+        type: 'ERP_LOGOUT',
+      })
     })
-  })
+    .mouseleave(function () {
+      $(this).hide()
+    })
 
-  //全局点击监听
-  window.addEventListener('click', handleClick)
   //添加店铺操作
   $('.add-store').click(function (param) {
     console.log('添加店铺')
@@ -258,7 +268,7 @@ window.onmousewheel = function (e) {
 
 //接收主进程的消息
 function ReceiveMasterMessage() {
-  ipcRenderer.on('mainWindow-message', (e, args) => {
+  ipcRenderer.on('mainWindow-message', async (e, args) => {
     let { type, params } = args
     console.log(type, params)
     switch (type) {
@@ -283,7 +293,7 @@ function ReceiveMasterMessage() {
         break
       case 'NEW_MESSAGE': //新消息提醒
         MessageNotify.play()
-        addNewUnReadMessageForStore(params)
+        await addNewUnReadMessageForStore(params)
         sessionStorage.setItem('unReadMessage', JSON.stringify(params)) //把未读存起来
       case 'REPLACE_TEXTAREA': // 替换待发送的文本
         $('textarea').text(params)
@@ -313,26 +323,31 @@ function appendTranslateButton(params) {
   let { buyer_id } = params
   const langOptions = [
     { lang: 'zh', langName: '中文' },
+    { lang: 'zh-TW', langName: '中文繁体' },
     { lang: 'EN', currency: 'SGD', langName: '英语' },
-    { lang: 'PH', currency: 'PHP', langName: '菲律宾语' },
-    { lang: 'MY', currency: 'MYR', langName: '马来语' },
+    { lang: 'tl', currency: 'PHP', langName: '菲律宾语' },
+    { lang: 'ms', currency: 'MYR', langName: '马来语' },
     { lang: 'ID', currency: 'IDR', langName: '印尼语' },
     { lang: 'TH', currency: 'THB', langName: '泰语' },
-    { lang: 'VN', currency: 'VND', langName: '越南语' },
-    { lang: 'BR', currency: 'BRL', langName: '巴西语' },
+    { lang: 'VI', currency: 'VND', langName: '越南语' },
+    { lang: 'pt', currency: 'BRL', langName: '葡萄牙语' },
   ]
-  const checkedLang = 'EN'
+
+  var checkedLang = storageGet('currentLang') || {
+    lang: 'EN',
+    langName: '英语',
+  }
   setTimeout(() => {
-    // if (!$('.emalacca-client-translate-msg-bottom')) {
     let langOptionsNode = ''
-    langOptions.map(el => {
-      langOptionsNode += `<li><span class="em-iconfont em-icon-right1" style="visibility:${
-        checkedLang == el.lang ? 'inherit' : 'hidden'
+    langOptions.map((el, index) => {
+      langOptionsNode += `<li data-lang="${el.lang}" data-langName="${
+        el.langName
+      }" data-index="${index}">
+      <span class="em-iconfont em-icon-right1" style="visibility:${
+        checkedLang.lang == el.lang ? 'inherit' : 'hidden'
       }"></span>${el.langName}</li>`
     })
-    // $('textarea')
-    //   .parent()
-    //   .append(
+    //这种方式插入节点可以使原本的回车事件失效
     document.querySelector(
       'textarea'
     ).parentNode.innerHTML += `<div class="emalacca-client-translate-msg-bottom">
@@ -340,13 +355,16 @@ function appendTranslateButton(params) {
                         <div class="lang-options">
                           ${langOptionsNode}
                         </div>
-                        <span class="lang-btn selected-lang">英语<span class="em-iconfont em-icon-13"></span></span>
+                        <div class="lang-btn selected-lang">
+                            <span>${checkedLang.langName}</span>
+                            <span class="em-iconfont em-icon-13"></span>
+                        </div>
                     </div>
                     <span class="lang-btn translate-btn">翻译</span>
                     <span class="lang-btn send-btn">发送</span>
                 </div>
                `
-    //   )
+
     $('.selected-lang').click(function () {
       $('.lang-options').toggle()
       $('.lang-options').mouseleave(function () {
@@ -354,33 +372,51 @@ function appendTranslateButton(params) {
       })
     })
 
+    //选择语言
+    $('.lang-options').click(function (e) {
+      let lang = e.target.getAttribute('data-lang')
+      let langName = e.target.getAttribute('data-langName')
+      let index = e.target.getAttribute('data-index')
+      checkedLang.lang = lang
+      checkedLang.langName = langName
+      sessionStorage.setItem('currentLang', JSON.stringify(checkedLang))
+      $('.selected-lang span:eq(0)').text(langName)
+      $('.lang-options li span').css('visibility', 'hidden')
+      $(`.lang-options li span:eq(${index})`).css('visibility', 'inherit')
+      $(this).hide()
+    })
+    //翻译按钮
     $('.translate-btn').click(function () {
-      handleTranslation(buyer_id, checkedLang)
+      handleTranslation(checkedLang.lang)
+    })
+    //发送按钮
+    $('.send-btn').click(function () {
+      dispatchSendMessage(buyer_id)
     })
 
-    $('.send-btn').click(function () {
-      handleSendMessage(buyer_id)
-    })
+    //文本框回车
     $('textarea').keyup(function (event) {
       if (event.shiftKey && event.keyCode == 13) {
         return false
       }
       if (event.keyCode == 13) {
         event.preventDefault()
-        handleSendMessage(buyer_id)
+        event.stopPropagation()
+        dispatchSendMessage(buyer_id)
       }
     })
-    $('textarea').keyup(function (e) {
-      $(this).text(e.target.value)
-      $(this).val(e.target.value)
+    // 输入监听
+    $(`body`).delegate('textarea', 'propetychange input', function () {
+      //监听
+      $(this).val($(this).val())
+      $(this).text($(this).val())
     })
   }, 1000)
 }
 
 //翻译待发送的文本
-async function handleTranslation(buyer_id, targetLang) {
-  let currentPageCountry = $('html').attr('class').toLocaleLowerCase() //当前页面获取到的国家
-  targetLang = targetLang || currentPageCountry
+async function handleTranslation(targetLang) {
+  //   let currentPageCountry = $('html').attr('class').toLocaleLowerCase() //当前页面获取到的国家
   ipcNotice({
     type: 'TRANS_TEXT',
     params: {
@@ -391,22 +427,72 @@ async function handleTranslation(buyer_id, targetLang) {
   })
 }
 
+//发送消息分发
+async function dispatchSendMessage(buyer_id) {
+  // 要区分图片还是文本
+  if ($('section img').length == 0 && !$('textarea').val()) {
+    ipcNotice({
+      type: 'ERROR_DIALOG',
+      params: '请输入消息内容',
+    })
+    $('textarea').val('')
+    return false
+  }
+  let messageType = $('section img').length > 0 ? 'image' : 'text'
+
+  if (messageType == 'image') {
+    $('section img').each(async function () {
+      //先上传图片
+      let imagesParams = {
+        type: 'image',
+        content: {
+          width: $(this).width(),
+          height: $(this).height(),
+          file_server_id: 0,
+        },
+      }
+      try {
+        let base64 = await getBase64($(this).attr('src'))
+        let imageUrl = handleUpload(base64)
+        imagesParams.content.url = imageUrl
+        handleSendMessage(buyer_id, imagesParams)
+      } catch (error) {
+        ipcNotice({
+          type: 'ERROR_DIALOG',
+          params: '消息发送失败',
+        })
+        ipcNotice({
+          type: 'WRITE_LOG',
+          params: error,
+        })
+      }
+    })
+  } else {
+    let textParams = {
+      type: 'text',
+      content: {
+        text: $('textarea').text(),
+      },
+    }
+    handleSendMessage(buyer_id, textParams)
+  }
+}
+
 //发送消息
-async function handleSendMessage(buyer_id) {
+async function handleSendMessage(buyer_id, params) {
   localforage
     .getItem('session')
     .then(function (value) {
       // 当离线仓库中的值被载入时，此处代码运行
       let { token } = value
-      console.log(token)
+      const baseInfo = {
+        host: location.host,
+        token: token,
+        to_id: buyer_id,
+      }
       ipcNotice({
         type: 'SEND_MESSAGE',
-        params: {
-          host: location.host,
-          token: token,
-          messageText: $('textarea').text(),
-          to_id: buyer_id,
-        },
+        params: Object.assign(baseInfo, params),
       })
     })
     .catch(function (err) {
@@ -418,4 +504,99 @@ async function handleSendMessage(buyer_id) {
 // 向主线程发送消息
 function ipcNotice({ type, params }) {
   ipcRenderer.send('inject-message', { type: type, params: params })
+}
+
+//blob转base64
+async function getBase64(url) {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest()
+    xhr.open('get', url, true)
+    xhr.responseType = 'blob'
+    xhr.onload = function () {
+      if (this.status === 200) {
+        var blob = this.response
+        var fileReader = new FileReader()
+        fileReader.onloadend = function (e) {
+          var result = e.target.result
+          resolve(result)
+        }
+        fileReader.readAsDataURL(blob)
+      }
+    }
+    xhr.onerror = function () {
+      reject()
+    }
+    xhr.send()
+  })
+}
+
+//base64转文件对象
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n)
+  filename = `${filename}.jpg`
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
+
+//虾皮上传图片
+async function handleUpload(base64) {
+  new Promise((resolve, reject) => {
+    let randomName = Math.random().toString(36).substring(2)
+    formData.append('file', dataURLtoFile(base64, randomName))
+    // formData.append('conversation_id', 1451748750830325495)
+    axios({
+      method: 'post',
+      data: formData,
+      url: `${location.origin}/webchat/api/v1.2/images`,
+    })
+      .then(res => {
+        if (res.data.url) {
+          resolve(res.data.url)
+        } else {
+          ipcNotice({
+            type: 'ERROR_DIALOG',
+            params: '消息发送失败',
+          })
+          reject(-1)
+        }
+      })
+      .catch(error => {
+        ipcNotice({
+          type: 'ERROR_DIALOG',
+          params: '消息发送失败',
+        })
+        ipcNotice({
+          type: 'WRITE_LOG',
+          params: error,
+        })
+      })
+  })
+}
+
+/**
+ * 店铺操作分发
+ *
+ * @param {*} actionType seller-center|remove-bind|modify-alias
+ * @param {*} storeId  店铺ID
+ */
+function dispatchStoreAction(actionType, storeId) {
+  switch (actionType) {
+    case 'seller-center':
+      window.open(location.origin)
+      break
+    case 'remove-bind':
+      ipcNotice({
+        type: 'REMOVE_BIND_STORE',
+        params: storeId,
+      })
+      break
+    default:
+      break
+  }
 }

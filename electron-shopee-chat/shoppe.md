@@ -23,3 +23,11 @@ cookies 中有一项是和服务器 session 强关联的，所以在网站取用
 日志路径可 通过 console.log(log.transports.file.file)查看，
 
 ### 用户授权信息保存在项目目录 storage.json 下，目前写的是固定的两个店铺信息和 erp 授权信息，后面可根据后段提供的接口进行调整
+
+### 虾皮上传文件
+
+https://seller.shopee.com.my/webchat/api/v1.2/images?_uid=0-341561079&_v=5.1.2&csrf_token=FmEhdIxNEeuYfgS9cD%2BIIg%3D%3D
+
+conversation_id: 1451748750830325495
+
+file: 二进制文件

@@ -7,7 +7,6 @@ const {
   shell,
   dialog,
   BrowserView,
-  Notification,
   Menu,
   Tray,
   nativeImage,
@@ -15,12 +14,14 @@ const {
 const axios = require('axios')
 const log = require('electron-log')
 const Lib = require('./utils/lib')
+const API = require('../../utils/api.conf')
 
 const path = require('path')
 const fs = require('fs')
 const googleTr = require('./utils/google-translate-server')
 
 const storage = require('electron-localstorage')
+const { resolve } = require('path')
 storage.setStoragePath(path.join(app.getAppPath(), 'storage.json')) // stoage存储路径
 
 log.transports.file.level = true //是否输出到 日志文件
@@ -115,11 +116,11 @@ async function createBrowserWin() {
   mainWindow.webContents.on(
     'new-window',
     (event, url, frameName, disposition) => {
-      if (disposition == 'new-window') {
-        // log.info('new window', disposition, url)
-        event.preventDefault()
-        shell.openExternal(url)
-      }
+      //   if (disposition == 'new-window') {
+      //     // log.info('new window', disposition, url)
+      //     event.preventDefault()
+      //     shell.openExternal(url)
+      //   }
     }
   )
 
@@ -229,7 +230,7 @@ async function setIntercept() {
 // 监听渲染进程消息
 async function injectMessageMonitor() {
   // 监听渲染线程消息
-  ipcMain.on('inject-message', (e, args) => {
+  ipcMain.on('inject-message', async (e, args) => {
     log.info('inject message', 'params:', args)
     let { type, params } = args
     switch (type) {
@@ -260,15 +261,17 @@ async function injectMessageMonitor() {
           }
         }
         break
-
       case 'TRANS_TEXT': // 翻译文本
         handleTranslation(params)
         break
       case 'SEND_MESSAGE': //发送消息操作
         sendMessage(params)
         break
+      case 'UPLOAD_IMAGE': //上传图片
+        handleUploadImage(params)
+        break
       case 'ERROR_DIALOG': //错误提示
-        dialog.showErrorBox('提示', params.content)
+        dialog.showErrorBox('提示', params)
         break
       case 'SET_ERP_AUTH': //erp授权
         if (params) {
@@ -314,6 +317,9 @@ async function injectMessageMonitor() {
       case 'CLOSE_CHILD_WINDOW': //关闭子窗口
         childWindow.close()
         break
+      case 'REMOVE_BIND_STORE': //解绑店铺
+        await handleRemoveBindStore(params)
+        break
       case 'SUCCESS_ADD_STORE': //添加店铺成功
         setTimeout(function () {
           childWindow.close()
@@ -352,7 +358,7 @@ async function handleTranslation({ type, messageText, targetLang }) {
     })
 }
 
-//检查erp授权状态
+// 检查erp授权状态
 function erpAuthValid() {
   log.info('check erp auth status')
   try {
@@ -369,7 +375,7 @@ function erpAuthValid() {
   }
 }
 
-//加载默认聊天窗口
+// 加载默认聊天窗口
 async function loadDefaultStoreChat() {
   mainWindow
     .loadURL(
@@ -413,21 +419,15 @@ async function mainWindowNotifier(type, params) {
 
 // 调用虾皮发送消息接口
 async function sendMessage(params) {
-  let { messageText, to_id, token, host } = params
-  if (!messageText) {
-    dialog.showErrorBox('提示', '请输入消息内容')
-    return false
-  }
-  let data = {
+  let { to_id, token, host, ...messageContent } = params
+  let data = Object.assign(messageContent, {
     request_id: Lib.guid(),
     to_id: parseInt(to_id),
-    type: 'text',
-    content: { text: messageText },
     chat_send_option: {
       force_send_cancel_order_warning: false,
       comply_cancel_order_warning: false,
     },
-  }
+  })
   log.info('send afterTranslation params:', data)
   axios({
     method: 'post',
@@ -445,6 +445,18 @@ async function sendMessage(params) {
     .catch(err => {
       dialog.showErrorBox('提示', '发送失败，请重试')
       log.error('send afterTranslation faild', err.response.data)
+    })
+}
+
+// 解绑店铺
+async function handleRemoveBindStore(storeId) {
+  API.handleRemoveStore(storeId)
+    .then(res => {
+      log.info('remove bind store success', res)
+    })
+    .catch(error => {
+      dialog.showErrorBox('提示', '解绑失败，请稍后重试')
+      log.error(error)
     })
 }
 
@@ -523,7 +535,7 @@ async function syncShopeeMessage(storeInfo) {
   })
 }
 
-//创建托盘
+// 创建托盘
 async function createTray() {
   try {
     appIcon = new Tray(path.join(__dirname, 'dark-logo.png'))

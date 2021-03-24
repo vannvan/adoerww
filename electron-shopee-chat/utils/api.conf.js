@@ -26,12 +26,11 @@ module.exports = API = {
   downloadExecle: function () {
     axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
     return new Promise((resolve, reject) => {
-      
       axios({
-        method:'get',
+        method: 'get',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         url: BASE_URL + '/product/crawl/talk/file/get-store-import-template',
-        responseType:'blob'
+        responseType: 'blob',
       })
         .then(res => {
           resolve(res)
@@ -47,6 +46,23 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/erp/store-list')
+        .then(res => {
+          resolve(res.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  handleRemoveStore: function (storeId) {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    let data = {
+      shopId: storeId,
+    }
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/del-store', data)
         .then(res => {
           resolve(res.data)
         })
