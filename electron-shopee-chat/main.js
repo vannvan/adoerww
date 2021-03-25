@@ -11,17 +11,20 @@ const {
   Tray,
   nativeImage,
 } = require('electron')
+
 const axios = require('axios')
 const log = require('electron-log')
 const Lib = require('./utils/lib')
-const API = require('../../utils/api.conf')
+const API = require('./utils/api.conf')
+const server = require('./utils/server')
 
 const path = require('path')
 const fs = require('fs')
 const googleTr = require('./utils/google-translate-server')
-
 const storage = require('electron-localstorage')
-const { resolve } = require('path')
+
+const SiteConfig = require('./conf/site')
+
 storage.setStoragePath(path.join(app.getAppPath(), 'storage.json')) // stoage存储路径
 
 log.transports.file.level = true //是否输出到 日志文件
@@ -37,6 +40,11 @@ var appIcon = null //托盘
 var messageFlag = true //托盘消息提示flag
 var messageTimer //托盘消息计时
 var messageQuene //消息队列
+const erpSystem = 'https://test-erp.emalacca.com'
+
+const Store = require('electron-store')
+let store = new Store({})
+store.set('siteConfig', SiteConfig)
 
 // app.dock.hide() //mac隐藏菜单
 Menu.setApplicationMenu(null) //windows隐藏菜单
@@ -56,7 +64,7 @@ fs.readFile(log.transports.file.file, function (err, data) {
   //   console.log('异步读取: ' + data.toString())
 })
 
-async function createBrowserWin() {
+async function createBrowserWindow() {
   // 设置窗口的高度和宽度
   mainWindow = new BrowserWindow({
     width: 980,
@@ -75,7 +83,7 @@ async function createBrowserWin() {
 
   if (!erpAuthValid()) {
     storage.setItem('erpAuthStatus', 1)
-    mainWindow.loadURL('https://test-erp.emalacca.com/auth/login')
+    mainWindow.loadURL(`${erpSystem}/auth/login`)
   } else {
     await loadDefaultStoreChat()
   }
@@ -177,20 +185,28 @@ async function setIntercept() {
   session.defaultSession.webRequest.onBeforeSendHeaders(
     filter,
     (details, callback) => {
-      //   log.info('request:', details.url)
       details.requestHeaders['user-agent'] =
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36'
       if (/shopee|xiapibuy/.test(details.url)) {
-        let authedStore = storage.getItem('authedStore') //已授权的店铺列表
-        let currentStoreId = String(storage.getItem('storeId')) // 当前所在的店铺
-        let currentStoreInfo = authedStore[currentStoreId]
-        let currentStoreCookies = currentStoreInfo.cookies
-        details.requestHeaders['authorization'] =
-          'Bearer ' + currentStoreInfo.token
-        details.requestHeaders['cookie'] = currentStoreCookies
-        details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
-        details.requestHeaders['x-v'] = '4'
+        try {
+          let authedStore = storage.getItem('authedStore') //已授权的店铺列表
+          let currentStoreId = String(store.get('currentStore')) // 当前所在的店铺
+          let currentStoreInfo = authedStore[currentStoreId]
+          let currentStoreCookies = currentStoreInfo.cookieStr
+          details.requestHeaders['authorization'] =
+            'Bearer ' + currentStoreInfo.token
+          details.requestHeaders['cookie'] = currentStoreCookies
+          details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
+          details.requestHeaders['x-v'] = '4'
+        } catch (error) {
+          log.error(error)
+          dialog.showErrorBox('提示', '店铺数据错误')
+        }
+
         if (/login/.test(details.url)) {
+          let authedStore = storage.getItem('authedStore') //已授权的店铺列表
+          let currentStoreId = String(store.get('currentStore')) // 当前所在的店铺
+          let currentStoreInfo = authedStore[currentStoreId]
           log.info(
             '======================shopee user auth action start======================'
           )
@@ -235,8 +251,8 @@ async function injectMessageMonitor() {
     let { type, params } = args
     switch (type) {
       case 'CHANGE_STORE': //切换店铺
-        storage.setItem('storeId', params.storeId) // 更新当前操作的店铺ID
-        storage.setItem('currentSite', params.key) //当前站点
+        store.set('currentStore', params.storeId) // 更新当前操作的店铺ID
+        store.set('currentSite', params.key) //当前站点
         //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
         if (params && params.storeId) {
           let exitCookies = storage.getItem('authedStore')[params.storeId]
@@ -278,18 +294,18 @@ async function injectMessageMonitor() {
           storage.setItem('erpAuthStatus', 1)
           params.expires_time = Date.parse(new Date()) / 1000 + 604800 //授权过期的具体时间
           storage.setItem('erpAuth', params)
-          loadDefaultStoreChat()
+          tryToGetAuthedStore().then(res => {
+            loadDefaultStoreChat()
+            console.log(res, 'ahahahahah')
+          })
         }
         break
       case 'ERP_LOGOUT': // erp退出
         storage.setItem('erpAuthStatus', -1)
-        storage.setItem('erpAuth', '')
         session.defaultSession.clearStorageData({
-          origin: 'https://test-erp.emalacca.com',
+          origin: erpSystem,
         })
-        mainWindow.webContents.loadURL(
-          'https://test-erp.emalacca.com/auth/login'
-        )
+        mainWindow.webContents.loadURL(`${erpSystem}/auth/login`)
         break
       case 'ADD_STORE': //添加店铺
         childWindow = new BrowserWindow({
@@ -305,6 +321,7 @@ async function injectMessageMonitor() {
               app.getAppPath(),
               '/components/add-store/child.js'
             ),
+            nodeIntegration: true,
           },
         })
         // childWindow.setAlwaysOnTop(true)
@@ -318,12 +335,40 @@ async function injectMessageMonitor() {
         childWindow.close()
         break
       case 'REMOVE_BIND_STORE': //解绑店铺
-        await handleRemoveBindStore(params)
+        server.handleRemoveBindStore(params).then(result => {
+          console.log(result, 'ahahahah')
+          if (result == 0) {
+            log.info('handleRemoveBindStore success')
+          } else {
+            dialog.showErrorBox('提示', '解绑失败，请稍后重试')
+          }
+        })
+
         break
       case 'SUCCESS_ADD_STORE': //添加店铺成功
         setTimeout(function () {
           childWindow.close()
         }, 2000)
+        break
+      case 'HANDLE_IMPORT_FILE': //导入文件
+        dialog
+          .showOpenDialog({
+            title: '请选择导入的文件',
+            buttonLabel: '导入文件',
+            properties: ['openFile'],
+            securityScopedBookmarks: true,
+            filters: [{ name: 'excel', extensions: ['xls', 'xlsx'] }],
+          })
+          .then(result => {
+            // 点击导入文件
+            console.log(result, 'result')
+            if (!result.canceled) {
+              API.importStoreFile(result.filePaths[0])
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
         break
     }
   })
@@ -354,7 +399,7 @@ async function handleTranslation({ type, messageText, targetLang }) {
     })
     .catch(error => {
       dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
-      log.error('translation faild:', error)
+      log.error('handleTranslation error:', error)
     })
 }
 
@@ -370,42 +415,35 @@ function erpAuthValid() {
     //说明token没过期
     return expires_time && expires_time > currentTime
   } catch (error) {
-    log.error(error)
+    log.error('erpAuthValid error:', error)
     return false
   }
 }
 
 // 加载默认聊天窗口
 async function loadDefaultStoreChat() {
+  let mainWindowDefaultPage = path.join(
+    app.getAppPath(),
+    '/empty-page/index.html'
+  )
+  let currentSite = store.get('currentSite')
+  if (currentSite) {
+    mainWindowDefaultPage = `https://${
+      store.get('siteConfig.shopeeSeller')[currentSite].host
+    }/webchat/conversations`
+  }
   mainWindow
-    .loadURL(
-      `https://seller.my.shopee.cn/webchat/conversations?storeId=338011596&site=my`
-    )
+    .loadURL(mainWindowDefaultPage)
     .then(() => {
       log.info('shopee is loaded')
     })
     .catch(err => {
       dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
-      log.error(err)
+      log.error('loadDefaultStoreChat error:', err)
     })
   mainWindow.setSize(1366, 780)
   mainWindow.setMinimumSize(1366, 780)
   mainWindow.center()
-  //   const leftWindow = new BrowserWindow({
-  //     show: false,
-  //     maximizable: false,
-  //     minimizable: false,
-  //     frame: false,
-  //     // parent: mainWindow,
-  //     width: 210,
-  //     x: 0,
-  //     y: 0,
-  //     zoomToPageWidth: true,
-  //   })
-  //   leftWindow.loadFile('main.html')
-  //   leftWindow.once('ready-to-show', () => {
-  //     leftWindow.show()
-  //   })
 }
 
 // 给渲染进程发送消息
@@ -444,19 +482,7 @@ async function sendMessage(params) {
     })
     .catch(err => {
       dialog.showErrorBox('提示', '发送失败，请重试')
-      log.error('send afterTranslation faild', err.response.data)
-    })
-}
-
-// 解绑店铺
-async function handleRemoveBindStore(storeId) {
-  API.handleRemoveStore(storeId)
-    .then(res => {
-      log.info('remove bind store success', res)
-    })
-    .catch(error => {
-      dialog.showErrorBox('提示', '解绑失败，请稍后重试')
-      log.error(error)
+      log.error('sendMessage error:', err.response.data)
     })
 }
 
@@ -504,7 +530,7 @@ async function loopSyncTask() {
         clearInterval(messageTimer)
       }
     } catch (error) {
-      log.error('unreadMessageCount error:', unreadMessageCount, error)
+      log.error('loopSyncTask error:', unreadMessageCount, error)
     }
     log.info('sync result:', JSON.stringify(syncResult))
     log.info(
@@ -535,6 +561,48 @@ async function syncShopeeMessage(storeInfo) {
   })
 }
 
+//检查店铺授权
+function tryToGetAuthedStore() {
+  return new Promise((resolve, reject) => {
+    const malacca_token = storage.getItem('erpAuth')
+    let authedStore = storage.getItem('authedStore') || {} //已授权的店铺列表
+    let storeMenuList = store.get('storeMenuList')
+    if (malacca_token) {
+      //如果本地存储没有授权信息
+      if (!storeMenuList) {
+        server.getAuthedAtore().then(() => {
+          resolve(1)
+        })
+      }
+      //在有店铺列表的情况下调获取token的接口
+      if (store.get('storeMenuList')) {
+        if (Object.keys(authedStore).length == 0) {
+          server.getStoreAuthInfo().then(res => {
+            if (res == -1) {
+              dialog.showErrorBox('提示', '店铺登录信息同步失败')
+            } else {
+              resolve(1)
+            }
+          })
+        }
+
+        let { expires_time } = authedStore
+        let currentTime = Date.parse(new Date()) / 1000
+        if (!expires_time || expires_time < currentTime) {
+          server.getStoreAuthInfo().then(res => {
+            if (res == -1) {
+              dialog.showErrorBox('提示', '店铺登录信息同步失败')
+            } else {
+              resolve(1)
+            }
+          }) //授权信息列表
+        }
+      }
+    }
+    reject(-1)
+  })
+}
+
 // 创建托盘
 async function createTray() {
   try {
@@ -546,11 +614,29 @@ async function createTray() {
           mainWindow.show()
         },
       },
+
       {
         label: '退出',
-        click: () => {
-          mainWindow.close()
-        },
+        submenu: [
+          {
+            label: '关闭程序',
+            click: () => {
+              mainWindow.close()
+            },
+          },
+          {
+            label: '清除缓存并关闭',
+            click: () => {
+              storage.setItem('erpAuthStatus', -1)
+              storage.clear()
+              store.clear()
+              session.defaultSession.clearStorageData({
+                origin: erpSystem,
+              })
+              mainWindow.close()
+            },
+          },
+        ],
       },
     ])
     appIcon.setToolTip('虾皮聊聊客户端')
@@ -564,14 +650,12 @@ async function createTray() {
 }
 
 app.on('ready', async () => {
-  let authedStore = storage.getItem('authedStore') //已授权的店铺列表
-  if (Object.keys(authedStore).length > 0) {
-    storage.setItem('storeId', Object.keys(authedStore)[0]) // 更新当前操作的店铺ID
-  }
-  await createBrowserWin()
-  await setIntercept()
-  await injectMessageMonitor()
-  await createTray()
+  tryToGetAuthedStore().then(async () => {
+    await createBrowserWindow()
+    await setIntercept()
+    await injectMessageMonitor()
+    await createTray()
+  })
 })
 
 app.on('window-all-closed', () => {

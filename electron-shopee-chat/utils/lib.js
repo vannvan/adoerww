@@ -1,3 +1,4 @@
+const SiteConfig = require('../conf/site')
 module.exports = Lib = {
   guid: function () {
     // 形如 57cc6dc7-e1d6-41a0-8be4-b9f4a33cd0be
@@ -18,5 +19,38 @@ module.exports = Lib = {
       return JSON.stringify(oldObj) == JSON.stringify(newObj)
     }
     return false
+  },
+
+  //店铺菜单分组
+  groupStore: function (source) {
+    let groups = []
+    source.forEach(o => {
+      let index = groups.findIndex(item => item && item.key == o.countryCode)
+      if (index < 0) {
+        groups.push({
+          key: o.countryCode,
+          siteName: SiteConfig.shopeeSeller[o.countryCode].siteName,
+          storeList: [o],
+        })
+      } else {
+        groups[index].storeList.push(o)
+      }
+    })
+    return groups
+  },
+
+  //解构接口错误信息
+  getError: function (error) {
+    let {
+      config: { url, method, data, headers },
+      message,
+    } = error
+    return {
+      url: url,
+      method: method,
+      data: data,
+      headers: headers,
+      message: message,
+    }
   },
 }

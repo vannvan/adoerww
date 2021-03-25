@@ -6,7 +6,7 @@ const malacca_token = storage.getItem('erpAuth')
   ? storage.getItem('erpAuth').access_token
   : null
 
-const BASE_URL = 'https://pre-erp.emalacca.com/api'
+const BASE_URL = 'http://192.168.50.87:8999/'
 module.exports = API = {
   // shoppe登录
   handleLoginShopee: function (params) {
@@ -40,7 +40,7 @@ module.exports = API = {
         })
     })
   },
-  // 获取店铺
+  // 获取erp店铺
   getErpStoreList: function () {
     axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
     return new Promise((resolve, reject) => {
@@ -55,6 +55,30 @@ module.exports = API = {
     })
   },
 
+  // 导入文件店铺
+  importStoreFile: function (files) {
+    // let formData = new FormData()
+    // console.log(formData, 'formData')
+    // for (let i in files) {
+    //   if (!isNaN(i)) {
+    //     formData.append('file', files[i])
+    //   }
+    // }
+    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/file/import-store', files)
+        .then(res => {
+          console.log(res, 'res')
+          resolve(res.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  //解绑店铺
   handleRemoveStore: function (storeId) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
     let data = {
@@ -64,7 +88,37 @@ module.exports = API = {
       axios
         .post(BASE_URL + '/product/crawl/talk/del-store', data)
         .then(res => {
-          resolve(res.data)
+          resolve(res)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  //获取聊聊店铺列表
+  handleGetChatClientStore: function () {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/store-list')
+        .then(res => {
+          resolve(res.data.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  //获取聊聊店铺授权列表，token，cookies
+  handleGetStoresAuthInfo: function () {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/store/all/get-token')
+        .then(res => {
+          resolve(res.data.data)
         })
         .catch(error => {
           reject(error)

@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
-    <!-- <link rel="stylesheet" href="https://at.alicdn.com/t/font_1833787_y77zoekr35.css"> -->
-    <!-- <link rel="stylesheet" href="bootstrap.min.css"> -->
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script> -->
+    <link rel="stylesheet" href="https://at.alicdn.com/t/font_1833787_y77zoekr35.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
     <style>
         ul,
         ol,
@@ -30,7 +30,8 @@
             margin-left: 24px;
         }
 
-        .is-em-active {
+        .is-em-active,
+        .fc-orange {
             color: #FF720D;
         }
 
@@ -48,7 +49,8 @@
             line-height: 28px;
         }
 
-        .em-tabs-content.is-em-content {
+        .em-tabs-content.is-em-content,
+        .em-tabs-footer.is-em-footer {
             display: block;
         }
 
@@ -61,12 +63,9 @@
             margin-top: 0;
         }
 
-        .em-tabs-footer {
+        .em-tabs-footer,
+        #errorAlert {
             display: none;
-        }
-
-        .em-tabs-footer.is-em-footer {
-            display: block;
         }
 
         .em-input-items+.em-input-items {
@@ -86,16 +85,10 @@
             right: 10px;
         }
 
-        .em-iconfont-password {
+        .em-iconfont-password,
+        .downloadExecle,
+        .fc-orange {
             cursor: pointer;
-        }
-
-        .downloadExecle {
-            cursor: pointer;
-        }
-
-        #errorAlert {
-            display: none;
         }
 
         .success-toast {
@@ -196,7 +189,7 @@
                     </div>
                     <div class="em-tabs-content">
                         <h6>请选择你要导入的店铺</h6>
-                        <div>店铺列表来源于马六甲ERP授权店铺, <span>查看详情</span></div>
+                        <div>店铺列表来源于马六甲ERP授权店铺, <span id="erpEmalaccaStore" class="fc-orange">查看详情</span></div>
                     </div>
                 </div>
 
@@ -221,8 +214,8 @@
         操作成功！
     </div>
 </body>
+<script src="addStore.js"></script>
 <!-- <script src="bootstrap.min.js"></script> -->
 
-<script type="module" src="addStore.js"></script>
 
 </html>

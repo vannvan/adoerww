@@ -2,16 +2,12 @@ const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
 const $ = require('jquery')
 const { default: axios } = require('axios')
+const Store = require('electron-store')
+let store = new Store()
+// console.log(store.get('siteConfig.langOptions'))
 
 // 将链接中携带的店铺信息放进storage
 if (location.search) {
-  let query = {}
-  window.location.search.replace(
-    /([^?&=]+)=([^&]+)/g,
-    (_, k, v) => (query[k] = v)
-  )
-  let storeInfo = { storeId: query.storeId, currentSite: query.site }
-  sessionStorage.setItem('storeInfo', JSON.stringify(storeInfo))
   //未读消息
   let unReadMessage = sessionStorage.getItem('unReadMessage')
     ? JSON.parse(sessionStorage.getItem('unReadMessage'))
@@ -37,6 +33,7 @@ function addCssByLink(url) {
   if (heads.length) heads[0].appendChild(link)
   else doc.documentElement.appendChild(link)
 }
+
 //加载阿里图标
 addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
 const Site = {
@@ -72,6 +69,7 @@ const Site = {
     { name: '越南', key: 'vn' },
   ],
 }
+const storeMenuList = store.get('storeMenuList')
 //消息通知
 const MessageNotify = document.createElement('audio')
 MessageNotify.src =
@@ -100,22 +98,19 @@ $(function () {
     </div>`
   )
   $('body').append(leftMenuWrap)
-  Site.siteOption.map(el => {
-    let storeInfo = sessionStorage.getItem('storeInfo')
-    if (storeInfo) {
-      currentStoreId = JSON.parse(storeInfo).storeId
-      currentSite = JSON.parse(storeInfo).currentSite
-    }
+  storeMenuList.map(el => {
+    currentStoreId = store.get('currentStore')
+    currentSite = store.get('currentSite')
     let storeListEl = ''
     if (el.storeList && el.storeList.length > 0) {
       el.storeList.map(subEl => {
-        let background = currentStoreId == subEl.storeId ? '#FF720D' : '#fff'
-        let color = currentStoreId == subEl.storeId ? '#fff' : '#000'
-        let highlightClass = currentStoreId == subEl.storeId ? 'active' : ''
+        let background = currentStoreId == subEl.shopId ? '#FF720D' : '#fff'
+        let color = currentStoreId == subEl.shopId ? '#fff' : '#000'
+        let highlightClass = currentStoreId == subEl.shopId ? 'active' : ''
         storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
-          <span data-store="${subEl.storeId}" data-key="${el.key}"> ${subEl.name}</span>
-          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${subEl.storeId}"></span>
-          <span class="new-message-tip" data-store="${subEl.storeId}"></span>
+          <span data-store="${subEl.shopId}" data-key="${el.key}"> ${subEl.storeName}</span>
+          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${subEl.shopId}"></span>
+          <span class="new-message-tip" data-store="${subEl.shopId}"></span>
         </li>`
       })
     }
@@ -130,7 +125,7 @@ $(function () {
         currentSite == el.key ? 'show-list' : ''
       }" for="site-${el.key}">
           <i class="icon em-iconfont em-icon-right"></i>
-          <span> ${el.name}</span>
+          <span> ${el.siteName}</span>
           </label>
           ${checkBox}
           <div class="store-list-wrap" >
@@ -169,12 +164,14 @@ $(function () {
           $storeOperation.hide()
           $storeOperation.attr('data-store', '')
         })
-        .click(function (e) {
-          //   console.log(e.target.getAttribute('action-type'))
-          let actionType = e.target.getAttribute('action-type')
-          dispatchStoreAction(actionType, storeId)
-        })
     }
+  })
+  //店铺操作
+  $('.emalacca-store-operation').click(function (e) {
+    //   console.log(e.target.getAttribute('action-type'))
+    e.preventDefault()
+    let actionType = e.target.getAttribute('action-type')
+    dispatchStoreAction(actionType, $(this).attr('data-store'))
   })
 
   // 菜单点击
@@ -183,19 +180,15 @@ $(function () {
     let key = e.target.getAttribute('data-key')
     if (key) {
       let storeId = e.target.getAttribute('data-store')
-      // 如果选中的可存下的店铺相同，就不动
-      let storeEdInfo = sessionStorage.getItem('storeInfo')
-      if (storeEdInfo) {
-        currentStoreId = JSON.parse(storeEdInfo).storeId
-        if (currentStoreId && currentStoreId == storeId) {
-          return false
-        }
+      // 如果选中的和存下的店铺相同，就不动
+      if (storeId == store.get('currentStore')) {
+        return false
       }
       //切换店铺
       ipcNotice({
         type: 'CHANGE_STORE',
         params: {
-          host: Site.shopeeSeller[key].host,
+          host: store.get('siteConfig.shopeeSeller')[key].host,
           storeId: storeId,
           key: key,
         },
@@ -321,20 +314,10 @@ async function addNewUnReadMessageForStore(newMessageParams) {
 // 添加翻译按钮
 function appendTranslateButton(params) {
   let { buyer_id } = params
-  const langOptions = [
-    { lang: 'zh', langName: '中文' },
-    { lang: 'zh-TW', langName: '中文繁体' },
-    { lang: 'EN', currency: 'SGD', langName: '英语' },
-    { lang: 'tl', currency: 'PHP', langName: '菲律宾语' },
-    { lang: 'ms', currency: 'MYR', langName: '马来语' },
-    { lang: 'ID', currency: 'IDR', langName: '印尼语' },
-    { lang: 'TH', currency: 'THB', langName: '泰语' },
-    { lang: 'VI', currency: 'VND', langName: '越南语' },
-    { lang: 'pt', currency: 'BRL', langName: '葡萄牙语' },
-  ]
+  const langOptions = store.get('siteConfig.langOptions')
 
   var checkedLang = storageGet('currentLang') || {
-    lang: 'EN',
+    lang: 'en',
     langName: '英语',
   }
   setTimeout(() => {

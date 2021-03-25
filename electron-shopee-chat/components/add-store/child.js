@@ -1,11 +1,8 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, shell } = require('electron')
 const API = require('../../utils/api.conf')
 const log = require('electron-log')
-require('bootstrap/dist/css/bootstrap.min.css')
-require('bootstrap/dist/js/bootstrap.min.js')
-
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
@@ -21,7 +18,6 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   $('#close').click(function (param) {
-    console.log('关闭子窗口')
     ipcNotice({
       type: 'CLOSE_CHILD_WINDOW',
     })
@@ -31,6 +27,16 @@ window.addEventListener('DOMContentLoaded', () => {
   })
   $('.downloadExecle').click(function () {
     // downloadExecle()
+  })
+  $('#erpEmalaccaStore').click(function () {
+    shell.openExternal('https://test-erp.emalacca.com/store/page')
+  })
+
+  $('#handleImportFile').click(() => {
+    // ipcNotice({
+    //   type: 'HANDLE_IMPORT_FILE',
+    // })
+    /* FormData 是表单数据类 */
   })
 })
 
