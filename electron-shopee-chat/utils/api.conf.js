@@ -2,15 +2,17 @@ const { default: axios } = require('axios')
 const storage = require('electron-localstorage')
 storage.setStoragePath('./storage.json')
 
-const malacca_token = storage.getItem('erpAuth')
-  ? storage.getItem('erpAuth').access_token
-  : null
+function getToken() {
+  return storage.getItem('erpAuth')
+    ? storage.getItem('erpAuth').access_token
+    : null
+}
 
 const BASE_URL = 'http://192.168.50.87:8999/'
 module.exports = API = {
   // shoppe登录
   handleLoginShopee: function (params) {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/login', params)
@@ -24,7 +26,7 @@ module.exports = API = {
   },
   // 下载模板
   downloadExecle: function () {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios({
         method: 'get',
@@ -42,7 +44,7 @@ module.exports = API = {
   },
   // 获取erp店铺
   getErpStoreList: function () {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/erp/store-list')
@@ -64,7 +66,7 @@ module.exports = API = {
     //     formData.append('file', files[i])
     //   }
     // }
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/file/import-store', files)
@@ -80,7 +82,7 @@ module.exports = API = {
 
   //解绑店铺
   handleRemoveStore: function (storeId) {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     let data = {
       shopId: storeId,
     }
@@ -88,7 +90,7 @@ module.exports = API = {
       axios
         .post(BASE_URL + '/product/crawl/talk/del-store', data)
         .then(res => {
-          resolve(res)
+          resolve(res.data)
         })
         .catch(error => {
           reject(error)
@@ -98,7 +100,7 @@ module.exports = API = {
 
   //获取聊聊店铺列表
   handleGetChatClientStore: function () {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/store-list')
@@ -113,7 +115,7 @@ module.exports = API = {
 
   //获取聊聊店铺授权列表，token，cookies
   handleGetStoresAuthInfo: function () {
-    axios.defaults.headers['Authorization'] = 'Bearer ' + malacca_token
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/store/all/get-token')

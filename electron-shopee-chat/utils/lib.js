@@ -23,6 +23,9 @@ module.exports = Lib = {
 
   //店铺菜单分组
   groupStore: function (source) {
+    if (source.length == 0) {
+      return null
+    }
     let groups = []
     source.forEach(o => {
       let index = groups.findIndex(item => item && item.key == o.countryCode)

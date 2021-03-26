@@ -2,6 +2,11 @@ console.log('erp inject')
 const { ipcRenderer } = require('electron')
 
 var globalTimer = null
+window._VV.$router.beforeEach(function (to, from, next) {
+  if (to.name != 'overview') {
+    next()
+  }
+})
 
 async function loopGetStorageTask() {
   try {
