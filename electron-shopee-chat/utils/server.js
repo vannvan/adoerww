@@ -1,4 +1,4 @@
-const { app } = require('electron')
+// const { app } = require('electron')
 const storage = require('electron-localstorage')
 const API = require('./api.conf')
 const Lib = require('./lib')
@@ -7,9 +7,8 @@ const Store = require('electron-store')
 let store = new Store({})
 
 const log = require('electron-log')
-const path = require('path')
-
-storage.setStoragePath(path.join(app.getAppPath(), 'storage.json')) // stoage存储路径
+// const path = require('path')
+storage.setStoragePath('./storage.json') // stoage存储路径
 
 module.exports = server = {
   //获取已授权店铺

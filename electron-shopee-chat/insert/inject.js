@@ -36,44 +36,10 @@ function addCssByLink(url) {
 
 //加载阿里图标
 addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
-const Site = {
-  shopeeSeller: {
-    my: { host: 'seller.my.shopee.cn', lang: 'en' },
-    br: { host: 'seller.shopee.com.br', lang: 'br' },
-    id: { host: 'seller.shopee.co.id', lang: 'id' },
-    th: { host: 'seller.shopee.co.th', lang: 'th' },
-    sg: { host: 'seller.shopee.sg', lang: 'sg' },
-    ph: { host: 'seller.shopee.ph', lang: 'ph' },
-    vn: { host: 'seller.shopee.vn', lang: 'vn' },
-    tw: { host: 'seller.shopee.tw', lang: 'tw' },
-  },
-  siteOption: [
-    {
-      name: '马来西亚',
-      key: 'my',
-      storeList: [
-        { name: 'aimiao', storeId: '341561079' },
-        { name: 'mailing', storeId: '338011596' },
-      ],
-    },
-    {
-      name: '菲律宾',
-      key: 'ph',
-      storeList: [{ name: 'feilvb', storeId: '128728821' }],
-    },
-    { name: '泰国', key: 'th' },
-    { name: '新加坡', key: 'sg' },
-    { name: '台湾', key: 'tw' },
-    { name: '巴西', key: 'br' },
-    { name: '印度尼西亚', key: 'id' },
-    { name: '越南', key: 'vn' },
-  ],
-}
 const storeMenuList = store.get('storeMenuList')
 //消息通知
 const MessageNotify = document.createElement('audio')
-MessageNotify.src =
-  'https://downsc.chinaz.net/Files/DownLoad/sound1/202012/13724.mp3'
+MessageNotify.src = store.get('noticeSounds')
 
 var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = null
@@ -95,7 +61,13 @@ $(function () {
         <span action-type="seller-center">卖家中心</span>
         <span action-type="remove-bind">解绑商店</span>
         <span action-type="modify-alias">修改别名</span>
-    </div>`
+    </div>
+    <div class="emalacca-store-input">
+        <input />
+        <span class="btn cancel">取消</span>
+        <span class="btn ok">保存</span>
+    </div>
+    `
   )
   $('body').append(leftMenuWrap)
   storeMenuList.map(el => {
@@ -108,8 +80,12 @@ $(function () {
         let color = currentStoreId == subEl.shopId ? '#fff' : '#000'
         let highlightClass = currentStoreId == subEl.shopId ? 'active' : ''
         storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
-          <span data-store="${subEl.shopId}" data-key="${el.key}"> ${subEl.storeName}</span>
-          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${subEl.shopId}"></span>
+          <span class="store-item-name" data-store="${
+            subEl.shopId
+          }" data-key="${el.key}"> ${subEl.storeAlias || subEl.storeName}</span>
+          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${
+            subEl.shopId
+          }"></span>
           <span class="new-message-tip" data-store="${subEl.shopId}"></span>
         </li>`
       })
@@ -220,18 +196,6 @@ $(function () {
   })
 })
 
-if (/webchat\/conversations/.test(location.pathname)) {
-  setTimeout(() => {
-    // 高亮当前店铺
-    let userInfo = sessionStorage.getItem('userInfo')
-      ? JSON.parse(sessionStorage.getItem('userInfo'))
-      : null
-    if (userInfo) {
-      //
-    }
-  }, 200)
-}
-
 window.onmousewheel = function (e) {
   //   e = e || window.event
   let messageEl = [...document.querySelectorAll('pre')]
@@ -285,9 +249,12 @@ function ReceiveMasterMessage() {
         document.querySelector('textarea').value = ''
         break
       case 'NEW_MESSAGE': //新消息提醒
-        MessageNotify.play()
-        await addNewUnReadMessageForStore(params)
-        sessionStorage.setItem('unReadMessage', JSON.stringify(params)) //把未读存起来
+        let { messageList, noticeEnable } = params
+        if (noticeEnable) {
+          MessageNotify.play()
+        }
+        await addNewUnReadMessageForStore(messageList)
+        sessionStorage.setItem('unReadMessage', JSON.stringify(messageList)) //把未读存起来
       case 'REPLACE_TEXTAREA': // 替换待发送的文本
         $('textarea').text(params)
         $('textarea').val(params) //替换textarea文本
@@ -579,6 +546,32 @@ function dispatchStoreAction(actionType, storeId) {
         params: storeId,
       })
       break
+    case 'modify-alias':
+      //找到该店铺的位置
+      let $storeItemName = $(`.store-item-name[data-store='${storeId}']`)
+      console.log($storeItemName)
+      $('.emalacca-store-input').css({
+        top: $storeItemName.offset().top,
+        display: 'flex',
+      })
+      $('.emalacca-store-input input').focus()
+      $('.emalacca-store-input .cancel').click(function () {
+        $('.emalacca-store-input').hide()
+      })
+      $('.emalacca-store-input .ok').click(function () {
+        let aliasName = $('.emalacca-store-input input').val()
+        if (!aliasName) {
+          ipcNotice({
+            type: 'ERROR_DIALOG',
+            params: '请输入有效字符',
+          })
+        } else {
+          ipcNotice({
+            type: 'MODIFY_ALIAS_NAME',
+            params: { storeId: storeId, aliasName: aliasName },
+          })
+        }
+      })
     default:
       break
   }

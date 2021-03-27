@@ -15,7 +15,6 @@ const {
 const axios = require('axios')
 const log = require('electron-log')
 const Lib = require('./utils/lib')
-const API = require('./utils/api.conf')
 const server = require('./utils/server')
 
 const path = require('path')
@@ -25,8 +24,8 @@ const storage = require('electron-localstorage')
 
 const SiteConfig = require('./conf/site')
 
-storage.setStoragePath(path.join(app.getAppPath(), 'storage.json')) // stoage存储路径
-
+storage.setStoragePath('./storage.json') // stoage存储路径
+console.log(storage.getStoragePath())
 log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
 
@@ -45,6 +44,14 @@ const erpSystem = 'http://192.168.50.44:8080//'
 const Store = require('electron-store')
 let store = new Store({})
 store.set('siteConfig', SiteConfig)
+store.set(
+  'noticeSounds',
+  'https://downsc.chinaz.net/Files/DownLoad/sound1/202012/13724.mp3'
+)
+//如果没有通知声音的配置就初始化
+if (store.get('noticeEnable') == undefined) {
+  store.set('noticeEnable', true)
+}
 
 // app.dock.hide() //mac隐藏菜单
 Menu.setApplicationMenu(null) //windows隐藏菜单
@@ -85,7 +92,7 @@ async function createBrowserWindow() {
     storage.setItem('erpAuthStatus', 1)
     mainWindow.loadURL(`${erpSystem}/auth/login`)
   } else {
-    tryToGetAuthedStore().then(() => {
+    tryToGetAuthedStore('init').then(() => {
       log.info('checkauth finished')
       loadDefaultStoreChat()
     })
@@ -297,8 +304,7 @@ async function injectMessageMonitor() {
           storage.setItem('erpAuthStatus', 1)
           params.expires_time = Date.parse(new Date()) / 1000 + 604800 //授权过期的具体时间
           storage.setItem('erpAuth', params)
-
-          tryToGetAuthedStore().then(() => {
+          tryToGetAuthedStore('init').then(() => {
             console.log('checkauth finished')
             loadDefaultStoreChat()
           })
@@ -332,7 +338,8 @@ async function injectMessageMonitor() {
               app.getAppPath(),
               '/components/add-store/child.js'
             ),
-            nodeIntegration: true,
+            nodeIntegration: true, // 是否启用node集成
+            enableRemoteModule: true, // 是否启用remote模块
           },
         })
         // childWindow.setAlwaysOnTop(true)
@@ -351,6 +358,10 @@ async function injectMessageMonitor() {
       case 'SUCCESS_ADD_STORE': //添加店铺成功
         setTimeout(function () {
           childWindow.close()
+          tryToGetAuthedStore('add').then(() => {
+            console.log('checkauth finished')
+            loadDefaultStoreChat()
+          })
         }, 2000)
         break
       case 'HANDLE_IMPORT_FILE': //导入文件
@@ -372,6 +383,9 @@ async function injectMessageMonitor() {
           .catch(err => {
             console.log(err)
           })
+        break
+      case 'MODIFY_ALIAS_NAME': //修改店铺别名
+        modifyAliasName(params)
         break
     }
   })
@@ -446,9 +460,23 @@ function loadDefaultStoreChat() {
     })
     .catch(err => {
       log.error('loadDefaultStoreChat error:', err)
+      //   mainWindow.reload()
+      reloadWindow(mainWindow)
       dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
-      app.exit()
+      //   app.exit()
     })
+}
+
+function reloadWindow(mainWin) {
+  if (mainWin.isDestroyed()) {
+    app.relaunch()
+    app.exit(0)
+  } else {
+    BrowserWindow.getAllWindows().forEach(w => {
+      if (w.id !== mainWin.id) w.destroy()
+    })
+    mainWin.reload()
+  }
 }
 
 // 给渲染进程发送消息
@@ -523,10 +551,11 @@ async function loopSyncTask() {
             appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
           }
         }, 650)
-        mainWindowNotifier(
-          'NEW_MESSAGE',
-          syncResult.filter(item => item.unread_count)
-        )
+
+        mainWindowNotifier('NEW_MESSAGE', {
+          noticeEnable: store.get('noticeEnable'),
+          messageList: syncResult.filter(item => item.unread_count),
+        })
       }
       //如果没有未读消息就停止通知
       if (!unreadMessageCount) {
@@ -581,11 +610,14 @@ async function removeBindStore(storeId) {
         if (store.get('currentStore') == storeId) {
           store.set('currentStore', null)
         }
+
         //step3 从菜单移除当前店铺
-        let storeMenuList = store.get('storeMenuList').map(el => el.storeList)
+        let storeMenuList = Lib.flat(
+          store.get('storeMenuList').map(el => el.storeList)
+        )
         let newMenuList = storeMenuList.filter(item => item.shopId == storeId)
         store.set('storeMenuList', Lib.groupStore(newMenuList))
-        tryToGetAuthedStore().then(() => {
+        tryToGetAuthedStore('remove').then(() => {
           console.log('checkauth finished')
           loadDefaultStoreChat()
         })
@@ -600,33 +632,80 @@ async function removeBindStore(storeId) {
     })
 }
 
+//修改别名
+async function modifyAliasName(params) {
+  API.handleModifyAliasName(params)
+    .then(res => {
+      if (res) {
+        // 修改本地菜单列表中的店铺名称
+        let storeMenuList = Lib.flat(
+          store.get('storeMenuList').map(el => el.storeList)
+        )
+        storeMenuList.map(el => {
+          if (el.shopId == params.storeId) {
+            el.storeName = params.aliasName
+          }
+        })
+        console.log(storeMenuList)
+        store.set('storeMenuList', Lib.groupStore(storeMenuList))
+        tryToGetAuthedStore('modify').then(() => {
+          console.log('checkauth finished')
+          loadDefaultStoreChat()
+        })
+      } else {
+        dialog.showErrorBox('提示', '修改失败，请稍后重试')
+      }
+    })
+    .catch(error => {
+      log.error(error)
+      dialog.showErrorBox('提示', '修改失败，请稍后重试')
+    })
+}
+
 //检查店铺授权
-async function tryToGetAuthedStore() {
+
+/**
+ * init 的时候只用判断本地是否有菜单列表
+ * add 重新获取菜单列表和授权列表
+ * modify 重新获取菜单列表和授权列表
+ * remove 重新获取菜单列表和授权列表
+ *
+ * @param {*} type init|add|modify|remove
+ */
+async function tryToGetAuthedStore(type) {
   const malacca_token = storage.getItem('erpAuth')
   let authedStore = storage.getItem('authedStore') || {} //已授权的店铺列表
   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
-    //如果本地存储没有授权信息
-    if (!storeMenuList) {
+    // 初始化时如果本地存储没有授权信息
+    if (!storeMenuList && type == 'init') {
       let res = await server.getAuthedAtore()
-      console.log('storeMenuList 本地没有授权列表', res)
+      log.error('storeMenuList 本地没有授权列表', res)
     }
+
+    //如果不是初始化
+    if (storeMenuList && type != 'init') {
+      let store = await server.getAuthedAtore()
+      log.error('storeMenuList 更新授权列表', store)
+      let auth = await server.getStoreAuthInfo()
+      log.error('storeMenuList 更新token列表', auth)
+    }
+
     //在有店铺列表的情况下调获取token的接口
     if (store.get('storeMenuList')) {
       if (Object.keys(authedStore).length == 0) {
         let res = await server.getStoreAuthInfo()
-        console.log('authedStore 本地没有授权信息', res)
+        log.error('authedStore 本地没有授权信息', res)
       }
 
       let { expires_time } = authedStore
       let currentTime = Date.parse(new Date()) / 1000
       if (!expires_time || expires_time < currentTime) {
         let res = await server.getStoreAuthInfo()
-        console.log('authedStore 已过期', res)
+        log.error('authedStore 已过期', res)
       }
     }
   }
-  // reject(-1)
 }
 
 // 创建托盘
@@ -635,21 +714,8 @@ async function createTray() {
     appIcon = new Tray(path.join(__dirname, 'dark-logo.png'))
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: '😁 打开聊聊',
-        click: () => {
-          mainWindow.show()
-        },
-      },
-
-      {
-        label: '😭 退出',
+        label: '选项',
         submenu: [
-          {
-            label: '关闭程序',
-            click: () => {
-              app.quit()
-            },
-          },
           {
             label: '清除缓存',
             click: () => {
@@ -662,7 +728,45 @@ async function createTray() {
               app.quit()
             },
           },
+          {
+            label: '消息通知',
+            type: 'checkbox',
+            checked: true,
+            click: e => {
+              //   console.log(e.checked)
+              store.set('noticeEnable', e.checked)
+            },
+          },
+          {
+            type: 'checkbox',
+            label: '开机启动',
+            checked: app.getLoginItemSettings().openAtLogin,
+            click: function () {
+              if (!app.isPackaged) {
+                app.setLoginItemSettings({
+                  openAtLogin: !app.getLoginItemSettings().openAtLogin,
+                  path: process.execPath,
+                })
+              } else {
+                app.setLoginItemSettings({
+                  openAtLogin: !app.getLoginItemSettings().openAtLogin,
+                })
+              }
+              console.log(app.getLoginItemSettings().openAtLogin)
+              console.log(!app.isPackaged)
+            },
+          },
         ],
+      },
+      {
+        label: '😁 打开聊聊',
+        click: () => {
+          mainWindow.show()
+        },
+      },
+      {
+        label: '😭 关闭程序',
+        role: 'quit',
       },
     ])
     appIcon.setToolTip('虾皮聊聊客户端')
@@ -677,7 +781,7 @@ async function createTray() {
 
 app.on('ready', () => {
   log.info('app start')
-  tryToGetAuthedStore().then(() => {
+  tryToGetAuthedStore('init').then(() => {
     createBrowserWindow()
     setIntercept()
     injectMessageMonitor()

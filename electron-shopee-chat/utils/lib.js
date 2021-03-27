@@ -42,18 +42,27 @@ module.exports = Lib = {
     return groups
   },
 
+  //数组平铺
+  flat: function (arr) {
+    let flatArr = [].concat(...arr)
+    return flatArr.some(item => Array.isArray(item)) ? flat(flatArr) : flatArr
+  },
+
   //解构接口错误信息
   getError: function (error) {
     let {
-      config: { url, method, data, headers },
-      message,
-    } = error
+      config: { url, method, headers },
+      data,
+    } = error.response
+    // let {
+    //   config: { url, method, data, headers },
+    //   message,
+    // } = error
     return {
       url: url,
       method: method,
-      data: data,
       headers: headers,
-      message: message,
+      message: data.message,
     }
   },
 }

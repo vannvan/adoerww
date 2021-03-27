@@ -5,6 +5,25 @@ body {
     justify-content: flex-end !important;
 }
 
+body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: #ededed;
+    position: absolute;
+    right: 0
+}
+
+body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: #fff
+}
+
+body::-webkit-scrollbar {
+    width: 6px;
+    height: 4px
+}
+
 #root {
     width: calc(100% - 218px) !important;
     height: calc(100% + 62px) !important;
@@ -255,6 +274,51 @@ body {
 }
 
 
+//修改店铺别名输入框
+.emalacca-store-input {
+    position: absolute;
+    display: none;
+    width: 218px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background: #fff;
+
+    border: 1px solid #ededed;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+
+    input {
+        height: 32px;
+        // border: 0; // 去除未选中状态边框
+        outline: none; // 去除选中状态边框
+        background: #fff2e8;
+        width: 120px;
+        border: none;
+        padding-left: 8px;
+        box-sizing: border-box;
+
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0 4px;
+        color: #fff;
+        height: 24px;
+        line-height: 24px;
+        // margin-top: 6px;
+        margin-left: 8px;
+        font-size: x-small;
+        background: #FF720D;
+        cursor: pointer;
+
+        &.cancel {
+            background: #8c8c8c;
+        }
+    }
+}
 
 .emalacca-client-mask {
     width: 100%;

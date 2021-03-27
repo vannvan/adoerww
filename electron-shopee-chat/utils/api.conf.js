@@ -1,6 +1,8 @@
 const { default: axios } = require('axios')
 const storage = require('electron-localstorage')
 storage.setStoragePath('./storage.json')
+const fs = require('fs')
+const { resolve } = require('path')
 
 function getToken() {
   return storage.getItem('erpAuth')
@@ -24,6 +26,22 @@ module.exports = API = {
         })
     })
   },
+
+  //新增店铺
+  handleAddStore: function (params) {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/add-store', params)
+        .then(res => {
+          resolve(res.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
   // 下载模板
   downloadExecle: function () {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
@@ -58,20 +76,30 @@ module.exports = API = {
   },
 
   // 导入文件店铺
-  importStoreFile: function (files) {
-    // let formData = new FormData()
-    // console.log(formData, 'formData')
-    // for (let i in files) {
-    //   if (!isNaN(i)) {
-    //     formData.append('file', files[i])
-    //   }
-    // }
+  importStoreFile: function (params) {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    return new Promise((resolve, reject) => {
+      axios({
+        method: 'post',
+        data: params,
+        url: BASE_URL + '/product/crawl/talk/file/import-store',
+      })
+        .then(res => {
+          resolve(res.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  //import Erp店铺
+  importErpStore: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/file/import-store', files)
+        .post(BASE_URL + '/product/crawl/talk/erp/import-store', params)
         .then(res => {
-          console.log(res, 'res')
           resolve(res.data)
         })
         .catch(error => {
@@ -119,6 +147,25 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(BASE_URL + '/product/crawl/talk/store/all/get-token')
+        .then(res => {
+          resolve(res.data.data)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
+  },
+
+  //修改店铺别名
+  handleModifyAliasName: function (params) {
+    axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    let data = {
+      shopId: params.storeId,
+      storeAlias: params.aliasName,
+    }
+    return new Promise((resolve, reject) => {
+      axios
+        .post(BASE_URL + '/product/crawl/talk/update-store-remark', data)
         .then(res => {
           resolve(res.data.data)
         })

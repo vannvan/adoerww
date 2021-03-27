@@ -17,12 +17,38 @@
     ],
     "build": {
         "appId": "com.xxx.app",
+        "productName": "虾皮聊聊客户端",
         "win": {
+            "icon": "build/icons/icon.ico",
             "target": [
                 "nsis",
                 "zip"
             ]
-        }
+        },
+        "directories": {
+            "output": "dist"
+        },
+        "extraResources": [
+            {
+                "from": "dist/icons",
+                "to": "./"
+            }
+        ],
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "allowElevation": true,
+            "installerIcon": "build/icons/icon.ico",
+            "uninstallerIcon": "build/icons/icon.ico",
+            "installerHeaderIcon": "build/icons/icon.ico",
+            "createDesktopShortcut": true
+        },
+        "publish": [
+            {
+                "provider": "generic",
+                "url": "http://127.0.0.1:8090/demo/"
+            }
+        ]
     },
     "author": "GitHub",
     "license": "CC0-1.0",

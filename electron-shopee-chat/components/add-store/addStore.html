@@ -2,217 +2,240 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script> -->
-    <link rel="stylesheet" href="https://at.alicdn.com/t/font_1833787_y77zoekr35.css">
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <style>
-        ul,
-        ol,
-        li {
-            list-style-type: none;
-            padding-inline-start: 0;
-        }
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script> -->
+	<link rel="stylesheet" href="https://at.alicdn.com/t/font_1833787_y77zoekr35.css">
+	<link rel="stylesheet" href="bootstrap.min.css">
+	<style>
+		ul,
+		ol,
+		li {
+			list-style-type: none;
+			padding-inline-start: 0;
+		}
 
-        .em-tabs {
-            display: flex;
-        }
+		.em-tabs {
+			display: flex;
+		}
 
-        .em-tabs-items {
-            position: relative;
-            font-weight: 600;
-            cursor: pointer;
-        }
+		.em-tabs-items {
+			position: relative;
+			font-weight: 600;
+			cursor: pointer;
+		}
 
-        .em-tabs-items+.em-tabs-items {
-            margin-left: 24px;
-        }
+		.em-tabs-items+.em-tabs-items {
+			margin-left: 24px;
+		}
 
-        .is-em-active,
-        .fc-orange {
-            color: #FF720D;
-        }
+		.is-em-active {
+			color: #FF720D;
+		}
+		.fc-blue {
+			color: #2A62ED;
+		}
+		.fc-gray {
+			color: #7B7B7B;
+		}
 
-        .is-em-active .is-em-active-index {
-            display: block;
-            position: absolute;
-            bottom: -1rem;
-            width: 100%;
-            left: 0;
-            border-bottom: 2px solid #FF720D;
-        }
+		.is-em-active .is-em-active-index {
+			display: block;
+			position: absolute;
+			bottom: -1rem;
+			width: 100%;
+			left: 0;
+			border-bottom: 2px solid #FF720D;
+		}
 
-        .em-tabs-content {
-            display: none;
-            line-height: 28px;
-        }
+		.em-tabs-content {
+			display: none;
+			line-height: 28px;
+		}
 
-        .em-tabs-content.is-em-content,
-        .em-tabs-footer.is-em-footer {
-            display: block;
-        }
+		.em-tabs-content.is-em-content,
+		.em-tabs-footer.is-em-footer {
+			display: block;
+		}
 
-        .em-tabs-content h6 {
-            font-weight: 600;
-            margin: 16px 0 12px;
-        }
+		.em-tabs-content h6 {
+			font-weight: 600;
+			margin: 16px 0 12px;
+		}
 
-        .em-tabs-content h6:first-child {
-            margin-top: 0;
-        }
+		.em-tabs-content h6:first-child {
+			margin-top: 0;
+		}
 
-        .em-tabs-footer,
-        #errorAlert {
-            display: none;
-        }
+		.em-tabs-footer,
+		#errorAlert {
+			display: none;
+		}
 
-        .em-input-items+.em-input-items {
-            position: relative;
-            margin-top: 16px;
-        }
+		.em-input-items+.em-input-items {
+			position: relative;
+			margin-top: 16px;
+		}
 
-        .modal-dialog .btn-primary {
-            background-color: #FF720D;
-            border-color: #FF720D;
-        }
+		.modal-dialog .btn-primary,.custom-control-input:checked~.custom-control-label::before {
+			background-color: #FF720D;
+			border-color: #FF720D;
+		}
+		.em-iconfont-position {
+			position: absolute;
+			z-index: 2;
+			top: 6px;
+			right: 10px;
+		}
 
-        .em-iconfont-position {
-            position: absolute;
-            z-index: 2;
-            top: 6px;
-            right: 10px;
-        }
+		.em-iconfont-password,
+		.downloadExecle,
+		.fc-blue {
+			cursor: pointer;
+		}
 
-        .em-iconfont-password,
-        .downloadExecle,
-        .fc-orange {
-            cursor: pointer;
-        }
-
-        .success-toast {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            z-index: 9;
-            display: none;
-            transform: translate(-50%, -50%);
-            min-width: 250px;
-            text-align: center;
-        }
-
-        @media (min-width: 576px) {
-            .modal-dialog {
-                width: 100% !important;
-            }
-        }
-    </style>
+		.success-toast {
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			z-index: 9;
+			display: none;
+			transform: translate(-50%, -50%);
+			min-width: 250px;
+			text-align: center;
+		}
+		#erpStoreList{
+			margin: 16px 0 ;
+		}
+		#erpStoreList .custom-control{
+			display: inline-block;
+			margin-right: 16px;
+			margin-bottom: 10px;
+		}
+		#erpStoreList .custom-control-label{
+			line-height: 24px;
+		}
+		.auth-code{
+			display: none;
+		}
+		#sendAuthCode {
+			width: 150px;
+    	margin-left: 20px;
+		}
+		
+		@media (min-width: 576px) {
+			.modal-dialog {
+				width: 100% !important;
+			}
+		}
+	</style>
 
 </head>
 
 <body>
-    <!-- Button trigger modal -->
-    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+	<!-- Button trigger modal -->
+	<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
         Launch demo modal
     </button> -->
 
-    <!-- Modal -->
-    <div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-        style="display:block;z-index: 1;">
-        <div class="modal-dialog" style="width:100%;max-width:100%;margin:0">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <ul class="modal-title em-tabs">
-                        <li class="em-tabs-items is-em-active" data-index="0">
-                            添加店铺
-                            <em class="is-em-active-index"></em>
-                        </li>
-                        <li class="em-tabs-items" data-index="1">
-                            批量导入
-                            <em class="is-em-active-index"></em>
-                        </li>
-                        <li class="em-tabs-items" data-index="2">
-                            云端导入
-                            <em class="is-em-active-index"></em>
-                        </li>
-                    </ul>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="em-tabs-content is-em-content">
-                        <div id="errorAlert" class="alert alert-dismissible fade show" role="alert">
-                            <span id="errorText"></span>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="em-input-items">
-                            <select class="form-control" id="shopeeDomain">
-                                <option value="https://seller.my.shopee.cn/">马来西亚</option>
-                                <option value="https://seller.id.shopee.cn/">印度尼西亚</option>
-                                <option value="https://seller.th.shopee.cn/">泰国</option>
-                                <option value="https://seller.ph.shopee.cn/">菲律宾</option>
-                                <option value="https://seller.sg.shopee.cn/">新加坡</option>
-                                <option value="https://seller.vn.shopee.cn/">越南</option>
-                                <option value="https://seller.br.shopee.cn/">巴西</option>
-                                <option value="https://seller.xiapi.shopee.cn/">台湾</option>
-                            </select>
-                        </div>
-                        <!-- is-valid成功 is-invalid错误-->
-                        <div class="em-input-items">
-                            <input type="text" placeholder="账号" class="form-control" id="accountNumber">
-                            <span class="em-iconfont em-icon-shouji em-iconfont-position"></span>
-                        </div>
-                        <div class="em-input-items">
-                            <input type="password" placeholder="密码" class="form-control" id="validationPassword">
-                            <span class="em-iconfont em-icon-mima em-iconfont-position em-iconfont-password"></span>
-                        </div>
-                        <!-- <div class="em-input-items">
-							<input type="text" placeholder="手机验证码" class="form-control" id="authaCodeFeedback"
-									aria-describedby="validationAuthCodeFeedback" required>
-							<div id="validationAuthCodeFeedback" class="invalid-feedback">
-									请输入验证码
-							</div>
-						</div> -->
-                    </div>
-                    <div class="em-tabs-content">
-                        <h6>准备店铺</h6>
-                        <div>导入的内容请参考模板, 不符合规则的店铺, 将无法导入</div>
-                        <div class="downloadExecle" style="color: #FF720D;"><span
-                                class="em-iconfont em-icon-xingzhuangjiehe"></span> 下载导入模板</div>
+	<!-- Modal -->
+	<div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+		style="display:block;z-index: 1;">
+		<div class="modal-dialog" style="width:100%;max-width:100%;margin:0">
+			<div class="modal-content">
+				<div class="modal-header">
+					<ul class="modal-title em-tabs">
+						<li class="em-tabs-items is-em-active" data-index="0">
+							添加店铺
+							<em class="is-em-active-index"></em>
+						</li>
+						<li class="em-tabs-items" data-index="1">
+							批量导入
+							<em class="is-em-active-index"></em>
+						</li>
+						<li class="em-tabs-items" data-index="2">
+							云端导入
+							<em class="is-em-active-index"></em>
+						</li>
+					</ul>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="em-tabs-content is-em-content">
+						<div id="errorAlert" class="alert alert-dismissible fade show" role="alert">
+							<span id="errorText"></span>
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="em-input-items">
+							<select class="form-control" id="shopeeDomain">
+								<option value="https://seller.my.shopee.cn/">马来西亚</option>
+								<option value="https://seller.id.shopee.cn/">印度尼西亚</option>
+								<option value="https://seller.th.shopee.cn/">泰国</option>
+								<option value="https://seller.ph.shopee.cn/">菲律宾</option>
+								<option value="https://seller.sg.shopee.cn/">新加坡</option>
+								<option value="https://seller.vn.shopee.cn/">越南</option>
+								<option value="https://seller.br.shopee.cn/">巴西</option>
+								<option value="https://seller.xiapi.shopee.cn/">台湾</option>
+							</select>
+						</div>
+						<!-- is-valid成功 is-invalid错误-->
+						<div class="em-input-items">
+							<input type="text" placeholder="账号" class="form-control" id="accountNumber">
+							<span class="em-iconfont em-icon-shouji em-iconfont-position"></span>
+						</div>
+						<div class="em-input-items">
+							<input type="password" placeholder="密码" class="form-control" id="validationPassword">
+							<span class="em-iconfont em-icon-mima em-iconfont-position em-iconfont-password"></span>
+						</div>
+						<div class="em-input-items auth-code">
+							<input type="text" placeholder="验证码" class="form-control" 	id="authCodeFeedback" aria-describedby="validationAuthCodeFeedback" required>
+							<button type="button" class="btn btn-primary" id="sendAuthCode">重新发送</button>
+						</div>
+					</div>
+					<div class="em-tabs-content">
+						<h6>准备店铺</h6>
+						<div>导入的内容请参考模板, 不符合规则的店铺, 将无法导入</div>
+						<div class="downloadExecle" style="color: #FF720D;"><span
+								class="em-iconfont em-icon-xingzhuangjiehe"></span> 下载导入模板</div>
 
-                        <h6>上传店铺文件</h6>
-                        <div>目前支持文件类型为".xls, .xlsx"</div>
-                    </div>
-                    <div class="em-tabs-content">
-                        <h6>请选择你要导入的店铺</h6>
-                        <div>店铺列表来源于马六甲ERP授权店铺, <span id="erpEmalaccaStore" class="fc-orange">查看详情</span></div>
-                    </div>
-                </div>
+						<h6>上传店铺文件</h6>
+						<div>目前支持文件类型为".xls, .xlsx"</div>
+					</div>
+					<div class="em-tabs-content">
+						<h6>请选择你要导入的店铺</h6>
+						<div class="fc-gray">店铺列表来源于马六甲ERP授权店铺, 
+							<span id="erpEmalaccaStore" class="fc-blue">查看详情</span>
+						</div>
+						<div id="erpStoreList">
+						</div>
+					</div>
+				</div>
 
-                <div class="modal-footer">
-                    <div class="em-tabs-footer is-em-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" id="handleAuth">授权</button>
-                    </div>
-                    <div class="em-tabs-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" id="handleImportFile">导入文件</button>
-                    </div>
-                    <div class="em-tabs-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" id="handleImportShops">导入店铺</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="alert alert-success success-toast" role="alert">
-        操作成功！
-    </div>
+				<div class="modal-footer">
+					<div class="em-tabs-footer is-em-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" id="handleAuth">授权</button>
+					</div>
+					<div class="em-tabs-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" id="handleImportFile">导入文件</button>
+					</div>
+					<div class="em-tabs-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" id="handleImportShops">导入店铺</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="alert alert-success success-toast" role="alert">
+		操作成功！
+	</div>
 </body>
 <script src="addStore.js"></script>
 <!-- <script src="bootstrap.min.js"></script> -->
