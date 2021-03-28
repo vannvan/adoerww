@@ -412,6 +412,10 @@ $(document).ready(function () {
           name: 'sentry-web监控工具',
           link: 'https://sentry.io/',
         },
+        {
+          name: '纯CSS小图标',
+          link: 'https://www.zhangxinxu.com/sp/icon/css.php',
+        },
       ],
     },
     {
