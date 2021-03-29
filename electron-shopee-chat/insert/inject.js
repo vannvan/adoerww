@@ -44,6 +44,11 @@ MessageNotify.src = store.get('noticeSounds')
 var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = null
 var currentSite = null
+var checkUpdateTimer = null
+//检查更新
+checkUpdateTimer = setInterval(() => {
+  ipcRenderer.send('checkForUpdate')
+}, 10000)
 
 $(function () {
   ReceiveMasterMessage()
@@ -258,6 +263,11 @@ function ReceiveMasterMessage() {
       case 'REPLACE_TEXTAREA': // 替换待发送的文本
         $('textarea').text(params)
         $('textarea').val(params) //替换textarea文本
+      case 'CHECK_VERSION': // 检查更新
+        let { cmd } = params
+        if (['error', 'update-not-available'].includes(cmd)) {
+          clearInterval(checkUpdateTimer)
+        }
       default:
         break
     }

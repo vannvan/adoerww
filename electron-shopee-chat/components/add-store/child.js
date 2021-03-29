@@ -95,7 +95,7 @@ function handleAddStore() {
         }
         API.handleAddStore(addData)
           .then(addResult => {
-            console.log(addResult.data)
+            log.info(addResult.data)
             if (addResult.code == 0) {
               ipcNotice({
                 type: 'SUCCESS_ADD_STORE',
@@ -120,7 +120,9 @@ function handleAddStore() {
         // 验证码
         let authCode = document.querySelector('.auth-code')
         authCode.style.display = 'flex'
-        handleAuthCode()
+        if (!timeInterval) {
+          handleAuthCode()
+        }
       }
     })
     .catch(error => {
@@ -204,6 +206,18 @@ let timeInterval = null
 function handleAuthCode() {
   timeInterval = setInterval(function () {
     console.log(athCodeTime, 'time')
+    if (athCodeTime == 0) {
+      $('#sendAuthCode').html('重新发送')
+      $('#sendAuthCode').removeAttr('disabled')
+      athCodeTime = 59
+      clearInterval(timeInterval)
+    } else {
+      $('#sendAuthCode').attr('disabled', 'true')
+      $('#sendAuthCode').html('重新发送(' + athCodeTime + ')')
+      athCodeTime--
+    }
+  }, 1000)
+  timeInterval = setInterval(function () {
     if (athCodeTime == 0) {
       $('#sendAuthCode').html('重新发送')
       $('#sendAuthCode').removeAttr('disabled')

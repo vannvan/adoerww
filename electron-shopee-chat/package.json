@@ -46,7 +46,7 @@
         "publish": [
             {
                 "provider": "generic",
-                "url": "http://127.0.0.1:8090/demo/"
+                "url": "http://127.0.0.1:3000/"
             }
         ]
     },
@@ -62,6 +62,7 @@
         "electron-localstorage": "^1.0.5",
         "electron-log": "^4.3.2",
         "electron-store": "^7.0.2",
+        "electron-updater": "^4.3.8",
         "jquery": "^3.6.0",
         "js-cookie": "^2.2.1",
         "localforage": "^1.9.0",

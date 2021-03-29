@@ -16,11 +16,13 @@ const axios = require('axios')
 const log = require('electron-log')
 const Lib = require('./utils/lib')
 const server = require('./utils/server')
+const API = require('./utils/api.conf')
 
 const path = require('path')
 const fs = require('fs')
 const googleTr = require('./utils/google-translate-server')
 const storage = require('electron-localstorage')
+const updateHandle = require('./utils/autoUpdater')
 
 const SiteConfig = require('./conf/site')
 
@@ -39,7 +41,7 @@ var appIcon = null //托盘
 var messageFlag = true //托盘消息提示flag
 var messageTimer //托盘消息计时
 var messageQuene //消息队列
-const erpSystem = 'http://192.168.50.44:8080//'
+const erpSystem = 'http://test-erp.emalacca.com/'
 
 const Store = require('electron-store')
 let store = new Store({})
@@ -101,6 +103,8 @@ async function createBrowserWindow() {
   //   mainWindow.loadFile('index.html')
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    let feedUrl = 'https://test2-erp.emalacca.com/chat/'
+    updateHandle(mainWindow, feedUrl)
   })
 
   mainWindow.webContents.on('did-finish-load', function () {
@@ -125,7 +129,7 @@ async function createBrowserWindow() {
       mainWindow.webContents.insertCSS(css)
 
       setTimeout(() => {
-        // loopSyncTask()
+        loopSyncTask()
       }, 100)
     }
   })
@@ -209,7 +213,7 @@ async function setIntercept() {
           details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
           details.requestHeaders['x-v'] = '4'
         } catch (error) {
-          log.error(error)
+          log.error('currentStore', String(store.get('currentStore')), error)
           dialog.showErrorBox('提示', '店铺数据错误')
         }
 
@@ -263,8 +267,8 @@ async function injectMessageMonitor() {
       case 'CHANGE_STORE': //切换店铺
         store.set('currentStore', params.storeId) // 更新当前操作的店铺ID
         store.set('currentSite', params.key) //当前站点
-        //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
-        if (params && params.storeId) {
+        try {
+          //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
           let exitCookies = storage.getItem('authedStore')[params.storeId]
           if (exitCookies) {
             mainWindow
@@ -285,7 +289,13 @@ async function injectMessageMonitor() {
           } else {
             dialog.showErrorBox('提示', '授权过期，请重新授权')
           }
+        } catch (error) {
+          dialog.showErrorBox(
+            '提示',
+            '当前店铺未正式授权，请完成授权后进行操作'
+          )
         }
+
         break
       case 'TRANS_TEXT': // 翻译文本
         handleTranslation(params)
@@ -618,7 +628,7 @@ async function removeBindStore(storeId) {
         let newMenuList = storeMenuList.filter(item => item.shopId == storeId)
         store.set('storeMenuList', Lib.groupStore(newMenuList))
         tryToGetAuthedStore('remove').then(() => {
-          console.log('checkauth finished')
+          log.info('checkauth finished')
           loadDefaultStoreChat()
         })
         log.info('handleRemoveBindStore success')
@@ -781,6 +791,13 @@ async function createTray() {
 
 app.on('ready', () => {
   log.info('app start')
+  //   storage.setItem('erpAuthStatus', -1)
+  //   storage.clear()
+  //   store.clear()
+  //   session.defaultSession.clearStorageData({
+  //     origin: erpSystem,
+  //   })
+
   tryToGetAuthedStore('init').then(() => {
     createBrowserWindow()
     setIntercept()
@@ -789,6 +806,6 @@ app.on('ready', () => {
   })
 })
 
-app.on('window-all-closed', () => {
-  if (appIcon) appIcon.destroy()
-})
+// app.on('window-all-closed', () => {
+//   if (appIcon) appIcon.destroy()
+// })

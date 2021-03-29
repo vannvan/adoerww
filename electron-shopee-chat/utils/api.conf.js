@@ -1,8 +1,6 @@
 const { default: axios } = require('axios')
 const storage = require('electron-localstorage')
 storage.setStoragePath('./storage.json')
-const fs = require('fs')
-const { resolve } = require('path')
 
 function getToken() {
   return storage.getItem('erpAuth')
@@ -10,14 +8,14 @@ function getToken() {
     : null
 }
 
-const BASE_URL = 'http://192.168.50.87:8999/'
 module.exports = API = {
+  BASE_URL: 'http://192.168.50.87:8999/',
   // shoppe登录
   handleLoginShopee: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/login', params)
+        .post(this.BASE_URL + '/product/crawl/talk/login', params)
         .then(res => {
           resolve(res.data)
         })
@@ -32,7 +30,7 @@ module.exports = API = {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/add-store', params)
+        .post(this.BASE_URL + '/product/crawl/talk/add-store', params)
         .then(res => {
           resolve(res.data)
         })
@@ -49,7 +47,8 @@ module.exports = API = {
       axios({
         method: 'get',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        url: BASE_URL + '/product/crawl/talk/file/get-store-import-template',
+        url:
+          this.BASE_URL + '/product/crawl/talk/file/get-store-import-template',
         responseType: 'blob',
       })
         .then(res => {
@@ -65,7 +64,7 @@ module.exports = API = {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/erp/store-list')
+        .post(this.BASE_URL + '/product/crawl/talk/erp/store-list')
         .then(res => {
           resolve(res.data)
         })
@@ -82,7 +81,7 @@ module.exports = API = {
       axios({
         method: 'post',
         data: params,
-        url: BASE_URL + '/product/crawl/talk/file/import-store',
+        url: this.BASE_URL + '/product/crawl/talk/file/import-store',
       })
         .then(res => {
           resolve(res.data)
@@ -98,7 +97,7 @@ module.exports = API = {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/erp/import-store', params)
+        .post(this.BASE_URL + '/product/crawl/talk/erp/import-store', params)
         .then(res => {
           resolve(res.data)
         })
@@ -116,7 +115,7 @@ module.exports = API = {
     }
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/del-store', data)
+        .post(this.BASE_URL + '/product/crawl/talk/del-store', data)
         .then(res => {
           resolve(res.data)
         })
@@ -131,7 +130,7 @@ module.exports = API = {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/store-list')
+        .post(this.BASE_URL + '/product/crawl/talk/store-list')
         .then(res => {
           resolve(res.data.data)
         })
@@ -146,7 +145,7 @@ module.exports = API = {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/store/all/get-token')
+        .post(this.BASE_URL + '/product/crawl/talk/store/all/get-token')
         .then(res => {
           resolve(res.data.data)
         })
@@ -165,7 +164,7 @@ module.exports = API = {
     }
     return new Promise((resolve, reject) => {
       axios
-        .post(BASE_URL + '/product/crawl/talk/update-store-remark', data)
+        .post(this.BASE_URL + '/product/crawl/talk/update-store-remark', data)
         .then(res => {
           resolve(res.data.data)
         })

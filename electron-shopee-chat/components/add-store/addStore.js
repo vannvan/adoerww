@@ -22,6 +22,7 @@ $('.em-tabs-items').click(function (event) {
   $('.em-tabs-footer.is-em-footer').removeClass('is-em-footer')
   $('.em-tabs-footer:eq(' + index + ')').addClass('is-em-footer')
   if (index === '2') {
+    $('#erpStoreList').html('')
     // 获取erp店铺列表
     API.getErpStoreList().then(res => {
       let data = res.data || []

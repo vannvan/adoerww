@@ -54,10 +54,6 @@ module.exports = Lib = {
       config: { url, method, headers },
       data,
     } = error.response
-    // let {
-    //   config: { url, method, data, headers },
-    //   message,
-    // } = error
     return {
       url: url,
       method: method,

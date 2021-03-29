@@ -9,6 +9,9 @@ window._VV.$router.beforeEach(function (to, from, next) {
 })
 
 async function loopGetStorageTask() {
+  document.querySelector('.ant-dropdown-link')
+    ? document.querySelector('.ant-dropdown-link').remove()
+    : null
   try {
     let erpStorage = localStorage.getItem('erp')
     let authInfo = {}
