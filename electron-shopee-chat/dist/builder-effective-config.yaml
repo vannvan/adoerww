@@ -9,7 +9,7 @@ win:
     - nsis
     - zip
 extraResources:
-  - from: dist/icons
+  - from: build/icons
     to: ./
 nsis:
   oneClick: false

@@ -3,8 +3,66 @@ const localforage = require('localforage')
 const $ = require('jquery')
 const { default: axios } = require('axios')
 const Store = require('electron-store')
+;(function ($) {
+  $.fn.extend({
+    message: function (options) {
+      options.className = options.type || 'info'
+      options = $.extend(
+        {
+          //type : options.type,
+          msg: options.msg,
+          speed: options.speed || 300,
+          //提示消息5秒后消失
+          existTime: options.existTime || 3000,
+        },
+        options
+      )
+
+      var div = $(
+        '<div class="emalacca-plugin-toast ' +
+          options.className +
+          '" role="alert" >' +
+          options.msg +
+          '</div>'
+      )
+      $('body').append(div)
+      div.show(options.speed)
+      //隐藏对象
+      setTimeout(function () {
+        div.toggle(options.speed)
+      }, options.existTime)
+      //移除对象
+      setTimeout(function () {
+        div.remove()
+      }, options.existTime + 5000)
+      // 关闭弹窗
+      $('#closeLoginMessage').click(function () {
+        $(this).closest('.emalacca-plugin-toast').remove()
+      })
+    },
+    loading: function () {
+      var div = $(
+        `<div class="shoppe-loading-wrap">
+            <div class="mask"></div>
+            <div class="inside"></div>
+            <div class="back"></div>
+        </div>`
+      )
+      $('body').append(div)
+    },
+    loadingHide: function () {
+      $('.shoppe-loading-wrap').hide()
+    },
+    loadingShow: function () {
+      $('.shoppe-loading-wrap').show()
+    },
+  })
+  return this
+})($)
+
+$.fn.loading()
+
 let store = new Store()
-// console.log(store.get('siteConfig.langOptions'))
 
 // 将链接中携带的店铺信息放进storage
 if (location.search) {
@@ -17,25 +75,9 @@ if (location.search) {
   }
 }
 
-function storageGet(key) {
-  return sessionStorage.getItem(key)
-    ? JSON.parse(sessionStorage.getItem(key))
-    : null
-}
-
-function addCssByLink(url) {
-  var doc = document
-  var link = doc.createElement('link')
-  link.setAttribute('rel', 'stylesheet')
-  link.setAttribute('type', 'text/css')
-  link.setAttribute('href', url)
-  var heads = doc.getElementsByTagName('head')
-  if (heads.length) heads[0].appendChild(link)
-  else doc.documentElement.appendChild(link)
-}
-
 //加载阿里图标
-addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
+Lib.addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
+
 const storeMenuList = store.get('storeMenuList')
 //消息通知
 const MessageNotify = document.createElement('audio')
@@ -45,10 +87,6 @@ var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = null
 var currentSite = null
 var checkUpdateTimer = null
-//检查更新
-checkUpdateTimer = setInterval(() => {
-  ipcRenderer.send('checkForUpdate')
-}, 10000)
 
 $(function () {
   ReceiveMasterMessage()
@@ -252,6 +290,7 @@ function ReceiveMasterMessage() {
         break
       case 'CLEAR_TEXTAREA': //清除文本框
         document.querySelector('textarea').value = ''
+        $("section svg[class='chat-icon']").parent().click()
         break
       case 'NEW_MESSAGE': //新消息提醒
         let { messageList, noticeEnable } = params
@@ -268,6 +307,9 @@ function ReceiveMasterMessage() {
         if (['error', 'update-not-available'].includes(cmd)) {
           clearInterval(checkUpdateTimer)
         }
+        break
+      case 'HIDE_LOADING': //隐藏loading
+        $.fn.loadingHide()
       default:
         break
     }
@@ -293,7 +335,7 @@ function appendTranslateButton(params) {
   let { buyer_id } = params
   const langOptions = store.get('siteConfig.langOptions')
 
-  var checkedLang = storageGet('currentLang') || {
+  var checkedLang = Lib.storageGet('currentLang') || {
     lang: 'en',
     langName: '英语',
   }
@@ -391,9 +433,9 @@ async function handleTranslation(targetLang) {
 async function dispatchSendMessage(buyer_id) {
   // 要区分图片还是文本
   if ($('section img').length == 0 && !$('textarea').val()) {
-    ipcNotice({
-      type: 'ERROR_DIALOG',
-      params: '请输入消息内容',
+    $.fn.message({
+      type: 'warning',
+      msg: '请输入消息内容',
     })
     $('textarea').val('')
     return false
@@ -412,15 +454,16 @@ async function dispatchSendMessage(buyer_id) {
         },
       }
       try {
-        let base64 = await getBase64($(this).attr('src'))
-        let imageUrl = handleUpload(base64)
+        let base64 = await Lib.getBase64($(this).attr('src'))
+        let imageUrl = await handleUpload(base64)
         imagesParams.content.url = imageUrl
         handleSendMessage(buyer_id, imagesParams)
       } catch (error) {
-        ipcNotice({
-          type: 'ERROR_DIALOG',
-          params: '消息发送失败',
+        $.fn.message({
+          type: 'warning',
+          msg: '消息发送失败',
         })
+        $("section svg[class='chat-icon']").parent().click()
         ipcNotice({
           type: 'WRITE_LOG',
           params: error,
@@ -466,49 +509,12 @@ function ipcNotice({ type, params }) {
   ipcRenderer.send('inject-message', { type: type, params: params })
 }
 
-//blob转base64
-async function getBase64(url) {
-  return new Promise((resolve, reject) => {
-    var xhr = new XMLHttpRequest()
-    xhr.open('get', url, true)
-    xhr.responseType = 'blob'
-    xhr.onload = function () {
-      if (this.status === 200) {
-        var blob = this.response
-        var fileReader = new FileReader()
-        fileReader.onloadend = function (e) {
-          var result = e.target.result
-          resolve(result)
-        }
-        fileReader.readAsDataURL(blob)
-      }
-    }
-    xhr.onerror = function () {
-      reject()
-    }
-    xhr.send()
-  })
-}
-
-//base64转文件对象
-function dataURLtoFile(dataurl, filename) {
-  var arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n)
-  filename = `${filename}.jpg`
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n)
-  }
-  return new File([u8arr], filename, { type: mime })
-}
-
 //虾皮上传图片
 async function handleUpload(base64) {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let randomName = Math.random().toString(36).substring(2)
-    formData.append('file', dataURLtoFile(base64, randomName))
+    let formData = new FormData()
+    formData.append('file', Lib.dataURLtoFile(base64, randomName))
     // formData.append('conversation_id', 1451748750830325495)
     axios({
       method: 'post',
@@ -519,18 +525,20 @@ async function handleUpload(base64) {
         if (res.data.url) {
           resolve(res.data.url)
         } else {
-          ipcNotice({
-            type: 'ERROR_DIALOG',
-            params: '消息发送失败',
+          $.fn.message({
+            type: 'warning',
+            msg: '消息发送失败',
           })
+          $("section svg[class='chat-icon']").parent().click()
           reject(-1)
         }
       })
       .catch(error => {
-        ipcNotice({
-          type: 'ERROR_DIALOG',
-          params: '消息发送失败',
+        $.fn.message({
+          type: 'warning',
+          msg: '消息发送失败',
         })
+        $("section svg[class='chat-icon']").parent().click()
         ipcNotice({
           type: 'WRITE_LOG',
           params: error,
@@ -555,6 +563,7 @@ function dispatchStoreAction(actionType, storeId) {
         type: 'REMOVE_BIND_STORE',
         params: storeId,
       })
+      $.fn.loadingShow()
       break
     case 'modify-alias':
       //找到该店铺的位置
@@ -571,15 +580,16 @@ function dispatchStoreAction(actionType, storeId) {
       $('.emalacca-store-input .ok').click(function () {
         let aliasName = $('.emalacca-store-input input').val()
         if (!aliasName) {
-          ipcNotice({
-            type: 'ERROR_DIALOG',
-            params: '请输入有效字符',
+          $.fn.message({
+            type: 'warning',
+            msg: '请输入有效字符',
           })
         } else {
           ipcNotice({
             type: 'MODIFY_ALIAS_NAME',
             params: { storeId: storeId, aliasName: aliasName },
           })
+          $.fn.loadingShow()
         }
       })
     default:

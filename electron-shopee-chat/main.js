@@ -32,19 +32,23 @@ log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
 
 // console.log(log.transports.file.file)  //日志路径
+let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
 
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
 var mainWindow = null // 主窗口
 var childWindow = null //子窗口
+var onlineStatusWindow = null //网络断开提示的子窗口
 var appIcon = null //托盘
 var messageFlag = true //托盘消息提示flag
 var messageTimer //托盘消息计时
 var messageQuene //消息队列
-const erpSystem = 'http://test-erp.emalacca.com/'
+const erpSystem = 'https://pre-erp.emalacca.com'
+var loopSyncTaskTimter = null //
 
 const Store = require('electron-store')
 let store = new Store({})
+store.set('isDev', isDev)
 store.set('siteConfig', SiteConfig)
 store.set(
   'noticeSounds',
@@ -83,10 +87,12 @@ async function createBrowserWindow() {
     autoHideMenuBar: true,
     show: false,
     title: '马六甲虾皮聊聊客户端',
+    minimizable: true,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
       contextIsolation: false,
+      preload: path.join(__dirname, './utils/lib.js'),
     },
   })
 
@@ -104,7 +110,7 @@ async function createBrowserWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
     let feedUrl = 'https://test2-erp.emalacca.com/chat/'
-    updateHandle(mainWindow, feedUrl)
+    updateHandle.init(mainWindow, feedUrl)
   })
 
   mainWindow.webContents.on('did-finish-load', function () {
@@ -125,12 +131,19 @@ async function createBrowserWindow() {
       const css = fs
         .readFileSync(path.join(__dirname, './insert/inject.min.css'))
         .toString()
+      const styles = fs
+        .readFileSync(path.join(__dirname, './styles/toast.min.css'))
+        .toString()
+
       mainWindow.webContents.executeJavaScript(js)
       mainWindow.webContents.insertCSS(css)
+      mainWindow.webContents.insertCSS(styles)
 
-      setTimeout(() => {
-        loopSyncTask()
-      }, 100)
+      if (!isDev) {
+        setTimeout(() => {
+          loopSyncTask()
+        }, 100)
+      }
     }
   })
 
@@ -164,28 +177,28 @@ async function createBrowserWindow() {
   //   })
 
   mainWindow.on('close', e => {
-    dialog.showMessageBox(
-      {
-        type: 'info',
-        title: 'Information',
-        defaultId: 0,
+    // 先阻止默认功能的调用，否则会关闭窗口
+    e.preventDefault()
+    dialog
+      .showMessageBox(mainWindow, {
+        type: 'warning',
+        title: '虾皮聊聊客户端',
         message: '确定要关闭吗？',
         buttons: ['最小化', '直接退出'],
-      },
-      index => {
-        if (index === 0) {
-          e.preventDefault() //阻止默认行为，一定要有
-          mainWindow.minimize() //调用 最小化实例方法
-        } else {
+      })
+      .then(index => {
+        if (index.response === 1) {
           mainWindow = null
-          //app.quit();	//不要用quit();试了会弹两次
-          app.exit() //exit()直接关闭客户端，不会执行quit();
+          app.exit()
+        } else {
+          mainWindow.minimize()
         }
-      }
-    )
+      })
   })
 
-  mainWindow.webContents.openDevTools()
+  if (isDev) {
+    mainWindow.webContents.openDevTools()
+  }
 }
 
 // 设置拦截
@@ -214,7 +227,11 @@ async function setIntercept() {
           details.requestHeaders['x-v'] = '4'
         } catch (error) {
           log.error('currentStore', String(store.get('currentStore')), error)
-          dialog.showErrorBox('提示', '店铺数据错误')
+          //   dialog.showErrorBox('提示', '店铺数据错误')
+          tryToGetAuthedStore('init').then(() => {
+            console.log('checkauth finished')
+            loadDefaultStoreChat()
+          })
         }
 
         if (/login/.test(details.url)) {
@@ -335,6 +352,9 @@ async function injectMessageMonitor() {
 
         break
       case 'ADD_STORE': //添加店铺
+        if (childWindow && childWindow.isVisible()) {
+          return false
+        }
         childWindow = new BrowserWindow({
           show: false,
           maximizable: false,
@@ -344,10 +364,6 @@ async function injectMessageMonitor() {
           frame: false,
           parent: mainWindow,
           webPreferences: {
-            preload: path.join(
-              app.getAppPath(),
-              '/components/add-store/child.js'
-            ),
             nodeIntegration: true, // 是否启用node集成
             enableRemoteModule: true, // 是否启用remote模块
           },
@@ -357,7 +373,9 @@ async function injectMessageMonitor() {
         childWindow.once('ready-to-show', () => {
           childWindow.show()
         })
-        childWindow.webContents.openDevTools()
+        if (isDev) {
+          childWindow.webContents.openDevTools()
+        }
         break
       case 'CLOSE_CHILD_WINDOW': //关闭子窗口
         childWindow.close()
@@ -368,11 +386,11 @@ async function injectMessageMonitor() {
       case 'SUCCESS_ADD_STORE': //添加店铺成功
         setTimeout(function () {
           childWindow.close()
-          tryToGetAuthedStore('add').then(() => {
-            console.log('checkauth finished')
-            loadDefaultStoreChat()
-          })
         }, 2000)
+        tryToGetAuthedStore('add').then(() => {
+          console.log('checkauth finished')
+          loadDefaultStoreChat()
+        })
         break
       case 'HANDLE_IMPORT_FILE': //导入文件
         dialog
@@ -471,8 +489,9 @@ function loadDefaultStoreChat() {
     .catch(err => {
       log.error('loadDefaultStoreChat error:', err)
       //   mainWindow.reload()
-      reloadWindow(mainWindow)
-      dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
+      //   reloadWindow(mainWindow)
+      app.relaunch()
+      //   dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
       //   app.exit()
     })
 }
@@ -531,8 +550,11 @@ async function sendMessage(params) {
 
 // 循环同步任务
 async function loopSyncTask() {
-  setInterval(async () => {
+  loopSyncTaskTimter = setInterval(async () => {
     let authedStore = storage.getItem('authedStore') //已授权的店铺列表
+    if (Object.keys(authedStore) == 0) {
+      clearInterval(loopSyncTaskTimter)
+    }
     log.info(
       '======================shopee sync message start ======================'
     )
@@ -633,11 +655,13 @@ async function removeBindStore(storeId) {
         })
         log.info('handleRemoveBindStore success')
       } else {
+        mainWindowNotifier('HIDE_LOADING')
         dialog.showErrorBox('提示', '解绑失败，请稍后重试')
       }
     })
     .catch(error => {
       log.error(error)
+      mainWindowNotifier('HIDE_LOADING')
       dialog.showErrorBox('提示', '解绑失败，请稍后重试')
     })
 }
@@ -663,11 +687,13 @@ async function modifyAliasName(params) {
           loadDefaultStoreChat()
         })
       } else {
+        mainWindowNotifier('HIDE_LOADING')
         dialog.showErrorBox('提示', '修改失败，请稍后重试')
       }
     })
     .catch(error => {
       log.error(error)
+      mainWindowNotifier('HIDE_LOADING')
       dialog.showErrorBox('提示', '修改失败，请稍后重试')
     })
 }
@@ -688,7 +714,7 @@ async function tryToGetAuthedStore(type) {
   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
     // 初始化时如果本地存储没有授权信息
-    if (!storeMenuList && type == 'init') {
+    if (!storeMenuList || type == 'init') {
       let res = await server.getAuthedAtore()
       log.error('storeMenuList 本地没有授权列表', res)
     }
@@ -708,9 +734,9 @@ async function tryToGetAuthedStore(type) {
         log.error('authedStore 本地没有授权信息', res)
       }
 
-      let { expires_time } = authedStore
+      let authedStoreExpires = storage.getItem('authedStoreExpires')
       let currentTime = Date.parse(new Date()) / 1000
-      if (!expires_time || expires_time < currentTime) {
+      if (!authedStoreExpires || authedStoreExpires < currentTime) {
         let res = await server.getStoreAuthInfo()
         log.error('authedStore 已过期', res)
       }
@@ -766,6 +792,12 @@ async function createTray() {
               console.log(!app.isPackaged)
             },
           },
+          {
+            label: '检查更新',
+            click: () => {
+              updateHandle.check()
+            },
+          },
         ],
       },
       {
@@ -791,12 +823,6 @@ async function createTray() {
 
 app.on('ready', () => {
   log.info('app start')
-  //   storage.setItem('erpAuthStatus', -1)
-  //   storage.clear()
-  //   store.clear()
-  //   session.defaultSession.clearStorageData({
-  //     origin: erpSystem,
-  //   })
 
   tryToGetAuthedStore('init').then(() => {
     createBrowserWindow()
@@ -809,3 +835,32 @@ app.on('ready', () => {
 // app.on('window-all-closed', () => {
 //   if (appIcon) appIcon.destroy()
 // })
+// 网络状态显示
+app.whenReady().then(() => {
+  // 网络状态显示
+  onlineStatusWindow = new BrowserWindow({
+    opacity: 0,
+    show: false,
+    width: 300,
+    height: 48,
+    maximizable: false,
+    minimizable: false,
+    frame: false,
+    parent: mainWindow,
+    webPreferences: {
+      nodeIntegration: true, // 是否启用node集成
+      enableRemoteModule: true, // 是否启用remote模块
+    },
+  })
+  onlineStatusWindow.loadFile('./components/line-status/lineStatus.html')
+  ipcMain.on('online-status-changed', (event, status) => {
+    onlineStatusWindow.show()
+    onlineStatusWindow.setOpacity(1)
+    onlineStatusWindow.setAlwaysOnTop(true)
+    if (status === 'online') {
+      setTimeout(() => {
+        onlineStatusWindow.hide()
+      }, 3000)
+    }
+  })
+})

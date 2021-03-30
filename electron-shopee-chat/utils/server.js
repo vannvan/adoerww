@@ -17,7 +17,15 @@ module.exports = server = {
     return new Promise(async resolve => {
       let storeList = await API.handleGetChatClientStore()
       if (storeList && storeList.length > 0) {
-        let { countryCode, shopId } = storeList[0] //默认第一个店铺
+        //可能会有垃圾数据，需要确保shopId和countryCode都存在的店铺
+        let fisrtIndex = storeList.findIndex(el => el.shopId && el.countryCode)
+        //如果连这个都没有就说明没有店铺
+        if (!fisrtIndex) {
+          store.set('storeMenuList', null)
+          resolve(-1)
+        }
+        log.info('fisrt store', storeList[fisrtIndex])
+        let { countryCode, shopId } = storeList[fisrtIndex] //默认第一个店铺
         store.set('currentSite', countryCode)
         store.set('currentStore', shopId)
         store.set('storeMenuList', Lib.groupStore(storeList))
@@ -39,8 +47,9 @@ module.exports = server = {
     return new Promise(async resolve => {
       let authInfo = await API.handleGetStoresAuthInfo()
       if (Object.keys(authInfo).length > 0) {
-        authInfo.expires_time = Date.parse(new Date()) / 1000 + 3600 * 5 * 24 //授权过期的具体时间 5 天
+        let time = Date.parse(new Date()) / 1000 + 3600 * 5 * 24 //授权过期的具体时间 5 天
         storage.setItem('authedStore', authInfo)
+        storage.setItem('authedStoreExpires', time)
         resolve(authInfo)
       } else {
         log.error('store authInfo is empty')

@@ -8,128 +8,8 @@
 	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script> -->
 	<link rel="stylesheet" href="https://at.alicdn.com/t/font_1833787_y77zoekr35.css">
 	<link rel="stylesheet" href="bootstrap.min.css">
-	<style>
-		ul,
-		ol,
-		li {
-			list-style-type: none;
-			padding-inline-start: 0;
-		}
-
-		.em-tabs {
-			display: flex;
-		}
-
-		.em-tabs-items {
-			position: relative;
-			font-weight: 600;
-			cursor: pointer;
-		}
-
-		.em-tabs-items+.em-tabs-items {
-			margin-left: 24px;
-		}
-
-		.is-em-active {
-			color: #FF720D;
-		}
-		.fc-blue {
-			color: #2A62ED;
-		}
-		.fc-gray {
-			color: #7B7B7B;
-		}
-
-		.is-em-active .is-em-active-index {
-			display: block;
-			position: absolute;
-			bottom: -1rem;
-			width: 100%;
-			left: 0;
-			border-bottom: 2px solid #FF720D;
-		}
-
-		.em-tabs-content {
-			display: none;
-			line-height: 28px;
-		}
-
-		.em-tabs-content.is-em-content,
-		.em-tabs-footer.is-em-footer {
-			display: block;
-		}
-
-		.em-tabs-content h6 {
-			font-weight: 600;
-			margin: 16px 0 12px;
-		}
-
-		.em-tabs-content h6:first-child {
-			margin-top: 0;
-		}
-
-		.em-tabs-footer,
-		#errorAlert {
-			display: none;
-		}
-
-		.em-input-items+.em-input-items {
-			position: relative;
-			margin-top: 16px;
-		}
-
-		.modal-dialog .btn-primary,.custom-control-input:checked~.custom-control-label::before {
-			background-color: #FF720D;
-			border-color: #FF720D;
-		}
-		.em-iconfont-position {
-			position: absolute;
-			z-index: 2;
-			top: 6px;
-			right: 10px;
-		}
-
-		.em-iconfont-password,
-		.downloadExecle,
-		.fc-blue {
-			cursor: pointer;
-		}
-
-		.success-toast {
-			position: fixed;
-			left: 50%;
-			top: 50%;
-			z-index: 9;
-			display: none;
-			transform: translate(-50%, -50%);
-			min-width: 250px;
-			text-align: center;
-		}
-		#erpStoreList{
-			margin: 16px 0 ;
-		}
-		#erpStoreList .custom-control{
-			display: inline-block;
-			margin-right: 16px;
-			margin-bottom: 10px;
-		}
-		#erpStoreList .custom-control-label{
-			line-height: 24px;
-		}
-		.auth-code{
-			display: none;
-		}
-		#sendAuthCode {
-			width: 150px;
-    	margin-left: 20px;
-		}
-		
-		@media (min-width: 576px) {
-			.modal-dialog {
-				width: 100% !important;
-			}
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="../../styles/toast.min.css">
+	<link rel="stylesheet" href="addStore.css">
 
 </head>
 
@@ -159,7 +39,7 @@
 							<em class="is-em-active-index"></em>
 						</li>
 					</ul>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close">
+					<button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close" id="close">
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
@@ -218,24 +98,27 @@
 
 				<div class="modal-footer">
 					<div class="em-tabs-footer is-em-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-secondary btn-close">取消</button>
 						<button type="button" class="btn btn-primary" id="handleAuth">授权</button>
 					</div>
 					<div class="em-tabs-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-secondary btn-close">取消</button>
 						<button type="button" class="btn btn-primary" id="handleImportFile">导入文件</button>
 					</div>
 					<div class="em-tabs-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-secondary btn-close">取消</button>
 						<button type="button" class="btn btn-primary" id="handleImportShops">导入店铺</button>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="shoppe-loading-wrap">
+			<div class="shade"></div>
+			<div class="inside"></div>
+			<div class="back"></div>
+		</div>
 	</div>
-	<div class="alert alert-success success-toast" role="alert">
-		操作成功！
-	</div>
+	
 </body>
 <script src="addStore.js"></script>
 <!-- <script src="bootstrap.min.js"></script> -->

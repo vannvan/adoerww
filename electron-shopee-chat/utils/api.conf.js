@@ -1,6 +1,7 @@
 const { default: axios } = require('axios')
 const storage = require('electron-localstorage')
 storage.setStoragePath('./storage.json')
+const log = require('electron-log')
 
 function getToken() {
   return storage.getItem('erpAuth')
@@ -9,7 +10,8 @@ function getToken() {
 }
 
 module.exports = API = {
-  BASE_URL: 'http://192.168.50.87:8999/',
+  //   BASE_URL: 'https://pre-erp.emalacca.com/api',
+  BASE_URL: 'http://192.168.50.87:8999',
   // shoppe登录
   handleLoginShopee: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
@@ -20,6 +22,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('handleLoginShopee', Lib.getError(error))
           reject(error)
         })
     })
@@ -35,6 +38,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('handleAddStore', Lib.getError(error))
           reject(error)
         })
     })
@@ -55,6 +59,7 @@ module.exports = API = {
           resolve(res)
         })
         .catch(error => {
+          log.error('downloadExecle', Lib.getError(error))
           reject(error)
         })
     })
@@ -69,6 +74,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('getErpStoreList', Lib.getError(error))
           reject(error)
         })
     })
@@ -87,6 +93,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('importStoreFile', Lib.getError(error))
           reject(error)
         })
     })
@@ -102,6 +109,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('importErpStore', Lib.getError(error))
           reject(error)
         })
     })
@@ -120,6 +128,7 @@ module.exports = API = {
           resolve(res.data)
         })
         .catch(error => {
+          log.error('handleRemoveStore', Lib.getError(error))
           reject(error)
         })
     })
@@ -135,6 +144,7 @@ module.exports = API = {
           resolve(res.data.data)
         })
         .catch(error => {
+          log.error('handleGetChatClientStore', Lib.getError(error))
           reject(error)
         })
     })
@@ -150,6 +160,7 @@ module.exports = API = {
           resolve(res.data.data)
         })
         .catch(error => {
+          log.error('handleGetStoresAuthInfo', Lib.getError(error))
           reject(error)
         })
     })
@@ -164,11 +175,12 @@ module.exports = API = {
     }
     return new Promise((resolve, reject) => {
       axios
-        .post(this.BASE_URL + '/product/crawl/talk/update-store-remark', data)
+        .post(this.BASE_URL + '/product/crawl/talk/update-store-alias', data)
         .then(res => {
           resolve(res.data.data)
         })
         .catch(error => {
+          log.error('handleModifyAliasName', Lib.getError(error))
           reject(error)
         })
     })
