@@ -64,19 +64,22 @@ $('.btn-close').click(function () {
   ipcNotice({
     type: 'CLOSE_CHILD_WINDOW',
   })
+  $('#accountNumber').val('')
+  $('#validationPassword').val('')
+  $('#auth-code').hide()
 })
 
 // 添加店铺--授权
 $('#handleAuth').click(function () {
   $('.shoppe-loading-wrap').css({
-    display: 'block'
+    display: 'block',
   })
   handleAddStore()
 })
 // 添加店铺--重新发送验证码
 $('#sendAuthCode').click(() => {
   $('.shoppe-loading-wrap').css({
-    display: 'block'
+    display: 'block',
   })
   handleAddStore()
 })
@@ -86,9 +89,9 @@ $('.downloadExecle').click(function () {
 })
 // 批量导入--导入文件
 $('#handleImportFile').click(() => {
-  $('.shoppe-loading-wrap').css({
-    display: 'block'
-  })
+  //   $('.shoppe-loading-wrap').css({
+  //     display: 'block'
+  //   })
   handleImportFile()
 })
 // 云端导入--查看详情
@@ -98,7 +101,7 @@ $('#erpEmalaccaStore').click(function () {
 // 云端导入--导入店铺
 $('#handleImportShops').click(() => {
   $('.shoppe-loading-wrap').css({
-    display: 'block'
+    display: 'block',
   })
   handleImportErp()
 })
@@ -135,7 +138,7 @@ function handleAddStore() {
         let countryCode = params.domain
           .match(/seller\.(\S*)\.shopee/)[1]
           .toUpperCase()
-        
+
         let addData = {
           countryCode: siteArr.includes(countryCode) ? countryCode : 'TW',
           storeLoginPsw: password,
@@ -144,7 +147,7 @@ function handleAddStore() {
         API.handleAddStore(addData)
           .then(addResult => {
             log.info(addResult.data)
-            $('.shoppe-loading-wrap').css({ display: 'none' })
+            $('.shoppe-loading-wrap').hide()
             if (addResult.code == 0) {
               ipcNotice({
                 type: 'SUCCESS_ADD_STORE',
@@ -153,29 +156,28 @@ function handleAddStore() {
                 type: 'success',
                 msg: '操作成功',
               })
-              let successToast = document.querySelector('.success-toast')
-              successToast.style.display = 'block'
             }
             log.info(
               '======================handleAddStore end======================'
             )
           })
           .catch(error => {
-            $('.shoppe-loading-wrap').css({ display: 'none' })
-            if (Lib.getError(error).message) {
-              ipcNotice({
-                type: 'ERROR_DIALOG',
-                params: Lib.getError(error).message,
+            $('.shoppe-loading-wrap').hide()
+            log.error('handleAddStore error:', Lib.getError(error))
+            if (error.message) {
+              $.fn.message({
+                type: 'error',
+                msg: Lib.getError(error).message,
+              })
+            } else {
+              $.fn.message({
+                type: 'error',
+                msg: '操作失败, 请稍后重试！',
               })
             }
-            log.error('handleAddStore error:', Lib.getError(error))
-            $.fn.message({
-              type: 'error',
-              msg: '操作失败, 请稍后重试！',
-            })
           })
       } else if (data.rspStatusCode === 470) {
-        $('.shoppe-loading-wrap').css({ display: 'none' })
+        $('.shoppe-loading-wrap').hide()
         // 验证码
         let authCode = document.querySelector('.auth-code')
         authCode.style.display = 'flex'
@@ -187,32 +189,43 @@ function handleAddStore() {
           handleAuthCode()
         }
       } else if (data.rspStatusCode === 482) {
-        $('.shoppe-loading-wrap').css({ display: 'none' })
+        $('.shoppe-loading-wrap').hide()
         // 验证码
         $.fn.message({
           type: 'warning',
           msg: '验证码错误, 请重新输入',
         })
       } else if (data.rspStatusCode === 491) {
-        $('.shoppe-loading-wrap').css({ display: 'none' })
+        $('.shoppe-loading-wrap').hide()
         // 账号或密码
         $.fn.message({
           type: 'warning',
           msg: '账号或密码错误, 请重新输入',
         })
       } else if (data.rspMsg && data.rspStatusCode !== 200) {
-        $('.shoppe-loading-wrap').css({ display: 'none' })
+        $('.shoppe-loading-wrap').hide()
         // 账号或密码
         $.fn.message({
           type: 'warning',
           msg: data.rspMsg,
         })
+      } else if (data.rspStatusCode === 404) {
+        $('.shoppe-loading-wrap').css({ display: 'none' })
+        // 账号或密码
+        $.fn.message({
+          type: 'warning',
+          msg: '当前站点不存在该账号',
+        })
       } else {
         $('.shoppe-loading-wrap').css({ display: 'none' })
+        $.fn.message({
+          type: 'warning',
+          msg: '登录信息有误，请查询后，再试',
+        })
       }
     })
     .catch(error => {
-      $('.shoppe-loading-wrap').css({ display: 'none' })
+      $('.shoppe-loading-wrap').hide()
       log.error('handleLoginShopee error:', Lib.getError(error))
       $.fn.message({
         type: 'error',
@@ -265,27 +278,32 @@ function handleImportFile() {
         let file = new File([fileStream], firstFile)
         let formData = new FormData()
         formData.append('file', file)
-        API.importStoreFile(formData).then(res => {
-          $('.shoppe-loading-wrap').css({ display: 'none' })
-          if (res.data) {
-            $.fn.message({
-              type: 'success',
-              msg: '操作成功',
-            })
-          }
-        })
-        .catch(error => {
-          log.error('downloadExecle:', error)
-          $('.shoppe-loading-wrap').css({ display: 'none' })
-          $.fn.message({
-            type: 'error',
-            msg: '操作失败, 请稍后重试！',
+        $('.shoppe-loading-wrap').show()
+        API.importStoreFile(formData)
+          .then(res => {
+            $('.shoppe-loading-wrap').hide()
+            if (res.data) {
+              $.fn.message({
+                type: 'success',
+                msg: '操作成功',
+              })
+              ipcNotice({
+                type: 'SUCCESS_ADD_STORE',
+              })
+            }
           })
-        })
+          .catch(error => {
+            log.error('downloadExecle:', error)
+            $('.shoppe-loading-wrap').hide()
+            $.fn.message({
+              type: 'error',
+              msg: '操作失败, 请稍后重试！',
+            })
+          })
       }
     })
     .catch(err => {
-      $('.shoppe-loading-wrap').css({ display: 'none' })
+      $('.shoppe-loading-wrap').hide()
       log.error(err)
       $.fn.message({
         type: 'error',
@@ -301,16 +319,19 @@ function handleImportErp() {
   })
   API.importErpStore({ stores: tempArray })
     .then(res => {
-      $('.shoppe-loading-wrap').css({ display: 'none' })
+      $('.shoppe-loading-wrap').hide()
       if (res.data) {
         $.fn.message({
           type: 'success',
           msg: '操作成功',
         })
+        ipcNotice({
+          type: 'SUCCESS_ADD_STORE',
+        })
       }
     })
     .catch(err => {
-      $('.shoppe-loading-wrap').css({ display: 'none' })
+      $('.shoppe-loading-wrap').hide()
       log.error(err)
       $.fn.message({
         type: 'error',
@@ -325,20 +346,8 @@ function handleAuthCode() {
     if (athCodeTime == 0) {
       $('#sendAuthCode').html('重新发送')
       $('#sendAuthCode').removeAttr('disabled')
-      athCodeTime = 59
       clearInterval(timeInterval)
-    } else {
-      $('#sendAuthCode').attr('disabled', 'true')
-      $('#sendAuthCode').html('重新发送(' + athCodeTime + ')')
-      athCodeTime--
-    }
-  }, 1000)
-  timeInterval = setInterval(function () {
-    if (athCodeTime == 0) {
-      $('#sendAuthCode').html('重新发送')
-      $('#sendAuthCode').removeAttr('disabled')
       athCodeTime = 59
-      clearInterval(timeInterval)
     } else {
       $('#sendAuthCode').attr('disabled', 'true')
       $('#sendAuthCode').html('重新发送(' + athCodeTime + ')')

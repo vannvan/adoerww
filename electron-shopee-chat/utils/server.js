@@ -17,24 +17,32 @@ module.exports = server = {
     return new Promise(async resolve => {
       let storeList = await API.handleGetChatClientStore()
       if (storeList && storeList.length > 0) {
-        //可能会有垃圾数据，需要确保shopId和countryCode都存在的店铺
-        let fisrtIndex = storeList.findIndex(el => el.shopId && el.countryCode)
-        //如果连这个都没有就说明没有店铺
-        if (!fisrtIndex) {
-          store.set('storeMenuList', null)
+        try {
+          //可能会有垃圾数据，需要确保shopId和countryCode都存在的店铺
+          let fisrtIndex = storeList.findIndex(
+            el => el.shopId && el.countryCode
+          )
+          //如果连这个都没有就说明没有店铺
+          if (!fisrtIndex < 0) {
+            log.error('fisrtIndex error')
+            store.set('storeMenuList', null)
+            resolve(-1)
+          }
+          log.info('fisrt store', JSON.stringify(storeList[fisrtIndex]))
+          let { countryCode, shopId } = storeList[fisrtIndex] //默认第一个店铺
+          store.set('currentSite', countryCode)
+          store.set('currentStore', shopId)
+          store.set('storeMenuList', Lib.groupStore(storeList))
+          resolve(fisrtIndex > -1 ? storeList : -1)
+        } catch (error) {
+          log.error('getAuthedAtore:', error)
           resolve(-1)
         }
-        log.info('fisrt store', storeList[fisrtIndex])
-        let { countryCode, shopId } = storeList[fisrtIndex] //默认第一个店铺
-        store.set('currentSite', countryCode)
-        store.set('currentStore', shopId)
-        store.set('storeMenuList', Lib.groupStore(storeList))
-        resolve(storeList)
       } else {
         log.error('store is empty')
         resolve(-1)
       }
-      log.info(storeList)
+      log.info('storeList:', JSON.stringify(storeList))
       log.info('======================getAuthedAtore end======================')
     })
   },
@@ -55,7 +63,7 @@ module.exports = server = {
         log.error('store authInfo is empty')
         resolve(-1)
       }
-      log.info(authInfo)
+      log.info('authInfo', JSON.stringify(authInfo))
       log.info(
         '======================getStoreAuthInfo end======================'
       )

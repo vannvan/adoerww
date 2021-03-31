@@ -23,6 +23,7 @@ async function loopGetStorageTask() {
           type: 'SET_ERP_AUTH',
           params: rest,
         })
+        window._VV.successAlert('登录成功,正在获取店铺数据，请稍后...')
         clearInterval(globalTimer)
       }
     }
@@ -34,9 +35,9 @@ async function loopGetStorageTask() {
   }
 }
 
-setInterval(() => {
+globalTimer = setInterval(() => {
   loopGetStorageTask()
-}, 1000)
+}, 500)
 
 // 向主线程发送消息
 async function ipcNotice({ type, params }) {

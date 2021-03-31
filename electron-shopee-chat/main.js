@@ -59,6 +59,30 @@ if (store.get('noticeEnable') == undefined) {
   store.set('noticeEnable', true)
 }
 
+axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
+
+axios.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    let originalRequest = error.config
+    if (
+      error.code === 'ECONNABORTED' &&
+      error.message.indexOf('timeout') !== -1 &&
+      !originalRequest._retry
+    ) {
+      //   // eslint-disable-next-line
+      //   if (mainWindow) {
+      //     mainWindowNotifier({
+      //       type: 'ERROR_ALERT',
+      //       params: '网络超时',
+      //     })
+      //   }
+    }
+    return Promise.reject(error)
+  }
+)
 // app.dock.hide() //mac隐藏菜单
 Menu.setApplicationMenu(null) //windows隐藏菜单
 
@@ -159,15 +183,8 @@ async function createBrowserWindow() {
     }
   )
 
-  //窗口聚焦监听
-  mainWindow.on('focus', function () {
-    mainWindow.focus()
-    // log.info(mainWindow.isFocused(), 'mainWindow.isFocused()')
-  })
-
-  //窗口失去焦点.
-  mainWindow.on('blur', function () {
-    //
+  mainWindow.on('closed', function () {
+    mainWindow = null
   })
 
   //   dialog.showOpenDialogSync({
@@ -201,6 +218,37 @@ async function createBrowserWindow() {
   }
 }
 
+function getShopeeAuth() {
+  let currentStoreId = String(store.get('currentStore'))
+  let authedStore = storage.getItem('authedStore')
+  let storeMenuList = store.get('storeMenuList')
+  if (!storeMenuList && !authedStore) {
+    return null
+  } else {
+    if (authedStore[currentStoreId]) {
+      return {
+        token: authedStore[currentStoreId].token,
+        cookie: authedStore[currentStoreId].cookieStr,
+      }
+    } else if (store.get('storeMenuList')) {
+      storeMenuList = Lib.flat(
+        store.get('storeMenuList').map(el => el.storeList)
+      )
+      let shopInfo = storeMenuList.find(item => item.shopId == currentStoreId)
+      if (shopInfo) {
+        return {
+          token: shopInfo.tk.token,
+          cookie: shopInfo.tk.cookieStr,
+        }
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
+  }
+}
+
 // 设置拦截
 async function setIntercept() {
   // 修改存取下列 URL 時使用的 User Agent。
@@ -216,43 +264,23 @@ async function setIntercept() {
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36'
       if (/shopee|xiapibuy/.test(details.url)) {
         try {
-          let authedStore = storage.getItem('authedStore') //已授权的店铺列表
-          let currentStoreId = String(store.get('currentStore')) // 当前所在的店铺
-          let currentStoreInfo = authedStore[currentStoreId]
-          let currentStoreCookies = currentStoreInfo.cookieStr
-          details.requestHeaders['authorization'] =
-            'Bearer ' + currentStoreInfo.token
-          details.requestHeaders['cookie'] = currentStoreCookies
-          details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
-          details.requestHeaders['x-v'] = '4'
+          if (getShopeeAuth()) {
+            log.info('getShopeeAuth:', getShopeeAuth())
+            details.requestHeaders['authorization'] =
+              'Bearer ' + getShopeeAuth().token
+            details.requestHeaders['cookie'] = getShopeeAuth().cookie
+            details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
+            details.requestHeaders['x-v'] = '4'
+          } else {
+            log.error(
+              'getShopeeAuth error:',
+              getShopeeAuth(),
+              'url:',
+              details.url
+            )
+          }
         } catch (error) {
           log.error('currentStore', String(store.get('currentStore')), error)
-          //   dialog.showErrorBox('提示', '店铺数据错误')
-          tryToGetAuthedStore('init').then(() => {
-            console.log('checkauth finished')
-            loadDefaultStoreChat()
-          })
-        }
-
-        if (/login/.test(details.url)) {
-          let authedStore = storage.getItem('authedStore') //已授权的店铺列表
-          let currentStoreId = String(store.get('currentStore')) // 当前所在的店铺
-          let currentStoreInfo = authedStore[currentStoreId]
-          log.info(
-            '======================shopee user auth action start======================'
-          )
-          log.info(
-            'shopee user auth action:',
-            'storage storeId:',
-            currentStoreId,
-            'token:',
-            currentStoreInfo.token,
-            'cookie:',
-            details.requestHeaders['cookie']
-          )
-          log.info(
-            '======================shopee user auth action end  ======================'
-          )
         }
       }
       callback({ requestHeaders: details.requestHeaders })
@@ -286,8 +314,7 @@ async function injectMessageMonitor() {
         store.set('currentSite', params.key) //当前站点
         try {
           //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
-          let exitCookies = storage.getItem('authedStore')[params.storeId]
-          if (exitCookies) {
+          if (getShopeeAuth()) {
             mainWindow
               .loadURL(
                 `https://${
@@ -312,7 +339,6 @@ async function injectMessageMonitor() {
             '当前店铺未正式授权，请完成授权后进行操作'
           )
         }
-
         break
       case 'TRANS_TEXT': // 翻译文本
         handleTranslation(params)
@@ -322,9 +348,6 @@ async function injectMessageMonitor() {
         break
       case 'UPLOAD_IMAGE': //上传图片
         handleUploadImage(params)
-        break
-      case 'ERROR_DIALOG': //错误提示
-        dialog.showErrorBox('提示', params)
         break
       case 'SET_ERP_AUTH': //erp授权
         if (params) {
@@ -340,20 +363,23 @@ async function injectMessageMonitor() {
       case 'ERP_LOGOUT': // erp退出
         storage.setItem('erpAuthStatus', -1)
         storage.setItem('erpAuth', null)
+        store.set('storeMenuList', null)
+        store.set('currentStore', null)
+        store.set('currentSite', null)
         session.defaultSession.clearStorageData({
           origin: erpSystem,
         })
-        mainWindow.webContents.loadURL(`${erpSystem}/auth/login`),
-          then(() => {
-            mainWindow.setMinimumSize(980, 640)
-            mainWindow.setSize(980, 640)
-            mainWindow.center()
-          })
+        mainWindow.webContents.loadURL(`${erpSystem}/auth/login`).then(() => {
+          mainWindow.setMinimumSize(980, 640)
+          mainWindow.setSize(980, 640)
+          mainWindow.center()
+        })
 
         break
       case 'ADD_STORE': //添加店铺
-        if (childWindow && childWindow.isVisible()) {
-          return false
+        if (childWindow) {
+          childWindow.show()
+          return
         }
         childWindow = new BrowserWindow({
           show: false,
@@ -368,6 +394,9 @@ async function injectMessageMonitor() {
             enableRemoteModule: true, // 是否启用remote模块
           },
         })
+        childWindow.on('blur', function () {
+          childWindow.hide()
+        })
         // childWindow.setAlwaysOnTop(true)
         childWindow.loadFile('./components/add-store/addStore.html')
         childWindow.once('ready-to-show', () => {
@@ -378,15 +407,13 @@ async function injectMessageMonitor() {
         }
         break
       case 'CLOSE_CHILD_WINDOW': //关闭子窗口
-        childWindow.close()
+        childWindow.hide()
         break
       case 'REMOVE_BIND_STORE': //解绑店铺
         removeBindStore(params)
         break
       case 'SUCCESS_ADD_STORE': //添加店铺成功
-        setTimeout(function () {
-          childWindow.close()
-        }, 2000)
+        childWindow.hide()
         tryToGetAuthedStore('add').then(() => {
           console.log('checkauth finished')
           loadDefaultStoreChat()
@@ -431,7 +458,7 @@ async function handleTranslation({ type, messageText, targetLang }) {
     dialog.showErrorBox('提示', '请输入消息内容')
     return false
   }
-  let sourceLang = type == 'send' ? 'zh-CN' : 'en'
+  let sourceLang = type == 'send' ? 'zh-CN' : 'auto'
   googleTr(messageText, sourceLang, targetLang)
     .then(resultText => {
       log.info('translation result:', resultText.map(el => el[0]).join(''))
@@ -439,7 +466,9 @@ async function handleTranslation({ type, messageText, targetLang }) {
       if (type == 'send') {
         mainWindowNotifier('REPLACE_TEXTAREA', result) //替换textarea
       } else {
-        mainWindowNotifier('TRANSLATION_RESULT', { targetText: resultText })
+        mainWindowNotifier('TRANSLATION_RESULT', {
+          targetText: JSON.stringify(resultText),
+        })
       }
     })
     .catch(error => {
@@ -714,17 +743,17 @@ async function tryToGetAuthedStore(type) {
   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
     // 初始化时如果本地存储没有授权信息
-    if (!storeMenuList || type == 'init') {
-      let res = await server.getAuthedAtore()
-      log.error('storeMenuList 本地没有授权列表', res)
+    if (!storeMenuList && type == 'init') {
+      let store = await server.getAuthedAtore()
+      log.error('storeMenuList 本地没有授权列表', JSON.stringify(store))
     }
 
     //如果不是初始化
     if (storeMenuList && type != 'init') {
       let store = await server.getAuthedAtore()
-      log.error('storeMenuList 更新授权列表', store)
+      log.error('storeMenuList 更新授权列表', JSON.stringify(store))
       let auth = await server.getStoreAuthInfo()
-      log.error('storeMenuList 更新token列表', auth)
+      log.error('storeMenuList 更新token列表', JSON.stringify(auth))
     }
 
     //在有店铺列表的情况下调获取token的接口
@@ -832,9 +861,6 @@ app.on('ready', () => {
   })
 })
 
-// app.on('window-all-closed', () => {
-//   if (appIcon) appIcon.destroy()
-// })
 // 网络状态显示
 app.whenReady().then(() => {
   // 网络状态显示
@@ -864,3 +890,44 @@ app.whenReady().then(() => {
     }
   })
 })
+
+const gotTheLock = app.requestSingleInstanceLock()
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // 当运行第二个实例时,将会聚焦到mainWindow这个窗口
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+      mainWindow.show()
+    }
+  })
+}
+
+// app.on('window-all-closed', () => {
+//   if (appIcon) appIcon.destroy()
+// })
+
+app.on('before-quit', function (evt) {
+  if (appIcon) appIcon.destroy()
+})
+
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  showWindow()
+})
+
+function showWindow() {
+  if (mainWindow) {
+    // 保证当前窗口存在
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    mainWindow.show()
+    mainWindow.focus()
+  } else {
+    createBrowserWindow()
+  }
+}

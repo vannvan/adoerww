@@ -8,10 +8,11 @@ function getToken() {
     ? storage.getItem('erpAuth').access_token
     : null
 }
+axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
 
 module.exports = API = {
-  //   BASE_URL: 'https://pre-erp.emalacca.com/api',
-  BASE_URL: 'http://192.168.50.87:8999',
+  BASE_URL: 'https://pre-erp.emalacca.com/api',
+  //   BASE_URL: 'http://192.168.50.87:8999',
   // shoppe登录
   handleLoginShopee: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()

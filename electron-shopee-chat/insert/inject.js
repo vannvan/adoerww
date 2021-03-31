@@ -125,7 +125,9 @@ $(function () {
         storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
           <span class="store-item-name" data-store="${
             subEl.shopId
-          }" data-key="${el.key}"> ${subEl.storeAlias || subEl.storeName}</span>
+          }" data-key="${el.key}"> ${
+          subEl.storeAlias || subEl.storeName || subEl.storeLoginAccount
+        }</span>
           <span class="icon em-iconfont em-icon-elipsis-v" data-store="${
             subEl.shopId
           }"></span>
@@ -275,13 +277,14 @@ function ReceiveMasterMessage() {
       case 'TRANSLATION_RESULT': // 翻译结果替换
         let messageEl = [...document.querySelectorAll('pre')]
         messageEl.map(el => {
-          console.log(JSON.stringify(params.targetText))
           if (
             currentTransNodeIndex == el.getAttribute('data-node-id') &&
             !el.getAttribute('trans')
           ) {
             el.setAttribute('trans', true)
-            el.innerHTML = `${params.targetText.map(el => el[0]).join('')}`
+            el.innerHTML = `${JSON.parse(params.targetText)
+              .map(el => el[0])
+              .join('')}`
           }
         })
         break
@@ -310,6 +313,13 @@ function ReceiveMasterMessage() {
         break
       case 'HIDE_LOADING': //隐藏loading
         $.fn.loadingHide()
+        break
+      case 'ERROR_ALERT': //错误提示
+        $.fn.message({
+          type: 'warning',
+          msg: params,
+        })
+        break
       default:
         break
     }
@@ -568,7 +578,6 @@ function dispatchStoreAction(actionType, storeId) {
     case 'modify-alias':
       //找到该店铺的位置
       let $storeItemName = $(`.store-item-name[data-store='${storeId}']`)
-      console.log($storeItemName)
       $('.emalacca-store-input').css({
         top: $storeItemName.offset().top,
         display: 'flex',
@@ -576,6 +585,7 @@ function dispatchStoreAction(actionType, storeId) {
       $('.emalacca-store-input input').focus()
       $('.emalacca-store-input .cancel').click(function () {
         $('.emalacca-store-input').hide()
+        $('.emalacca-store-input input').val('')
       })
       $('.emalacca-store-input .ok').click(function () {
         let aliasName = $('.emalacca-store-input input').val()
