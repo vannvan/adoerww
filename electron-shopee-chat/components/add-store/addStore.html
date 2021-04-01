@@ -34,10 +34,10 @@
                             批量导入
                             <em class="is-em-active-index"></em>
                         </li>
-                        <li class="em-tabs-items" data-index="2">
+                        <!-- <li class="em-tabs-items" data-index="2" sty>
                             云端导入
                             <em class="is-em-active-index"></em>
-                        </li>
+                        </li> -->
                     </ul>
                     <button type="button" class="close btn-close" data-dismiss="modal" aria-label="Close" id="close">
                         <span aria-hidden="true">&times;</span>
@@ -53,14 +53,14 @@
                         </div>
                         <div class="em-input-items">
                             <select class="form-control" id="shopeeDomain">
-                                <option value="https://seller.my.shopee.cn/">马来西亚</option>
+                                <!-- <option value="https://seller.my.shopee.cn/">马来西亚</option>
                                 <option value="https://seller.id.shopee.cn/">印度尼西亚</option>
                                 <option value="https://seller.th.shopee.cn/">泰国</option>
                                 <option value="https://seller.ph.shopee.cn/">菲律宾</option>
                                 <option value="https://seller.sg.shopee.cn/">新加坡</option>
                                 <option value="https://seller.vn.shopee.cn/">越南</option>
                                 <option value="https://seller.br.shopee.cn/">巴西</option>
-                                <option value="https://seller.xiapi.shopee.cn/">台湾</option>
+                                <option value="https://seller.xiapi.shopee.cn/">台湾</option> -->
                             </select>
                         </div>
                         <!-- is-valid成功 is-invalid错误-->
@@ -73,9 +73,13 @@
                             <span class="em-iconfont em-icon-mima em-iconfont-position em-iconfont-password"></span>
                         </div>
                         <div class="em-input-items auth-code">
-                            <input type="text" placeholder="验证码" class="form-control" id="authCodeFeedback"
-                                aria-describedby="validationAuthCodeFeedback" required>
-                            <button type="button" class="btn btn-primary" id="sendAuthCode">重新发送</button>
+                            <div style="display:flex;width:100%">
+                                <input type="text" placeholder="验证码" class="form-control" id="authCodeFeedback"
+                                    aria-describedby="validationAuthCodeFeedback" required>
+                                <button type="button" class="btn btn-primary" id="sendAuthCode"
+                                    style="white-space:nowrap;">重新发送</button>
+                            </div>
+
                         </div>
                     </div>
                     <div class="em-tabs-content">
@@ -96,7 +100,7 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
+                <div class="modal-footer" style="position: fixed; bottom: 0; right: 0; left: 0;border-top: none;">
                     <div class="em-tabs-footer is-em-footer">
                         <button type="button" class="btn btn-secondary btn-close">取消</button>
                         <button type="button" class="btn btn-primary" id="handleAuth">授权</button>

@@ -50,6 +50,12 @@ module.exports = Lib = {
     })
   },
 
+  objectToQueryString: function (obj) {
+    return Object.keys(obj)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(obj[key])}`)
+      .join('&')
+  },
+
   storageGet: function (key) {
     return sessionStorage.getItem(key)
       ? JSON.parse(sessionStorage.getItem(key))
@@ -109,7 +115,7 @@ module.exports = Lib = {
     let {
       config: { url, method, headers },
       data,
-    } = error.response || {config:{url:null}}
+    } = error.response || { config: { url: null } }
     return {
       url: url,
       method: method,

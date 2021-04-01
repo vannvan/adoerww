@@ -8,7 +8,7 @@ function getToken() {
     ? storage.getItem('erpAuth').access_token
     : null
 }
-axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
+// axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
 
 module.exports = API = {
   BASE_URL: 'https://pre-erp.emalacca.com/api',
@@ -146,6 +146,7 @@ module.exports = API = {
         })
         .catch(error => {
           log.error('handleGetChatClientStore', Lib.getError(error))
+          log.error('handleGetChatClientStore', error)
           reject(error)
         })
     })
@@ -169,6 +170,9 @@ module.exports = API = {
 
   //修改店铺别名
   handleModifyAliasName: function (params) {
+    log.info(
+      '======================handleModifyAliasName start======================'
+    )
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
     let data = {
       shopId: params.storeId,
@@ -178,11 +182,17 @@ module.exports = API = {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/update-store-alias', data)
         .then(res => {
+          log.info('handleModifyAliasName  success')
           resolve(res.data.data)
         })
         .catch(error => {
           log.error('handleModifyAliasName', Lib.getError(error))
           reject(error)
+        })
+        .finally(() => {
+          log.info(
+            '======================handleModifyAliasName end======================'
+          )
         })
     })
   },

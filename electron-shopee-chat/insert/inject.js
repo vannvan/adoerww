@@ -122,15 +122,22 @@ $(function () {
         let background = currentStoreId == subEl.shopId ? '#FF720D' : '#fff'
         let color = currentStoreId == subEl.shopId ? '#fff' : '#000'
         let highlightClass = currentStoreId == subEl.shopId ? 'active' : ''
+        let preIconColor = currentStoreId == subEl.shopId ? '#fff' : '#ef4d2d'
         storeListEl += `<li class="store-item ${highlightClass}"  style="background:${background};color:${color}">
-          <span class="store-item-name" data-store="${
-            subEl.shopId
-          }" data-key="${el.key}"> ${
+        <span class="icon em-iconfont em-icon-shopee" style="color:${preIconColor}"></span>  
+        <span class="store-item-name" data-store="${subEl.shopId}" data-key="${
+          el.key
+        }"> ${
           subEl.storeAlias || subEl.storeName || subEl.storeLoginAccount
         }</span>
-          <span class="icon em-iconfont em-icon-elipsis-v" data-store="${
-            subEl.shopId
-          }"></span>
+          <span class="icon em-iconfont em-icon-elipsis-v" style="visibility:${
+            subEl.authorizedStatus == 1 ? 'inherit' : 'hidden'
+          }" data-store="${subEl.shopId}"></span>
+          <span class="re-auth reauthorization" data-id="${
+            subEl.id
+          }" style="display:${
+          subEl.authorizedStatus == 0 ? 'inline-block' : 'none'
+        }">重新授权</span>
           <span class="new-message-tip" data-store="${subEl.shopId}"></span>
         </li>`
       })
@@ -187,12 +194,30 @@ $(function () {
         })
     }
   })
+
   //店铺操作
   $('.emalacca-store-operation').click(function (e) {
     //   console.log(e.target.getAttribute('action-type'))
     e.preventDefault()
     let actionType = e.target.getAttribute('action-type')
     dispatchStoreAction(actionType, $(this).attr('data-store'))
+  })
+
+  //重新授权
+  $('.reauthorization').click(function (e) {
+    let dataId = e.target.getAttribute('data-id')
+    let storeMenuList = Lib.flat(
+      store.get('storeMenuList').map(el => el.storeList)
+    )
+    let storeInfo = storeMenuList.find(el => el.id == dataId) //查找当前操作店铺信息
+    ipcNotice({
+      type: 'RE_AURH',
+      params: {
+        dataId: dataId,
+        countryCode: storeInfo?.countryCode,
+        storeLoginAccount: storeInfo?.storeLoginAccount,
+      },
+    })
   })
 
   // 菜单点击
@@ -320,6 +345,12 @@ function ReceiveMasterMessage() {
           msg: params,
         })
         break
+      case 'IS_LOADING_AUTHINFO': //正在加载权限列表
+        $.fn.message({
+          type: 'info',
+          msg: '正在重新加载店铺数据，请稍后...',
+        })
+        $.fn.loadingShow()
       default:
         break
     }
@@ -333,8 +364,8 @@ async function addNewUnReadMessageForStore(newMessageParams) {
     if (storeIds.includes($(this).attr('data-store'))) {
       let unReadMessageCount = newMessageParams.find(
         el => el.storeId == $(this).attr('data-store')
-      ).unread_message_count
-      $(this).parent().find('span:eq(1)').hide() //隐藏操作
+      ).unread_count
+      $(this).parent().find('span:eq(2)').hide() //隐藏操作
       $(this).show().text(unReadMessageCount)
     }
   })
@@ -516,6 +547,7 @@ async function handleSendMessage(buyer_id, params) {
 
 // 向主线程发送消息
 function ipcNotice({ type, params }) {
+  console.log('type:', type, 'params:', params)
   ipcRenderer.send('inject-message', { type: type, params: params })
 }
 
@@ -574,6 +606,9 @@ function dispatchStoreAction(actionType, storeId) {
         params: storeId,
       })
       $.fn.loadingShow()
+      setTimeout(() => {
+        $.fn.loadingHide()
+      }, 30000)
       break
     case 'modify-alias':
       //找到该店铺的位置
@@ -600,6 +635,9 @@ function dispatchStoreAction(actionType, storeId) {
             params: { storeId: storeId, aliasName: aliasName },
           })
           $.fn.loadingShow()
+          setTimeout(() => {
+            $.fn.loadingHide()
+          }, 30000)
         }
       })
     default:

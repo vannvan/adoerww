@@ -1,11 +1,11 @@
 {
     "name": "shopee-chat-client",
-    "version": "0.1.2",
+    "version": "0.1.23",
     "description": "虾皮聊聊客户端",
     "main": "main.js",
     "scripts": {
         "start": "electron . dev",
-        "build": "electron-builder --win --x64"
+        "build": "rm -rf dist && npm version patch && electron-builder --win --x64"
     },
     "repository": "https://gitlab.ikjzd.com/kj_erp/web/shopee-chat-client",
     "keywords": [

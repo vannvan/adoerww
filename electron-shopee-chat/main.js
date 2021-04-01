@@ -33,6 +33,7 @@ log.transports.console.level = true //是否输出到 控制台
 
 // console.log(log.transports.file.file)  //日志路径
 let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
+// let isDev = false
 
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
@@ -59,7 +60,7 @@ if (store.get('noticeEnable') == undefined) {
   store.set('noticeEnable', true)
 }
 
-axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
+// axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
 
 axios.interceptors.response.use(
   response => {
@@ -166,7 +167,7 @@ async function createBrowserWindow() {
       if (!isDev) {
         setTimeout(() => {
           loopSyncTask()
-        }, 100)
+        }, 5000)
       }
     }
   })
@@ -265,7 +266,6 @@ async function setIntercept() {
       if (/shopee|xiapibuy/.test(details.url)) {
         try {
           if (getShopeeAuth()) {
-            log.info('getShopeeAuth:', getShopeeAuth())
             details.requestHeaders['authorization'] =
               'Bearer ' + getShopeeAuth().token
             details.requestHeaders['cookie'] = getShopeeAuth().cookie
@@ -280,8 +280,17 @@ async function setIntercept() {
             )
           }
         } catch (error) {
+          store.set('currentStore', null)
+          store.set('currentSite', null)
+          loadDefaultStoreChat()
           log.error('currentStore', String(store.get('currentStore')), error)
         }
+      }
+      //避免跳转到虾皮的登录页
+      if (/account\/signin\?next=/.test(details.url)) {
+        store.set('currentStore', null)
+        store.set('currentSite', null)
+        loadDefaultStoreChat()
       }
       callback({ requestHeaders: details.requestHeaders })
       if (/offer\/count/.test(details.url)) {
@@ -377,43 +386,22 @@ async function injectMessageMonitor() {
 
         break
       case 'ADD_STORE': //添加店铺
-        if (childWindow) {
+        if (childWindow && !childWindow.isDestroyed()) {
           childWindow.show()
-          return
-        }
-        childWindow = new BrowserWindow({
-          show: false,
-          maximizable: false,
-          minimizable: false,
-          title: '添加店铺',
-          icon: '',
-          frame: false,
-          parent: mainWindow,
-          webPreferences: {
-            nodeIntegration: true, // 是否启用node集成
-            enableRemoteModule: true, // 是否启用remote模块
-          },
-        })
-        childWindow.on('blur', function () {
-          childWindow.hide()
-        })
-        // childWindow.setAlwaysOnTop(true)
-        childWindow.loadFile('./components/add-store/addStore.html')
-        childWindow.once('ready-to-show', () => {
-          childWindow.show()
-        })
-        if (isDev) {
-          childWindow.webContents.openDevTools()
+        } else {
+          createChildWindow()
         }
         break
       case 'CLOSE_CHILD_WINDOW': //关闭子窗口
-        childWindow.hide()
+        childWindow.close()
         break
       case 'REMOVE_BIND_STORE': //解绑店铺
         removeBindStore(params)
         break
       case 'SUCCESS_ADD_STORE': //添加店铺成功
-        childWindow.hide()
+        setTimeout(() => {
+          childWindow.close()
+        }, 2000)
         tryToGetAuthedStore('add').then(() => {
           console.log('checkauth finished')
           loadDefaultStoreChat()
@@ -442,8 +430,50 @@ async function injectMessageMonitor() {
       case 'MODIFY_ALIAS_NAME': //修改店铺别名
         modifyAliasName(params)
         break
+      case 'RE_AURH': //重新授权
+        if (childWindow && !childWindow.isDestroyed()) {
+          childWindow.close()
+        }
+        createChildWindow(params)
     }
   })
+}
+
+async function createChildWindow(defaultParams = null) {
+  childWindow = new BrowserWindow({
+    show: false,
+    maximizable: false,
+    width: 540,
+    height: 360,
+    minimizable: false,
+    title: '添加店铺',
+    icon: '',
+    frame: false,
+    modal: true,
+    parent: mainWindow,
+    webPreferences: {
+      nodeIntegration: true, // 是否启用node集成
+      enableRemoteModule: true, // 是否启用remote模块
+    },
+  })
+  childWindow.setMinimumSize(540, 360)
+
+  //   childWindow.on('blur', function () {
+  //     childWindow.hide()
+  //   })
+  let url = `file://${__dirname}/components/add-store/addStore.html`
+  if (defaultParams) {
+    let p = Lib.objectToQueryString(defaultParams)
+    url = url + '?' + p
+  }
+  // childWindow.setAlwaysOnTop(true)
+  childWindow.loadURL(url)
+  childWindow.once('ready-to-show', () => {
+    childWindow.show()
+  })
+  if (isDev) {
+    childWindow.webContents.openDevTools()
+  }
 }
 
 //翻译文本
@@ -589,14 +619,14 @@ async function loopSyncTask() {
     )
     let syncResult = await Promise.all(
       Object.keys(authedStore).map(async key => {
-        let result = await syncShopeeMessage(authedStore[key])
+        let result = await syncShopeeMessage(authedStore[key], key)
         return result
       })
     )
-
     let haveNewMessage = Lib.compare(messageQuene, syncResult) //本次消息和上次消息对比
     try {
       let unreadMessageCount = syncResult
+        .filter(Boolean)
         .map(el => el.unread_message_count)
         .reduce((prev, curr) => prev + curr)
 
@@ -625,7 +655,7 @@ async function loopSyncTask() {
         clearInterval(messageTimer)
       }
     } catch (error) {
-      log.error('loopSyncTask error:', unreadMessageCount, error)
+      log.error('loopSyncTask error:', error)
     }
     log.info('sync result:', JSON.stringify(syncResult))
     log.info(
@@ -635,20 +665,35 @@ async function loopSyncTask() {
 }
 
 // 同步用户未读消息等
-async function syncShopeeMessage(storeInfo) {
-  let { name, token, host } = storeInfo
-  log.info('sync one user message:', name)
+async function syncShopeeMessage(storeInfo, key) {
+  let { token, user } = storeInfo
+  let storeMenuList = Lib.flat(
+    store.get('storeMenuList').map(el => el.storeList)
+  )
+  let storeInfoMatch = storeMenuList.find(el => el.shopId == key)
+  if (!storeInfoMatch) {
+    return false
+  }
+  let host = store.get(
+    `siteConfig.shopeeSeller.${storeInfoMatch.countryCode}.host`
+  )
+  log.info(
+    'url:',
+    `https://${host}/webchat/api/v1.2/user/sync`,
+    'someone',
+    JSON.stringify(user)
+  )
   return new Promise((resolve, reject) => {
     axios({
-      method: 'post',
       url: `https://${host}/webchat/api/v1.2/user/sync`,
+      method: 'post',
       headers: {
         Authorization: 'Bearer ' + token,
       },
     })
       .then(res => {
-        let { cookies, token, password, ...storeBaseInfo } = storeInfo
-        resolve(Object.assign(storeBaseInfo, res.data))
+        // let { cookies, token, password, ...storeBaseInfo } = storeInfo
+        resolve(Object.assign({ storeId: key }, res.data))
       })
       .catch(error => {
         reject(error)
@@ -667,21 +712,27 @@ async function removeBindStore(storeId) {
         authedStore = delete authedStore[storeId]
         storage.setItem(authedStore)
 
-        //step2 避免一会重新加载该店铺页面
-        if (store.get('currentStore') == storeId) {
+        let storeMenuList = Lib.flat(
+          store.get('storeMenuList').map(el => el.storeList)
+        )
+
+        // step2 重置选中店铺
+        try {
+          let fisrtIndex = storeMenuList.findIndex(
+            el => el.shopId && el.countryCode
+          )
+          let { countryCode, shopId } = storeMenuList[fisrtIndex]
+          store.set('currentSite', countryCode)
+          store.set('currentStore', shopId)
+        } catch (error) {
+          log.error('重置店铺', error)
           store.set('currentStore', null)
         }
 
         //step3 从菜单移除当前店铺
-        let storeMenuList = Lib.flat(
-          store.get('storeMenuList').map(el => el.storeList)
-        )
-        let newMenuList = storeMenuList.filter(item => item.shopId == storeId)
+        let newMenuList = storeMenuList.filter(item => item.shopId != storeId)
         store.set('storeMenuList', Lib.groupStore(newMenuList))
-        tryToGetAuthedStore('remove').then(() => {
-          log.info('checkauth finished')
-          loadDefaultStoreChat()
-        })
+        loadDefaultStoreChat()
         log.info('handleRemoveBindStore success')
       } else {
         mainWindowNotifier('HIDE_LOADING')
@@ -706,15 +757,16 @@ async function modifyAliasName(params) {
         )
         storeMenuList.map(el => {
           if (el.shopId == params.storeId) {
-            el.storeName = params.aliasName
+            el.storeAlias = params.aliasName
           }
         })
         console.log(storeMenuList)
         store.set('storeMenuList', Lib.groupStore(storeMenuList))
-        tryToGetAuthedStore('modify').then(() => {
-          console.log('checkauth finished')
-          loadDefaultStoreChat()
-        })
+        // tryToGetAuthedStore('modify').then(() => {
+        //   console.log('checkauth finished')
+        //   loadDefaultStoreChat()
+        // })
+        loadDefaultStoreChat()
       } else {
         mainWindowNotifier('HIDE_LOADING')
         dialog.showErrorBox('提示', '修改失败，请稍后重试')
@@ -738,38 +790,46 @@ async function modifyAliasName(params) {
  * @param {*} type init|add|modify|remove
  */
 async function tryToGetAuthedStore(type) {
+  // 除了初始化之外都有页面，需要让用户知道在加载菜单列表
+  if ((type = !'init')) {
+    mainWindowNotifier('IS_LOADING_AUTHINFO')
+  }
   const malacca_token = storage.getItem('erpAuth')
   let authedStore = storage.getItem('authedStore') || {} //已授权的店铺列表
   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
-    // 初始化时如果本地存储没有授权信息
-    if (!storeMenuList && type == 'init') {
-      let store = await server.getAuthedAtore()
-      log.error('storeMenuList 本地没有授权列表', JSON.stringify(store))
-    }
+    let storeList = await server.getAuthedAtore()
+    log.info('storeMenuList 更新店铺列表', JSON.stringify(storeList))
+    let auth = await server.getStoreAuthInfo()
+    log.info('storeMenuList 更新token列表', JSON.stringify(auth))
 
-    //如果不是初始化
-    if (storeMenuList && type != 'init') {
-      let store = await server.getAuthedAtore()
-      log.error('storeMenuList 更新授权列表', JSON.stringify(store))
-      let auth = await server.getStoreAuthInfo()
-      log.error('storeMenuList 更新token列表', JSON.stringify(auth))
-    }
+    // if (!storeMenuList && type == 'init') {
+    //   let store = await server.getAuthedAtore()
+    //   log.error('storeMenuList 本地没有授权列表', JSON.stringify(store))
+    // }
 
-    //在有店铺列表的情况下调获取token的接口
-    if (store.get('storeMenuList')) {
-      if (Object.keys(authedStore).length == 0) {
-        let res = await server.getStoreAuthInfo()
-        log.error('authedStore 本地没有授权信息', res)
-      }
+    // //如果不是初始化
+    // if (type != 'init') {
+    //   let store = await server.getAuthedAtore()
+    //   log.error('storeMenuList 更新授权列表', JSON.stringify(store))
+    //   let auth = await server.getStoreAuthInfo()
+    //   log.error('storeMenuList 更新token列表', JSON.stringify(auth))
+    // }
 
-      let authedStoreExpires = storage.getItem('authedStoreExpires')
-      let currentTime = Date.parse(new Date()) / 1000
-      if (!authedStoreExpires || authedStoreExpires < currentTime) {
-        let res = await server.getStoreAuthInfo()
-        log.error('authedStore 已过期', res)
-      }
-    }
+    // //在有店铺列表的情况下调获取token的接口
+    // if (storeMenuList) {
+    //   if (Object.keys(authedStore).length == 0) {
+    //     let res = await server.getStoreAuthInfo()
+    //     log.error('authedStore 本地没有授权信息', res)
+    //   }
+
+    //   let authedStoreExpires = storage.getItem('authedStoreExpires')
+    //   let currentTime = Date.parse(new Date()) / 1000
+    //   if (!authedStoreExpires || authedStoreExpires < currentTime) {
+    //     let res = await server.getStoreAuthInfo()
+    //     log.error('authedStore 已过期', res)
+    //   }
+    // }
   }
 }
 
@@ -852,7 +912,6 @@ async function createTray() {
 
 app.on('ready', () => {
   log.info('app start')
-
   tryToGetAuthedStore('init').then(() => {
     createBrowserWindow()
     setIntercept()

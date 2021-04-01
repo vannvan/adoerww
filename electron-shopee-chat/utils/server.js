@@ -35,6 +35,8 @@ module.exports = server = {
           store.set('storeMenuList', Lib.groupStore(storeList))
           resolve(fisrtIndex > -1 ? storeList : -1)
         } catch (error) {
+          store.set('currentStore', null)
+          store.set('currentSite', null)
           log.error('getAuthedAtore:', error)
           resolve(-1)
         }
@@ -87,6 +89,9 @@ module.exports = server = {
         .catch(error => {
           log.error('handleRemoveBindStore error:', Lib.getError(error))
           reject(-1)
+        })
+        .finally(() => {
+          resolve(0)
         })
     })
   },

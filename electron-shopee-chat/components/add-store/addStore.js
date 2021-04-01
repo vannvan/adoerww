@@ -9,7 +9,38 @@ const { dialog } = require('electron').remote
 require('../../utils/lib')
 const log = require('electron-log')
 const fs = require('fs')
+const Store = require('electron-store')
+
 const siteArr = ['MY', 'PH', 'VN', 'ID', 'SG', 'BR', 'TW', 'TH']
+let store = new Store({})
+
+let dataId = null //当前操作店铺的表id
+
+$(function () {
+  locationParams = location.search
+  let siteList = store.get('siteConfig.shopeeSeller')
+  let countryOptions = ''
+  Object.keys(siteList).forEach(key => {
+    countryOptions += `<option value="https://${siteList[key].host}">${siteList[key].siteName}</option>`
+  })
+
+  $('#shopeeDomain').append(countryOptions)
+  if (locationParams) {
+    // 获取URL的查询参数
+    q = {}
+    locationParams.replace(/([^?&=]+)=([^&]+)/g, (_, k, v) => (q[k] = v))
+    console.log(q.countryCode)
+    if (q.countryCode) {
+      let matchCountry =
+        'https://' + store.get(`siteConfig.shopeeSeller.${q.countryCode}.host`)
+      $('#shopeeDomain').val(matchCountry)
+    }
+    if (q.storeLoginAccount) {
+      $('#accountNumber').val(q.storeLoginAccount)
+    }
+    dataId = q.dataId
+  }
+})
 
 const checkboxTemplate = (id, items) => {
   return $(`
@@ -130,6 +161,7 @@ function handleAddStore() {
     userName: accountNumber,
     vcode: authCodeFeedback.value || '',
   }
+
   log.info('======================handleAddStore start======================')
   API.handleLoginShopee(params)
     .then(res => {
@@ -143,6 +175,9 @@ function handleAddStore() {
           countryCode: siteArr.includes(countryCode) ? countryCode : 'TW',
           storeLoginPsw: password,
           storeLoginAccount: accountNumber,
+        }
+        if (dataId) {
+          addData.id = dataId //重新授权时必须的字段
         }
         API.handleAddStore(addData)
           .then(addResult => {
