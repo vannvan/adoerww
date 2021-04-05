@@ -164,25 +164,11 @@ async function createBrowserWindow() {
       mainWindow.webContents.insertCSS(css)
       mainWindow.webContents.insertCSS(styles)
 
-      if (!isDev) {
-        setTimeout(() => {
-          loopSyncTask()
-        }, 5000)
-      }
+      setTimeout(() => {
+        loopSyncTask()
+      }, 60000)
     }
   })
-
-  // 创建窗口监听
-  mainWindow.webContents.on(
-    'new-window',
-    (event, url, frameName, disposition) => {
-      //   if (disposition == 'new-window') {
-      //     // log.info('new window', disposition, url)
-      //     event.preventDefault()
-      //     shell.openExternal(url)
-      //   }
-    }
-  )
 
   mainWindow.on('closed', function () {
     mainWindow = null
@@ -254,7 +240,31 @@ function getShopeeAuth() {
 async function setIntercept() {
   // 修改存取下列 URL 時使用的 User Agent。
   const filter = {
-    urls: ['https://*.shopee.cn/*', 'https://*.shopee.com.my/*'],
+    urls: [
+      'https://*.shopee.cn/*',
+      'https://*.shopee.com.my/*',
+      '*://*.shopee.tw/*',
+      '*://shopee.tw/*',
+      '*://*.shopee.cn/*',
+      '*://shopee.cn/*',
+      '*://*.shopeesz.com/*',
+      '*://*.shopee.co.id/*',
+      '*://shopee.co.id/*',
+      '*://*.shopee.vn/*',
+      '*://shopee.vn/*',
+      '*://shopee.co.th/*',
+      '*://*.shopee.co.th/*',
+      '*://shopee.ph/*',
+      '*://*.shopee.ph/*',
+      '*://shopee.com.my/*',
+      '*://*.shopee.com.my/*',
+      '*://shopee.sg/*',
+      '*://*.shopee.sg/*',
+      '*://shopee.com.br/*',
+      '*://*.shopee.com.br/*',
+      '*://shopee.com/*',
+      '*://*.shopee.com/*',
+    ],
   }
 
   //请求介入
@@ -322,15 +332,32 @@ async function injectMessageMonitor() {
         store.set('currentStore', params.storeId) // 更新当前操作的店铺ID
         store.set('currentSite', params.key) //当前站点
         try {
-          //如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
+          //   let loadingWindow = new BrowserWindow({
+          //     show: false,
+          //     maximizable: false,
+          //     width: mainWindow.getSize()[0],
+          //     height: mainWindow.getSize()[1],
+          //     minimizable: false,
+          //     parent: mainWindow,
+          //     webPreferences: {
+          //       nodeIntegration: true,
+          //       webSecurity: false,
+          //       contextIsolation: false,
+          //       preload: path.join(__dirname, './utils/lib.js'),
+          //     },
+          //   })
+          //   let url = `file://${__dirname}/empty-page/index.html`
+          //   loadingWindow.loadURL(url)
+          //   loadingWindow.setAlwaysOnTop(true)
+          //   loadingWindow.once('ready-to-show', () => {
+          //     loadingWindow.show()
+          //     mainWindow.hide()
+          //   })
+          //   如果拿到了storeId说明已授权，没有则需要用户自己登录，或者授权
           if (getShopeeAuth()) {
             mainWindow
               .loadURL(
-                `https://${
-                  params.host
-                }/webchat/conversations?'${new Date().getTime()}&storeId=${
-                  params.storeId
-                }&site=${params.key}`
+                `https://${params.host}/webchat/conversations?storeId=${params.storeId}&site=${params.key}`
               )
               .then(() => {
                 log.info('load new store chat success')
@@ -352,9 +379,7 @@ async function injectMessageMonitor() {
       case 'TRANS_TEXT': // 翻译文本
         handleTranslation(params)
         break
-      case 'SEND_MESSAGE': //发送消息操作
-        sendMessage(params)
-        break
+
       case 'UPLOAD_IMAGE': //上传图片
         handleUploadImage(params)
         break
@@ -526,10 +551,7 @@ function erpAuthValid() {
 
 // 加载默认聊天窗口
 function loadDefaultStoreChat() {
-  let mainWindowDefaultPage = path.join(
-    app.getAppPath(),
-    '/empty-page/index.html'
-  )
+  let mainWindowDefaultPage = `file://${__dirname}/empty-page/index.html`
   let currentSite = store.get('currentSite')
   let currentStore = store.get('currentStore')
   if (currentSite && currentStore) {
@@ -537,6 +559,7 @@ function loadDefaultStoreChat() {
       store.get('siteConfig.shopeeSeller')[currentSite].host
     }/webchat/conversations`
   }
+  log.info('mainWindowDefaultPage', mainWindowDefaultPage)
   mainWindow
     .loadURL(mainWindowDefaultPage)
     .then(() => {
@@ -549,9 +572,9 @@ function loadDefaultStoreChat() {
       log.error('loadDefaultStoreChat error:', err)
       //   mainWindow.reload()
       //   reloadWindow(mainWindow)
-      app.relaunch()
-      //   dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
-      //   app.exit()
+      //   app.relaunch()
+      dialog.showErrorBox('提示', '加载聊天室窗口失败，请重启应用程序')
+      app.exit(0)
     })
 }
 
@@ -574,37 +597,6 @@ async function mainWindowNotifier(type, params) {
     type: type,
     params: params,
   })
-}
-
-// 调用虾皮发送消息接口
-async function sendMessage(params) {
-  let { to_id, token, host, ...messageContent } = params
-  let data = Object.assign(messageContent, {
-    request_id: Lib.guid(),
-    to_id: parseInt(to_id),
-    chat_send_option: {
-      force_send_cancel_order_warning: false,
-      comply_cancel_order_warning: false,
-    },
-  })
-  log.info('send afterTranslation params:', data)
-  axios({
-    method: 'post',
-    data: data,
-    url: `https://${host}/webchat/api/v1.2/messages`,
-    headers: {
-      Authorization: 'Bearer ' + token,
-    },
-  })
-    .then(res => {
-      log.info('send afterTranslation success', res.data)
-      // 清除文本框
-      mainWindowNotifier('CLEAR_TEXTAREA')
-    })
-    .catch(err => {
-      log.error('sendMessage error:', err.response.data)
-      dialog.showErrorBox('提示', '发送失败，请重试')
-    })
 }
 
 // 循环同步任务
@@ -636,7 +628,7 @@ async function loopSyncTask() {
         mainWindow.flashFrame(true) //窗口闪动
         messageTimer = setInterval(() => {
           messageFlag = !messageFlag
-          if (messageFlag) {
+          if (messageFlag && appIcon) {
             appIcon.setImage(nativeImage.createEmpty())
           } else {
             appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
@@ -649,7 +641,7 @@ async function loopSyncTask() {
         })
       }
       //如果没有未读消息就停止通知
-      if (!unreadMessageCount) {
+      if (!unreadMessageCount && appIcon) {
         messageFlag = true
         appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
         clearInterval(messageTimer)
@@ -661,12 +653,15 @@ async function loopSyncTask() {
     log.info(
       '======================shopee sync message end   ======================'
     )
-  }, 5000)
+  }, 60000)
 }
 
 // 同步用户未读消息等
 async function syncShopeeMessage(storeInfo, key) {
   let { token, user } = storeInfo
+  if (!store.get('storeMenuList')) {
+    return false
+  }
   let storeMenuList = Lib.flat(
     store.get('storeMenuList').map(el => el.storeList)
   )
@@ -762,10 +757,6 @@ async function modifyAliasName(params) {
         })
         console.log(storeMenuList)
         store.set('storeMenuList', Lib.groupStore(storeMenuList))
-        // tryToGetAuthedStore('modify').then(() => {
-        //   console.log('checkauth finished')
-        //   loadDefaultStoreChat()
-        // })
         loadDefaultStoreChat()
       } else {
         mainWindowNotifier('HIDE_LOADING')
@@ -892,6 +883,7 @@ async function createTray() {
       {
         label: '😁 打开聊聊',
         click: () => {
+          mainWindow.restore()
           mainWindow.show()
         },
       },
@@ -959,6 +951,7 @@ if (!gotTheLock) {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore()
       mainWindow.focus()
+      mainWindow.restore()
       mainWindow.show()
     }
   })

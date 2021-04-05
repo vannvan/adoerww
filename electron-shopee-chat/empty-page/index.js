@@ -3,7 +3,6 @@ const $ = require('jquery')
 const localforage = require('localforage')
 const { default: axios } = require('axios')
 const Store = require('electron-store')
-const Lib = require('../utils/lib')
 var currentStoreId = null
 var currentSite = null
 var checkUpdateTimer = null
@@ -21,7 +20,7 @@ $(function () {
           </div>
           <div class="emalacca-client-menu-list"></div>
           <div class="head-img">
-              <img src="https://s3.ax1x.com/2021/03/12/6UDVqs.png" class="emalacca-head-img"/>
+              <img src="https://z3.ax1x.com/2021/04/02/ceyJTU.png" class="emalacca-head-img"/>
           <div class="emalacca-logout">退出登录</div>
       </div>
       <div class="emalacca-store-operation">

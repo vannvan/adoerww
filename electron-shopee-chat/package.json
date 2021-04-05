@@ -1,6 +1,6 @@
 {
     "name": "shopee-chat-client",
-    "version": "0.1.23",
+    "version": "0.1.27",
     "description": "虾皮聊聊客户端",
     "main": "main.js",
     "scripts": {

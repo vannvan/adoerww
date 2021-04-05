@@ -23,7 +23,7 @@ async function loopGetStorageTask() {
           type: 'SET_ERP_AUTH',
           params: rest,
         })
-        window._VV.successAlert('登录成功,正在获取店铺数据，请稍后...')
+        window._VV.successAlert('登录成功,正在获取店铺数据，请稍后...', 100000)
         clearInterval(globalTimer)
       }
     }

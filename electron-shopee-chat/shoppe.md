@@ -31,3 +31,7 @@ https://seller.shopee.com.my/webchat/api/v1.2/images?_uid=0-341561079&_v=5.1.2&c
 conversation_id: 1451748750830325495
 
 file: 二进制文件
+
+### 虾皮上传视频
+
+https://seller.my.shopee.cn/webchat/api/coreapi/v1.2/video/preupload?_uid=0-341561079&_v=5.1.2

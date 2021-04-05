@@ -316,10 +316,6 @@ function ReceiveMasterMessage() {
       case 'CHECKED_SOMEBODY': //选中某人
         appendTranslateButton(params)
         break
-      case 'CLEAR_TEXTAREA': //清除文本框
-        document.querySelector('textarea').value = ''
-        $("section svg[class='chat-icon']").parent().click()
-        break
       case 'NEW_MESSAGE': //新消息提醒
         let { messageList, noticeEnable } = params
         if (noticeEnable) {
@@ -327,13 +323,23 @@ function ReceiveMasterMessage() {
         }
         await addNewUnReadMessageForStore(messageList)
         sessionStorage.setItem('unReadMessage', JSON.stringify(messageList)) //把未读存起来
+        break
       case 'REPLACE_TEXTAREA': // 替换待发送的文本
         $('textarea').text(params)
         $('textarea').val(params) //替换textarea文本
       case 'CHECK_VERSION': // 检查更新
         let { cmd } = params
-        if (['error', 'update-not-available'].includes(cmd)) {
-          clearInterval(checkUpdateTimer)
+        if (cmd == 'update-available') {
+          $.fn.message({
+            type: 'info',
+            msg: '检查到新版本，正在下载，请稍后...',
+          })
+        }
+        if (cmd == 'update-not-available') {
+          $.fn.message({
+            type: 'info',
+            msg: '没有新版本可用！',
+          })
         }
         break
       case 'HIDE_LOADING': //隐藏loading
@@ -364,7 +370,7 @@ async function addNewUnReadMessageForStore(newMessageParams) {
     if (storeIds.includes($(this).attr('data-store'))) {
       let unReadMessageCount = newMessageParams.find(
         el => el.storeId == $(this).attr('data-store')
-      ).unread_count
+      ).unread_message_count
       $(this).parent().find('span:eq(2)').hide() //隐藏操作
       $(this).show().text(unReadMessageCount)
     }
@@ -373,6 +379,9 @@ async function addNewUnReadMessageForStore(newMessageParams) {
 
 // 添加翻译按钮
 function appendTranslateButton(params) {
+  if ($('.emalacca-client-translate-msg-bottom').length != 0) {
+    return false
+  }
   let { buyer_id } = params
   const langOptions = store.get('siteConfig.langOptions')
 
@@ -380,6 +389,7 @@ function appendTranslateButton(params) {
     lang: 'en',
     langName: '英语',
   }
+
   setTimeout(() => {
     let langOptionsNode = ''
     langOptions.map((el, index) => {
@@ -451,6 +461,7 @@ function appendTranslateButton(params) {
     // 输入监听
     $(`body`).delegate('textarea', 'propetychange input', function () {
       //监听
+      console.log($(this).val())
       $(this).val($(this).val())
       $(this).text($(this).val())
     })
@@ -479,6 +490,7 @@ async function dispatchSendMessage(buyer_id) {
       msg: '请输入消息内容',
     })
     $('textarea').val('')
+    $('textarea').text('')
     return false
   }
   let messageType = $('section img').length > 0 ? 'image' : 'text'
@@ -534,14 +546,42 @@ async function handleSendMessage(buyer_id, params) {
         token: token,
         to_id: buyer_id,
       }
-      ipcNotice({
-        type: 'SEND_MESSAGE',
-        params: Object.assign(baseInfo, params),
-      })
+      sendMessage(Object.assign(baseInfo, params))
     })
     .catch(function (err) {
       // 当出错时，此处代码运行
       console.log(err)
+    })
+}
+async function sendMessage(params) {
+  let { to_id, token, host, ...messageContent } = params
+  let data = Object.assign(messageContent, {
+    request_id: Lib.guid(),
+    to_id: parseInt(to_id),
+    chat_send_option: {
+      force_send_cancel_order_warning: false,
+      comply_cancel_order_warning: false,
+    },
+  })
+  axios({
+    method: 'post',
+    data: data,
+    url: `https://${host}/webchat/api/v1.2/messages`,
+    headers: {
+      Authorization: 'Bearer ' + token,
+    },
+  })
+    .then(() => {
+      // 清除文本框
+      $('textarea').val('')
+      $("section svg[class='chat-icon']").parent().click()
+    })
+    .catch(err => {
+      console.log('sendMessage error:', err.data)
+      $.fn.message({
+        type: 'error',
+        msg: '发送失败，请稍后重试',
+      })
     })
 }
 
