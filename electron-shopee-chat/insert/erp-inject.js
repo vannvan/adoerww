@@ -8,6 +8,14 @@ window._VV.$router.beforeEach(function (to, from, next) {
   }
 })
 
+if (location.search && /account/.test(location.search)) {
+  let t = document.querySelector('input')
+  let evt = document.createEvent('HTMLEvents')
+  evt.initEvent('input', true, true)
+  t.value = location.search.split(/=/)[1]
+  t.dispatchEvent(evt)
+}
+
 async function loopGetStorageTask() {
   document.querySelector('.ant-dropdown-link')
     ? document.querySelector('.ant-dropdown-link').remove()

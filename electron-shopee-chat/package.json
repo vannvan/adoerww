@@ -1,28 +1,41 @@
 {
     "name": "shopee-chat-client",
-    "version": "0.1.27",
+    "version": "0.1.29",
     "description": "虾皮聊聊客户端",
     "main": "main.js",
     "scripts": {
         "start": "electron . dev",
-        "build": "rm -rf dist && npm version patch && electron-builder --win --x64"
+        "build": "rm -rf dist && electron-builder --win",
+        "build:mac": "rm -rf dist && npm version patch && electron-builder --m"
     },
     "repository": "https://gitlab.ikjzd.com/kj_erp/web/shopee-chat-client",
-    "keywords": [
-        "Electron",
-        "quick",
-        "start",
-        "tutorial",
-        "demo"
-    ],
     "build": {
         "appId": "com.xxx.app",
         "productName": "虾皮聊聊客户端",
+        "dmg": {
+            "contents": [
+                {
+                    "x": 410,
+                    "y": 150,
+                    "type": "link",
+                    "path": "/Applications"
+                },
+                {
+                    "x": 130,
+                    "y": 150,
+                    "type": "file"
+                }
+            ]
+        },
+        "mac": {
+            "icon": "build/icons/icon.icns",
+            "artifactName": "${productName}_setup_${version}.${ext}"
+        },
         "win": {
             "icon": "build/icons/icon.ico",
+            "artifactName": "${productName}_setup_${version}.${ext}",
             "target": [
-                "nsis",
-                "zip"
+                "nsis"
             ]
         },
         "directories": {
@@ -65,6 +78,7 @@
         "electron-updater": "^4.3.8",
         "jquery": "^3.6.0",
         "js-cookie": "^2.2.1",
+        "js-md5": "^0.7.3",
         "localforage": "^1.9.0",
         "popper.js": "^1.16.1",
         "request": "^2.88.2"

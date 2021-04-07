@@ -35,3 +35,11 @@ file: 二进制文件
 ### 虾皮上传视频
 
 https://seller.my.shopee.cn/webchat/api/coreapi/v1.2/video/preupload?_uid=0-341561079&_v=5.1.2
+
+### 虾皮发送消息接口 header 参数
+
+固定字符串：42990074-9a73-4459-b749-f3110d222a72
+x-s 来源于 当前请求链接，token，32 位固定 hash 字符串， 通过 md5 加密生成，中间没有分隔符
+
+越南站点示例：
+/messages?\_uid=0-369425305&\_v=5.3.242990074-9a73-4459-b749-f3110d222a72Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVfdGltZSI6MTYxNzY5OTk5NiwiaWQiOiIzNmUwM2EzZi05NmI0LTExZWItYjg1Ni04MDY5MzM2YjkwMzUifQ.YZUsF-yk0t4xdKuWrBewIjFDRYb64DrmUWMNJMIXEq0

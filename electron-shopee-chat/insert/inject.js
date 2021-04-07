@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron')
 const localforage = require('localforage')
 const $ = require('jquery')
+const md5 = require('js-md5')
 const { default: axios } = require('axios')
 const Store = require('electron-store')
 ;(function ($) {
@@ -74,6 +75,24 @@ if (location.search) {
     addNewUnReadMessageForStore(unReadMessage)
   }
 }
+if (location.pathname == '/webchat/conversations') {
+  $('#root').css('transform', 'translateY(-62px)')
+}
+
+// 监听页面链接更新
+let bodyList = document.querySelector('body'),
+  observer = new MutationObserver(function (mutations) {
+    if (location.pathname == '/webchat/conversations') {
+      $('#root').css('transform', 'translateY(-62px)')
+    } else {
+      $('#root').css('transform', 'translateY(0px)')
+    }
+  })
+let config = {
+  childList: true,
+  subtree: true,
+}
+observer.observe(bodyList, config)
 
 //加载阿里图标
 Lib.addCssByLink('//at.alicdn.com/t/font_1833787_5je7dr8w03.css')
@@ -86,7 +105,6 @@ MessageNotify.src = store.get('noticeSounds')
 var currentTransNodeIndex = null //当前翻译节点索引
 var currentStoreId = null
 var currentSite = null
-var checkUpdateTimer = null
 
 $(function () {
   ReceiveMasterMessage()
@@ -264,13 +282,18 @@ $(function () {
   $('.emalacca-head-img').click(function () {
     $('.emalacca-logout').toggle()
   })
+
+  //在聊天界面之外的页面添加返回上一页操作
 })
 
 window.onmousewheel = function (e) {
   //   e = e || window.event
   let messageEl = [...document.querySelectorAll('pre')]
   messageEl.map((el, index) => {
-    if (!el.getAttribute('flag')) {
+    //判断消息位置
+    let flexPos = window.getComputedStyle(el.parentElement.parentElement, null)
+      .justifyContent
+    if (!el.getAttribute('flag') && flexPos == 'flex-start') {
       el.innerHTML += `<button class="emalacca-client-trans-button-mini">译</button>`
       el.setAttribute('flag', true)
       el.setAttribute('data-node-id', index + 1)
@@ -390,6 +413,11 @@ function appendTranslateButton(params) {
     langName: '英语',
   }
 
+  const svgPath = [
+    '<path d="M7 18l-5 3V4a1 1 0 011-1h18a1 1 0 011 1v13a1 1 0 01-1 1H7zm-3-.532L6.446 16H20V5H4v12.468zM7 9h10A5 5 0 017 9z"></path>',
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M19.974 3h-16a1 1 0 00-1 1v16a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1zm-15 16V5h14v14h-14z"></path><path d="M15.42 11.733a.3.3 0 010 .534L9.627 15.24a.3.3 0 01-.437-.267V9.027a.3.3 0 01.437-.267l5.793 2.973z"></path>',
+  ]
+
   setTimeout(() => {
     let langOptionsNode = ''
     langOptions.map((el, index) => {
@@ -399,6 +427,12 @@ function appendTranslateButton(params) {
       <span class="em-iconfont em-icon-right1" style="visibility:${
         checkedLang.lang == el.lang ? 'inherit' : 'hidden'
       }"></span>${el.langName}</li>`
+    })
+    //去掉视频和个人定制图标曹祖
+    $(".chat-icon[viewBox='0 0 24 24']").each(function (e) {
+      if (svgPath.includes(this.innerHTML)) {
+        this.remove()
+      }
     })
     //这种方式插入节点可以使原本的回车事件失效
     document.querySelector(
@@ -461,7 +495,6 @@ function appendTranslateButton(params) {
     // 输入监听
     $(`body`).delegate('textarea', 'propetychange input', function () {
       //监听
-      console.log($(this).val())
       $(this).val($(this).val())
       $(this).text($(this).val())
     })
@@ -540,10 +573,16 @@ async function handleSendMessage(buyer_id, params) {
     .getItem('session')
     .then(function (value) {
       // 当离线仓库中的值被载入时，此处代码运行
-      let { token } = value
+      let {
+        token,
+        version,
+        user: { uid },
+      } = value
       const baseInfo = {
         host: location.host,
         token: token,
+        uid: uid,
+        version: version,
         to_id: buyer_id,
       }
       sendMessage(Object.assign(baseInfo, params))
@@ -554,7 +593,7 @@ async function handleSendMessage(buyer_id, params) {
     })
 }
 async function sendMessage(params) {
-  let { to_id, token, host, ...messageContent } = params
+  let { to_id, token, version, host, uid, ...messageContent } = params
   let data = Object.assign(messageContent, {
     request_id: Lib.guid(),
     to_id: parseInt(to_id),
@@ -566,9 +605,11 @@ async function sendMessage(params) {
   axios({
     method: 'post',
     data: data,
-    url: `https://${host}/webchat/api/v1.2/messages`,
+    url: `https://${host}/webchat/api/v1.2/messages?_uid=${uid}&_v=5.3.2`,
     headers: {
       Authorization: 'Bearer ' + token,
+      'x-v': 3,
+      'x-s': getXSString(uid, token),
     },
   })
     .then(() => {
@@ -683,4 +724,12 @@ function dispatchStoreAction(actionType, storeId) {
     default:
       break
   }
+}
+
+function getXSString(uid, token) {
+  let url = `/messages?_uid=${uid}&_v=5.3.2`
+  let hashStr = '42990074-9a73-4459-b749-f3110d222a72'
+  token = 'Bearer ' + token
+  console.log(url + hashStr + token)
+  return md5(url + hashStr + token)
 }

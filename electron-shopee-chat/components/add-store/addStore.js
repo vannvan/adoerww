@@ -212,6 +212,7 @@ function handleAddStore() {
             }
           })
       } else if (data.rspStatusCode === 470) {
+        log.error('response 470:', data)
         $('.shoppe-loading-wrap').hide()
         // 验证码
         let authCode = document.querySelector('.auth-code')
@@ -224,6 +225,7 @@ function handleAddStore() {
           handleAuthCode()
         }
       } else if (data.rspStatusCode === 482) {
+        log.error('response 482:', data)
         $('.shoppe-loading-wrap').hide()
         // 验证码
         $.fn.message({
@@ -238,6 +240,7 @@ function handleAddStore() {
           msg: '账号或密码错误, 请重新输入',
         })
       } else if (data.rspMsg && data.rspStatusCode !== 200) {
+        log.error('response error:', data)
         $('.shoppe-loading-wrap').hide()
         // 账号或密码
         $.fn.message({
@@ -245,6 +248,7 @@ function handleAddStore() {
           msg: data.rspMsg,
         })
       } else if (data.rspStatusCode === 404) {
+        log.error('response 404:', data)
         $('.shoppe-loading-wrap').css({ display: 'none' })
         // 账号或密码
         $.fn.message({
@@ -252,6 +256,7 @@ function handleAddStore() {
           msg: '当前站点不存在该账号',
         })
       } else {
+        log.error('response error:', data)
         $('.shoppe-loading-wrap').css({ display: 'none' })
         $.fn.message({
           type: 'warning',

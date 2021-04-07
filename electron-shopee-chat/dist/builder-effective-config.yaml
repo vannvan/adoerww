@@ -3,11 +3,23 @@ directories:
   buildResources: build
 appId: com.xxx.app
 productName: 虾皮聊聊客户端
+dmg:
+  contents:
+    - x: 410
+      'y': 150
+      type: link
+      path: /Applications
+    - x: 130
+      'y': 150
+      type: file
+mac:
+  icon: build/icons/icon.icns
+  artifactName: ${productName}_setup_${version}.${ext}
 win:
   icon: build/icons/icon.ico
+  artifactName: ${productName}_setup_${version}.${ext}
   target:
     - nsis
-    - zip
 extraResources:
   - from: build/icons
     to: ./

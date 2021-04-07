@@ -32,8 +32,8 @@ log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
 
 // console.log(log.transports.file.file)  //日志路径
-let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
-// let isDev = false
+// let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
+let isDev = true
 
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
@@ -163,10 +163,6 @@ async function createBrowserWindow() {
       mainWindow.webContents.executeJavaScript(js)
       mainWindow.webContents.insertCSS(css)
       mainWindow.webContents.insertCSS(styles)
-
-      setTimeout(() => {
-        loopSyncTask()
-      }, 60000)
     }
   })
 
@@ -273,14 +269,15 @@ async function setIntercept() {
     (details, callback) => {
       details.requestHeaders['user-agent'] =
         'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36'
-      if (/shopee|xiapibuy/.test(details.url)) {
+      if (
+        /shopee|xiapibuy/.test(details.url) &&
+        !/messages/.test(details.url)
+      ) {
         try {
           if (getShopeeAuth()) {
-            details.requestHeaders['authorization'] =
+            details.requestHeaders['Authorization'] =
               'Bearer ' + getShopeeAuth().token
             details.requestHeaders['cookie'] = getShopeeAuth().cookie
-            details.requestHeaders['x-s'] = '089986cd32e608575a81d17cefe9d408'
-            details.requestHeaders['x-v'] = '4'
           } else {
             log.error(
               'getShopeeAuth error:',
@@ -395,19 +392,29 @@ async function injectMessageMonitor() {
         }
         break
       case 'ERP_LOGOUT': // erp退出
-        storage.setItem('erpAuthStatus', -1)
-        storage.setItem('erpAuth', null)
-        store.set('storeMenuList', null)
-        store.set('currentStore', null)
-        store.set('currentSite', null)
-        session.defaultSession.clearStorageData({
-          origin: erpSystem,
-        })
-        mainWindow.webContents.loadURL(`${erpSystem}/auth/login`).then(() => {
-          mainWindow.setMinimumSize(980, 640)
-          mainWindow.setSize(980, 640)
-          mainWindow.center()
-        })
+        try {
+          let {
+            userInfo: { maAccount = '' },
+          } = storage.getItem('erpAuth').userInfo
+          storage.setItem('erpAuthStatus', -1)
+          storage.setItem('erpAuth', null)
+          store.set('storeMenuList', null)
+          store.set('currentStore', null)
+          store.set('currentSite', null)
+          session.defaultSession.clearStorageData({
+            origin: erpSystem,
+          })
+          clearInterval(loopSyncTaskTimter)
+          mainWindow.webContents
+            .loadURL(`${erpSystem}/auth/login?account=${maAccount}`)
+            .then(() => {
+              mainWindow.setMinimumSize(980, 640)
+              mainWindow.setSize(980, 640)
+              mainWindow.center()
+            })
+        } catch (error) {
+          log.error('ERP_LOGOUT error', error)
+        }
 
         break
       case 'ADD_STORE': //添加店铺
@@ -562,11 +569,12 @@ function loadDefaultStoreChat() {
   log.info('mainWindowDefaultPage', mainWindowDefaultPage)
   mainWindow
     .loadURL(mainWindowDefaultPage)
-    .then(() => {
+    .then(async () => {
       log.info('shopee is loaded')
       mainWindow.setSize(1366, 780)
       mainWindow.setMinimumSize(1366, 780)
       mainWindow.center()
+      await loopSyncTask()
     })
     .catch(err => {
       log.error('loadDefaultStoreChat error:', err)
@@ -961,7 +969,7 @@ if (!gotTheLock) {
 //   if (appIcon) appIcon.destroy()
 // })
 
-app.on('before-quit', function (evt) {
+app.on('quit', function (evt) {
   if (appIcon) appIcon.destroy()
 })
 
