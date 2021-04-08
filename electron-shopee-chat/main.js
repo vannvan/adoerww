@@ -21,19 +21,15 @@ const API = require('./utils/api.conf')
 const path = require('path')
 const fs = require('fs')
 const googleTr = require('./utils/google-translate-server')
-const storage = require('electron-localstorage')
 const updateHandle = require('./utils/autoUpdater')
 
 const SiteConfig = require('./conf/site')
 
-storage.setStoragePath('./storage.json') // stoage存储路径
-console.log(storage.getStoragePath())
 log.transports.file.level = true //是否输出到 日志文件
 log.transports.console.level = true //是否输出到 控制台
 
-// console.log(log.transports.file.file)  //日志路径
-// let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
-let isDev = true
+let isDev = process.argv[2] ? process.argv[2] == 'dev' : false
+// let isDev = true
 
 log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
 
@@ -49,6 +45,7 @@ var loopSyncTaskTimter = null //
 
 const Store = require('electron-store')
 let store = new Store({})
+
 store.set('isDev', isDev)
 store.set('siteConfig', SiteConfig)
 store.set(
@@ -60,13 +57,16 @@ if (store.get('noticeEnable') == undefined) {
   store.set('noticeEnable', true)
 }
 
+log.info('日志路径：', log.transports.file.file) //日志路径
+log.info('store 路径：', app.getPath('userData'))
+
 // axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
 
 axios.interceptors.response.use(
-  response => {
+  (response) => {
     return response
   },
-  error => {
+  (error) => {
     let originalRequest = error.config
     if (
       error.code === 'ECONNABORTED' &&
@@ -122,7 +122,7 @@ async function createBrowserWindow() {
   })
 
   if (!erpAuthValid()) {
-    storage.setItem('erpAuthStatus', 1)
+    store.set('erpAuthStatus', 1)
     mainWindow.loadURL(`${erpSystem}/auth/login`)
   } else {
     tryToGetAuthedStore('init').then(() => {
@@ -176,7 +176,7 @@ async function createBrowserWindow() {
   //       buttonLabel:'确认上传'
   //   })
 
-  mainWindow.on('close', e => {
+  mainWindow.on('close', (e) => {
     // 先阻止默认功能的调用，否则会关闭窗口
     e.preventDefault()
     dialog
@@ -186,7 +186,7 @@ async function createBrowserWindow() {
         message: '确定要关闭吗？',
         buttons: ['最小化', '直接退出'],
       })
-      .then(index => {
+      .then((index) => {
         if (index.response === 1) {
           mainWindow = null
           app.exit()
@@ -203,7 +203,7 @@ async function createBrowserWindow() {
 
 function getShopeeAuth() {
   let currentStoreId = String(store.get('currentStore'))
-  let authedStore = storage.getItem('authedStore')
+  let authedStore = store.get('authedStore')
   let storeMenuList = store.get('storeMenuList')
   if (!storeMenuList && !authedStore) {
     return null
@@ -215,9 +215,9 @@ function getShopeeAuth() {
       }
     } else if (store.get('storeMenuList')) {
       storeMenuList = Lib.flat(
-        store.get('storeMenuList').map(el => el.storeList)
+        store.get('storeMenuList').map((el) => el.storeList)
       )
-      let shopInfo = storeMenuList.find(item => item.shopId == currentStoreId)
+      let shopInfo = storeMenuList.find((item) => item.shopId == currentStoreId)
       if (shopInfo) {
         return {
           token: shopInfo.tk.token,
@@ -359,7 +359,7 @@ async function injectMessageMonitor() {
               .then(() => {
                 log.info('load new store chat success')
               })
-              .catch(error => {
+              .catch((error) => {
                 log.error(error)
                 dialog.showErrorBox('提示', '切换店铺失败，请稍后重试')
               })
@@ -382,9 +382,10 @@ async function injectMessageMonitor() {
         break
       case 'SET_ERP_AUTH': //erp授权
         if (params) {
-          storage.setItem('erpAuthStatus', 1)
+          store.set('erpAuthStatus', 1)
           params.expires_time = Date.parse(new Date()) / 1000 + 604800 //授权过期的具体时间
-          storage.setItem('erpAuth', params)
+          store.set('erpAuth', params)
+          log.info('authed erpInfo:', store.get('erpAuth'))
           tryToGetAuthedStore('init').then(() => {
             console.log('checkauth finished')
             loadDefaultStoreChat()
@@ -395,9 +396,9 @@ async function injectMessageMonitor() {
         try {
           let {
             userInfo: { maAccount = '' },
-          } = storage.getItem('erpAuth').userInfo
-          storage.setItem('erpAuthStatus', -1)
-          storage.setItem('erpAuth', null)
+          } = store.get('erpAuth').userInfo
+          store.set('erpAuthStatus', -1)
+          store.set('erpAuth', null)
           store.set('storeMenuList', null)
           store.set('currentStore', null)
           store.set('currentSite', null)
@@ -448,14 +449,14 @@ async function injectMessageMonitor() {
             securityScopedBookmarks: true,
             filters: [{ name: 'excel', extensions: ['xls', 'xlsx'] }],
           })
-          .then(result => {
+          .then((result) => {
             // 点击导入文件
             console.log(result, 'result')
             if (!result.canceled) {
               API.importStoreFile(result.filePaths[0])
             }
           })
-          .catch(err => {
+          .catch((err) => {
             console.log(err)
           })
         break
@@ -522,9 +523,9 @@ async function handleTranslation({ type, messageText, targetLang }) {
   }
   let sourceLang = type == 'send' ? 'zh-CN' : 'auto'
   googleTr(messageText, sourceLang, targetLang)
-    .then(resultText => {
-      log.info('translation result:', resultText.map(el => el[0]).join(''))
-      let result = resultText.map(el => el[0]).join('')
+    .then((resultText) => {
+      log.info('translation result:', resultText.map((el) => el[0]).join(''))
+      let result = resultText.map((el) => el[0]).join('')
       if (type == 'send') {
         mainWindowNotifier('REPLACE_TEXTAREA', result) //替换textarea
       } else {
@@ -533,7 +534,7 @@ async function handleTranslation({ type, messageText, targetLang }) {
         })
       }
     })
-    .catch(error => {
+    .catch((error) => {
       log.error('handleTranslation error:', error)
       dialog.showErrorBox('提示', '翻译服务异常，请稍后重试')
     })
@@ -543,7 +544,7 @@ async function handleTranslation({ type, messageText, targetLang }) {
 function erpAuthValid() {
   log.info('check erp auth status')
   try {
-    let erpAuthInfo = storage.getItem('erpAuth')
+    let erpAuthInfo = store.get('erpAuth')
     // erpAuthInfo = JSON.parse(erpAuthInfo)
     let { expires_time } = erpAuthInfo
     log.info('erp auth expires_time', expires_time)
@@ -576,7 +577,7 @@ function loadDefaultStoreChat() {
       mainWindow.center()
       await loopSyncTask()
     })
-    .catch(err => {
+    .catch((err) => {
       log.error('loadDefaultStoreChat error:', err)
       //   mainWindow.reload()
       //   reloadWindow(mainWindow)
@@ -591,7 +592,7 @@ function reloadWindow(mainWin) {
     app.relaunch()
     app.exit(0)
   } else {
-    BrowserWindow.getAllWindows().forEach(w => {
+    BrowserWindow.getAllWindows().forEach((w) => {
       if (w.id !== mainWin.id) w.destroy()
     })
     mainWin.reload()
@@ -610,7 +611,7 @@ async function mainWindowNotifier(type, params) {
 // 循环同步任务
 async function loopSyncTask() {
   loopSyncTaskTimter = setInterval(async () => {
-    let authedStore = storage.getItem('authedStore') //已授权的店铺列表
+    let authedStore = store.get('authedStore') //已授权的店铺列表
     if (Object.keys(authedStore) == 0) {
       clearInterval(loopSyncTaskTimter)
     }
@@ -618,7 +619,7 @@ async function loopSyncTask() {
       '======================shopee sync message start ======================'
     )
     let syncResult = await Promise.all(
-      Object.keys(authedStore).map(async key => {
+      Object.keys(authedStore).map(async (key) => {
         let result = await syncShopeeMessage(authedStore[key], key)
         return result
       })
@@ -627,7 +628,7 @@ async function loopSyncTask() {
     try {
       let unreadMessageCount = syncResult
         .filter(Boolean)
-        .map(el => el.unread_message_count)
+        .map((el) => el.unread_message_count)
         .reduce((prev, curr) => prev + curr)
 
       // 如果未读消息大于1且本次消息和上次消息不同
@@ -645,7 +646,7 @@ async function loopSyncTask() {
 
         mainWindowNotifier('NEW_MESSAGE', {
           noticeEnable: store.get('noticeEnable'),
-          messageList: syncResult.filter(item => item.unread_count),
+          messageList: syncResult.filter((item) => item.unread_count),
         })
       }
       //如果没有未读消息就停止通知
@@ -653,6 +654,7 @@ async function loopSyncTask() {
         messageFlag = true
         appIcon.setImage(path.join(__dirname, 'dark-logo.png'))
         clearInterval(messageTimer)
+        clearInterval(loopSyncTaskTimter)
       }
     } catch (error) {
       log.error('loopSyncTask error:', error)
@@ -671,9 +673,9 @@ async function syncShopeeMessage(storeInfo, key) {
     return false
   }
   let storeMenuList = Lib.flat(
-    store.get('storeMenuList').map(el => el.storeList)
+    store.get('storeMenuList').map((el) => el.storeList)
   )
-  let storeInfoMatch = storeMenuList.find(el => el.shopId == key)
+  let storeInfoMatch = storeMenuList.find((el) => el.shopId == key)
   if (!storeInfoMatch) {
     return false
   }
@@ -694,11 +696,11 @@ async function syncShopeeMessage(storeInfo, key) {
         Authorization: 'Bearer ' + token,
       },
     })
-      .then(res => {
+      .then((res) => {
         // let { cookies, token, password, ...storeBaseInfo } = storeInfo
         resolve(Object.assign({ storeId: key }, res.data))
       })
-      .catch(error => {
+      .catch((error) => {
         reject(error)
       })
   })
@@ -708,21 +710,21 @@ async function syncShopeeMessage(storeInfo, key) {
 async function removeBindStore(storeId) {
   server
     .handleRemoveBindStore(storeId)
-    .then(result => {
+    .then((result) => {
       if (result) {
         //setp1 先移除当前涉及当前店铺的token
-        let authedStore = storage.getItem('authedStore')
+        let authedStore = store.get('authedStore')
         authedStore = delete authedStore[storeId]
-        storage.setItem(authedStore)
+        store.set('authedStore', authedStore)
 
         let storeMenuList = Lib.flat(
-          store.get('storeMenuList').map(el => el.storeList)
+          store.get('storeMenuList').map((el) => el.storeList)
         )
 
         // step2 重置选中店铺
         try {
           let fisrtIndex = storeMenuList.findIndex(
-            el => el.shopId && el.countryCode
+            (el) => el.shopId && el.countryCode
           )
           let { countryCode, shopId } = storeMenuList[fisrtIndex]
           store.set('currentSite', countryCode)
@@ -733,7 +735,7 @@ async function removeBindStore(storeId) {
         }
 
         //step3 从菜单移除当前店铺
-        let newMenuList = storeMenuList.filter(item => item.shopId != storeId)
+        let newMenuList = storeMenuList.filter((item) => item.shopId != storeId)
         store.set('storeMenuList', Lib.groupStore(newMenuList))
         loadDefaultStoreChat()
         log.info('handleRemoveBindStore success')
@@ -742,7 +744,7 @@ async function removeBindStore(storeId) {
         dialog.showErrorBox('提示', '解绑失败，请稍后重试')
       }
     })
-    .catch(error => {
+    .catch((error) => {
       log.error(error)
       mainWindowNotifier('HIDE_LOADING')
       dialog.showErrorBox('提示', '解绑失败，请稍后重试')
@@ -752,13 +754,13 @@ async function removeBindStore(storeId) {
 //修改别名
 async function modifyAliasName(params) {
   API.handleModifyAliasName(params)
-    .then(res => {
+    .then((res) => {
       if (res) {
         // 修改本地菜单列表中的店铺名称
         let storeMenuList = Lib.flat(
-          store.get('storeMenuList').map(el => el.storeList)
+          store.get('storeMenuList').map((el) => el.storeList)
         )
-        storeMenuList.map(el => {
+        storeMenuList.map((el) => {
           if (el.shopId == params.storeId) {
             el.storeAlias = params.aliasName
           }
@@ -771,7 +773,7 @@ async function modifyAliasName(params) {
         dialog.showErrorBox('提示', '修改失败，请稍后重试')
       }
     })
-    .catch(error => {
+    .catch((error) => {
       log.error(error)
       mainWindowNotifier('HIDE_LOADING')
       dialog.showErrorBox('提示', '修改失败，请稍后重试')
@@ -793,8 +795,8 @@ async function tryToGetAuthedStore(type) {
   if ((type = !'init')) {
     mainWindowNotifier('IS_LOADING_AUTHINFO')
   }
-  const malacca_token = storage.getItem('erpAuth')
-  let authedStore = storage.getItem('authedStore') || {} //已授权的店铺列表
+  const malacca_token = store.get('erpAuth')
+  let authedStore = store.get('authedStore') || {} //已授权的店铺列表
   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
     let storeList = await server.getAuthedAtore()
@@ -822,7 +824,7 @@ async function tryToGetAuthedStore(type) {
     //     log.error('authedStore 本地没有授权信息', res)
     //   }
 
-    //   let authedStoreExpires = storage.getItem('authedStoreExpires')
+    //   let authedStoreExpires = store.get('authedStoreExpires')
     //   let currentTime = Date.parse(new Date()) / 1000
     //   if (!authedStoreExpires || authedStoreExpires < currentTime) {
     //     let res = await server.getStoreAuthInfo()
@@ -843,8 +845,7 @@ async function createTray() {
           {
             label: '清除缓存',
             click: () => {
-              storage.setItem('erpAuthStatus', -1)
-              storage.clear()
+              store.set('erpAuthStatus', -1)
               store.clear()
               session.defaultSession.clearStorageData({
                 origin: erpSystem,
@@ -856,7 +857,7 @@ async function createTray() {
             label: '消息通知',
             type: 'checkbox',
             checked: true,
-            click: e => {
+            click: (e) => {
               //   console.log(e.checked)
               store.set('noticeEnable', e.checked)
             },
