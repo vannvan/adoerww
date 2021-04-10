@@ -15,6 +15,11 @@ dmg:
 mac:
   icon: build/icons/icon.icns
   artifactName: ${productName}_setup_${version}.${ext}
+  entitlements: entitlements.mac.plist
+  hardenedRuntime: true
+  extendInfo:
+    NSMicrophoneUsageDescription: 请允许本程序访问您的麦克风
+    NSCameraUsageDescription: 请允许本程序访问您的摄像头
 win:
   icon: build/icons/icon.ico
   artifactName: ${productName}_setup_${version}.${ext}

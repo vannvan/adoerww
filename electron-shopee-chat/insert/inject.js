@@ -517,7 +517,7 @@ async function handleTranslation(targetLang) {
 //发送消息分发
 async function dispatchSendMessage(buyer_id) {
   // 要区分图片还是文本
-  if ($('section img').length == 0 && !$('textarea').val()) {
+  if ($("section img[src^='blob']").length == 0 && !$('textarea').val()) {
     $.fn.message({
       type: 'warning',
       msg: '请输入消息内容',
@@ -526,34 +526,37 @@ async function dispatchSendMessage(buyer_id) {
     $('textarea').text('')
     return false
   }
-  let messageType = $('section img').length > 0 ? 'image' : 'text'
+  let messageType = $("section img[src^='blob']").length > 0 ? 'image' : 'text'
 
   if (messageType == 'image') {
-    $('section img').each(async function () {
-      //先上传图片
-      let imagesParams = {
-        type: 'image',
-        content: {
-          width: $(this).width(),
-          height: $(this).height(),
-          file_server_id: 0,
-        },
-      }
-      try {
-        let base64 = await Lib.getBase64($(this).attr('src'))
-        let imageUrl = await handleUpload(base64)
-        imagesParams.content.url = imageUrl
-        handleSendMessage(buyer_id, imagesParams)
-      } catch (error) {
-        $.fn.message({
-          type: 'warning',
-          msg: '消息发送失败',
-        })
-        $("section svg[class='chat-icon']").parent().click()
-        ipcNotice({
-          type: 'WRITE_LOG',
-          params: error,
-        })
+    $("section img[src^='blob']").each(async function () {
+      if (/blob/.test($(this).attr('src'))) {
+        //先上传图片
+        let imagesParams = {
+          type: 'image',
+          content: {
+            width: $(this).width(),
+            height: $(this).height(),
+            file_server_id: 0,
+          },
+        }
+        try {
+          let base64 = await Lib.getBase64($(this).attr('src'))
+          let imageUrl = await handleUpload(base64)
+          imagesParams.content.url = imageUrl
+          handleSendMessage(buyer_id, imagesParams)
+        } catch (error) {
+          $.fn.message({
+            type: 'warning',
+            msg: '消息发送失败',
+          })
+          $('#messagesContainer').nextAll().find('svg').last().parent().click()
+          //   $("section svg[class='chat-icon']").parent().click()
+          ipcNotice({
+            type: 'WRITE_LOG',
+            params: error,
+          })
+        }
       }
     })
   } else {
@@ -615,7 +618,8 @@ async function sendMessage(params) {
     .then(() => {
       // 清除文本框
       $('textarea').val('')
-      $("section svg[class='chat-icon']").parent().click()
+      $('#messagesContainer').nextAll().find('svg').last().parent().click()
+      //   $("section svg[class='chat-icon']").parent().click()
     })
     .catch(err => {
       console.log('sendMessage error:', err.data)

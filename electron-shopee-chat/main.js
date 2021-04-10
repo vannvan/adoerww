@@ -796,8 +796,13 @@ async function tryToGetAuthedStore(type) {
     mainWindowNotifier('IS_LOADING_AUTHINFO')
   }
   const malacca_token = store.get('erpAuth')
+<<<<<<< HEAD
   //   let authedStore = store.get('authedStore') || {} //已授权的店铺列表
   //   let storeMenuList = store.get('storeMenuList')
+=======
+  let authedStore = store.get('authedStore') || {} //已授权的店铺列表
+  let storeMenuList = store.get('storeMenuList')
+>>>>>>> 9f6361f20ef96619f8acdd0d8d98cc91c11364ea
   if (malacca_token) {
     let storeList = await server.getAuthedAtore()
     log.info('storeMenuList 更新店铺列表', JSON.stringify(storeList))

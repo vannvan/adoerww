@@ -163,6 +163,7 @@ function handleAddStore() {
   }
 
   log.info('======================handleAddStore start======================')
+  log.info('request:', params)
   API.handleLoginShopee(params)
     .then(res => {
       let data = res.data
