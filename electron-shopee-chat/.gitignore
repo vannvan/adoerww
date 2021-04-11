@@ -27,3 +27,4 @@ dist/
 
 .aliossrc
 /package-lock.json
+/storage.json
