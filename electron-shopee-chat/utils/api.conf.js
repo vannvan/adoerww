@@ -1,12 +1,11 @@
 const { default: axios } = require('axios')
-const storage = require('electron-localstorage')
-storage.setStoragePath('./storage.json')
+// storage.setStoragePath('./storage.json')
 const log = require('electron-log')
+const Store = require('electron-store')
+let store = new Store({})
 
 function getToken() {
-  return storage.getItem('erpAuth')
-    ? storage.getItem('erpAuth').access_token
-    : null
+  return store.get('erpAuth') ? store.get('erpAuth').access_token : null
 }
 // axios.defaults.timeout = 10000 //设置超时时间,单位毫秒
 
@@ -16,13 +15,14 @@ module.exports = API = {
   // shoppe登录
   handleLoginShopee: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    log.info('handleLoginShopee request params:', params)
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/login', params)
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleLoginShopee', Lib.getError(error))
           reject(error)
         })
@@ -32,13 +32,15 @@ module.exports = API = {
   //新增店铺
   handleAddStore: function (params) {
     axios.defaults.headers['Authorization'] = 'Bearer ' + getToken()
+    log.info('handleAddStore request params:', params)
+
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/add-store', params)
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleAddStore', Lib.getError(error))
           reject(error)
         })
@@ -56,10 +58,10 @@ module.exports = API = {
           this.BASE_URL + '/product/crawl/talk/file/get-store-import-template',
         responseType: 'blob',
       })
-        .then(res => {
+        .then((res) => {
           resolve(res)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('downloadExecle', Lib.getError(error))
           reject(error)
         })
@@ -71,10 +73,10 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/erp/store-list')
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('getErpStoreList', Lib.getError(error))
           reject(error)
         })
@@ -90,10 +92,10 @@ module.exports = API = {
         data: params,
         url: this.BASE_URL + '/product/crawl/talk/file/import-store',
       })
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('importStoreFile', Lib.getError(error))
           reject(error)
         })
@@ -106,10 +108,10 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/erp/import-store', params)
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('importErpStore', Lib.getError(error))
           reject(error)
         })
@@ -122,13 +124,15 @@ module.exports = API = {
     let data = {
       shopId: storeId,
     }
+    log.info('handleRemoveStore request params:', data)
+
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/del-store', data)
-        .then(res => {
+        .then((res) => {
           resolve(res.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleRemoveStore', Lib.getError(error))
           reject(error)
         })
@@ -141,10 +145,10 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/store-list')
-        .then(res => {
+        .then((res) => {
           resolve(res.data.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleGetChatClientStore', Lib.getError(error))
           log.error('handleGetChatClientStore', error)
           reject(error)
@@ -158,10 +162,10 @@ module.exports = API = {
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/store/all/get-token')
-        .then(res => {
+        .then((res) => {
           resolve(res.data.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleGetStoresAuthInfo', Lib.getError(error))
           reject(error)
         })
@@ -178,14 +182,16 @@ module.exports = API = {
       shopId: params.storeId,
       storeAlias: params.aliasName,
     }
+    log.info('handleModifyAliasName request params:', data)
+
     return new Promise((resolve, reject) => {
       axios
         .post(this.BASE_URL + '/product/crawl/talk/update-store-alias', data)
-        .then(res => {
+        .then((res) => {
           log.info('handleModifyAliasName  success')
           resolve(res.data.data)
         })
-        .catch(error => {
+        .catch((error) => {
           log.error('handleModifyAliasName', Lib.getError(error))
           reject(error)
         })

@@ -1,12 +1,12 @@
 {
     "name": "shopee-chat-client",
-    "version": "0.1.29",
+    "version": "0.1.32",
     "description": "虾皮聊聊客户端",
     "main": "main.js",
     "scripts": {
         "start": "electron . dev",
-        "build": "rm -rf dist && electron-builder --win",
-        "build:mac": "rm -rf dist && npm version patch && electron-builder --m"
+        "build": "rm -rf dist  && electron-builder --win",
+        "build:mac": "rm -rf dist && electron-builder --m"
     },
     "repository": "https://gitlab.ikjzd.com/kj_erp/web/shopee-chat-client",
     "build": {
@@ -29,7 +29,13 @@
         },
         "mac": {
             "icon": "build/icons/icon.icns",
-            "artifactName": "${productName}_setup_${version}.${ext}"
+            "artifactName": "${productName}_setup_${version}.${ext}",
+            "entitlements": "entitlements.mac.plist",
+            "hardenedRuntime": true,
+            "extendInfo": {
+                "NSMicrophoneUsageDescription": "请允许本程序访问您的麦克风",
+                "NSCameraUsageDescription": "请允许本程序访问您的摄像头"
+            }
         },
         "win": {
             "icon": "build/icons/icon.ico",
