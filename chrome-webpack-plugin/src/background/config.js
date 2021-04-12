@@ -55,6 +55,14 @@ export const CONFIGINFO = {
     // 上传地址
     handleUploadImages: function() {
       return this.ApiUrl + 'basic/config/platform/uploadImage'
+    },
+    // 获取需更新版本信息 
+    getQueryUpdatePlug: function() {
+      return this.ApiUrl + 'product/crawl/member/query-update-plug'
+    },
+    // 到erp获取虾皮用户的粉丝列表，
+    getShopeeFollowerList: function() {
+      return this.ApiUrl + 'product/crawl/shopee-fans/get'
     }
   }
 }

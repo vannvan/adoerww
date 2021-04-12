@@ -68,7 +68,7 @@ export const WEBSITES = [
     mall: 'https://mall.shopee.com.br/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.br.shopee.cn/',
     cnfront: 'https://br.xiapibuy.com/',
-    cnmall: 'https://mall.br.xiapibuy.com/shop/ID/following?__classic__=1'
+    cnmall: 'https://br.xiapibuy.com/shop/ID/following?__classic__=1'
   },
   {
     name: '台湾',
@@ -131,6 +131,8 @@ export const MESSAGE = {
     checkIsAuthedERP: `您还未登录，请<a href="${ERP_LOGIN_URL}" target="_blank">登录</a>采集插件`,
     pleaseLoginPinDuoDuo:
       '请先<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
+    pleaseAgainLoginPinDuoDuo:
+    '数据异常，请重新<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
     pleaseLogin1688: '请先登录1688后再采集',
     pleaseLoginTmall: '请先登录天猫再采集',
     pleaseLoginTaobao: '请先登录淘宝再采集',
@@ -138,7 +140,8 @@ export const MESSAGE = {
     pleaseSelectSomeGoods: '请选择需要采集的商品',
     beyondMaximumLimit: '批量采集不能超过50条',
     faildGetGoodsInfo: '未获取到商品信息',
-    collectExceptionEncounter: '采集遇到异常，请稍后重试'
+    collectExceptionEncounter: '采集遇到异常，请稍后重试',
+    getFaildFollowerList: '获取粉丝数据失败'
   },
   success: {
     collectSuccess: '采集成功',
@@ -169,6 +172,11 @@ export const COLLECT_SITES = [
     name: 'Lazada',
     link: 'https://www.lazada.com/en/',
     logo: require('@/assets/icon/logo-lazada.png')
+  },
+  {
+    name: '敦煌',
+    link: 'https://www.dhgate.com/',
+    logo: require('@/assets/icon/logo-dhgate.png')
   }
 ]
 
@@ -243,6 +251,10 @@ export const RIGHT_MENU = [
         name: '店铺前台',
         action: 'front'
       }
+      //   {
+      //     name: '同步登录态',
+      //     action: 'syncShopeeAuth'
+      //   }
     ]
   }
 ]

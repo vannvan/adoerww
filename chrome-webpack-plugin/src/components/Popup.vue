@@ -2,23 +2,43 @@
   <div class="emalacca-popup-wrap">
     <div class="emalacca-popup-header">
       <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
-      <b class="emalacca-plugin-name">{{ pluginName }}</b>
-      
+      <b class="emalacca-plugin-name">
+        {{ pluginName }}
+        <template v-if="isVersionNewest">
+          {{ nowVersion }}
+        </template>
+        <a
+          class="update-version"
+          :href="newVersionData.plugDownloadUrl"
+          v-if="!isVersionNewest"
+          target="_blank"
+          :title="'下载' + newVersionData.plugName + newVersionData.versionDisplayName"
+        >
+          {{ nowVersion }}
+          <i class="update-red"></i>
+        </a>
+      </b>
+
       <img
         class="emalacca-pupup-header-exit"
         src="@/assets/icon/exit.png"
         @click="handleExit()"
         v-if="userInfo"
       />
-      <div :class="isShowMessage ? 'malacca-pupup-hint-box' : 'malacca-pupup-header-switches-box'">
-        <switches class="malacca-pupup-header-switches" v-model="isDisabled" text-enabled="启用" text-disabled="停用" @input="switchesChange"></switches>
+      <div :class="!isHideMessage ? 'malacca-pupup-hint-box' : 'malacca-pupup-header-switches-box'">
+        <switches
+          class="malacca-pupup-header-switches"
+          v-model="isStartPlug"
+          text-enabled="启用"
+          text-disabled="停用"
+          @input="switchesChange"
+        ></switches>
         <div class="malacca-pupup-mask-layer"></div>
         <div class="malacca-pupup-message-box">
           <div class="malacca-pupup-message-content">插件已停用，点击启用插件</div>
-          <div class="malacca-pupup-message-bottom" @click="isShowMessage = false">我知道了</div>
+          <div class="malacca-pupup-message-bottom" @click="isHideMessage = true">我知道了</div>
         </div>
       </div>
-      
     </div>
     <div class="emalacca-popup-content">
       <template v-if="userInfo">
@@ -83,8 +103,8 @@
 <script>
 import { ERP_SYSTEM } from '@/lib/env.conf'
 import { COLLECT_SITES } from '@/lib/conf'
-import { getStorage } from '@/lib/utils'
-import { setStorageSync, getStorageSync, getTabUrl, getAllTabs, gotoErp, setStorageLocal } from '@/lib/chrome'
+import { getStorage, isNil } from '@/lib/utils'
+import { setStorageSync, getStorageSync, getAllTabs, getTabUrl } from '@/lib/chrome'
 import { CONFIGINFO } from '../background/config'
 import Switches from './Switches'
 import $ from 'jquery'
@@ -114,12 +134,15 @@ export default {
   data() {
     return {
       userInfo: null,
-      pluginName: APPNAME + ' V' + VERSION,
+      pluginName: APPNAME,
+      nowVersion: 'V' + VERSION,
       collectSites: COLLECT_SITES,
       collecting: 0,
       collectingTime: null,
-      isDisabled: false,  // 是否停用插件
-      isShowMessage: false  // 是否显示提示窗
+      isStartPlug: true, // 是否启用插件
+      isHideMessage: true, // 是否隐藏提示窗
+      isVersionNewest: true, // 版本是否最新的
+      newVersionData: {} // 最新版本的信息
     }
   },
   mounted() {
@@ -129,24 +152,29 @@ export default {
     if (this.userInfo) {
       this.getCollecting()
     }
+    // 获取需更新版本信息
+    this.getQueryUpdatePlug()
 
     // 从缓存中获取是否禁用插件
     getStorageSync('isDisabledPlug').then(data => {
-      this.isDisabled = data['isDisabledPlug'] || false
-      if (this.isDisabled) {
-        this.isShowMessage = true
+      this.isStartPlug = !isNil(data['isDisabledPlug']) ? !data['isDisabledPlug'] : true
+      chrome.browserAction.setBadgeText({text: this.isStartPlug ? '' : 'off'});
+      chrome.browserAction.setBadgeBackgroundColor({color: this.isStartPlug ? '' : 'red'});
+      // 停用插件时，显示提示窗
+      if (!this.isStartPlug) {
+        this.isHideMessage = false
       }
     })
   },
   methods: {
     handleExit() {
-      sendMessageToContentScript({ cmd: 'erp-logout', type: 'ERP_LOGOUT' }, function(response) {
+      sendMessageToContentScript({ type: 'ERP_LOGOUT' }, function(response) {
         console.log(response, 'response')
       })
-      
+
       // 不管erp系统是否完成退出，插件都要退出
       localStorage.setItem('pt-plug-access-user', null)
-      setStorageLocal({'isLogin': false})  // ERP登出或者插件登出，保存false
+      // setStorageLocal({'isLogin': false})  // ERP登出或者插件登出，保存false
       setTimeout(() => {
         window.close() //关闭popup
       }, 500)
@@ -171,11 +199,10 @@ export default {
           Authorization: 'Bearer ' + getStorage('pt-plug-access-user').token
         },
         dataType: 'json',
-        success: (res) => {
+        success: res => {
           if (res.code == 0) {
             this.collecting = res.data.doingCount
             if (this.collecting > 0) {
-              this.collectingTime = 
               this.collectingTime = setInterval(() => {
                 this.getCollecting()
               }, 500)
@@ -188,20 +215,41 @@ export default {
     },
     // 开关
     switchesChange(value) {
-      this.isDisabled = value
-      this.isShowMessage = false
-      setStorageSync({'isDisabledPlug': value}).then( ()=> {
+      this.isStartPlug = value
+      this.isHideMessage = true
+      chrome.browserAction.setBadgeText({text: value ? '' : 'off'});
+      chrome.browserAction.setBadgeBackgroundColor({color: value ? '' : 'red'});
+      setStorageSync({ isDisabledPlug: !value }).then(() => {
         // 更新全部匹配的页面
         this.handleUpDate({ type: 'UPDATE_PAGE' })
       })
-      
     },
     handleUpDate(message) {
-      // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
-      getAllTabs(urls => {
-        urls.map(el => {
-          chrome.tabs.sendMessage(el.id, message)
-        })
+      // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求getAllTabs,getTabUrl
+      getTabUrl(tab => {
+        chrome.tabs.sendMessage(tab.id, message)
+      })
+    },
+
+    // 获取需更新版本信息
+    getQueryUpdatePlug() {
+      let params = {
+        versionDisplayName: 'V' + VERSION
+      }
+      $.ajax({
+        url: CONFIGINFO.url.getQueryUpdatePlug(),
+        type: 'POST',
+        data: JSON.stringify(params),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: res => {
+          if (res.code == 0) {
+            if (!isNil(res.data)) {
+              this.isVersionNewest = false
+              this.newVersionData = res.data
+            }
+          }
+        }
       })
     }
   },
@@ -334,23 +382,23 @@ body {
       }
     }
   }
-  .malacca-pupup-header-switches-box{
+  .malacca-pupup-header-switches-box {
     float: right;
     margin-right: 10px;
-    .malacca-pupup-mask-layer{
+    .malacca-pupup-mask-layer {
       display: none;
     }
-    .malacca-pupup-message-box{
+    .malacca-pupup-message-box {
       display: none;
     }
   }
-  
-  .malacca-pupup-hint-box{
+
+  .malacca-pupup-hint-box {
     position: relative;
     float: right;
     display: block;
     margin-right: 0;
-    .malacca-pupup-header-switches{
+    .malacca-pupup-header-switches {
       position: absolute;
       left: -88px;
       top: -8px;
@@ -361,7 +409,7 @@ body {
       padding: 8px 10px;
       background: #fff;
     }
-    .malacca-pupup-mask-layer{
+    .malacca-pupup-mask-layer {
       position: fixed;
       left: 0;
       right: 0;
@@ -372,7 +420,7 @@ body {
       opacity: 0.4;
       display: block;
     }
-    .malacca-pupup-message-box{
+    .malacca-pupup-message-box {
       position: absolute;
       right: 0;
       top: 48px;
@@ -382,19 +430,31 @@ body {
       display: block;
       border-radius: 5px;
       background: #fff;
-      .malacca-pupup-message-content{
+      .malacca-pupup-message-content {
         text-align: center;
-        padding: 10px 15px;
+        padding: 10px 24px;
         white-space: nowrap;
         box-sizing: border-box;
       }
-      .malacca-pupup-message-bottom{
+      .malacca-pupup-message-bottom {
         color: #ff720d;
         text-align: center;
         border-top: 1px solid #ccc;
         cursor: pointer;
         padding: 7px 0;
       }
+    }
+  }
+  .update-version {
+    position: relative;
+    .update-red {
+      position: absolute;
+      right: -7px;
+      top: -3px;
+      width: 6px;
+      height: 6px;
+      background: red;
+      border-radius: 50%;
     }
   }
 }

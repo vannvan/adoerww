@@ -5,6 +5,7 @@ import $ from 'jquery'
 import { Html } from '@/background/server/html.js'
 import { MESSAGE } from '@/lib/conf'
 import { getRule } from '@/lib/rules'
+import { sendMessageToServer } from '@/lib/chrome-client'
 const superagent = require('superagent');
 
 export const FillUrl = function(url, httpFlag) {
@@ -44,12 +45,12 @@ export const queryUrlPar = function(url = '') { 
   return obj; 
 }
 
-// 判断当前网页是否是详情页
-export const isDetail = function() { 
+// 判断当前网页是否是详情页&&采集当前商品
+export const isDetail = function(url) { 
   let linkRule = getRule(location.href)
   let siteConfig = JSON.parse(linkRule)
   let pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
-  return pageType === 'detail'; 
+  return pageType === 'detail' && url === location.href; 
 }
 
 export const Platform = {
@@ -337,85 +338,12 @@ export const Platform = {
       return FillUrl(descUrl, true)
     },
     crawl: function (url, callback, sync) {
-      // 处理速卖通新版产品链接，将新版产品链接转换成旧版
-      var type = true
-      if (
-        url.indexOf('aliexpress.com/item/') != -1 &&
-        url.indexOf('.html') != -1
-      ) {
-        var itemId = url.substring(
-          url.indexOf('aliexpress.com/item/') + 20,
-          url.indexOf('.html')
-        )
-        if (itemId.indexOf('/') == -1) {
-          type = false
-        }
+      // 详情采集(需要传html)
+      let data = {
+        url: url
       }
-      Html.getHtml(
-        url,
-        0,
-        function (data) {
-          data.url = url
-          if (data.html) {
-            var descUrl = ''
-            if (type) {
-              descUrl = Platform.SmtCrawl.getDescUrl(data.html)
-            } else {
-              descUrl = Platform.SmtCrawl.getNewDescUrl(data.html)
-            }
-
-            // 取描述信息
-            Html.getHtml(
-              descUrl,
-              0,
-              function (desc) {
-                data.desc = desc.html
-                data.productTitle = ''
-                var div = $('<div></div>')
-                div.html(data.html)
-                // 获取标题
-                var productTitle = ''
-                var result = ''
-                for (var i = 0; i < div.find('script').length; i++) {
-                  if (
-                    div
-                      .find('script')
-                      [i].innerHTML.indexOf('window.runParams') !== -1
-                  ) {
-                    try {
-                      result = eval(
-                        div
-                          .find('script')
-                          [i].innerHTML.split('window.runParams.csrfToken')[0]
-                      )
-                    } catch (error) {
-                      result = ''
-                    }
-                  }
-                }
-                var productTitleBack = $(div).find('title')[0].innerText
-
-                try {
-                  productTitle = result.data.pageModule.title
-                } catch (error) {
-                  productTitle = ''
-                }
-                if (!!productTitle) {
-                  data.productTitle = productTitle
-                } else {
-                  data.productTitle = productTitleBack
-                }
-                callback(data)
-              },
-              sync
-            )
-          } else {
-            data.html = ''
-            callback(data)
-          }
-        },
-        sync
-      )
+      callback(data)
+      
     },
   },
 
@@ -444,57 +372,48 @@ export const Platform = {
   },
   // 拼多多采集
   YangkeduoCrawl: {
-    crawl: function (url, callback, sync) {
-      Html.getHtml(
-        url,
-        1,
-        function (data) {
-          var div = $('<div></div>')
-          div.html(data.html)
-          for (var i = 0; i < div.find('script').length; i++) {
-            let scriptValue = div.find('script')[i].innerHTML
-            if (scriptValue.includes('window.rawData')) {
-              try {
-                eval(scriptValue)
-              } catch (error) {
-                result = ''
-              }
-            }
-          }
-          try {
-            if (window.rawData.store.initDataObj.goods) {
-              let goodInfo = window.rawData.store.initDataObj.goods
-              data.html = JSON.stringify(goodInfo)
-            } else {
-              data.html = ''
-            }
-          } catch (e) {
-            data.html = ''
-          }
-
-          if (!data.html) {
-            // data.msg = '请先登录拼多多'
-            $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseLoginPinDuoDuo })
-            return
-          }
-
-          let productTitle = div.find('.enable-select').text()
-          data.productTitle = productTitle
-          data.desc = data.html
-          data.url = url
-          callback(data)
-        },
-        sync
-      )
+    crawl: function (url, callback) {
+      // 详情采集()
+      let rawData = document.documentElement.outerHTML.match(/window.rawData\=.*/g, '')[0]
+      if (rawData.indexOf('原商品已售罄，为你推荐相似商品') !== -1) {
+        // 清空缓存
+        localStorage.clear()
+        // sendMessageToServer('clearUrlCookie', {
+        //   url: '.yangkeduo.com'
+        // })
+        sendMessageToServer('clearUrlCookie', {
+          url: 'https://mobile.yangkeduo.com',
+          domain: '.yangkeduo.com'
+        }, data => {
+          $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseAgainLoginPinDuoDuo })
+        })
+        return 
+      }
+      let data = {
+        html: document.documentElement.outerHTML,
+        url: url
+      }
+      callback(data)
     },
   },
 
   // 拼多多批发采集
   PifaPinduoduoCrawl: {
     crawl: function (url, callback) {
-      // 详情采集()
+      // 详情采集
       let data = {
-        html: isDetail() ? document.documentElement.innerHTML : null,
+        html: isDetail(url) ? document.documentElement.outerHTML : null,
+        url: url
+      }
+      callback(data)
+    },
+  },
+  // 敦煌采集
+  DhgateCrawl: {
+    crawl: function (url, callback) {
+      // 详情采集(需要传html)
+      let data = {
+        html: isDetail(url) ? document.documentElement.outerHTML : null,
         url: url
       }
       callback(data)

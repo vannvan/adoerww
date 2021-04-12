@@ -36,6 +36,19 @@ function _defaultFor(arg, val) {
   return typeof arg !== 'undefined' ? arg : val
 }
 
+function delCookie() {
+  var keys = document.cookie.match(/[^ =;]+(?==)/g)
+  if (keys) {
+    for (var i = keys.length; i--; ) {
+      document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString() // 清除当前域名下的,例如：m.ratingdog.cn
+      document.cookie =
+        keys[i] + '=0;path=/;domain=' + document.domain + ';expires=' + new Date(0).toUTCString() // 清除当前域名下的，例如 .m.ratingdog.cn
+      document.cookie =
+        keys[i] + '=0;path=/;domain=ratingdog.cn;expires=' + new Date(0).toUTCString() // 清除一级域名下的或指定的，例如 .ratingdog.cn
+    }
+  }
+}
+
 // 两个cookies重点方法，解决关注功能403的问题
 Cookies.set('csrftoken', _rc_set('SPC_F', 32, null, new Date(curTs() + 86400 * 1000 * 365 * 20)), {
   expires: 7
@@ -51,13 +64,14 @@ const debounceHandleActions = debounce(function() {
 
 //粉丝关注
 const Follow = {
-  domain: window.location.origin,
+  domain: location.origin,
   preload: function() {
     try {
       $(window).scroll(debounceHandleActions)
     } catch (e) {
       return
     }
+    Follow.syncShoppeBaseInfo()
   },
 
   //获取数据展示面板需要的数据，并赋值
@@ -158,7 +172,10 @@ const Follow = {
     return new Promise(resolve => {
       sendMessageToBackground(
         'auth',
-        { csrfToken: getCookie('csrftoken') || window.csrf, domain: this.domain },
+        {
+          csrfToken: getCookie('csrftoken') || window.csrf,
+          domain: this.domain
+        },
         'SET_SHOPPE_CRSF_TOKEN',
         data => {
           resolve(data)
@@ -181,24 +198,20 @@ const Follow = {
     })
   },
 
-  //获取当前登录的店铺id
-  //   getCurrentStoreId: function() {
-  //     return new Promise(resolve => {
-  //       sendMessageToBackground('request', { domain: this.domain }, 'GET_CURRENT_STORE_ID', data => {
-  //         resolve(data)
-  //       })
-  //     })
-  //   },
-
   //同步虾皮基础信息
   syncShoppeBaseInfo: function() {
     return new Promise(resolve => {
       sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPEE_BASE_INFO', data => {
         console.log('SYNC_SHOPEE_BASE_INFO', data)
-        if (data.code == 0) {
-          //   document.cookie = `SPC_EC=${data.result.cs_token}`
-          //   虾皮的xiapibuy.com的登录状态需要这个cookies值才能同步给页面
-          Cookies.set('SPC_EC', data.result.cs_token, { expires: 7 })
+        if (data && data.code == 0) {
+          console.log('SPC_CDS', Cookies.get('SPC_CDS'))
+          if (/xiapibuy|shopee\.cn/.test(location.host)) {
+            // 虾皮的xiapibuy.com的登录状态需要这个cookies值才能同步给页面
+            Cookies.set('SPC_EC', data.result.cs_token, { expires: 7 })
+          }
+        } else {
+          delCookie()
+          console.log('clear cookies')
         }
         resolve(data)
       })
@@ -215,6 +228,20 @@ const Follow = {
           reject(res)
         }
       })
+    })
+  },
+
+  // 到erp获取虾皮用户的粉丝列表，
+  getFollowersOfShopeeUser: function({ countryCode, shopId }) {
+    return new Promise(resolve => {
+      sendMessageToBackground(
+        'request',
+        { countryCode: countryCode, shopId: shopId },
+        'GET_FOLLOWERS_OF_SHOPEE_USER',
+        data => {
+          resolve(data)
+        }
+      )
     })
   },
 

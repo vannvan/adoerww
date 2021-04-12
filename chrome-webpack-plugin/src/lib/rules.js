@@ -3,7 +3,7 @@ import $ from 'jquery'
 //支持采集的平台
 const ruleInfo = {
   'aliexpress.com':
-    "{\"detect\": \"if ((/\\\\/item\\\\/.+?\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif ((/\\\\/item\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif ((/\\\\/store\\\\/product\\\\/.+?\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif (url.indexOf('/store/other-products/') !== -1 || url.indexOf('/store/group/') !== -1 || url.indexOf('/all-wholesale-products/') !== -1) {\\n  return 'category';\\n}\\nif ((/\\\\/category\\\\/\\\\d+/).test(url) || url.indexOf('wholesale') !== -1) {\\n  return 'sortlist';\\n}\\nif ((/store\\\\/\\\\d+\\\\/search/).test(url)) {\\n  return 'category';\\n}\",\n" +
+    "{\"detect\": \"if ((/\\\\/item\\\\/.+?\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif ((/\\\\/item\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif ((/\\\\/store\\\\/product\\\\/.+?\\\\/[\\\\d_]+\\\\.html/).test(url)) {\\n  return 'detail';\\n}\\nif (url.indexOf('/store/other-products/') !== -1 || url.indexOf('/store/group/') !== -1 || url.indexOf('/all-wholesale-products/') !== -1) {\\n  return 'category';\\n}\\nif ((/\\\\/category\\\\/\\\\d+/).test(url) || url.indexOf('wholesale') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('aliexpress.com/af/') !== -1) {\\n  return 'sortlist';\\n}\\nif ((/store\\\\/\\\\d+\\\\/search/).test(url)) {\\n  return 'category';\\n}\",\n" +
     "\"detail\": \"if (url.indexOf('aliexpress.com/item/') !== -1 ||  url.indexOf('store/product') !== -1 || url.indexOf('aliexpress.com?spm') !== -1) {\\n  return true;\\n}\",\n" +
     '"map": {\n' +
     '"detail": "single",\n' +
@@ -24,7 +24,7 @@ const ruleInfo = {
     '"shopcategory": "category"\n' +
     '}\n' +
     '}',
-  amazon:
+  'amazon':
     '{\n' +
     "\"detect\": \"if (url.indexOf('/dp/') !== -1 && url.indexOf('www.amazon.com.au') == -1 ) {\\n  return 'detail';\\n}\\nif (url.indexOf('/gp/product/') !== -1) {\\n  return 'detail';\\n}\\nif(url.indexOf('amazon.com/s?marketplaceID') != -1){return 'category';}\\nif(url.indexOf('s?k=') != -1){return 'sortlist';}\",\n" +
     "\"detail\": \"if (url.indexOf('/dp/') !== -1 && url.indexOf('www.amazon.com.au') == -1 ) {\\n  return true;\\n}\\nif (url.indexOf('amazon.com/gp/product/') !== -1 || url.indexOf('/gp/slredirect/picassoRedirect.html/') !== -1) {\\n  return true;\\n}\",\n" +
@@ -50,7 +50,7 @@ const ruleInfo = {
     '"category": "category"\n' +
     '}\n' +
     '}',
-  ebay:
+  'ebay':
     '{\n' +
     "\"detect\": \"if ((/\\\\/itm(\\\\/.*)?\\\\/\\\\d+/).test(url)) {\\n  return 'detail';\\n}\\nif (url.indexOf('stores.ebay') !== -1) {\\n  return 'category';\\n}\",\n" +
     '"detail": "return (/\\\\/itm(\\\\/.*)?\\\\/\\\\d+/).test(url); ",\n' +
@@ -99,16 +99,7 @@ const ruleInfo = {
     '"globalcategory": "category"\n' +
     '}\n' +
     '}',
-  'dhgate.com':
-    '{\n' +
-    "\"detect\": \"if (url.indexOf('dhgate.com/wholesale') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('dhgate.com/product') !== -1 || url.indexOf('dhgate.com/store/product') !== -1) {\\n  return 'detail';\\n}\",\n" +
-    '"detail": "if (url.indexOf(\'dhgate.com/product\') !== -1 || url.indexOf(\'dhgate.com/store/product\') !== -1) {\\n  return true;\\n}",\n' +
-    '"map": {\n' +
-    '"detail": "single",\n' +
-    '"shopcategory": "category",\n' +
-    '"globalcategory": "category"\n' +
-    '}\n' +
-    '}',
+  
   'etsy.com':
     '{\n' +
     '"detect": "\\nif (url.indexOf(\'etsy.com/listing\') !== -1 ) {\\n  return \'detail\';\\n}",\n' +
@@ -237,7 +228,7 @@ const ruleInfo = {
 
   'mobile.yangkeduo.com':
     '{\n' +
-    "\"detect\": \"if (url.indexOf('/goods.html?') !== -1 ) {\\n  return 'detail';\\n}\",\n" +
+    "\"detect\": \"if (url.indexOf('/goods.html?') !== -1 || url.indexOf('/goods2.html?') !== -1) {\\n  return 'detail';\\n}\",\n" +
     '"detail": "if (url.indexOf(\'yangkeduo.com\')!==-1) {\\n  return true;\\n}",\n' +
     '"map": {\n' +
     '"detail": "single",\n' +
@@ -264,7 +255,17 @@ const ruleInfo = {
     '"shopcategory": "category",\n' +
     '"globalcategory": "category"\n' +
     '}\n' +
-    '}'
+    '}',
+  'dhgate.com':
+    '{\n' +
+    "\"detect\": \"if (url.indexOf('dhgate.com/wholesale') !== -1 || url.indexOf('dhgate.com/w/') !== -1) {\\n  return 'sortlist';\\n}\\nif (url.indexOf('dhgate.com/product') !== -1) {\\n  return 'detail';\\n}\",\n" +
+    "\"detail\": \"if (url.indexOf('/product/') !== -1) {\\n  return true;\\n}\",\n" +
+    '"map": {\n' +
+    '"detail": "single",\n' +
+    '"shopcategory": "category",\n' +
+    '"globalcategory": "category"\n' +
+    '}\n' +
+    '}',
 }
 
 export const getRule = url => {

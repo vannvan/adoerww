@@ -2,7 +2,7 @@
   <label class="layui-input-block">
     <input class="switch-component" type="checkbox" :checked="value" @change="trigger"/>
     <div class="layui-unselect layui-form-switch" :class="value ? 'layui-form-onswitch' : ''">
-      <em>{{!value ? textEnabled : textDisabled}}</em>
+      <em>{{value ? textEnabled : textDisabled}}</em>
 			<i></i>
     </div>
   </label>
@@ -14,13 +14,16 @@ export default {
 
   props: {
     value: {
+      type: Boolean,
       default: false,
     },
 		textEnabled: {
+      type: String,
 			default: ''
 		},
 
 		textDisabled: {
+      type: String,
 			default: ''
 		},
   },

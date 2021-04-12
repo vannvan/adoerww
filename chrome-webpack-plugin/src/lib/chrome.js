@@ -1,8 +1,6 @@
 // const chrome = {}
 const contextMenus = {}
-import {
-  ERP_SYSTEM
-} from '@/lib/env.conf'
+import { ERP_SYSTEM } from '@/lib/env.conf'
 
 // 右键菜单
 export function contextMenu(config) {
@@ -33,89 +31,102 @@ export function exceScript(tabId, linkOrCode) {
 
   chrome.tab.exceScript(
     tabId,
-    linkOrCode.match(/\.js$/) ?
-    {
-      file: linkOrCode.match(/\/?(\w+\.?-?\w+\.js$)/)[1]
-    } :
-    {
-      code: linkOrCode
-    }
+    linkOrCode.match(/\.js$/)
+      ? {
+          file: linkOrCode.match(/\/?(\w+\.?-?\w+\.js$)/)[1]
+        }
+      : {
+          code: linkOrCode
+        }
   )
 }
 
 // 获取当前窗口的ID
 export function getCurrent(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getCurrent(function (currentWindow) {
+  chrome.windows.getCurrent(function(currentWindow) {
     callback && callback(currentWindow.id)
   })
 }
+
 // 获取当前tabID
 export function getTabId(callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, function (tabs) {
-    callback && callback(tabs.length ? tabs[0].id : null)
-  })
+  chrome.tabs.query(
+    {
+      active: true,
+      currentWindow: true
+    },
+    function(tabs) {
+      callback && callback(tabs.length ? tabs[0].id : null)
+    }
+  )
 }
 // 获取当前tabID2
 export function getTabId2(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getCurrent(function (currentWindow) {
-    chrome.tabs.query({
-      active: true,
-      windowId: currentWindow.id
-    }, function (tabs) {
-      if (callback) callback(tabs.length ? tabs[0].id : null)
-    })
+  chrome.windows.getCurrent(function(currentWindow) {
+    chrome.tabs.query(
+      {
+        active: true,
+        windowId: currentWindow.id
+      },
+      function(tabs) {
+        if (callback) callback(tabs.length ? tabs[0].id : null)
+      }
+    )
   })
 }
 
 //获取当前tab的url
 export function getTabUrl(callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.getSelected(null, function (tab) {
-    callback(tab.url)
+  chrome.tabs.getSelected(null, function(tab) {
+    callback(tab)
   })
 }
 
 //获取所有标签页
 export function getAllTabs(callback) {
   if (typeof callback != 'function') return
-  chrome.windows.getAll({
-    populate: true
-  }, function (windows) {
-    windows.forEach(function (window) {
-      //   window.tabs.forEach(function(tab) {
-      //     //collect all of the urls here, I will just log them instead
-      //     console.log(tab.url)
-      //   })
-      callback(window.tabs)
-    })
-  })
+  chrome.windows.getAll(
+    {
+      populate: true
+    },
+    function(windows) {
+      windows.forEach(function(window) {
+        //   window.tabs.forEach(function(tab) {
+        //     //collect all of the urls here, I will just log them instead
+        //     console.log(tab.url)
+        //   })
+        callback(window.tabs)
+      })
+    }
+  )
 }
 
 //打开指定标签页
 export function gotoSomeTab(windowId, tabIndex, callback) {
   if (typeof callback != 'function') return
-  chrome.tabs.highlight({
-    windowId: windowId,
-    tabs: tabIndex
-  }, function (tab) {
-    callback(tab)
-  })
+  chrome.tabs.highlight(
+    {
+      windowId: windowId,
+      tabs: tabIndex
+    },
+    function(tab) {
+      callback(tab)
+    }
+  )
 }
 
 //打开erp所在的标签页
 export function gotoErp(callback) {
   const currentErpSystem = ERP_SYSTEM[process.env.NODE_ENV]
   let reg = new RegExp(currentErpSystem)
-  getAllTabs(function (tabs) {
+  getAllTabs(function(tabs) {
     for (let i = 0; i < tabs.length; i++) {
       if (reg.test(tabs[i].url)) {
-        gotoSomeTab(tabs[i].windowId, tabs[i].index, function (res) {
+        gotoSomeTab(tabs[i].windowId, tabs[i].index, function(res) {
           callback(res)
         })
         break
@@ -131,7 +142,7 @@ export function getStorageSync(values) {
     return
   }
   return new Promise(resolve => {
-    chrome.storage.sync.get(values, (items) => {
+    chrome.storage.sync.get(values, items => {
       resolve(items)
     })
   })
@@ -156,7 +167,7 @@ export function removeStorageSync(values, callback) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.sync.remove(values, function () {
+  chrome.storage.sync.remove(values, function() {
     typeof callback == 'function' && callback(values)
   })
 }
@@ -167,7 +178,7 @@ export function clearStorageSync(callback) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.sync.clear(function () {
+  chrome.storage.sync.clear(function() {
     typeof callback == 'function' && callback(values)
   })
 }
@@ -178,7 +189,7 @@ export function getStorageLocal(values, callback) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.local.get(values, function (items) {
+  chrome.storage.local.get(values, function(items) {
     callback && callback(items)
   })
 }
@@ -189,7 +200,7 @@ export function setStorageLocal(values, callback) {
     console.log('Sorry, maybe you dont have storage permission')
     return
   }
-  chrome.storage.local.set(values, function () {
+  chrome.storage.local.set(values, function() {
     typeof callback == 'function' && callback(values)
   })
 }
@@ -202,26 +213,70 @@ Object mapping each key that changed to its corresponding StorageChange for that
  * @param {string} namespace "sync"，"local"或"managed"
  */
 export function storageChanged() {
-  chrome.storage.onChanged.addListener(function (changes, namespace) {
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (var key in changes) {
-      var storageChange = changes[key];
-      console.log('Storage key "%s" in namespace "%s" changed. ' +
-        'Old value was "%s", new value is "%s".',
+      var storageChange = changes[key]
+      console.log(
+        'Storage key "%s" in namespace "%s" changed. ' + 'Old value was "%s", new value is "%s".',
         key,
         namespace,
         storageChange.oldValue,
-        storageChange.newValue);
+        storageChange.newValue
+      )
     }
-  });
+  })
 }
 
 // storage.local 保存数据
 export function getAllCookies(values, callback) {
   if (!chrome.cookies) {
-    chrome.cookies = chrome.experimental.cookies;
+    chrome.cookies = chrome.experimental.cookies
   }
-  chrome.cookies.getAll(values, function () {
+  chrome.cookies.getAll(values, function() {
     callback && callback(items)
   })
-  
+}
+
+/**
+ * 获取一个cookie
+ * @param {*} url
+ * @param {*} key
+ * @param {*} cb
+ */
+
+export const getCookie = (url, key, cb) => {
+  chrome.cookies.get(
+    {
+      url: url,
+      name: key
+    },
+    function(cookie) {
+      if (cookie && cookie.value) {
+        cb(cookie.value)
+      } else {
+        cb(0)
+      }
+    }
+  )
+}
+
+/**
+ * 获取cookie列表
+ * @param {*} url
+ * @param {*} cb
+ */
+
+export const getCookies = (url, cb) => {
+  chrome.cookies.getAll(
+    {
+      url: url
+    },
+    function(cookies) {
+      if (cookies) {
+        cb(cookies)
+      } else {
+        cb(0)
+      }
+    }
+  )
 }

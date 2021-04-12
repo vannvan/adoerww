@@ -21,7 +21,7 @@
         </p>
         <template v-if="followHelpVisible">
           <p>
-            第一步:打开对应站点的卖家中心，弹出shopee“温馨提示”弹框时，点击“取消”再进行登录操作，如点击“确认”会跳转到中国后台链接，则无法使用。此步操作特别关键！
+            第一步:打开对应站点的卖家中心，弹出shopee“温馨提示”弹框时，点击“取消”再进行登录操作，如点击“确认”会跳转到.cn域名的链接，则无法使用。此步操作特别关键！
           </p>
           <p>
             第二步:完成第一步登录成功后，进入对应站点的前台页面，检查右上方账号是否已同步成功，同步成功即可开始使用插件，如显示未登陆状态，请重新操作第一步。
@@ -30,8 +30,7 @@
             第三步:开始使用粉丝关注，鼠标悬浮在商品图片上显示“获取粉丝”点击进入该商品的卖家粉丝列表，根据需求可输入前置条件进行关注。
           </p>
           <p style="margin:10px auto">
-            <span style="color:#f00">注:</span
-            >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
+            <span style="color:#f00">注:切换站点店铺时，请确保上一店铺账号已退出“卖家中心”</span>
           </p>
           <li v-for="(item, index) in shoppeSites" :key="index + 'a'">
             <a :href="item.seller" target="black">{{ item.name }}卖家中心</a>
@@ -54,8 +53,7 @@
           <p>第一步:确认"粉丝关注"步骤1,2已完成</p>
           <p>第二步:点击"自动取关"后进入已关注页面列表进行操作</p>
           <p style="margin:10px auto">
-            <span style="color:#f00">注:</span
-            >如遇到首次进入页面操作就提示异常且失败的情况,请在页面上手动取关一项后刷新页面即可正常使用
+            <span style="color:#f00">注:切换站点店铺时，请确保上一店铺账号已退出“卖家中心”</span>
           </p>
         </template>
       </div>
@@ -103,7 +101,7 @@
             </li>
           </div>
           <!-- 折叠 -->
-          <div class="holdon-action" @click="followActionMoreVisible = !followActionMoreVisible">
+          <div class="holdon-action" @click="followActionMoreVisible = !followActionMoreVisible;handleCancel()">
             {{ followActionMoreVisible ? '收起' : '更多' }}
           </div>
           <!-- 更多筛选 -->
@@ -205,7 +203,16 @@
                   v-enterNumberMin="0"
                   v-enterNumberMax="countFollowers"
                   v-model="unfollowMaxNumber"
-                />
+                />个
+              </span>
+            </li>
+            <li>
+              <span class="title">
+                是否跳过互粉用户
+              </span>
+              <span class="value">
+                <input type="checkbox" class="check-box" v-model="skipFollwer" />
+                {{ skipFollwer ? '跳过' : '不跳过' }}
               </span>
             </li>
           </div>
@@ -233,7 +240,7 @@
         <p>失败</p>
         <p>{{ resultCount.fail }}</p>
       </div>
-      <div class="count-item skip" v-if="currentTab == 1">
+      <div class="count-item skip">
         <p>跳过</p>
         <p>{{ resultCount.skip }}</p>
       </div>
@@ -253,7 +260,7 @@
 import Drawer from './Drawer'
 import Follow from '@/inject/shopee'
 import $ from 'jquery'
-import { WEBSITES, MESSAGE } from '@/lib/conf'
+import { WEBSITES, MESSAGE, getSiteLink } from '@/lib/conf'
 import { isEmpty } from '@/lib/utils'
 import dayjs from 'dayjs'
 
@@ -279,16 +286,18 @@ export default {
       },
       buttonText: '开启',
       countFollowers: null, //当前页面粉丝数
+      //店铺信息
       storeInfo: {
         account: {}
-      }, //店铺信息
+      },
+      //操作结果
       resultCount: {
         success: 0,
         fail: 0,
         skip: 0
-      }, //结果统计
+      },
       isRequest: false,
-      globalTimer: null, //定时器
+      globalTimer: null, //自动操作定时器
       usernameQueue: [], //用户队列
       currentUserName: null, //当前操作用用
       cookieSyncStatus: true, //cookies同步状态
@@ -299,10 +308,12 @@ export default {
       shoppeSites: WEBSITES,
       countryCode: null, //当前国家
       currentStoreId: null, //当前用户自己的店铺id
-      followHelpVisible: false,
-      unFollowHelpVisible: false,
+      followHelpVisible: false, // 关注帮助文本
+      unFollowHelpVisible: false, //取关帮助文本
       followActionMoreVisible: false, //关注操作更多是否可见
-      scrollTimer: null //自动滚动定时器
+      scrollTimer: null, //自动滚动定时器,
+      currentUserFollowers: [], //当前用户自己的粉丝IDs
+      skipFollwer: false //是否跳过互粉
     }
   },
   props: {
@@ -323,11 +334,11 @@ export default {
       handler(newVal) {
         let { pathname } = location
         if (!/followers|following/.test(pathname) && newVal) {
-          //   this.handleToggleTabs(2)
           this.currentTab = 1
         } else {
           if (/following/.test(location.href)) {
             this.currentTab = 2
+            this.getFollowersOfShopeeUser()
           } else if (/followers/.test(location.href)) {
             this.currentTab = 1
           }
@@ -385,7 +396,9 @@ export default {
   },
   mounted() {
     //   把页面整体左移，避免小分辨率右侧操作栏遮挡主体
-    $('.middle-centered-div').css('transform', 'translateX(-50%)')
+    $('.middle-centered-div.inner').css('transform', 'translateX(-50%)')
+    $('.page-holder.center-container').css('transform', 'translateX(-50%)')
+
     this.isOther = /followers/.test(location.pathname)
     this.currentTab = this.isOther ? 1 : 2
     this.buttonText = this.isOther ? '开启关注' : '开启取关'
@@ -398,9 +411,6 @@ export default {
           this.storeInfo = res.result.data
         }
       })
-    } else {
-      //获取虾皮的店铺ID,除了以上两个页面
-      this.getCurrentStoreId()
     }
 
     window.addEventListener('scroll', this.handleScroll)
@@ -441,11 +451,19 @@ export default {
           let countryWebSite = WEBSITES.find(el => reg.test(JSON.stringify(el))) //获取到对应的取关地址
           this.$emit('update:display', false)
           if (this.currentTab == 2) {
-            location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
+            window.open(getSiteLink('mall').replace('ID', this.currentStoreId))
+            // location.replace(countryWebSite.mall.replace('ID', this.currentStoreId))
           } else if (countryWebSite.front != location.href) {
             this.$Notice.info({
               content: '将带你去首页寻找合适的店铺获取粉丝哦！！！'
             })
+            // 台湾跳转修改
+            if (countryWebSite.front === 'https://shopee.tw/') {
+              setTimeout(() => {
+                location.replace(countryWebSite.cnfront)
+              }, 3000)
+              return
+            }
             setTimeout(() => {
               location.replace(countryWebSite.front)
             }, 3000)
@@ -459,10 +477,13 @@ export default {
     },
 
     handleScroll() {
-      $('.middle-centered-div').css('transform', 'translateX(-50%)')
+      $('.middle-centered-div.inner').css('transform', 'translateX(-50%)')
+      $('.page-holder.center-container').css('transform', 'translateX(-50%)')
+      
       this.countFollowers = $('.clickable_area.middle-centered-div').length
     },
 
+    //定时滚动
     scrollTo() {
       this.scrollTimer = setInterval(() => {
         if (this.lastOffsetHeight >= document.body.offsetHeight) {
@@ -507,7 +528,6 @@ export default {
         this.handleCancel()
         return
       }
-      this.scrollTo() //开始滚
       //如果没有填,并且把更多展开了，给一波默认值
       this.filterParams.limitFollowNumber = this.filterParams.limitFollowNumber || 100
       if (this.followActionMoreVisible) {
@@ -527,15 +547,15 @@ export default {
         this.handleCancel()
         return
       }
-      clearInterval(this.scrollTimer) //停止滚
       if (!this.validate()) return
       let htmlStr = `<li>[${getTime()}] 取关任务开始...</li>`
       $('#ResultContent').prepend(htmlStr)
       this.getStoreFollowers('unfollow')
     },
 
-    //关注或取关操作
+    //关注或取关操作 actionType: unfollow或者follow
     getStoreFollowers(actionType) {
+      this.scrollTo() //开始滚
       this.globalTimer = setInterval(() => {
         this.updateUserList()
         console.log(
@@ -553,14 +573,14 @@ export default {
           Follow.getStoreFollowers(this.currentUserName).then(res => {
             if (res.code == 0) {
               let { shopid } = res.result.data
-              if (actionType == 'follow' && this.filterMatch(res.result.data).match) {
+              //  无需跳过的
+              let notSkip = this.filterMatch(actionType, res.result.data).match
+              if (actionType == 'follow' && notSkip) {
                 this.handleNotifyToBack(actionType, shopid, this.currentUserName)
-              } else if (actionType == 'unfollow') {
+              } else if (actionType == 'unfollow' && notSkip) {
                 this.handleNotifyToBack(actionType, shopid, this.currentUserName)
               } else {
-                let reasonText = this.filterMatch(res.result.data).reason
-                  ? this.filterMatch(res.result.data).reason.reason
-                  : ''
+                let reasonText = this.filterMatch(actionType, res.result.data).reason || ''
                 this.resultCount.skip += 1
                 let htmlStr = `<li>[${getTime()}] ${
                   this.currentUserName
@@ -639,25 +659,40 @@ export default {
         })
     },
 
+    //到erp获取虾皮用户的粉丝列表
+    getFollowersOfShopeeUser() {
+      console.log('获取粉丝列表')
+      let shopId = location.pathname.replace(/[^0-9]/gi, '')
+      const countryList = WEBSITES.map(el => el.key)
+      let countryCode = countryList.find(item => location.host.match(new RegExp(item)))
+      Follow.getFollowersOfShopeeUser({ countryCode: countryCode, shopId: shopId }).then(res => {
+        if (res.code == 0) {
+          this.currentUserFollowers = res.result.data.fans
+          console.log(this.currentUserFollowers)
+        } else {
+          this.$Notice.error({
+            content: MESSAGE.error.getFaildFollowerList
+          })
+        }
+      })
+    },
+
     //过滤匹配
-    filterMatch(source) {
+    filterMatch(actionType, source) {
       // item_count是商品数
       let {
         account: { is_seller },
         last_active_time,
         item_count,
         follower_count,
-        rating_bad,
-        rating_good,
-        rating_normal,
-        name
+        name,
+        shopid
       } = source
-      let rateCount = rating_bad + rating_good + rating_normal //评价次数
-      console.log(
-        `上次登录: ${dayjs(last_active_time * 1000).format(
-          'YYYY-MM-DD'
-        )},商品数: ${item_count},关注数: ${follower_count},评价数: ${rateCount},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
-      )
+      //   console.log(
+      //     `上次登录: ${dayjs(last_active_time * 1000).format(
+      //       'YYYY-MM-DD'
+      //     )},商品数: ${item_count},关注数: ${follower_count},是否卖家：${is_seller},用户姓名：${name},获取时间：${getTime()}`
+      //   )
       let {
         lastLoginTime, //上次登录时间
         followsTimes, //关注数
@@ -680,23 +715,29 @@ export default {
         { key: 'matchStep3', match: matchStep3, reason: `卖家商品数量不匹配,${item_count}个` },
         { key: 'matchStep5', match: matchStep5, reason: '当前用户是卖家' }
       ]
-      let faildReason = reasonOpt.find(el => !el.match)
-      console.log(faildReason)
-      if (!this.followActionMoreVisible) {
-        //如果没有展开更多，就全通过
-        return { match: true }
-      }
-      if (!isFilterSeller) {
-        if (is_seller) {
-          let isMatch = matchStep1 && matchStep2 && matchStep3
-          return { match: isMatch, result: isMatch ? '' : faildReason }
+      if (actionType == 'unfollow') {
+        // 当前用户是否是自己的粉丝
+        let matchStepSelf = this.skipFollwer && this.currentUserFollowers.includes(shopid)
+        return { match: !matchStepSelf, reason: matchStepSelf ? '当前用户是自己的粉丝' : '' }
+      } else {
+        let faildReason = reasonOpt.find(el => !el.match)
+        faildReason = faildReason ? faildReason.reason : ''
+        if (!this.followActionMoreVisible) {
+          //如果没有展开更多，就全通过
+          return { match: true, reason: '' }
+        }
+        if (!isFilterSeller) {
+          if (is_seller) {
+            let isMatch = matchStep1 && matchStep2 && matchStep3
+            return { match: isMatch, reason: isMatch ? '' : faildReason }
+          } else {
+            let isMatch = matchStep1 && matchStep2
+            return { match: isMatch, reason: isMatch ? '' : faildReason }
+          }
         } else {
-          let isMatch = matchStep1 && matchStep2
+          let isMatch = matchStep1 && matchStep2 && matchStep3 && matchStep5
           return { match: isMatch, reason: isMatch ? '' : faildReason }
         }
-      } else {
-        let isMatch = matchStep1 && matchStep2 && matchStep3 && matchStep5
-        return { match: isMatch, reason: isMatch ? '' : faildReason }
       }
     },
 

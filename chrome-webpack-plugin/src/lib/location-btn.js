@@ -93,7 +93,7 @@ const getBtnLocationItems = ($a) => {
   // 虾皮
   if (/(shopee\.)|(xiapibuy\.)/.test(locationHref)) {
 		// 商品列表&详情--优化加价商品
-    let $divImg = $a.find('.V1Fpl5')	
+    let $divImg = $a.find('img:eq(0)')	
 		// 商品详情--热门商品
     let $divImg2 = $a.find('.lazy-image__image')	
     let divSrc = $divImg.length > 0 ? $divImg[0].attributes.getNamedItem('src').value : ''
@@ -113,6 +113,18 @@ const getBtnLocationItems = ($a) => {
 			height = $divImg2.height() || $divImg2[0].clientHeight
 		}
 	}
+
+  // 敦煌
+  if (locationHref.indexOf('dhgate.com') !== -1) {
+    let $divImg = $a.find('img')
+    if (!isEmpty($divImg) && $divImg.length > 0) {
+      // a标签里有div标签的商品（图片由backgbround展示）
+      top = !isEmpty($divImg.offset()) ? $divImg.offset().top : offsetTop
+      left = !isEmpty($divImg.offset()) ? $divImg.offset().left : offsetLeft
+    	width = $divImg.width()
+      height = $divImg.height()
+    }
+  }
 	let locationParams = {
     imgTop: top,
     imgLeft: left,
