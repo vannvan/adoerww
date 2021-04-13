@@ -1,7 +1,6 @@
-import _ from 'lodash'  // https://www.lodashjs.com/docs/lodash.cloneDeep
+import _ from 'lodash' // https://www.lodashjs.com/docs/lodash.cloneDeep
 
-
-//深拷贝 
+//深拷贝
 export function cloneDeep(value) {
   return _.cloneDeep(value)
 }
@@ -145,6 +144,28 @@ export function add(arg1, arg2) {
 }
 
 /**
+ * 减法
+ * @param { number } arg1
+ * @param { number } arg2
+ */
+export function sub(arg1, arg2) {
+  let r1, r2, m, n
+  try {
+    r1 = arg1.toString().split('.')[1].length
+  } catch (e) {
+    r1 = 0
+  }
+  try {
+    r2 = arg2.toString().split('.')[1].length
+  } catch (e) {
+    r2 = 0
+  }
+  m = Math.pow(10, Math.max(r1, r2))
+  n = r1 >= r2 ? r1 : r2
+  return Number(((arg1 * m - arg2 * m) / m).toFixed(n))
+}
+
+/**
  *
  *
  * @export
@@ -188,7 +209,7 @@ export const requestResult = (type, callback) => {
 }
 
 //图片转base64
-export const getBase64 = (url) => {
+export const getBase64 = url => {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest()
     xhr.open('get', url, true)

@@ -2,9 +2,8 @@
 import $ from 'jquery'
 import { getCookie, debounce, isEmpty } from '@/lib/utils'
 import { sendMessageToBackground, getURL } from '@/lib/chrome-client.js'
-import { dataViewElementTemplate, operationPanelTemplate, collectText } from './template'
+import { dataViewElementTemplate } from './template'
 import { solidCrawl } from './shopee-crawl'
-import { MESSAGE, getSiteLink } from '../lib/conf'
 require('@/background/config/message')
 
 const Cookies = require('js-cookie')

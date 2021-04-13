@@ -68,10 +68,3 @@ chrome.runtime.onMessage.addListener(function(request, sender) {
   }
   return true
 })
-
-// content.js
-
-$('body').append(
-  $(`<div id="emalacca-chrome-extension-installed" style="display:none" version="${VERSION}">
-</div>`)
-)

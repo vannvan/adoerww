@@ -73,7 +73,8 @@
                 "*://*.17zwd.com/*",
                 "*://mobile.yangkeduo.com/*",
                 "*://pifa.pinduoduo.com/*",
-                "*://*.dhgate.com/*"
+                "*://*.dhgate.com/*",
+                "*://*.alipay.com/*"
             ],
             "js": [
                 "./inject/inject.js"
@@ -170,7 +171,8 @@
         "*://*.17zwd.com/*",
         "*://mobile.yangkeduo.com/*",
         "*://*.dhgate.com/*",
-        "*://*.szchengji-inc.com/*"
+        "*://*.szchengji-inc.com/*",
+        "*://*.alipay.com/*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

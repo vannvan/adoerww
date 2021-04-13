@@ -1,6 +1,6 @@
 import purchas1688AddAddress from './purchas-1688'
 import purchasePddAddAddress from './purchas-pdd'
-import { setStorageSync, getStorageSync, getTabId2 } from '@/lib/chrome'
+import { setStorageSync, getStorageSync, getTabId2, getCookies } from '@/lib/chrome'
 var contentNotify = {} //content-script 消息通知
 const realConsigneeInfo = {
   fullname: '李大锤',
@@ -48,33 +48,35 @@ class Purchas {
     this.pdd = null
   }
   init() {
+    let _this = this
     chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
       let { action, options, type } = request
       contentNotify = {
         type: type,
         sendResponse: sendResponse
       }
+      _this.pdd = new purchasePddAddAddress({
+        contentNotify: contentNotify
+      })
+      _this.t1688 = new purchas1688AddAddress({
+        contentNotify: contentNotify
+      })
       if (action == 'purchas' && type == 'INIT_ORDER_INFO') {
         let { purchasLink, orderInfo } = options
         chrome.tabs.create({ url: purchasLink, selected: true }, async function(nextTab) {
           orderInfo.tabId = nextTab.id
           setStorageSync({ orderInfo: orderInfo })
-          this.pdd = new purchasePddAddAddress({
-            contentNotify: contentNotify
-          })
-          this.t1688 = new purchas1688AddAddress({
-            contentNotify: contentNotify
-          })
+
           if (/1688/.test(purchasLink)) {
-            this.t1688.initListener()
+            _this.t1688.initListener()
             setTimeout(() => {
-              this.t1688.validateAddress(realConsigneeInfo, 'init')
+              _this.t1688.validateAddress(realConsigneeInfo, 'init')
             }, 2000)
           }
           if (/pdd/.test(purchasLink)) {
-            this.pdd.initListener()
+            _this.pdd.initListener()
             setTimeout(() => {
-              this.pdd.validateAddress(realConsigneeInfo, 'init')
+              _this.pdd.validateAddress(realConsigneeInfo, 'init')
             }, 2000)
           }
         })
@@ -82,7 +84,7 @@ class Purchas {
       }
 
       if (action == 'purchas' && type == 'CHECK_CURRENT_TAB_ORDER') {
-        let isLogin = await this.t1688.validateAddress(realConsigneeInfo)
+        let isLogin = await _this.t1688.validateAddress(realConsigneeInfo)
         if (isLogin == -1) {
           sendResponse({ code: -1, result: null, message: '请登录1688后刷新此页面' })
         } else {
@@ -91,17 +93,37 @@ class Purchas {
             let {
               orderInfo: { tabId }
             } = tabOrderInfo
-            getTabId2(currenTabId => {
-              if (tabId == currenTabId) {
-                sendResponse({ code: 0, result: tabOrderInfo, message: '标签页数据获取成功' })
+            getTabId2(currentTabId => {
+              if (tabId == currentTabId) {
+                sendResponse({ code: 0, result: tabOrderInfo, message: null })
               }
             })
           } catch (error) {
             // sendResponse({ code: -2, result: tabOrderInfo, message: '当前标签页不匹配' })
-            console.log(error)
+            console.error(error)
           }
         }
-        // console.log('isLogin', isLogin)
+      }
+
+      if (action == 'purchas' && type == 'SUBMIT_PURCHAS_ORDER_NUMBER') {
+        try {
+          console.log('订单号:', options)
+          getCookies(options.siteOrigin, async cookies => {
+            let cookieStr = cookies.reduce((prev, curr) => {
+              return `${curr.name}=${curr.value}; ` + prev
+            }, '')
+            console.log(`${options.siteOrigin}cookies:`, cookieStr)
+          })
+          sendResponse({ code: 0, result: null, message: '关联马六甲订单成功，请继续完成付款' })
+        } catch (error) {
+          sendResponse({
+            code: -1,
+            result: null,
+            message: '关联马六甲订单失败，请关闭页面重新下单'
+          })
+
+          console.error(error)
+        }
       }
     })
   }
