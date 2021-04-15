@@ -425,14 +425,12 @@ export const backEvent = {
         if (cookies.length > 0) {
           // 拼多多单独处理api_uid
           if (data.url === 'https://mobile.yangkeduo.com') {
-            chrome.cookies.remove(
-              {
-                url: 'http://mobile.yangkeduo.com/',
-                name: 'api_uid'
-              }
-            )
+            chrome.cookies.remove({
+              url: 'http://mobile.yangkeduo.com/',
+              name: 'api_uid'
+            })
           }
-          
+
           cookies.map(el => {
             chrome.cookies.remove(
               {
@@ -447,7 +445,6 @@ export const backEvent = {
         } else {
           call()
         }
-        
       }
     )
   }

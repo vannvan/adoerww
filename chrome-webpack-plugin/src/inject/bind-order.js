@@ -18,31 +18,36 @@ class bindOrder {
         if (oldHref != location.href && /1688|yangkeduo/.test(location.href)) {
           console.log('切换页面', location.href)
           oldHref = location.href
-          sendMessageToBackground('purchas', {}, 'CHECK_CURRENT_TAB_ORDER', data => {
-            if (data && data.code == -1) {
-              $.fn.message({
-                type: 'error',
-                msg: data.message
-              })
+          sendMessageToBackground(
+            'purchas',
+            { currentSite: self.currentSite() },
+            'CHECK_CURRENT_TAB_ORDER',
+            data => {
+              if (data && data.code == -1) {
+                $.fn.message({
+                  type: 'error',
+                  msg: data.message
+                })
+              }
+              if (data && data.code == 0) {
+                self.purchasOrderInfo = data.result.orderInfo
+                self.fillOrderInfoPanel(data.result.orderInfo)
+              }
+              // 如果是待提交订单页面，计算利润
+              let pageType = self.getPageType()
+              console.log('页面类型；', pageType)
+              switch (pageType) {
+                case 'preOrder':
+                  self.calculateProfit()
+                  break
+                case 'toPay':
+                  self.handleSubmitOrderNO()
+                  break
+                default:
+                  break
+              }
             }
-            if (data && data.code == 0) {
-              self.purchasOrderInfo = data.result.orderInfo
-              self.fillOrderInfoPanel(data.result.orderInfo)
-            }
-            // 如果是待提交订单页面，计算利润
-            let pageType = self.getPageType()
-            console.log('页面类型；', pageType)
-            switch (pageType) {
-              case 'preOrder':
-                self.calculateProfit()
-                break
-              case 'toPay':
-                self.handleSubmitOrderNO()
-                break
-              default:
-                break
-            }
-          })
+          )
         }
       })
     let config = {
@@ -77,11 +82,11 @@ class bindOrder {
   //提交订单号到系统
   handleSubmitOrderNO() {
     let query = {}
-    let purchasOrderNo = null
+    let purchaseOrderno = null
     location.search.replace(/([^?&=]+)=([^&]+)/g, (_, k, v) => (query[k] = v))
-    if (this.getPageType() == '1688') {
+    if (this.currentSite() == '1688') {
       console.log(query.orderId, '1688订单号')
-      purchasOrderNo = query.orderId
+      purchaseOrderno = query.orderId
     } else {
       try {
         let alipayQuery = {}
@@ -89,7 +94,7 @@ class bindOrder {
           /([^?&=]+)=([^&]+)/g,
           (_, k, v) => (alipayQuery[k] = v)
         )
-        purchasOrderNo = alipayQuery.order_sn
+        purchaseOrderno = alipayQuery.order_sn
         console.log(alipayQuery.order_sn, 'pdd订单号')
       } catch (error) {
         $.fn.message({ type: 'error', msg: '获取拼多多订单信息失败' })
@@ -102,10 +107,9 @@ class bindOrder {
       : 'https://mobile.yangkeduo.com/'
     sendMessageToBackground(
       'purchas',
-      { purchaseOrderno: purchasOrderNo, siteOrigin: siteOrigin },
+      { purchaseOrderno: purchaseOrderno, siteOrigin: siteOrigin },
       'SUBMIT_PURCHAS_ORDER_NUMBER',
       data => {
-        console.log(data)
         if (data && data.code == 0) {
           $.fn.message({ type: 'success', msg: data.message })
         }
@@ -164,17 +168,19 @@ class bindOrder {
           { purchasLink: purchasLink, orderInfo: orderInfo },
           'INIT_ORDER_INFO',
           data => {
-            if (data) {
-              console.log(data)
-              if (data.code == -1) {
-                $.fn.message({
-                  type: 'error',
-                  msg: data.message
-                })
-              }
+            if (data && data.code == -1) {
+              $.fn.message({
+                type: 'error',
+                msg: data.message
+              })
             }
           }
         )
+      } else {
+        $.fn.message({
+          type: 'error',
+          msg: '仅支持1688和拼多多采购'
+        })
       }
     }
   }
@@ -207,15 +213,15 @@ class bindOrder {
                 </p>
                 <p class="consignee-info-item">
                     <span class="title">收件人</span>
-                    <span class="value">李大锤</span>
+                    <span class="value">${orderInfo.contacts}</span>
                 </p>
                 <p class="consignee-info-item">
                     <span class="title">电话</span>
-                    <span class="value">13999999999</span>
+                    <span class="value">${orderInfo.phone}</span>
                 </p>
                 <p class="consignee-info-item">
                     <span class="title">地址</span>
-                    <span class="value">广东省深圳市龙华区民治街道办事处光浩国际中心A栋24楼</span>
+                    <span class="value">${orderInfo.fullAddress}</span>
                 </p>
             </div>
             <div class="purchas-sku-info">${skusNode}</div>
@@ -251,7 +257,20 @@ class bindOrder {
     })
     dragApp('#emalacca-plugin-purchas-order', '.emalacca-plugin-purchas-header')
   }
+
+  //为erp获取1688及pdd的登录状态
+  getPurchasSiteLoginStatus() {
+    sendMessageToBackground('purchas', {}, 'GET_PURCHAS_SITE_LOGIN_STATUS', data => {
+      if (data && data.result && /192|emalacca/.test(location.href)) {
+        let { pddLoginStatus, t1688LoginStatus } = data.result
+        $('body').append(
+          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" isPddLogin="${pddLoginStatus}" is1688Login="${t1688LoginStatus}"></div>`
+        )
+      }
+    })
+  }
 }
 
 const BO = new bindOrder()
 BO.locationObserver()
+BO.getPurchasSiteLoginStatus()

@@ -22,6 +22,7 @@ class purchasPddAddAddress {
     })
   }
   initListener() {
+    console.log('pdd initListener')
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
         if (/proxy\/api/.test(details.url)) {
@@ -58,6 +59,27 @@ class purchasPddAddAddress {
     //
   }
 
+  checkLogin() {
+    return new Promise(resolve => {
+      getCookies('http://mobile.yangkeduo.com/', async cookies => {
+        try {
+          pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
+          pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
+          if (pddUserId && pddAccesstoken) {
+            let cookieStr = cookies.reduce((prev, curr) => {
+              return `${curr.name}=${curr.value}; ` + prev
+            }, '')
+            resolve(cookieStr)
+          } else {
+            resolve(false)
+          }
+        } catch (error) {
+          resolve(false)
+        }
+      })
+    })
+  }
+
   getPddAddressList(userId) {
     const url = `https://mobile.yangkeduo.com/proxy/api/addresses?pdduid=${userId || pddUserId}`
     return new Promise((resolve, reject) => {
@@ -83,41 +105,46 @@ class purchasPddAddAddress {
     let _this = this
     _this.purchaseOrderInfo = realConsigneeInfo
     console.log('pdd validateAddress')
-    getCookies('http://mobile.yangkeduo.com/', async cookies => {
-      try {
-        let { province, city, county, mobile, fullname, fullAddress } = realConsigneeInfo
-        pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
-        pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
-        console.log('pdd_user_id:', pddUserId, 'PDDAccessToken:', pddAccesstoken)
-        let addressList = (await _this.getPddAddressList(pddUserId)) || []
-        console.log('addressList:', addressList)
-
-        let exitAddress = addressList.find(
-          el => el.mobile == mobile && el.name == fullname && fullAddress.indexOf(el.address) >= 0
-        )
-        console.log('exitAddress:', exitAddress)
-        // 如果当前地址不是拼多多的默认地址，调用默认地址接口
-        if (exitAddress && exitAddress.is_default == '0') {
-          let setDefault = await _this.handleSetDefaultAddress(exitAddress.address_id)
-          if (!setDefault || !setDefault.result) {
-            _this.contentNotify(
-              -1,
-              null,
-              '关联拼多多地址失败，请将当前拼多多订单地址修改为ERP订单地址'
-            )
+    return new Promise(resolve => {
+      getCookies('http://mobile.yangkeduo.com/', async cookies => {
+        try {
+          let { province, city, region, phone, fullname, fullAddress } = realConsigneeInfo
+          pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
+          pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
+          if (pddUserId && pddAccesstoken) {
+            resolve(true)
           }
+          console.log('pdd_user_id:', pddUserId, 'PDDAccessToken:', pddAccesstoken)
+          let addressList = (await _this.getPddAddressList(pddUserId)) || []
+          console.log('addressList:', addressList)
+
+          let exitAddress = addressList.find(
+            el => el.mobile == phone && el.name == fullname && fullAddress.indexOf(el.address) >= 0
+          )
+          console.log('exitAddress:', exitAddress)
+          // 如果当前地址不是拼多多的默认地址，调用默认地址接口
+          if (exitAddress && exitAddress.is_default == '0') {
+            let setDefault = await _this.handleSetDefaultAddress(exitAddress.address_id)
+            if (!setDefault || !setDefault.result) {
+              _this.contentNotify(
+                -1,
+                null,
+                '关联拼多多地址失败，请将当前拼多多订单地址修改为ERP订单地址'
+              )
+            }
+          }
+          // 如果当前地址不存在，或者地址列表为空
+          if (!exitAddress) {
+            let pddAddressIds = await _this.getPddAddressIds(province, city, region)
+            pddAddressIds &&
+              pddAddressIds.result == 'success' &&
+              _this.handleAddAddressToPdd(pddAddressIds)
+          }
+        } catch (error) {
+          _this.contentNotify(-1, null, '请登录拼多多后刷新此页面')
+          console.error(error)
         }
-        // 如果当前地址不存在，或者地址列表为空
-        if (!exitAddress) {
-          let pddAddressIds = await _this.getPddAddressIds(province, city, county)
-          pddAddressIds &&
-            pddAddressIds.result == 'success' &&
-            _this.handleAddAddressToPdd(pddAddressIds)
-        }
-      } catch (error) {
-        _this.contentNotify(-1, null, '请登录拼多多后刷新此页面')
-        console.error(error)
-      }
+      })
     })
   }
 
@@ -158,21 +185,24 @@ class purchasPddAddAddress {
   handleAddAddressToPdd({ provinceId, cityId, countyId }) {
     let _this = this
     const url = `https://mobile.yangkeduo.com/proxy/api/api/origenes/address?pdduid=${pddUserId}`
-    let { mobile, fullname, address } = _this.purchaseOrderInfo
+    let { phone, contacts, detailedAddress } = _this.purchaseOrderInfo
     const params = {
-      name: fullname,
-      mobile: mobile,
+      name: contacts,
+      mobile: phone,
       province_id: provinceId,
       city_id: cityId,
       district_id: countyId,
-      address: address,
-      is_default: 1
+      address: detailedAddress,
+      is_default: 1,
+      check_region: true
     }
     return new Promise((resolve, reject) => {
       $.ajax({
         method: 'post',
         url: url,
-        data: params,
+        data: JSON.stringify(params),
+        dataType: 'json',
+        contentType: 'application/json;charset=utf-8',
         success: res => {
           resolve(res)
         },

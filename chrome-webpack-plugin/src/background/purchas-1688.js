@@ -1,5 +1,6 @@
 // 无货源绑定订单脚本
 console.log('1688无货源脚本加载')
+import { getCookies } from '@/lib/chrome'
 const regeneratorRuntime = require('@/assets/js/runtime.js')
 
 var csrf_token = ''
@@ -21,20 +22,8 @@ class purchas1688AddAddress {
     })
   }
 
-  //判断当前页面是不是下单程序打开的
-  isPurchaseTab() {
-    return new Promise(async (resolve, reject) => {
-      // await this.sleep(200);//延迟100毫秒启动
-      let tabData = await getTabData()
-      if (!tabData || !tabData.purchaseItem) {
-        reject(null)
-      } else {
-        resolve(tabData)
-      }
-    })
-  }
-
   initListener() {
+    console.log('1688 initListener')
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
         if (/operate_receive_address/.test(details.url)) {
@@ -61,9 +50,33 @@ class purchas1688AddAddress {
     console.log('initAddress')
   }
 
+  checkLogin() {
+    return new Promise(resolve => {
+      let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
+      $.ajax({
+        type: 'get',
+        url: addressUrl,
+        success: res => {
+          let matchCsrf = /data-csrftoken="(.*?)"/.exec(res)
+          if (matchCsrf) {
+            getCookies('https://www.1688.com/', async cookies => {
+              let cookieStr = cookies.reduce((prev, curr) => {
+                return `${curr.name}=${curr.value}; ` + prev
+              }, '')
+              resolve(cookieStr)
+            })
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  }
+
   validateAddress(realConsigneeInfo) {
-    return new Promise((resolve, reject) => {
-      let { mobile, fullname, fullAddress } = realConsigneeInfo
+    // console.log('realConsigneeInfo', realConsigneeInfo)
+    return new Promise(resolve => {
+      let { phone, contacts, fullAddress } = realConsigneeInfo
       let _this = this
       let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
       $.ajax({
@@ -73,10 +86,10 @@ class purchas1688AddAddress {
           var matchCsrf = /data-csrftoken="(.*?)"/.exec(response)
           if (!matchCsrf) {
             // 提示前台给出提示
-            resolve(-1)
+            resolve(false)
             return false
           }
-          resolve(0)
+          resolve(true)
           csrf_token = matchCsrf[1]
           console.log('csrftoken', csrf_token)
           const matchAddressHtmlList = [...$(response).find('.single-address')]
@@ -85,7 +98,7 @@ class purchas1688AddAddress {
           console.log('matchAddressHtmlList:', JSON.stringify(addressList))
           let exitAddress = addressList.find(
             el =>
-              el.mobile == mobile && el.fullName == fullname && fullAddress.indexOf(el.address) >= 0
+              el.mobile == phone && el.fullName == contacts && fullAddress.indexOf(el.address) >= 0
           )
           console.log('exitAddress:', exitAddress)
           // 如果当前地址不是1688的默认地址，就修改为默认地址
@@ -99,7 +112,7 @@ class purchas1688AddAddress {
           // 如果当前地址不存在，或者地址列表为空
           if (!exitAddress) {
             console.log('新增地址')
-            _this.parse1688Address()
+            _this.parse1688Address(realConsigneeInfo)
           }
         }
       })
@@ -110,10 +123,10 @@ class purchas1688AddAddress {
     return html.map(el => JSON.parse($(el).attr('data-address')))
   }
 
-  parse1688Address() {
-    let { fullname, mobile, fullAddress } = realConsigneeInfo
+  parse1688Address(realConsigneeInfo) {
+    let { contacts, phone, fullAddress } = realConsigneeInfo
     let _this = this
-    fullAddress = fullname + mobile + fullAddress
+    fullAddress = contacts + phone + fullAddress
     const url =
       'https://wuliu.1688.com/address/ajax/address_parse.jsx?callback=jQuery17209390225001079777_1538036004820&address=' +
       encodeURIComponent(fullAddress) +
@@ -134,7 +147,7 @@ class purchas1688AddAddress {
             !ret.data.districtCode ||
             (ret.data.city && ret.data.city.indexOf(realConsigneeInfo.city.substr(0, 2)) == -1) ||
             (ret.data.district.indexOf(realConsigneeInfo.city.substr(0, 2)) == -1 &&
-              ret.data.district.indexOf(realConsigneeInfo.county.substr(0, 2)) == -1)
+              ret.data.district.indexOf(realConsigneeInfo.region.substr(0, 2)) == -1)
           ) {
             _this.contentNotify(-1, null, '关联1688地址失败，请将当前1688订单地址修改为ERP订单地址')
           }

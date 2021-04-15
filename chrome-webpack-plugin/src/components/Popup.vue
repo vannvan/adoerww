@@ -113,7 +113,7 @@ function sendMessageToContentScript(message, callback) {
   // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
   getAllTabs(urls => {
     urls.map(el => {
-      if (el.url.search(ERP_SYSTEM[process.env.NODE_ENV]) > -1) {
+      if (el.url.match(/192|emalacca/)) {
         chrome.tabs.sendMessage(el.id, message, function(response) {
           if (callback) {
             callback(response)
@@ -158,8 +158,8 @@ export default {
     // 从缓存中获取是否禁用插件
     getStorageSync('isDisabledPlug').then(data => {
       this.isStartPlug = !isNil(data['isDisabledPlug']) ? !data['isDisabledPlug'] : true
-      chrome.browserAction.setBadgeText({text: this.isStartPlug ? '' : 'off'});
-      chrome.browserAction.setBadgeBackgroundColor({color: this.isStartPlug ? '' : 'red'});
+      chrome.browserAction.setBadgeText({ text: this.isStartPlug ? '' : 'off' })
+      chrome.browserAction.setBadgeBackgroundColor({ color: this.isStartPlug ? '' : 'red' })
       // 停用插件时，显示提示窗
       if (!this.isStartPlug) {
         this.isHideMessage = false
@@ -217,8 +217,8 @@ export default {
     switchesChange(value) {
       this.isStartPlug = value
       this.isHideMessage = true
-      chrome.browserAction.setBadgeText({text: value ? '' : 'off'});
-      chrome.browserAction.setBadgeBackgroundColor({color: value ? '' : 'red'});
+      chrome.browserAction.setBadgeText({ text: value ? '' : 'off' })
+      chrome.browserAction.setBadgeBackgroundColor({ color: value ? '' : 'red' })
       setStorageSync({ isDisabledPlug: !value }).then(() => {
         // 更新全部匹配的页面
         this.handleUpDate({ type: 'UPDATE_PAGE' })
