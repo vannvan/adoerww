@@ -6,7 +6,7 @@ const regeneratorRuntime = require('@/assets/js/runtime.js')
 var csrf_token = ''
 var contentNotifyHandler = {} //content-script 消息通知
 
-class purchas1688AddAddress {
+class Purchas1688AddAddress {
   constructor({ contentNotify }) {
     contentNotifyHandler = contentNotify
     this.purchaseOrderInfo = {}
@@ -43,14 +43,9 @@ class purchas1688AddAddress {
       ['blocking', 'requestHeaders', 'extraHeaders']
     )
   }
-  /**
-   * 获取当前订单关联的系统收货人信息
-   */
-  initAddress() {
-    console.log('initAddress')
-  }
 
   checkLogin() {
+    let _this = this
     return new Promise(resolve => {
       let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
       $.ajax({
@@ -75,6 +70,9 @@ class purchas1688AddAddress {
 
   validateAddress(realConsigneeInfo) {
     // console.log('realConsigneeInfo', realConsigneeInfo)
+    if (!this.checkLogin()) {
+      return false
+    }
     return new Promise(resolve => {
       let { phone, contacts, fullAddress } = realConsigneeInfo
       let _this = this
@@ -85,7 +83,6 @@ class purchas1688AddAddress {
         success: function(response) {
           var matchCsrf = /data-csrftoken="(.*?)"/.exec(response)
           if (!matchCsrf) {
-            // 提示前台给出提示
             resolve(false)
             return false
           }
@@ -234,4 +231,4 @@ class purchas1688AddAddress {
   }
 }
 
-export default purchas1688AddAddress
+export default Purchas1688AddAddress

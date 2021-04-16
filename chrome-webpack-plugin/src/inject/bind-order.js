@@ -4,7 +4,7 @@ import { sub } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import dragApp from './drag'
 
-class bindOrder {
+class BindOrder {
   constructor() {
     this.supportSite = ['1688', 'yangkeduo']
     this.purchasOrderInfo = {}
@@ -15,9 +15,9 @@ class bindOrder {
     let oldHref = null
     let bodyList = document.querySelector('body'),
       observer = new MutationObserver(function(mutations) {
-        if (oldHref != location.href && /1688|yangkeduo/.test(location.href)) {
+        if (oldHref != location.pathname && /1688|yangkeduo/.test(location.href)) {
           console.log('切换页面', location.href)
-          oldHref = location.href
+          oldHref = location.pathname
           sendMessageToBackground(
             'purchas',
             { currentSite: self.currentSite() },
@@ -33,15 +33,17 @@ class bindOrder {
                 self.purchasOrderInfo = data.result.orderInfo
                 self.fillOrderInfoPanel(data.result.orderInfo)
               }
-              // 如果是待提交订单页面，计算利润
+
               let pageType = self.getPageType()
               console.log('页面类型；', pageType)
               switch (pageType) {
-                case 'preOrder':
+                case 'preOrder': // 如果是待提交订单页面，计算利润
                   self.calculateProfit()
                   break
-                case 'toPay':
-                  self.handleSubmitOrderNO()
+                case 'toPay': // 如果是待付款页面，保存订单号
+                  setTimeout(() => {
+                    self.handleSubmitOrderNO()
+                  }, 1500)
                   break
                 default:
                   break
@@ -105,16 +107,16 @@ class bindOrder {
     let siteOrigin = /trade_flow/.test(location.href)
       ? 'https://www.1688.com/'
       : 'https://mobile.yangkeduo.com/'
+    if (!purchaseOrderno) {
+      return false
+    }
     sendMessageToBackground(
       'purchas',
       { purchaseOrderno: purchaseOrderno, siteOrigin: siteOrigin },
       'SUBMIT_PURCHAS_ORDER_NUMBER',
       data => {
-        if (data && data.code == 0) {
-          $.fn.message({ type: 'success', msg: data.message })
-        }
-        if (data && data.code == -1) {
-          $.fn.message({ type: 'error', msg: data.message })
+        if (data) {
+          $.fn.message({ type: data.code == 0 ? 'success' : 'error', msg: data.message })
         }
       }
     )
@@ -271,6 +273,6 @@ class bindOrder {
   }
 }
 
-const BO = new bindOrder()
+const BO = new BindOrder()
 BO.locationObserver()
 BO.getPurchasSiteLoginStatus()
