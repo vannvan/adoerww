@@ -32,6 +32,7 @@ export const Auth = {
   //同步虾皮登录token
   setCookies: function(params, type, call) {
     console.log(params, type)
+    // 如果没有退出
     if (params.csrfToken && localStorage.setItem('csrfToken', params.csrfToken)) {
       call({ type: type, result: '设置成功' })
     }
@@ -65,7 +66,28 @@ export const Auth = {
     console.log(params, type)
     const countryList = WEBSITES.map(el => el.key)
     // 如果当前是站点时cn站点并且userInfo的country和当前匹配，就直接用存下的
-    let userInfo = getStorage('userInfo', {})
+    let userInfo = getStorage('userInfo', null)
+    let storageCountry = userInfo ? userInfo.countryCode : null
+    let shopeeLoginStatus = localStorage.getItem('shopeeLoginStatus')
+    if (shopeeLoginStatus == -1) {
+      localStorage.setItem('userInfo', null)
+      call({ type: type, code: -1 })
+      return false
+    }
+    if (new RegExp(storageCountry).test(params.domain) && shopeeLoginStatus != -1) {
+      console.log('同步国内站点')
+      call({
+        type: type,
+        code: 0,
+        result: {
+          storeId: userInfo.shopid,
+          username: userInfo.username,
+          country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw',
+          // 这里需要把 cs_token 送给前台 作为前台cookies中的 SPC_EC 同步用户状态
+          cs_token: userInfo.cs_token
+        }
+      })
+    }
     let currentCountryCode = countryList.find(item => params.domain.match(new RegExp(item)))
     Request.handleLoginShopee(params, type)
       .then(res => {
@@ -82,11 +104,11 @@ export const Auth = {
           type: type,
           code: 0,
           result: {
-            storeId: userInfo.shopid,
-            username: userInfo.username,
+            storeId: userInfo ? userInfo.shopid : null,
+            username: userInfo ? userInfo.username : null,
             country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw',
             // 这里需要把 cs_token 送给前台 作为前台cookies中的 SPC_EC 同步用户状态
-            cs_token: userInfo.cs_token
+            cs_token: userInfo ? userInfo.cs_token : null
           }
         })
       })

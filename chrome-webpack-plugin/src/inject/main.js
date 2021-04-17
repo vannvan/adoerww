@@ -15,7 +15,7 @@ const APP = {
       Follow.sendCsrfToken()
       Follow.preload()
     }
-    dragApp()
+    dragApp('.emalacca-plugin-action-wrap', '.emalacca-plugin-action-toggle')
   }
 }
 
@@ -28,4 +28,10 @@ setTimeout(() => {
     }
   })
   APP.init()
+  // 此节点用来让网页判断是否已安装插件及判断插件版本
+  $('body').append(
+    $(
+      `<div id="emalacca-chrome-extension-installed" style="display:none" version="${VERSION}"></div>`
+    )
+  )
 }, 500)

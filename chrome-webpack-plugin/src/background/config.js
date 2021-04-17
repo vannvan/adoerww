@@ -55,6 +55,24 @@ export const CONFIGINFO = {
     // 上传地址
     handleUploadImages: function() {
       return this.ApiUrl + 'basic/config/platform/uploadImage'
+    },
+    // 获取需更新版本信息
+    getQueryUpdatePlug: function() {
+      return this.ApiUrl + 'product/crawl/member/query-update-plug'
+    },
+    // 到erp获取虾皮用户的粉丝列表，
+    getShopeeFollowerList: function() {
+      return this.ApiUrl + 'product/crawl/shopee-fans/get'
+    },
+
+    // 提交采购订单cookies
+    submitPurchasOrderNO: function() {
+      return this.ApiUrl + 'order-purchase/sync/expressTrackingNumber'
+    },
+
+    //修改采购订单状态
+    updatePurchasStatus: function() {
+      return this.ApiUrl + 'order-purchase/updateOrderPurchaseStatus'
     }
   }
 }

@@ -31,6 +31,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     } else if (request.action === 'handleUploadImages') {
       backEvent.handleUploadImages(request.data, sendResponse)
       return true
+    } else if (request.action === 'clearUrlCookie') {
+      backEvent.clearUrlCookie(request.data, sendResponse)
+      return true
     }
   }
 })
@@ -411,6 +414,39 @@ export const backEvent = {
         }
       })
     })
+  },
+  // 清空cookies
+  clearUrlCookie: function(data, call) {
+    chrome.cookies.getAll(
+      {
+        domain: data.domain
+      },
+      function(cookies) {
+        if (cookies.length > 0) {
+          // 拼多多单独处理api_uid
+          if (data.url === 'https://mobile.yangkeduo.com') {
+            chrome.cookies.remove({
+              url: 'http://mobile.yangkeduo.com/',
+              name: 'api_uid'
+            })
+          }
+
+          cookies.map(el => {
+            chrome.cookies.remove(
+              {
+                url: data.url,
+                name: el.name
+              },
+              function(cookie) {
+                call(cookie)
+              }
+            )
+          })
+        } else {
+          call()
+        }
+      }
+    )
   }
 }
 

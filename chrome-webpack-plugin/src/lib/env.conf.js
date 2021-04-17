@@ -1,7 +1,7 @@
 //erp
 export const ERP_SYSTEM = {
   development: 'https://test-erp.emalacca.com/',
-  // development: 'http://localhost:2333/',
+  //   development: 'http://localhost:3000/api/',
   testing: 'https://test-erp.emalacca.com/',
   testing2: 'https://test2-erp.emalacca.com/',
   preproduction: 'https://pre-erp.emalacca.com/',

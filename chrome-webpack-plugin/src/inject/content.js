@@ -47,7 +47,7 @@ const debounceHandleLinks = debounce(function() {
 }, 800)
 
 if (CONFIG) {
-  //
+  // 判断插件是否被停用
   getStorageSync('isDisabledPlug').then(data => {
     if (!data['isDisabledPlug']) {
       $(document).ready(handleLinks(CONFIG.detail))
@@ -202,31 +202,50 @@ function insertFetchBtn($a, url) {
     }
     $crawlBg.css('display', 'none')
   }
+  // 加载遮罩层和多选，操作界面
+  let appendItems = () => {
+    // 列表引入
+    $a.after($crawlBg)
+    $('body').append($crawlPanel)
+    $a.after($crawlSelect)
+    $a.parent().css('position', 'relative')
+    // 隐藏div
+    $a.parent().on('mouseleave', function() {
+      hideCreationDiv()
+    })
+  }
+
   // 列表页显示
-  if ($firstImg.length > 0) {
-    // 淘宝列表采集(广告商品需要改url) 获取真实url判断是否采集过
-    if (sumaitongShowArr.includes(pageType) && url.indexOf('click.simba.taobao.com/cc') > -1) {
-      url = taobaoTranslationUrl($a, url) ? taobaoTranslationUrl($a, url) : url
-    }
-    // 1688列表采集(广告商品需要改url)  获取真实url判断是否采集过
-    if (sumaitongShowArr.includes(pageType) && url.indexOf('dj.1688.com/ci_') > -1) {
-      url = albbTranslationUrl($a) ? albbTranslationUrl($a) : url
+  if (sumaitongShowArr.includes(pageType)) {
+    if ($firstImg.length > 0) {
+      // 淘宝列表采集(广告商品需要改url) 获取真实url判断是否采集过
+      if (url.indexOf('click.simba.taobao.com/cc') > -1) {
+        url = taobaoTranslationUrl($a, url) ? taobaoTranslationUrl($a, url) : url
+      }
+      // 1688列表采集(广告商品需要改url)  获取真实url判断是否采集过
+      if (url.indexOf('dj.1688.com/ci_') > -1) {
+        url = albbTranslationUrl($a) ? albbTranslationUrl($a) : url
+      }
+      // 单独处理速卖通，卖家首页商品样式
+      if (location.href.indexOf('aliexpress.com/store') > -1) {
+        $a.parents('.img').append($crawlBg)
+        $('body').append($crawlPanel)
+        $a.parents('.img').append($crawlSelect)
+        $a.parents('.img').css('position', 'relative')
+        // 隐藏div
+        $a.parents('.img').on('mouseleave', function() {
+          hideCreationDiv()
+        })
+      } else {
+        appendItems()
+      }
+    } else if (url.indexOf('dhgate.com') > -1 && $a.hasClass('pic')) {
+      // 敦煌列表的商品，img延迟加载处理
+      appendItems()
     }
     $crawlSelect.attr({
       'data-selecturl': url
     })
-
-    // 列表引入
-    if (sumaitongShowArr.includes(pageType)) {
-      $a.after($crawlBg)
-      $('body').append($crawlPanel)
-      $a.after($crawlSelect)
-      $a.parent().css('position', 'relative')
-      // 隐藏div
-      $a.parent().on('mouseleave', function() {
-        hideCreationDiv()
-      })
-    }
   }
 
   $a.on('mouseenter', function() {
@@ -237,6 +256,9 @@ function insertFetchBtn($a, url) {
       if (url.indexOf('1688.com') > -1 && $isShowImgGather.length == 0) {
         $isShowImgGather = $(this).find('.img')
       }
+      if (url.indexOf('dhgate.com') > -1 && $isShowImgGather.length == 0) {
+        $isShowImgGather = $(this).find('img')
+      }
       if ($isShowImgGather.length > 0) {
         $crawlSelect.css({
           'pointer-events': 'auto',
@@ -245,19 +267,36 @@ function insertFetchBtn($a, url) {
         $crawlBg.css('display', 'block')
       }
       let $that = $(this)
+
       $crawlPanel.on('mouseenter', function() {
-        $that
-          .parent()
-          .find('.emalacca-plugin-goods-acquisition-select')
-          .css({
-            display: 'block'
-          })
-        $that
-          .parent()
-          .find('.emalacca-plugin-mask')
-          .css({
-            display: 'block'
-          })
+        // 单独处理速卖通，卖家首页商品样式
+        if (location.href.indexOf('aliexpress.com/store') > -1) {
+          $that
+            .parents('.img')
+            .find('.emalacca-plugin-goods-acquisition-select')
+            .css({
+              display: 'block'
+            })
+          $that
+            .parents('.img')
+            .find('.emalacca-plugin-mask')
+            .css({
+              display: 'block'
+            })
+        } else {
+          $that
+            .parent()
+            .find('.emalacca-plugin-goods-acquisition-select')
+            .css({
+              display: 'block'
+            })
+          $that
+            .parent()
+            .find('.emalacca-plugin-mask')
+            .css({
+              display: 'block'
+            })
+        }
       })
     } else {
       // 非列表页
@@ -449,6 +488,7 @@ function insertFetchBtn($a, url) {
       })
       return false
     }
+    // window.open(`${getSiteLink('front', location.host, true)}/shop/${realStoreId}/followers`)
     Follow.syncShoppeBaseInfo().then(res => {
       if (res.code == -1) {
         $.fn.message({

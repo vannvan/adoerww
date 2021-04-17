@@ -11,7 +11,8 @@ export const Crawl = {
       { 'shopee.': Platform.ShopeeCrawl },
       { 'xiapibuy.com': Platform.ShopeeCrawl },
       { 'mobile.yangkeduo.com': Platform.YangkeduoCrawl },
-      { 'pifa.pinduoduo.com': Platform.PifaPinduoduoCrawl }
+      { 'pifa.pinduoduo.com': Platform.PifaPinduoduoCrawl },
+      { 'dhgate.com': Platform.DhgateCrawl }
     ],
   },
   getCrawlObject: function(type, url) {

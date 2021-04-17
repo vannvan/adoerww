@@ -546,7 +546,7 @@ function erpAuthValid() {
   try {
     let erpAuthInfo = store.get('erpAuth')
     // erpAuthInfo = JSON.parse(erpAuthInfo)
-    let { expires_time } = erpAuthInfo
+    let { expires_time } = erpAuthInfo || {}
     log.info('erp auth expires_time', expires_time)
     let currentTime = Date.parse(new Date()) / 1000
     //说明token没过期
@@ -796,8 +796,8 @@ async function tryToGetAuthedStore(type) {
     mainWindowNotifier('IS_LOADING_AUTHINFO')
   }
   const malacca_token = store.get('erpAuth')
-  let authedStore = store.get('authedStore') || {} //已授权的店铺列表
-  let storeMenuList = store.get('storeMenuList')
+  //   let authedStore = store.get('authedStore') || {} //已授权的店铺列表
+  //   let storeMenuList = store.get('storeMenuList')
   if (malacca_token) {
     let storeList = await server.getAuthedAtore()
     log.info('storeMenuList 更新店铺列表', JSON.stringify(storeList))
@@ -902,7 +902,8 @@ async function createTray() {
       },
     ])
     appIcon.setToolTip('虾皮聊聊客户端')
-    appIcon.setContextMenu(contextMenu)
+    appIcon.setContextMenu(contextMenu) //windows托盘
+    app.dock.setMenu(contextMenu) // mac dock栏
     appIcon.on('click', () => {
       mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
     })

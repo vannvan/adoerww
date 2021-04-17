@@ -1,8 +1,122 @@
 // 粉丝关注相关
 // -1 接口错误 -2 数据错误
 import $ from 'jquery'
-import { getSiteLink } from '@/lib/conf'
+import { getSiteLink, WEBSITES } from '@/lib/conf'
 import { requestResult } from '@/lib/utils'
+import { CONFIGINFO } from '@/background/config.js'
+// import { getAllTabs } from '@/lib/chrome'
+
+function clearAllShopeeCookies(shopeeUrl) {
+  console.log('清除cookies', shopeeUrl)
+  chrome.cookies.getAll(
+    {
+      url: shopeeUrl
+    },
+    function(cookies) {
+      cookies.map(el => {
+        chrome.cookies.remove(
+          {
+            url: shopeeUrl,
+            name: el.name
+          },
+          function(cookie) {
+            console.log(cookie)
+          }
+        )
+      })
+    }
+  )
+}
+
+chrome.webRequest.onBeforeSendHeaders.addListener(
+  function(details) {
+    if (/logout/.test(details.url)) {
+      //   console.log(details)
+      console.log('退出')
+      let currentUrl = details.initiator
+      const countryList = WEBSITES.map(el => el.key)
+      let countryCode = countryList.find(item => currentUrl.match(new RegExp(item))) || 'tw'
+      let contrySiteInfo = WEBSITES.find(el => el.key == countryCode)
+      let siteArr = Object.values(contrySiteInfo).filter(item => /http/.test(item))
+      siteArr.map(el => {
+        clearAllShopeeCookies(el)
+      })
+      localStorage.setItem('userInfo', null)
+      localStorage.setItem('shopeeLoginStatus', -1)
+      // setTimeout(() => {
+      //   localStorage.setItem('shopeeLoginStatus', 1)
+      // }, 20000) //生产环境调大
+      localStorage.setItem('csrfToken', '')
+    }
+  },
+  {
+    urls: [
+      '*://*.shopee.tw/*',
+      '*://shopee.tw/*',
+      '*://*.shopee.cn/*',
+      '*://shopee.cn/*',
+      '*://*.shopeesz.com/*',
+      '*://*.shopee.co.id/*',
+      '*://shopee.co.id/*',
+      '*://*.shopee.vn/*',
+      '*://shopee.vn/*',
+      '*://shopee.co.th/*',
+      '*://*.shopee.co.th/*',
+      '*://shopee.ph/*',
+      '*://*.shopee.ph/*',
+      '*://shopee.com.my/*',
+      '*://*.shopee.com.my/*',
+      '*://shopee.sg/*',
+      '*://*.shopee.sg/*',
+      '*://shopee.com.br/*',
+      '*://*.shopee.com.br/*',
+      '*://shopee.com/*',
+      '*://*.shopee.com/*',
+      '*://*.xiapibuy.com/*',
+      'https://*.xiapibuy.com/*-i.*/'
+    ]
+  },
+  ['blocking', 'requestHeaders']
+)
+// 监控登录
+chrome.webRequest.onCompleted.addListener(
+  function(details) {
+    if (/login/.test(details.url) && details.statusCode === 200) {
+      console.log('登录')
+      let shopeeLoginStatus = localStorage.getItem('shopeeLoginStatus')
+      if (shopeeLoginStatus == -1) {
+        localStorage.setItem('shopeeLoginStatus', 1)
+      }
+    }
+  },
+  {
+    urls: [
+      '*://*.shopee.tw/*',
+      '*://shopee.tw/*',
+      '*://*.shopee.cn/*',
+      '*://shopee.cn/*',
+      '*://*.shopeesz.com/*',
+      '*://*.shopee.co.id/*',
+      '*://shopee.co.id/*',
+      '*://*.shopee.vn/*',
+      '*://shopee.vn/*',
+      '*://shopee.co.th/*',
+      '*://*.shopee.co.th/*',
+      '*://shopee.ph/*',
+      '*://*.shopee.ph/*',
+      '*://shopee.com.my/*',
+      '*://*.shopee.com.my/*',
+      '*://shopee.sg/*',
+      '*://*.shopee.sg/*',
+      '*://shopee.com.br/*',
+      '*://*.shopee.com.br/*',
+      '*://shopee.com/*',
+      '*://*.shopee.com/*',
+      '*://*.xiapibuy.com/*',
+      'https://*.xiapibuy.com/*-i.*/'
+    ]
+  }
+)
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -27,6 +141,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   if ((action = 'request' && type == 'GET_SHOPPE_ITEM_LIST_INFO')) {
     Request.getShopeeItemsList(options, type, sendResponse)
+    return true
+  }
+  if ((action = 'request' && type == 'GET_FOLLOWERS_OF_SHOPEE_USER')) {
+    Request.getFollowersOfShopeeUser(options, type, sendResponse)
     return true
   }
   return true
@@ -129,6 +247,23 @@ export const Request = {
       type: 'get',
       url: `${getSiteLink('front', params.domain)}api/v2/shop/get?username=${params.storeName}`,
       dataType: 'json',
+      ...requestResult(type, call)
+    })
+  },
+
+  // 到erp获取虾皮用户的粉丝列表，
+  getFollowersOfShopeeUser: function(params, type, call) {
+    console.log(params, type)
+    if (!params.countryCode) return
+    $.ajax({
+      type: 'post',
+      url: CONFIGINFO.url.getShopeeFollowerList(),
+      data: JSON.stringify({
+        countryCode: params.countryCode.toUpperCase(),
+        shopId: params.shopId
+      }),
+      dataType: 'json',
+      contentType: 'application/json',
       ...requestResult(type, call)
     })
   }

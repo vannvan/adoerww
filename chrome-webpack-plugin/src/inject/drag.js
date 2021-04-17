@@ -1,7 +1,7 @@
-const dragApp = () => {
+const dragApp = (contentEL, toggleEl) => {
   //   //获取元素
-  let dv = document.querySelector('.emalacca-plugin-action-wrap')
-  let toggleElement = document.querySelector('.emalacca-plugin-action-toggle')
+  let dv = document.querySelector(contentEL)
+  let toggleElement = document.querySelector(toggleEl)
   toggleElement.addEventListener('mousedown', function(e) {
     let x = e.clientX - dv.offsetLeft
     let y = e.clientY - dv.offsetTop
