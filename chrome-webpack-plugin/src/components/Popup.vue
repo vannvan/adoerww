@@ -220,15 +220,16 @@ export default {
       chrome.browserAction.setBadgeText({ text: value ? '' : 'off' })
       chrome.browserAction.setBadgeBackgroundColor({ color: value ? '' : 'red' })
       setStorageSync({ isDisabledPlug: !value }).then(() => {
-        // 更新全部匹配的页面
-        this.handleUpDate({ type: 'UPDATE_PAGE' })
+        // 刷新当前页面
+        chrome.tabs.reload()
+        // this.handleUpDate({ type: 'UPDATE_PAGE' })
       })
     },
     handleUpDate(message) {
       // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求getAllTabs,getTabUrl
-      getTabUrl(tab => {
-        chrome.tabs.sendMessage(tab.id, message)
-      })
+      //   getTabUrl(tab => {
+      //     chrome.tabs.sendMessage(tab.id, { message })
+      //   })
     },
 
     // 获取需更新版本信息

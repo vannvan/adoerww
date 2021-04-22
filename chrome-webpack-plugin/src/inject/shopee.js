@@ -64,13 +64,26 @@ const debounceHandleActions = debounce(function() {
 //粉丝关注
 const Follow = {
   domain: location.origin,
+  requestTimer: null, //请求计时器
   preload: function() {
     try {
       $(window).scroll(debounceHandleActions)
     } catch (e) {
       return
     }
-    Follow.syncShoppeBaseInfo()
+    let oldHref = null
+    let bodyList = document.querySelector('body'),
+      observer = new MutationObserver(function(mutations) {
+        if (oldHref != location.pathname) {
+          oldHref = location.pathname
+          Follow.syncShoppeBaseInfo()
+        }
+      })
+    let config = {
+      childList: true,
+      subtree: true
+    }
+    observer.observe(bodyList, config)
   },
 
   //获取数据展示面板需要的数据，并赋值
@@ -199,17 +212,24 @@ const Follow = {
 
   //同步虾皮基础信息
   syncShoppeBaseInfo: function() {
+    let _this = this
+    if (_this.requestTimer) {
+      return false
+    }
     return new Promise(resolve => {
+      _this.requestTimer = true
       sendMessageToBackground('auth', { domain: this.domain }, 'SYNC_SHOPEE_BASE_INFO', data => {
         console.log('SYNC_SHOPEE_BASE_INFO', data)
         if (data && data.code == 0) {
+          _this.requestTimer = false
           console.log('SPC_CDS', Cookies.get('SPC_CDS'))
           if (/xiapibuy|shopee\.cn/.test(location.host)) {
             // 虾皮的xiapibuy.com的登录状态需要这个cookies值才能同步给页面
             Cookies.set('SPC_EC', data.result.cs_token, { expires: 7 })
           }
         } else {
-          delCookie()
+          _this.requestTimer = false
+          //   delCookie()
           console.log('clear cookies')
         }
         resolve(data)

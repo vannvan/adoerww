@@ -4,6 +4,8 @@ import $ from 'jquery'
 import { getSiteLink, WEBSITES } from '@/lib/conf'
 import { requestResult } from '@/lib/utils'
 import { CONFIGINFO } from '@/background/config.js'
+import { getCookies } from '@/lib/chrome'
+
 // import { getAllTabs } from '@/lib/chrome'
 
 function clearAllShopeeCookies(shopeeUrl) {
@@ -14,18 +16,33 @@ function clearAllShopeeCookies(shopeeUrl) {
     },
     function(cookies) {
       cookies.map(el => {
-        chrome.cookies.remove(
-          {
-            url: shopeeUrl,
-            name: el.name
-          },
-          function(cookie) {
-            console.log(cookie)
-          }
-        )
+        chrome.cookies.remove({
+          url: shopeeUrl,
+          name: el.name
+        })
       })
     }
   )
+}
+
+/**
+ * 将当前跨境站点的cookies同步至本土站点 或者反过来
+ *
+ * @param {*} cookies
+ * @param {*} otherSites
+ */
+function syncAllSameSiteCookies(cookies, otherSites) {
+  console.log('同步cookies', cookies)
+  console.log('other sites', otherSites)
+  otherSites.map(siteEl => {
+    cookies.map(cookie => {
+      chrome.cookies.set({
+        url: siteEl,
+        name: cookie.name,
+        value: cookie.value
+      })
+    })
+  })
 }
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -82,8 +99,20 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 chrome.webRequest.onCompleted.addListener(
   function(details) {
     if (/login/.test(details.url) && details.statusCode === 200) {
-      console.log('登录')
+      console.log('登录监听', details)
       let shopeeLoginStatus = localStorage.getItem('shopeeLoginStatus')
+      let currentUrl = details.initiator
+      const countryList = WEBSITES.map(el => el.key)
+      let countryCode = countryList.find(item => currentUrl.match(new RegExp(item))) || 'tw'
+      let contrySiteInfo = WEBSITES.find(el => el.key == countryCode)
+      let siteArr = Object.values(contrySiteInfo).filter(item => /http/.test(item))
+      getCookies(details.initiator, cookies => {
+        syncAllSameSiteCookies(
+          cookies,
+          siteArr.filter(item => item != details.initiator)
+        )
+      })
+      // 同步当前站点相关的跨境站或本土站所有网站的cookies
       if (shopeeLoginStatus == -1) {
         localStorage.setItem('shopeeLoginStatus', 1)
       }

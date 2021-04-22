@@ -29,6 +29,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 })
 
 export const Auth = {
+  requestFlag: false,
   //同步虾皮登录token
   setCookies: function(params, type, call) {
     console.log(params, type)
@@ -64,6 +65,10 @@ export const Auth = {
   // 配置虾皮平台信息
   syncShoppeBaseInfo: function(params, type, call) {
     console.log(params, type)
+    let _this = this
+    if (_this.requestFlag) {
+      return false
+    }
     const countryList = WEBSITES.map(el => el.key)
     // 如果当前是站点时cn站点并且userInfo的country和当前匹配，就直接用存下的
     let userInfo = getStorage('userInfo', null)
@@ -71,24 +76,35 @@ export const Auth = {
     let shopeeLoginStatus = localStorage.getItem('shopeeLoginStatus')
     if (shopeeLoginStatus == -1) {
       localStorage.setItem('userInfo', null)
-      call({ type: type, code: -1 })
+      call({ type: type, code: -1, message: '刚退出或用户信息为空' })
       return false
     }
-    if (new RegExp(storageCountry).test(params.domain) && shopeeLoginStatus != -1) {
-      console.log('同步国内站点')
-      call({
-        type: type,
-        code: 0,
-        result: {
-          storeId: userInfo.shopid,
-          username: userInfo.username,
-          country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw',
-          // 这里需要把 cs_token 送给前台 作为前台cookies中的 SPC_EC 同步用户状态
-          cs_token: userInfo.cs_token
-        }
-      })
+    try {
+      if (
+        (new RegExp(storageCountry).test(params.domain) && shopeeLoginStatus != -1) ||
+        /xiapi\.xiapibuy|xiapi\.shopee/.test(params.domain)
+      ) {
+        console.log('同步国内站点')
+        call({
+          type: type,
+          code: 0,
+          result: {
+            storeId: userInfo.shopid,
+            username: userInfo.username,
+            country: countryList.find(item => params.domain.match(new RegExp(item))) || 'tw',
+            // 这里需要把 cs_token 送给前台 作为前台cookies中的 SPC_EC 同步用户状态
+            cs_token: userInfo.cs_token
+          }
+        })
+        // //就不用走后面登录了
+        // return false
+      }
+    } catch (error) {
+      console.log(error)
     }
+
     let currentCountryCode = countryList.find(item => params.domain.match(new RegExp(item)))
+    _this.requestFlag = true
     Request.handleLoginShopee(params, type)
       .then(res => {
         if (res) {
@@ -97,9 +113,10 @@ export const Auth = {
         }
       })
       .catch(() => {
-        call({ type: type, code: -1 })
+        call({ type: type, code: -1, message: '登录失败' })
       })
       .finally(() => {
+        _this.requestFlag = false
         call({
           type: type,
           code: 0,

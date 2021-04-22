@@ -67,6 +67,24 @@ class Purchas1688AddAddress {
       })
     })
   }
+  /**
+   * 判断两个地址是否匹配
+   * eg 龙华区民治街道办逸秀新村64栋908
+   *let str2 = '龙华区民治街道办新村64栋908'  true
+   *let str3 = '华龙区民治街道办新村64栋9082'  false
+   *let str4 = '新村64栋908' true
+   *let str5 = '新村64栋908下铺' false
+   *
+   * @param {*} longStr
+   * @param {*} shortStr
+   * @return {*}
+   * @memberof Purchas1688AddAddress
+   */
+  isInclude(longStr, shortStr) {
+    let str1Arr = longStr.replace(/\s+/g, '').split('')
+    let strArr2 = shortStr.replace(/\s+/g, '').split('')
+    return strArr2.every(el => str1Arr.includes(el))
+  }
 
   validateAddress(realConsigneeInfo) {
     // console.log('realConsigneeInfo', realConsigneeInfo)
@@ -75,6 +93,7 @@ class Purchas1688AddAddress {
     }
     return new Promise(resolve => {
       let { phone, contacts, fullAddress } = realConsigneeInfo
+      console.log('采购单:', phone, contacts, fullAddress)
       let _this = this
       let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
       $.ajax({
@@ -95,7 +114,9 @@ class Purchas1688AddAddress {
           console.log('matchAddressHtmlList:', JSON.stringify(addressList))
           let exitAddress = addressList.find(
             el =>
-              el.mobile == phone && el.fullName == contacts && fullAddress.indexOf(el.address) >= 0
+              el.mobile == phone &&
+              el.fullName == contacts &&
+              _this.isInclude(fullAddress, el.address)
           )
           console.log('exitAddress:', exitAddress)
           // 如果当前地址不是1688的默认地址，就修改为默认地址
@@ -123,7 +144,7 @@ class Purchas1688AddAddress {
   parse1688Address(realConsigneeInfo) {
     let { contacts, phone, fullAddress } = realConsigneeInfo
     let _this = this
-    fullAddress = contacts + phone + fullAddress
+    fullAddress = contacts + ' ' + phone + ' ' + fullAddress
     const url =
       'https://wuliu.1688.com/address/ajax/address_parse.jsx?callback=jQuery17209390225001079777_1538036004820&address=' +
       encodeURIComponent(fullAddress) +

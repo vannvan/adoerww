@@ -451,14 +451,7 @@ export const backEvent = {
 }
 
 var tabId = null
-// chrome.browserAction.onClicked.addListener(function () {
-//   var index = chrome.extension.getURL('presentation/presentation.html')
-//   tabId
-//     ? chrome.tabs.update(tabId, { selected: true })
-//     : chrome.tabs.create({ url: index }, function (tab) {
-//         tabId = tab.id
-//       })
-// })
+
 chrome.tabs.onRemoved.addListener(function(tid) {
   tid === tabId && (tabId = null)
 })

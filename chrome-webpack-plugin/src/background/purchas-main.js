@@ -2,13 +2,14 @@ import Purchas1688AddAddress from './purchas-1688'
 import PurchasePddAddAddress from './purchas-pdd'
 import { setStorageSync, getStorageSync, getTabId2, getCookies, getAllTabs } from '@/lib/chrome'
 import { CONFIGINFO } from '@/background/config.js'
+import dayjs from 'dayjs'
+
 var contentNotify = {} //content-script 消息通知
 
 class Purchas {
   constructor() {
     this.t1688 = null
     this.pdd = null
-    this.userInfo = JSON.parse(localStorage.getItem('pt-plug-access-user'))
     this.purchaseOrderInfo = {}
   }
 
@@ -121,11 +122,13 @@ class Purchas {
         let tabOrderInfo = await getStorageSync('orderInfo')
         let { orderInfo } = tabOrderInfo
         let updateParams = {
-          ordersn: orderInfo.ordersn,
-          purchaseOrderno: options.purchaseOrderno,
+          ordersn: orderInfo.ordersn, //原始订单号
+          purchaseOrderno: options.purchaseOrderno, //采集平台订单号
+          orderno: orderInfo.orderno, //采购单号
           status: 2,
           reqCookie: cookieStr,
-          purchaseSeller: uniqueSiteId
+          purchaseAccount: uniqueSiteId,
+          purchaseTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
         }
         let orderStatus = await _this.updatePurchasStatus(updateParams)
         call({
@@ -148,7 +151,6 @@ class Purchas {
   }
 
   updatePurchasStatus(data) {
-    let _this = this
     return new Promise(resolve => {
       $.ajax({
         url: CONFIGINFO.url.updatePurchasStatus(),

@@ -132,7 +132,7 @@ export const MESSAGE = {
     pleaseLoginPinDuoDuo:
       '请先<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
     pleaseAgainLoginPinDuoDuo:
-    '数据异常，请重新<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
+      '数据异常，请重新<a href="https://mobile.yangkeduo.com/login.html" target="_blank">登录</a>拼多多后再采集',
     pleaseLogin1688: '请先登录1688后再采集',
     pleaseLoginTmall: '请先登录天猫再采集',
     pleaseLoginTaobao: '请先登录淘宝再采集',
