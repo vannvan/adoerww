@@ -4,8 +4,8 @@
 import { WEBSITES } from '@/lib/conf'
 import { getStorage } from '@/lib/utils'
 import { Request } from './shopee-server'
-
-// import { backEvent } from './server/server'
+import { getCookies } from '@/lib/chrome'
+const regeneratorRuntime = require('@/assets/js/runtime.js')
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   let { action, options, type } = request
@@ -24,6 +24,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   // 同步虾皮token
   if (action == 'auth' && type == 'SET_SHOPPE_CRSF_TOKEN') {
     Auth.setCookies(options, type, sendResponse)
+    return true
+  }
+
+  // 获取采集站点的cookies
+  if (action == 'auth' && type == 'GET_COLLECT_SITE_LOGIN_STATUS') {
+    Auth.getCollectSitesAuthInfo(options, type, sendResponse)
     return true
   }
 })
@@ -129,5 +135,74 @@ export const Auth = {
           }
         })
       })
+  },
+
+  // 1688登录状态检查
+  check1688Auth: function() {
+    return new Promise(resolve => {
+      let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
+      $.ajax({
+        type: 'get',
+        url: addressUrl,
+        success: res => {
+          let matchCsrf = /data-csrftoken="(.*?)"/.exec(res)
+          if (matchCsrf) {
+            getCookies('https://www.1688.com/', async cookies => {
+              let cookieStr = cookies.reduce((prev, curr) => {
+                return `${curr.name}=${curr.value}; ` + prev
+              }, '')
+              resolve(cookieStr)
+            })
+          } else {
+            resolve(false)
+          }
+        }
+      })
+    })
+  },
+
+  // pdd登录状态检查
+  checkPddAuth: function() {
+    return new Promise(resolve => {
+      getCookies('http://mobile.yangkeduo.com/', async cookies => {
+        try {
+          let pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
+          let pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
+          if (pddUserId && pddAccesstoken) {
+            let cookieStr = cookies.reduce((prev, curr) => {
+              return `${curr.name}=${curr.value}; ` + prev
+            }, '')
+            resolve({ cookieStr: cookieStr, pddAccesstoken: pddAccesstoken })
+          } else {
+            resolve(false)
+          }
+        } catch (error) {
+          resolve(false)
+        }
+      })
+    })
+  },
+
+  // 获取采集站点的cookies
+  getCollectSitesAuthInfo: async function(params, type, call) {
+    console.log(params, type)
+    const t1688LoginStatus = await Auth.check1688Auth()
+    const pddLoginStatus = await Auth.checkPddAuth()
+    call({
+      code: 0,
+      result: { pddLoginStatus: pddLoginStatus.cookieStr, t1688LoginStatus: t1688LoginStatus },
+      message: null
+    })
+    console.log('pdd登录状态', pddLoginStatus.cookieStr, '1688登录状态', t1688LoginStatus)
+    // setInterval(() => {
+    //   $.ajax({
+    //     method: 'get',
+    //     url:
+    //       'https://detail.tmall.com/item.htm?id=639981638247&ali_refid=a3_430406_1007:20893751:J:9587295_0_1927950034:e664cf54bc482ee40a8d1abf9ab0c5e1&ali_trackid=85_e664cf54bc482ee40a8d1abf9ab0c5e1&spm=a21bo.2017.201874-sales.7',
+    //     success: res => {
+    //       console.log(res)
+    //     }
+    //   })
+    // }, 500)
   }
 }

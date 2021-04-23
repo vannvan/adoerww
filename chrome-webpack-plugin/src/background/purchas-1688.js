@@ -2,6 +2,7 @@
 console.log('1688无货源脚本加载')
 import { getCookies } from '@/lib/chrome'
 const regeneratorRuntime = require('@/assets/js/runtime.js')
+import Auth from './auth-server'
 
 var csrf_token = ''
 var contentNotifyHandler = {} //content-script 消息通知
@@ -44,29 +45,6 @@ class Purchas1688AddAddress {
     )
   }
 
-  checkLogin() {
-    let _this = this
-    return new Promise(resolve => {
-      let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
-      $.ajax({
-        type: 'get',
-        url: addressUrl,
-        success: res => {
-          let matchCsrf = /data-csrftoken="(.*?)"/.exec(res)
-          if (matchCsrf) {
-            getCookies('https://www.1688.com/', async cookies => {
-              let cookieStr = cookies.reduce((prev, curr) => {
-                return `${curr.name}=${curr.value}; ` + prev
-              }, '')
-              resolve(cookieStr)
-            })
-          } else {
-            resolve(false)
-          }
-        }
-      })
-    })
-  }
   /**
    * 判断两个地址是否匹配
    * eg 龙华区民治街道办逸秀新村64栋908
@@ -86,9 +64,10 @@ class Purchas1688AddAddress {
     return strArr2.every(el => str1Arr.includes(el))
   }
 
-  validateAddress(realConsigneeInfo) {
+  async validateAddress(realConsigneeInfo) {
     // console.log('realConsigneeInfo', realConsigneeInfo)
-    if (!this.checkLogin()) {
+    let isLogin = await Auth.check1688Auth()
+    if (!isLogin) {
       return false
     }
     return new Promise(resolve => {

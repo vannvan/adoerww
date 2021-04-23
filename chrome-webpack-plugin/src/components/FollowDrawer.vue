@@ -101,7 +101,13 @@
             </li>
           </div>
           <!-- 折叠 -->
-          <div class="holdon-action" @click="followActionMoreVisible = !followActionMoreVisible;handleCancel()">
+          <div
+            class="holdon-action"
+            @click="
+              followActionMoreVisible = !followActionMoreVisible
+              handleCancel()
+            "
+          >
             {{ followActionMoreVisible ? '收起' : '更多' }}
           </div>
           <!-- 更多筛选 -->
@@ -479,18 +485,26 @@ export default {
     handleScroll() {
       $('.middle-centered-div.inner').css('transform', 'translateX(-50%)')
       $('.page-holder.center-container').css('transform', 'translateX(-50%)')
-      
+
       this.countFollowers = $('.clickable_area.middle-centered-div').length
     },
 
     //定时滚动
     scrollTo() {
       this.scrollTimer = setInterval(() => {
-        if (this.lastOffsetHeight >= document.body.offsetHeight) {
+        if (this.lastOffsetHeight > document.body.offsetHeight) {
+          console.log('停止自动滚动')
+          console.log(
+            'lastOffsetHeight',
+            this.lastOffsetHeight,
+            'offsetHeight',
+            document.body.offsetHeight
+          )
           clearTimeout(this.scrollTimer)
         } else {
           window.scrollTo(0, document.body.offsetHeight)
           this.lastOffsetHeight = document.body.offsetHeight
+          console.log('this.lastOffsetHeight', this.lastOffsetHeight)
         }
       }, 5000)
     },
@@ -555,35 +569,36 @@ export default {
 
     //关注或取关操作 actionType: unfollow或者follow
     getStoreFollowers(actionType) {
-      this.scrollTo() //开始滚
-      this.globalTimer = setInterval(() => {
-        this.updateUserList()
+      const _this = this
+      _this.scrollTo() //开始滚
+      _this.globalTimer = setInterval(() => {
+        _this.updateUserList()
         console.log(
           'usernameQueue length:',
-          this.usernameQueue.length,
+          _this.usernameQueue.length,
           'actionedUserList length:',
-          this.actionedUserList.length
+          _this.actionedUserList.length
         )
-        this.currentUserName = this.usernameQueue.splice(0, 1)[0]
-        if (!isEmpty(this.currentUserName)) {
-          this.isRequest = true
-          this.buttonText = '正在运行中，点击可取消'
-          this.actionedUserList.push(this.currentUserName)
-          if (!this.handleSkipJudge(actionType)) return
-          Follow.getStoreFollowers(this.currentUserName).then(res => {
+        _this.currentUserName = _this.usernameQueue.splice(0, 1)[0]
+        if (!isEmpty(_this.currentUserName)) {
+          _this.isRequest = true
+          _this.buttonText = '正在运行中，点击可取消'
+          _this.actionedUserList.push(_this.currentUserName)
+          if (!_this.handleSkipJudge(actionType)) return
+          Follow.getStoreFollowers(_this.currentUserName).then(res => {
             if (res.code == 0) {
               let { shopid } = res.result.data
               //  无需跳过的
-              let notSkip = this.filterMatch(actionType, res.result.data).match
+              let notSkip = _this.filterMatch(actionType, res.result.data).match
               if (actionType == 'follow' && notSkip) {
-                this.handleNotifyToBack(actionType, shopid, this.currentUserName)
+                _this.handleNotifyToBack(actionType, shopid, _this.currentUserName)
               } else if (actionType == 'unfollow' && notSkip) {
-                this.handleNotifyToBack(actionType, shopid, this.currentUserName)
+                _this.handleNotifyToBack(actionType, shopid, _this.currentUserName)
               } else {
-                let reasonText = this.filterMatch(actionType, res.result.data).reason || ''
-                this.resultCount.skip += 1
+                let reasonText = _this.filterMatch(actionType, res.result.data).reason || ''
+                _this.resultCount.skip += 1
                 let htmlStr = `<li>[${getTime()}] ${
-                  this.currentUserName
+                  _this.currentUserName
                 }跳过,原因：<small>${reasonText}</small></li>`
                 $('#ResultContent').prepend(htmlStr)
               }
@@ -593,7 +608,7 @@ export default {
           let infoText = actionType == 'follow' ? '关注' : '取关'
           let htmlStr = `<li>[${getTime()}] ${infoText} 任务完成！</li>`
           $('#ResultContent').prepend(htmlStr)
-          this.handleCancel()
+          _this.handleCancel()
         }
       }, 1000)
     },
@@ -609,12 +624,10 @@ export default {
           this.actionedUserList >= this.countFollowers
       }
       if (limitOpts[this.currentTab]) {
-        clearInterval(this.globalTimer)
+        this.handleCancel(this.isOther ? '开启关注' : '开启取关')
         this.$nextTick(() => {
           let infoText = actionType == 'follow' ? '关注' : '取关'
           let htmlStr = `<li style="color:#2ecc71">[${getTime()}] ${infoText} 任务完成...</li>`
-          this.buttonText = this.isOther ? '开启关注' : '开启取关'
-          this.isRequest = false
           $('#ResultContent').prepend(htmlStr)
         })
         return false
@@ -755,9 +768,9 @@ export default {
     },
 
     //取消请求
-    handleCancel() {
+    handleCancel(buttonText = '重新开始') {
       this.isRequest = false
-      this.buttonText = '重新开始'
+      this.buttonText = buttonText
       clearInterval(this.globalTimer)
       clearInterval(this.scrollTimer)
     }

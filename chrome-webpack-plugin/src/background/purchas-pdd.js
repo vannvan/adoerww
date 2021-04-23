@@ -26,29 +26,6 @@ class PurchasPddAddAddress {
     console.log('pdd initListener')
   }
 
-  checkLogin() {
-    console.log('pdd授权校验')
-    let _this = this
-    return new Promise(resolve => {
-      getCookies('http://mobile.yangkeduo.com/', async cookies => {
-        try {
-          _this.pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
-          _this.pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
-          if (_this.pddUserId && _this.pddAccesstoken) {
-            let cookieStr = cookies.reduce((prev, curr) => {
-              return `${curr.name}=${curr.value}; ` + prev
-            }, '')
-            resolve({ cookieStr: cookieStr, pddAccesstoken: _this.pddAccesstoken })
-          } else {
-            resolve(false)
-          }
-        } catch (error) {
-          resolve(false)
-        }
-      })
-    })
-  }
-
   /**
    * setp1 获取拼多多地址列表，判断是否已存在
    * step2 如果不存在，根据省市区获取拼多多对应地址id

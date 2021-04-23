@@ -259,20 +259,7 @@ class BindOrder {
     })
     dragApp('#emalacca-plugin-purchas-order', '.emalacca-plugin-purchas-header')
   }
-
-  //为erp获取1688及pdd的登录状态
-  getPurchasSiteLoginStatus() {
-    sendMessageToBackground('purchas', {}, 'GET_PURCHAS_SITE_LOGIN_STATUS', data => {
-      if (data && data.result && /192|emalacca/.test(location.href)) {
-        let { pddLoginStatus, t1688LoginStatus } = data.result
-        $('body').append(
-          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" isPddLogin="${pddLoginStatus}" is1688Login="${t1688LoginStatus}"></div>`
-        )
-      }
-    })
-  }
 }
 
 const BO = new BindOrder()
 BO.locationObserver()
-BO.getPurchasSiteLoginStatus()

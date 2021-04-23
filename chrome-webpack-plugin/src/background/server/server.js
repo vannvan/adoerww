@@ -449,9 +449,3 @@ export const backEvent = {
     )
   }
 }
-
-var tabId = null
-
-chrome.tabs.onRemoved.addListener(function(tid) {
-  tid === tabId && (tabId = null)
-})

@@ -42,18 +42,6 @@ class Purchas {
         _this.submitPurchasOrderNumber(options, sendResponse)
         return true
       }
-
-      if (action == 'purchas' && type == 'GET_PURCHAS_SITE_LOGIN_STATUS') {
-        const t1688LoginStatus = await _this.t1688.checkLogin()
-        const pddLoginStatus = await _this.pdd.checkLogin()
-        sendResponse({
-          code: 0,
-          result: { pddLoginStatus: pddLoginStatus.cookieStr, t1688LoginStatus: t1688LoginStatus },
-          message: null
-        })
-        console.log('pdd登录状态', pddLoginStatus.cookieStr, '1688登录状态', t1688LoginStatus)
-        return true
-      }
     })
   }
 
