@@ -36,9 +36,9 @@ export const ERP = {
   getCollectSitesAuthInfo: function() {
     sendMessageToBackground('auth', {}, 'GET_COLLECT_SITE_LOGIN_STATUS', data => {
       if (data && data.result) {
-        let { pddLoginStatus, t1688LoginStatus } = data.result
+        let { pddLoginStatus, t1688LoginStatus, taobaoLoginStatus } = data.result
         $('body').append(
-          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" isPddLogin="${pddLoginStatus}" is1688Login="${t1688LoginStatus}"></div>`
+          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" isPddLogin="${pddLoginStatus}" is1688Login="${t1688LoginStatus}" isLoginTaobao="${taobaoLoginStatus}"></div>`
         )
       }
     })

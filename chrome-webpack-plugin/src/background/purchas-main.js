@@ -68,11 +68,9 @@ class Purchas {
     let { currentSite } = options
     try {
       let tabOrderInfo = await getStorageSync('orderInfo')
-      let {
-        orderInfo: { tabId }
-      } = tabOrderInfo
+      let { orderInfo } = tabOrderInfo || {}
       getTabId2(async currentTabId => {
-        if (tabId == currentTabId) {
+        if (orderInfo && orderInfo.tabId == currentTabId) {
           if (currentSite == '1688') {
             const t1688LoginStatus = await _this.t1688.validateAddress(tabOrderInfo.orderInfo)
             !t1688LoginStatus && call({ code: -1, result: null, message: '请登录1688后刷新此页面' })

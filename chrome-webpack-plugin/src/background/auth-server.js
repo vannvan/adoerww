@@ -183,26 +183,50 @@ export const Auth = {
     })
   },
 
+  // 天猫|淘宝登录状态检查
+  checkTaobaoAuth: function() {
+    return new Promise(resolve => {
+      getCookies('https://www.taobao.com/', async cookies => {
+        try {
+          let lgc = cookies.find(el => el.name == 'lgc')
+          let cookieStr = cookies.reduce((prev, curr) => {
+            return `${curr.name}=${curr.value}; ` + prev
+          }, '')
+          let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
+          if (lgc && isOverdue) {
+            resolve(cookieStr)
+          } else {
+            resolve(false)
+          }
+        } catch (error) {
+          resolve(false)
+        }
+      })
+    })
+  },
+
   // 获取采集站点的cookies
   getCollectSitesAuthInfo: async function(params, type, call) {
     console.log(params, type)
     const t1688LoginStatus = await Auth.check1688Auth()
     const pddLoginStatus = await Auth.checkPddAuth()
+    const taobaoLoginStatus = await Auth.checkTaobaoAuth()
     call({
       code: 0,
-      result: { pddLoginStatus: pddLoginStatus.cookieStr, t1688LoginStatus: t1688LoginStatus },
+      result: {
+        pddLoginStatus: pddLoginStatus.cookieStr,
+        t1688LoginStatus: t1688LoginStatus,
+        taobaoLoginStatus: taobaoLoginStatus
+      },
       message: null
     })
-    console.log('pdd登录状态', pddLoginStatus.cookieStr, '1688登录状态', t1688LoginStatus)
-    // setInterval(() => {
-    //   $.ajax({
-    //     method: 'get',
-    //     url:
-    //       'https://detail.tmall.com/item.htm?id=639981638247&ali_refid=a3_430406_1007:20893751:J:9587295_0_1927950034:e664cf54bc482ee40a8d1abf9ab0c5e1&ali_trackid=85_e664cf54bc482ee40a8d1abf9ab0c5e1&spm=a21bo.2017.201874-sales.7',
-    //     success: res => {
-    //       console.log(res)
-    //     }
-    //   })
-    // }, 500)
+    console.log(
+      'pdd登录状态',
+      pddLoginStatus.cookieStr,
+      '1688登录状态',
+      t1688LoginStatus,
+      'taobao登录状态',
+      taobaoLoginStatus
+    )
   }
 }
