@@ -1,6 +1,5 @@
 // 无货源绑定订单脚本
 console.log('1688无货源脚本加载')
-import { getCookies } from '@/lib/chrome'
 const regeneratorRuntime = require('@/assets/js/runtime.js')
 import Auth from './auth-server'
 

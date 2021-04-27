@@ -158,11 +158,11 @@ export const COLLECT_SITES = [
     link: 'https://aliexpress.com/',
     logo: require('@/assets/icon/logo-aliexpress.png')
   },
-  {
-    name: '拼多多',
-    link: 'https://mobile.yangkeduo.com/',
-    logo: require('@/assets/icon/logo-pinduoduo.png')
-  },
+  //   {
+  //     name: '拼多多',
+  //     link: 'https://mobile.yangkeduo.com/',
+  //     logo: require('@/assets/icon/logo-pinduoduo.png')
+  //   },
   {
     name: 'Shopee',
     link: 'https://shopee.com/index.html',

@@ -106,7 +106,7 @@ chrome.webRequest.onCompleted.addListener(
       let countryCode = countryList.find(item => currentUrl.match(new RegExp(item))) || 'tw'
       let contrySiteInfo = WEBSITES.find(el => el.key == countryCode)
       let siteArr = Object.values(contrySiteInfo).filter(item => /http/.test(item))
-      getCookies(details.initiator, cookies => {
+      getCookies({ url: details.initiator }, cookies => {
         syncAllSameSiteCookies(
           cookies,
           siteArr.filter(item => item != details.initiator)

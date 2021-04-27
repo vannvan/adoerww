@@ -2,9 +2,9 @@
 // -1 接口错误 -2 数据错误
 // import $ from 'jquery'
 import { WEBSITES } from '@/lib/conf'
-import { getStorage } from '@/lib/utils'
+import { getStorage, handleJudgeLink } from '@/lib/utils'
 import { Request } from './shopee-server'
-import { getCookies } from '@/lib/chrome'
+import { getCookies, sendMessageToContentScript } from '@/lib/chrome'
 const regeneratorRuntime = require('@/assets/js/runtime.js')
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -30,6 +30,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   // 获取采集站点的cookies
   if (action == 'auth' && type == 'GET_COLLECT_SITE_LOGIN_STATUS') {
     Auth.getCollectSitesAuthInfo(options, type, sendResponse)
+    return true
+  }
+  // 拦截采集站点登录行为
+  if (action == 'auth' && type == 'INIT_COLLECT_SITE_LOGIN_ACTION') {
+    Auth.handleInterceptCollectSiteLoginAction(options, type, sendResponse)
     return true
   }
 })
@@ -147,7 +152,7 @@ export const Auth = {
         success: res => {
           let matchCsrf = /data-csrftoken="(.*?)"/.exec(res)
           if (matchCsrf) {
-            getCookies('https://www.1688.com/', async cookies => {
+            getCookies({ domain: '.1688.com' }, async cookies => {
               let cookieStr = cookies.reduce((prev, curr) => {
                 return `${curr.name}=${curr.value}; ` + prev
               }, '')
@@ -164,7 +169,7 @@ export const Auth = {
   // pdd登录状态检查
   checkPddAuth: function() {
     return new Promise(resolve => {
-      getCookies('http://mobile.yangkeduo.com/', async cookies => {
+      getCookies({ domain: '.yangkeduo.com' }, async cookies => {
         try {
           let pddUserId = cookies.find(el => el.name == 'pdd_user_id').value
           let pddAccesstoken = cookies.find(el => el.name == 'PDDAccessToken').value
@@ -172,7 +177,7 @@ export const Auth = {
             let cookieStr = cookies.reduce((prev, curr) => {
               return `${curr.name}=${curr.value}; ` + prev
             }, '')
-            resolve({ cookieStr: cookieStr, pddAccesstoken: pddAccesstoken })
+            resolve(cookieStr)
           } else {
             resolve(false)
           }
@@ -183,17 +188,40 @@ export const Auth = {
     })
   },
 
-  // 天猫|淘宝登录状态检查
+  // 淘宝登录状态检查
   checkTaobaoAuth: function() {
     return new Promise(resolve => {
-      getCookies('https://www.taobao.com/', async cookies => {
+      getCookies({ domain: '.taobao.com' }, async cookies => {
         try {
           let lgc = cookies.find(el => el.name == 'lgc')
           let cookieStr = cookies.reduce((prev, curr) => {
             return `${curr.name}=${curr.value}; ` + prev
           }, '')
-          let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
-          if (lgc && isOverdue) {
+          //   let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
+          if (lgc) {
+            resolve(cookieStr)
+          } else {
+            resolve(false)
+          }
+        } catch (error) {
+          resolve(false)
+        }
+      })
+    })
+  },
+
+  // 天猫登录状态检查
+  checkTmallAuth: function() {
+    return new Promise(resolve => {
+      getCookies({ domain: '.tmall.com' }, async cookies => {
+        try {
+          let lgc = cookies.find(el => el.name == 'lgc')
+          let cookieStr = cookies.reduce((prev, curr) => {
+            return `${curr.name}=${curr.value}; ` + prev
+          }, '')
+          //   console.log('cookieStr', cookieStr, lgc)
+          //   let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
+          if (lgc) {
             resolve(cookieStr)
           } else {
             resolve(false)
@@ -211,22 +239,59 @@ export const Auth = {
     const t1688LoginStatus = await Auth.check1688Auth()
     const pddLoginStatus = await Auth.checkPddAuth()
     const taobaoLoginStatus = await Auth.checkTaobaoAuth()
+    const tmallLoginStatus = await Auth.checkTmallAuth()
     call({
       code: 0,
       result: {
-        pddLoginStatus: pddLoginStatus.cookieStr,
+        pddLoginStatus: pddLoginStatus,
         t1688LoginStatus: t1688LoginStatus,
-        taobaoLoginStatus: taobaoLoginStatus
+        taobaoLoginStatus: taobaoLoginStatus,
+        tmallLoginStatus: tmallLoginStatus
       },
       message: null
     })
     console.log(
       'pdd登录状态',
-      pddLoginStatus.cookieStr,
+      pddLoginStatus,
       '1688登录状态',
       t1688LoginStatus,
       'taobao登录状态',
-      taobaoLoginStatus
+      taobaoLoginStatus,
+      'tmall登录状态',
+      tmallLoginStatus
+    )
+  },
+
+  // 对采集站点操作行为进行拦截
+  handleInterceptCollectSiteLoginAction: async function(params, type, call) {
+    console.log(params, type)
+    chrome.webRequest.onCompleted.addListener(
+      function(details) {
+        //对采集站点登录行为进行拦截
+        if (/login\.do/.test(details.url) && details.statusCode == 200) {
+          console.log('登录成功')
+          let siteMatch = handleJudgeLink(details.url)
+          call({
+            code: 0,
+            result: siteMatch,
+            message: `监听到${siteMatch.siteName}登录成功`
+          })
+        }
+        if (/_____tmd_____/.test(details.url) && details.statusCode == 200) {
+          console.log('阿里巴巴出现了验证码')
+          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function(response) {
+            console.log(response, 'UPDATE_SITE_COOKIES')
+          })
+        }
+      },
+      {
+        urls: [
+          '*://*.taobao.com/*',
+          '*://*.tmall.com/*',
+          '*://*.1688.com/*',
+          '*://*.yangkeduo.com/*'
+        ]
+      }
     )
   }
 }

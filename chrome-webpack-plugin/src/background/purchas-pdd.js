@@ -37,7 +37,7 @@ class PurchasPddAddAddress {
     _this.purchaseOrderInfo = realConsigneeInfo
     console.log('pdd validateAddress')
     return new Promise(resolve => {
-      getCookies('http://mobile.yangkeduo.com/', async cookies => {
+      getCookies({ url: 'http://mobile.yangkeduo.com/' }, async cookies => {
         try {
           let { province, city, region, phone, contacts, fullAddress } = realConsigneeInfo
           _this.pddUserId = cookies.find(el => el.name == 'pdd_user_id').value

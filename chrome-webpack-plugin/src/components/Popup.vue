@@ -104,29 +104,11 @@
 import { ERP_SYSTEM } from '@/lib/env.conf'
 import { COLLECT_SITES } from '@/lib/conf'
 import { getStorage, isNil } from '@/lib/utils'
-import { setStorageSync, getStorageSync, getAllTabs, getTabUrl } from '@/lib/chrome'
+import { setStorageSync, getStorageSync, sendMessageToContentScript } from '@/lib/chrome'
 import { CONFIGINFO } from '../background/config'
 import Switches from './Switches'
 import $ from 'jquery'
 
-function sendMessageToContentScript(message, callback) {
-  // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
-  getAllTabs(urls => {
-    urls.map(el => {
-      if (el.url.match(/192|emalacca/)) {
-        chrome.tabs.sendMessage(el.id, message, function(response) {
-          if (callback) {
-            callback(response)
-            //关闭标签
-            chrome.tabs.remove(el.id, function(e) {
-              console.log(e)
-            })
-          }
-        })
-      }
-    })
-  })
-}
 export default {
   components: {
     Switches
@@ -169,7 +151,7 @@ export default {
   methods: {
     handleExit() {
       sendMessageToContentScript({ type: 'ERP_LOGOUT' }, function(response) {
-        console.log(response, 'response')
+        console.log(response, 'ERP_LOGOUT')
       })
 
       // 不管erp系统是否完成退出，插件都要退出

@@ -36,10 +36,26 @@ export const ERP = {
   getCollectSitesAuthInfo: function() {
     sendMessageToBackground('auth', {}, 'GET_COLLECT_SITE_LOGIN_STATUS', data => {
       if (data && data.result) {
-        let { pddLoginStatus, t1688LoginStatus, taobaoLoginStatus } = data.result
+        let { pddLoginStatus, t1688LoginStatus, taobaoLoginStatus, tmallLoginStatus } = data.result
+        $('#emalacca-chrome-extension-purchas-auth')
+          ? $('#emalacca-chrome-extension-purchas-auth').remove()
+          : null
         $('body').append(
-          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" isPddLogin="${pddLoginStatus}" is1688Login="${t1688LoginStatus}" isLoginTaobao="${taobaoLoginStatus}"></div>`
+          `<div id="emalacca-chrome-extension-purchas-auth" style="display:none" 
+          isPddLogin="${pddLoginStatus}" 
+          is1688Login="${t1688LoginStatus}" 
+          isLoginTaobao="${taobaoLoginStatus}" 
+          isLoginTmall="${tmallLoginStatus}"></div>`
         )
+      }
+    })
+  },
+  handleInitIntercept: function() {
+    sendMessageToBackground('auth', {}, 'INIT_COLLECT_SITE_LOGIN_ACTION', data => {
+      console.log('Init Intercept...')
+      if (data && data.code == 0) {
+        ERP.getCollectSitesAuthInfo() //获取采集站点的cookies
+        $.fn.message({ type: 'success', msg: data.message + '，点击‘完成登录’即可' })
       }
     })
   }
@@ -49,6 +65,7 @@ export const ERP = {
 if (/emalacca|192/.test(location.origin)) {
   ERP.syncAuthStatus() //同步erp用户信息
   ERP.getCollectSitesAuthInfo() //获取采集站点的cookies
+  ERP.handleInitIntercept()
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.type == 'ERP_LOGOUT') {
       window.localStorage.clear()
@@ -61,6 +78,11 @@ if (/emalacca|192/.test(location.origin)) {
     if (request.type == 'UPDATE_PAGE') {
       sendResponse(request.type)
       location.reload()
+      return true
+    }
+    if (request.type == 'UPDATE_SITE_COOKIES') {
+      sendResponse(request.type)
+      ERP.getCollectSitesAuthInfo() //获取采集站点的cookies
       return true
     }
     return true

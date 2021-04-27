@@ -1,4 +1,5 @@
 import _ from 'lodash' // https://www.lodashjs.com/docs/lodash.cloneDeep
+const URL = /^(https?:\/\/(([a-zA-Z0-9]+-?)+[a-zA-Z0-9]+\.)+[a-zA-Z]+)(:\d+)?(\/.*)?(\?.*)?(#.*)?$/
 
 //深拷贝
 export function cloneDeep(value) {
@@ -244,4 +245,25 @@ export const dataURLtoFile = (dataurl, filename) => {
     u8arr[n] = bstr.charCodeAt(n)
   }
   return new File([u8arr], filename, { type: mime })
+}
+
+export const handleJudgeLink = (url, callback) => {
+  const siteMap = {
+    1688: '1688',
+    taobao: '淘宝',
+    tmall: '天猫',
+    yangkeduo: '拼多多'
+  }
+  if (!URL.test(url)) {
+    console.log('不是有效链接')
+    return false
+  } else {
+    let match = url.match(/1688|taobao|tmall|yangkeduo/)
+    return match
+      ? {
+          sitekey: match[0],
+          siteName: siteMap[match[0]]
+        }
+      : 'other'
+  }
 }

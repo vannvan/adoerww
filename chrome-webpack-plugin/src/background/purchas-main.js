@@ -1,6 +1,12 @@
 import Purchas1688AddAddress from './purchas-1688'
 import PurchasePddAddAddress from './purchas-pdd'
-import { setStorageSync, getStorageSync, getTabId2, getCookies, getAllTabs } from '@/lib/chrome'
+import {
+  setStorageSync,
+  getStorageSync,
+  getTabId2,
+  getCookies,
+  sendMessageToContentScript
+} from '@/lib/chrome'
 import { CONFIGINFO } from '@/background/config.js'
 import dayjs from 'dayjs'
 
@@ -92,7 +98,7 @@ class Purchas {
   async submitPurchasOrderNumber(options, call) {
     let _this = this
     try {
-      getCookies(options.siteOrigin, async cookies => {
+      getCookies({ url: options.siteOrigin }, async cookies => {
         let cookieStr = cookies.reduce((prev, curr) => {
           return `${curr.name}=${curr.value}; ` + prev
         }, '')
@@ -165,14 +171,8 @@ class Purchas {
 
   //刷新erp
   refreshERPsystem() {
-    getAllTabs(urls => {
-      urls.map(el => {
-        if (el.url.match(/192|emalacca/)) {
-          chrome.tabs.sendMessage(el.id, { type: 'UPDATE_PAGE' }, function(response) {
-            console.log('UPDATE_PAGE', response)
-          })
-        }
-      })
+    sendMessageToContentScript({ type: 'UPDATE_PAGE' }, function(response) {
+      console.log(response, 'UPDATE_PAGE')
     })
   }
 }

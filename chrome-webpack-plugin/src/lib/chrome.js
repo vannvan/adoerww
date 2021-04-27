@@ -266,9 +266,10 @@ export const getCookie = (url, key, cb) => {
  * @param {*} cb
  */
 
-export const getCookies = (url, cb) => {
+export const getCookies = ({ url, domain }, cb) => {
   chrome.cookies.getAll(
     {
+      domain: domain,
       url: url
     },
     function(cookies) {
@@ -279,4 +280,32 @@ export const getCookies = (url, cb) => {
       }
     }
   )
+}
+
+/**
+ *
+ *  给erp发送消息
+ * @param {*} message
+ * @param {*} callback
+ */
+export const sendMessageToContentScript = (message, callback) => {
+  // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求
+  getAllTabs(urls => {
+    urls.map(el => {
+      if (el.url.match(/192|emalacca/)) {
+        chrome.tabs.sendMessage(el.id, message, function(response) {
+          if (callback) {
+            console.log('sendMessageToContentScript', message.type)
+            if (message.type == 'ERP_LOGOUT') {
+              //关闭标签
+              chrome.tabs.remove(el.id, function(e) {
+                console.log(e)
+              })
+            }
+            callback(response)
+          }
+        })
+      }
+    })
+  })
 }
