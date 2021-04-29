@@ -141,7 +141,7 @@ export default {
     getStorageSync('isDisabledPlug').then(data => {
       this.isStartPlug = !isNil(data['isDisabledPlug']) ? !data['isDisabledPlug'] : true
       chrome.browserAction.setBadgeText({ text: this.isStartPlug ? '' : 'off' })
-      chrome.browserAction.setBadgeBackgroundColor({ color: this.isStartPlug ? '' : 'red' })
+      chrome.browserAction.setBadgeBackgroundColor({ color: this.isStartPlug ? '#fff' : 'red' })
       // 停用插件时，显示提示窗
       if (!this.isStartPlug) {
         this.isHideMessage = false
@@ -200,34 +200,24 @@ export default {
       this.isStartPlug = value
       this.isHideMessage = true
       chrome.browserAction.setBadgeText({ text: value ? '' : 'off' })
-      chrome.browserAction.setBadgeBackgroundColor({ color: value ? '' : 'red' })
+      chrome.browserAction.setBadgeBackgroundColor({ color: value ? '#fff' : 'red' })
       setStorageSync({ isDisabledPlug: !value }).then(() => {
         // 刷新当前页面
         chrome.tabs.reload()
-        // this.handleUpDate({ type: 'UPDATE_PAGE' })
       })
-    },
-    handleUpDate(message) {
-      // 找到与当前环境匹配的erp系统是否被打开，如果被打开，通过tabId继续发送退出请求getAllTabs,getTabUrl
-      //   getTabUrl(tab => {
-      //     chrome.tabs.sendMessage(tab.id, { message })
-      //   })
     },
 
     // 获取需更新版本信息
     getQueryUpdatePlug() {
-      let params = {
-        versionDisplayName: 'V' + VERSION
-      }
       $.ajax({
         url: CONFIGINFO.url.getQueryUpdatePlug(),
         type: 'POST',
-        data: JSON.stringify(params),
         contentType: 'application/json',
         dataType: 'json',
         success: res => {
           if (res.code == 0) {
-            if (!isNil(res.data)) {
+            let { versionDisplayName } = res.data
+            if (versionDisplayName.search(VERSION) < 0) {
               this.isVersionNewest = false
               this.newVersionData = res.data
             }

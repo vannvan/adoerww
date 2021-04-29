@@ -58,7 +58,7 @@ export const CONFIGINFO = {
     },
     // 获取需更新版本信息
     getQueryUpdatePlug: function() {
-      return this.ApiUrl + 'product/crawl/member/query-update-plug'
+      return this.ApiUrl + 'product/crawl/member/query-last-version/'
     },
     // 到erp获取虾皮用户的粉丝列表，
     getShopeeFollowerList: function() {

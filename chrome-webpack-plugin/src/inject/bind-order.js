@@ -41,6 +41,10 @@ class BindOrder {
                   self.calculateProfit()
                   break
                 case 'toPay': // 如果是待付款页面，保存订单号
+                  $.fn.message({
+                    type: 'info',
+                    msg: '请在此页面稍作停留，提示‘关联马六甲订单成功/失败后’，可进行下一步操作'
+                  })
                   setTimeout(() => {
                     self.handleSubmitOrderNO()
                   }, 1500)
@@ -162,7 +166,7 @@ class BindOrder {
 
   // erp操作监听
   erpMessageHandler(e) {
-    if (e.data && e.data.purchasLink) {
+    if (e.data && e.data.action == 'init-purchas-order') {
       let { purchasLink, orderInfo } = e.data
       if (/1688|yangkeduo/.test(purchasLink)) {
         sendMessageToBackground(

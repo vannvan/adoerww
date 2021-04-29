@@ -236,8 +236,14 @@ function insertFetchBtn($a, url) {
         $a.parents('.img').on('mouseleave', function() {
           hideCreationDiv()
         })
-      } else {
-        appendItems()
+      } else{
+        // 处理淘宝小图显示
+        if (location.href.indexOf('taobao.com') > -1 && ($firstImg.width() > 30 || $a.width() > 30)) {
+          appendItems()
+        } else if (location.href.indexOf('taobao.com') === -1) {
+          appendItems()
+        }
+        
       }
     } else if (url.indexOf('dhgate.com') > -1 && $a.hasClass('pic')) {
       // 敦煌列表的商品，img延迟加载处理
@@ -249,6 +255,7 @@ function insertFetchBtn($a, url) {
   }
 
   $a.on('mouseenter', function() {
+    
     //   如果是列表
     if (sumaitongShowArr.includes(pageType)) {
       // 列表页显示
@@ -259,7 +266,7 @@ function insertFetchBtn($a, url) {
       if (url.indexOf('dhgate.com') > -1 && $isShowImgGather.length == 0) {
         $isShowImgGather = $(this).find('img')
       }
-      if ($isShowImgGather.length > 0) {
+      if ($isShowImgGather.length > 0 ) {
         $crawlSelect.css({
           'pointer-events': 'auto',
           display: 'block'

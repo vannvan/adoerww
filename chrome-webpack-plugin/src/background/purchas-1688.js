@@ -1,7 +1,6 @@
 // 无货源绑定订单脚本
 console.log('1688无货源脚本加载')
 const regeneratorRuntime = require('@/assets/js/runtime.js')
-import Auth from './auth-server'
 
 var csrf_token = ''
 var contentNotifyHandler = {} //content-script 消息通知
@@ -64,11 +63,6 @@ class Purchas1688AddAddress {
   }
 
   async validateAddress(realConsigneeInfo) {
-    // console.log('realConsigneeInfo', realConsigneeInfo)
-    let isLogin = await Auth.check1688Auth()
-    if (!isLogin) {
-      return false
-    }
     return new Promise(resolve => {
       let { phone, contacts, fullAddress } = realConsigneeInfo
       console.log('采购单:', phone, contacts, fullAddress)

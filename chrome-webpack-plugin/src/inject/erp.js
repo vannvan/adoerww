@@ -1,6 +1,11 @@
 // erp系统植入脚本
 import { sendMessageToBackground } from '@/lib/chrome-client.js'
 // import { getStorageLocal, setStorageLocal } from '@/lib/chrome.js'
+import { ERP_SYSTEM } from '@/lib/env.conf'
+
+const ERP_DOMAIN = ERP_SYSTEM[process.env.NODE_ENV]
+
+// const ERP_DOMAIN = 'http://192.168.50.63:8080/'
 
 export const ERP = {
   syncAuthStatus: function() {
@@ -36,7 +41,13 @@ export const ERP = {
   getCollectSitesAuthInfo: function() {
     sendMessageToBackground('auth', {}, 'GET_COLLECT_SITE_LOGIN_STATUS', data => {
       if (data && data.result) {
-        let { pddLoginStatus, t1688LoginStatus, taobaoLoginStatus, tmallLoginStatus } = data.result
+        let {
+          pddLoginStatus,
+          t1688LoginStatus,
+          taobaoLoginStatus,
+          tmallLoginStatus,
+          alibabaValidCookies
+        } = data.result
         $('#emalacca-chrome-extension-purchas-auth')
           ? $('#emalacca-chrome-extension-purchas-auth').remove()
           : null
@@ -45,7 +56,9 @@ export const ERP = {
           isPddLogin="${pddLoginStatus}" 
           is1688Login="${t1688LoginStatus}" 
           isLoginTaobao="${taobaoLoginStatus}" 
-          isLoginTmall="${tmallLoginStatus}"></div>`
+          isLoginTmall="${tmallLoginStatus}"
+          alibabaValidCookies=${alibabaValidCookies}
+          ></div>`
         )
       }
     })
@@ -58,6 +71,14 @@ export const ERP = {
         $.fn.message({ type: 'success', msg: data.message + '，点击‘完成登录’即可' })
       }
     })
+  },
+  // 监听erp消息
+  erpMessageHandler(e) {
+    if (e.data && e.data.action == 'get-collect-site-cookies') {
+      //   const { action } = e.data
+      ERP.getCollectSitesAuthInfo()
+      //   window.postMessage({ action: action, result: 'success' }, ERP_DOMAIN)
+    }
   }
 }
 
@@ -66,6 +87,7 @@ if (/emalacca|192/.test(location.origin)) {
   ERP.syncAuthStatus() //同步erp用户信息
   ERP.getCollectSitesAuthInfo() //获取采集站点的cookies
   ERP.handleInitIntercept()
+  window.addEventListener('message', ERP.erpMessageHandler, false)
   chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.type == 'ERP_LOGOUT') {
       window.localStorage.clear()

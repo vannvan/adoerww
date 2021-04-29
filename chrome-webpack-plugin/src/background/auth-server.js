@@ -199,7 +199,7 @@ export const Auth = {
           }, '')
           //   let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
           if (lgc) {
-            resolve(cookieStr)
+            resolve({ cookieStr: cookieStr, cookieArr: cookies })
           } else {
             resolve(false)
           }
@@ -219,10 +219,8 @@ export const Auth = {
           let cookieStr = cookies.reduce((prev, curr) => {
             return `${curr.name}=${curr.value}; ` + prev
           }, '')
-          //   console.log('cookieStr', cookieStr, lgc)
-          //   let isOverdue = Date.parse(new Date()) / 1000 < lgc.expirationDate // 是否已过期
           if (lgc) {
-            resolve(cookieStr)
+            resolve({ cookieStr: cookieStr, cookieArr: cookies })
           } else {
             resolve(false)
           }
@@ -240,13 +238,36 @@ export const Auth = {
     const pddLoginStatus = await Auth.checkPddAuth()
     const taobaoLoginStatus = await Auth.checkTaobaoAuth()
     const tmallLoginStatus = await Auth.checkTmallAuth()
+    // 把淘宝的 x5sec 单独处理
+    let taobaox5sec = taobaoLoginStatus
+      ? taobaoLoginStatus.cookieArr.filter(item => item.name == 'x5sec')
+      : []
+    let tmallx5sec = tmallLoginStatus
+      ? tmallLoginStatus.cookieArr.filter(item => item.name == 'x5sec')
+      : []
+    let alibabaValidCookies = [].concat(taobaox5sec, tmallx5sec)
+    let taobaoNormalCookies = taobaoLoginStatus
+      ? taobaoLoginStatus.cookieArr
+          .filter(item => item.name != 'x5sec')
+          .reduce((prev, curr) => {
+            return `${curr.name}=${curr.value}; ` + prev
+          }, '')
+      : false
+    let tmallNormalCookies = tmallLoginStatus
+      ? tmallLoginStatus.cookieArr
+          .filter(item => item.name != 'x5sec')
+          .reduce((prev, curr) => {
+            return `${curr.name}=${curr.value}; ` + prev
+          }, '')
+      : false
     call({
       code: 0,
       result: {
         pddLoginStatus: pddLoginStatus,
         t1688LoginStatus: t1688LoginStatus,
-        taobaoLoginStatus: taobaoLoginStatus,
-        tmallLoginStatus: tmallLoginStatus
+        taobaoLoginStatus: taobaoNormalCookies, //这里先去掉，用的时候单独加
+        tmallLoginStatus: tmallNormalCookies,
+        alibabaValidCookies: JSON.stringify(alibabaValidCookies)
       },
       message: null
     })

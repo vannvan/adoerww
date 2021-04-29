@@ -20,7 +20,7 @@ const getBtnLocationItems = ($a) => {
   }
   // a标签的坐标，还有全部属性attributes
   let { offsetLeft = 0, offsetTop = 0, attributes = {} } = $a[0]
-  // 1688
+  // 淘宝
   if (locationHref.indexOf('taobao.com') !== -1) {
     //attributes是个类数组对象，当为null时，也是为object；只能用isNil判断是否为null
     let $aStyle = attributes.getNamedItem('style')
