@@ -29,7 +29,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
   // 获取采集站点的cookies
   if (action == 'auth' && type == 'GET_COLLECT_SITE_LOGIN_STATUS') {
-    Auth.getCollectSitesAuthInfo(options, type, sendResponse)
+    setTimeout(() => {
+      Auth.getCollectSitesAuthInfo(options, type, sendResponse)
+    }, 2000)
     return true
   }
   // 拦截采集站点登录行为
@@ -153,10 +155,11 @@ export const Auth = {
           let matchCsrf = /data-csrftoken="(.*?)"/.exec(res)
           if (matchCsrf) {
             getCookies({ domain: '.1688.com' }, async cookies => {
+              console.log('1688 cookies:', cookies)
               let cookieStr = cookies.reduce((prev, curr) => {
                 return `${curr.name}=${curr.value}; ` + prev
               }, '')
-              resolve(cookieStr)
+              resolve({ cookieStr: cookieStr, cookieArr: cookies })
             })
           } else {
             resolve(false)
@@ -193,6 +196,7 @@ export const Auth = {
     return new Promise(resolve => {
       getCookies({ domain: '.taobao.com' }, async cookies => {
         try {
+          console.log('taobao cookies:', cookies)
           let lgc = cookies.find(el => el.name == 'lgc')
           let cookieStr = cookies.reduce((prev, curr) => {
             return `${curr.name}=${curr.value}; ` + prev
@@ -215,6 +219,7 @@ export const Auth = {
     return new Promise(resolve => {
       getCookies({ domain: '.tmall.com' }, async cookies => {
         try {
+          console.log('tmall cookies:', cookies)
           let lgc = cookies.find(el => el.name == 'lgc')
           let cookieStr = cookies.reduce((prev, curr) => {
             return `${curr.name}=${curr.value}; ` + prev
@@ -238,14 +243,17 @@ export const Auth = {
     const pddLoginStatus = await Auth.checkPddAuth()
     const taobaoLoginStatus = await Auth.checkTaobaoAuth()
     const tmallLoginStatus = await Auth.checkTmallAuth()
-    // 把淘宝的 x5sec 单独处理
+    // 把阿里系的 x5sec 单独处理
     let taobaox5sec = taobaoLoginStatus
       ? taobaoLoginStatus.cookieArr.filter(item => item.name == 'x5sec')
       : []
     let tmallx5sec = tmallLoginStatus
       ? tmallLoginStatus.cookieArr.filter(item => item.name == 'x5sec')
       : []
-    let alibabaValidCookies = [].concat(taobaox5sec, tmallx5sec)
+    let t1688x5sec = t1688LoginStatus
+      ? t1688LoginStatus.cookieArr.filter(item => item.name == 'x5sec')
+      : []
+    let alibabaValidCookies = [].concat(taobaox5sec, tmallx5sec, t1688x5sec)
     let taobaoNormalCookies = taobaoLoginStatus
       ? taobaoLoginStatus.cookieArr
           .filter(item => item.name != 'x5sec')
@@ -260,27 +268,24 @@ export const Auth = {
             return `${curr.name}=${curr.value}; ` + prev
           }, '')
       : false
+    let t1688NormalCookies = t1688LoginStatus
+      ? t1688LoginStatus.cookieArr
+          .filter(item => item.name != 'x5sec')
+          .reduce((prev, curr) => {
+            return `${curr.name}=${curr.value}; ` + prev
+          }, '')
+      : false
     call({
       code: 0,
       result: {
         pddLoginStatus: pddLoginStatus,
-        t1688LoginStatus: t1688LoginStatus,
-        taobaoLoginStatus: taobaoNormalCookies, //这里先去掉，用的时候单独加
+        t1688LoginStatus: t1688NormalCookies, //这里先去掉，用的时候单独加
+        taobaoLoginStatus: taobaoNormalCookies,
         tmallLoginStatus: tmallNormalCookies,
         alibabaValidCookies: JSON.stringify(alibabaValidCookies)
       },
       message: null
     })
-    console.log(
-      'pdd登录状态',
-      pddLoginStatus,
-      '1688登录状态',
-      t1688LoginStatus,
-      'taobao登录状态',
-      taobaoLoginStatus,
-      'tmall登录状态',
-      tmallLoginStatus
-    )
   },
 
   // 对采集站点操作行为进行拦截
@@ -300,6 +305,12 @@ export const Auth = {
         }
         if (/_____tmd_____/.test(details.url) && details.statusCode == 200) {
           console.log('阿里巴巴出现了验证码')
+          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function(response) {
+            console.log(response, 'UPDATE_SITE_COOKIES')
+          })
+        }
+        if (/sib\.htm/.test(details) && details.statusCode == 200) {
+          console.log('详情页数据请求')
           sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function(response) {
             console.log(response, 'UPDATE_SITE_COOKIES')
           })

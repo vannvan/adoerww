@@ -48,6 +48,7 @@ export const ERP = {
           tmallLoginStatus,
           alibabaValidCookies
         } = data.result
+        console.log('更新采集站点cookies')
         $('#emalacca-chrome-extension-purchas-auth')
           ? $('#emalacca-chrome-extension-purchas-auth').remove()
           : null

@@ -87,7 +87,7 @@ export const Platform = {
           if (orgUrl !== data.responseURL) {
             data.url = data.responseURL
           }
-          data.reqCookie = document.cookie
+          //   data.reqCookie = document.cookie
           data.pageDocHtml = '<html>' + document.body.innerHTML + '</html>'
           // 在当前页采集
           try {
@@ -164,7 +164,7 @@ export const Platform = {
         0,
         function(data) {
           data.url = url
-          data.reqCookie = document.cookie
+          //   data.reqCookie = document.cookie
 
           // url取最后一次重定向url请求（广告）
           // if (url !== data.responseURL) {
@@ -290,7 +290,7 @@ export const Platform = {
           0,
           function(data) {
             data.url = orgUrl
-            data.reqCookie = document.cookie
+            // data.reqCookie = document.cookie
             // url取最后一次重定向url请求（广告）
             // if (orgUrl !== data.responseURL) {
             //   data.url = data.responseURL
