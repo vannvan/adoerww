@@ -228,7 +228,7 @@ const ruleInfo = {
 
   'mobile.yangkeduo.com':
     '{\n' +
-    "\"detect\": \"if (url.indexOf('/goods.html?') !== -1 || url.indexOf('/goods2.html?') !== -1) {\\n  return 'detail';\\n}\",\n" +
+    "\"detect\": \"if (url.indexOf('/goods.html?') !== -1) {\\n  return 'detail';\\n}\",\n" +
     '"detail": "if (url.indexOf(\'yangkeduo.com\')!==-1) {\\n  return true;\\n}",\n' +
     '"map": {\n' +
     '"detail": "single",\n' +
@@ -279,6 +279,7 @@ export const getRule = url => {
   var rule = ''
   $.each(ruleInfo, function(key, value) {
     if (url.indexOf(key) != -1) {
+      console.log(value, 'value')
       rule = value
       return
     }

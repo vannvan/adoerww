@@ -222,6 +222,31 @@ class Purchas1688AddAddress {
       }
     })
   }
+
+  get1688OrderInfo(orderId, orderBuyer) {
+    const url = `https://trade.1688.com/order/new_step_order_detail.htm?orderId=${orderId}`
+    return new Promise(resolve => {
+      $.ajax({
+        method: 'get',
+        url: url,
+        success: res => {
+          let tokenExit = /name='_csrf_token'/.exec(res)
+          if (tokenExit) {
+            resolve({ code: 0, result: res, message: '同步1688订单信息成功' })
+          } else {
+            resolve({
+              code: -1,
+              result: null,
+              message: `同步1688订单失败，请登录账户[${orderBuyer}]后刷新页面`
+            })
+          }
+        },
+        error: error => {
+          console.error(error)
+        }
+      })
+    })
+  }
 }
 
 export default Purchas1688AddAddress

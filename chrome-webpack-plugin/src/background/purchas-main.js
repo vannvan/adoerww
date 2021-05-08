@@ -48,6 +48,12 @@ class Purchas {
         _this.submitPurchasOrderNumber(options, sendResponse)
         return true
       }
+
+      if (action == 'purchas' && type == 'SYNC_1688_ORDER_DETAIL') {
+        let { purchaseOrderno, purchasBuyerName } = options
+        _this.handleSync1688OrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
+        return true
+      }
     })
   }
 
@@ -174,6 +180,38 @@ class Purchas {
     sendMessageToContentScript({ type: 'UPDATE_PAGE' }, function(response) {
       console.log(response, 'UPDATE_PAGE')
     })
+  }
+
+  // 取1688订单详情
+  // 待付款 1778452597138175459
+  // 待收获 1778453857153175459
+  // 交易关闭 1778192605893175459
+  async handleSync1688OrderInfo(orderNO, orderBuyer, call) {
+    let { result, code, message } = await this.t1688.get1688OrderInfo(orderNO, orderBuyer)
+    if (code == 0 && result) {
+      let orderStatusTextNode = $(result).find('.stress') || null //订单状态节点
+      let orderLogisticsNode = $(result).find('.logistics-flow-exposure') || null
+      console.log('orderLogisticsNode', orderLogisticsNode)
+      const orderStatusText = orderStatusTextNode.length
+        ? orderStatusTextNode[0].innerText
+        : '未知状态'
+      const orderLogistic = orderLogisticsNode.length ? orderLogisticsNode[0].dataset : null
+      call({
+        code: 0,
+        message: '同步1688订单信息成功',
+        result: {
+          orderStatusText: orderStatusText,
+          purchaseOrderno: orderNO,
+          ...orderLogistic
+        }
+      })
+    } else {
+      call({
+        code: -1,
+        message: message,
+        result: null
+      })
+    }
   }
 }
 

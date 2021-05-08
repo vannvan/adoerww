@@ -177,6 +177,10 @@ export default {
               new Function('url', siteConfig.detail)(location.href) ||
               isShopMainPageAndNotSelfStore() //如果是某店铺的页面
             _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
+            // rules.js 不支持.search()
+            if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+              _this.pageType = 'detail'
+            }
             _this.loadMenuAction()
           }
         })
@@ -319,6 +323,10 @@ export default {
     getPageType() {
       let siteConfig = JSON.parse(getRule(location.href))
       this.pageType = new Function('url', siteConfig.detect)(location.href)
+      // rules.js 不支持.search()
+      if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+        this.pageType = 'detail'
+      }
     },
 
     //加载程序菜单

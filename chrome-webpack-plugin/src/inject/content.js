@@ -20,9 +20,9 @@ import { getLoginInfo } from '@/lib/chrome-client'
 import { getStorageSync } from '@/lib/chrome'
 //----------------------------------------------新增内容---------------------------------------------
 const linkrule = getRule(location.href)
-
+console.log(linkrule, 'linkrule')
 const CONFIG = linkrule ? JSON.parse(linkrule) : null
-
+console.log(CONFIG, 'CONFIG')
 chrome.extension.onMessage.addListener(function(message, sender, callback) {
   if (message.ID !== 'content') {
     return
@@ -137,6 +137,10 @@ function insertFetchBtn($a, url) {
   var linkruleHref = getRule(location.href)
   var CONFIG_OBJ = JSON.parse(linkruleHref)
   var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
+  // rules.js 不支持.search()
+  if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+    pageType = 'detail'
+  }
   var sumaitongShowArr = ['category', 'sortlist']
   var imgALBBUrl =
     'https://s.1688.com/youyuan/index.htm?tab=imageSearch&imageType=https://cbu01.alicdn.com&imageAddress='

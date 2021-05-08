@@ -3,6 +3,7 @@ import { sendMessageToBackground } from '@/lib/chrome-client.js'
 import { sub } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import dragApp from './drag'
+import { data } from 'browserslist'
 
 class BindOrder {
   constructor() {
@@ -166,6 +167,7 @@ class BindOrder {
 
   // erp操作监听
   erpMessageHandler(e) {
+    // 采购下单操作
     if (e.data && e.data.action == 'init-purchas-order') {
       let { purchasLink, orderInfo } = e.data
       if (/1688|yangkeduo/.test(purchasLink)) {
@@ -188,6 +190,30 @@ class BindOrder {
           msg: '仅支持1688和拼多多采购'
         })
       }
+    }
+
+    //同步订单信息操作
+    if (e.data && e.data.action == 'sync-1688-order-detail') {
+      let { purchaseOrderno, purchasBuyerName } = e.data
+      sendMessageToBackground(
+        'purchas',
+        {
+          purchaseOrderno: purchaseOrderno,
+          purchasBuyerName: purchasBuyerName || '啊哈'
+        },
+        'SYNC_1688_ORDER_DETAIL',
+        data => {
+          if (data && data.code == 0) {
+            console.log(data)
+          }
+          if (data && data.code == -1) {
+            $.fn.message({
+              type: 'error',
+              msg: data.message
+            })
+          }
+        }
+      )
     }
   }
 
