@@ -77,6 +77,7 @@ class PurchasPddAddAddress {
     })
   }
 
+  // 获取pdd已有地址列表
   getPddAddressList(userId) {
     let _this = this
     const url = `https://mobile.yangkeduo.com/proxy/api/addresses?pdduid=${userId ||
@@ -98,6 +99,7 @@ class PurchasPddAddAddress {
     })
   }
 
+  // 获取pdd地址对应id
   getPddAddressIds(province, city, county) {
     const url = `https://plw.szchengji-inc.com/order/purchase_order/get_pdd_area_ids?province=${province}&city=${city}&county=${county}`
     return new Promise((resolve, reject) => {
@@ -115,6 +117,7 @@ class PurchasPddAddAddress {
     })
   }
 
+  //设为默认地址
   handleSetDefaultAddress(address_id) {
     let _this = this
     const url = `https://mobile.yangkeduo.com/proxy/api/api/origenes/address_default/${address_id}?pdduid=${this.pddUserId}`
@@ -136,6 +139,7 @@ class PurchasPddAddAddress {
     })
   }
 
+  // 添加地址
   handleAddAddressToPdd({ provinceId, cityId, countyId }) {
     let _this = this
     const url = `https://mobile.yangkeduo.com/proxy/api/api/origenes/address?pdduid=${_this.pddUserId}`
@@ -170,6 +174,33 @@ class PurchasPddAddAddress {
             '关联拼多多地址失败，请将当前拼多多订单地址修改为ERP订单地址'
           )
           reject(error)
+        }
+      })
+    })
+  }
+
+  // 获取pdd订单详情
+  getYangkeduoOrderInfo(orderId, orderBuyer) {
+    const url = `https://mobile.yangkeduo.com/order.html?order_sn=${orderId}`
+    return new Promise(resolve => {
+      $.ajax({
+        methods: 'get',
+        url: url,
+        success: res => {
+          let orderExit = /window\.rawData=({.*?};)/.exec(res)
+          if (orderExit && orderExit.length > 0) {
+            resolve({
+              code: 0,
+              result: orderExit[1].replace(/;/, ''),
+              message: '同步拼多多订单信息成功'
+            })
+          } else {
+            resolve({
+              code: -1,
+              result: null,
+              message: `同步拼多多订单失败，请登录账户[${orderBuyer}]后刷新页面`
+            })
+          }
         }
       })
     })

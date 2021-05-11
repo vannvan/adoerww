@@ -178,7 +178,10 @@ export default {
               isShopMainPageAndNotSelfStore() //如果是某店铺的页面
             _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
             // rules.js 不支持.search()
-            if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+            if (
+              location.href.indexOf('mobile.yangkeduo.com') != -1 &&
+              location.href.search(/\/goods?(\d*)\.html?/) !== -1
+            ) {
               _this.pageType = 'detail'
             }
             _this.loadMenuAction()
@@ -273,7 +276,10 @@ export default {
         case 'EmalaccaFollower':
           Follow.syncShoppeBaseInfo().then(res => {
             if (res && res.code == -1) {
-              $.fn.message({ type: 'warning', msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz })
+              $.fn.message({
+                type: 'warning',
+                msg: MESSAGE.error.pleaseCheckWhetherHaveAuthoriz
+              })
             } else {
               let currentPageLink = location.href
               let selfStoreId = res.result.storeId //用户自己的店铺ID
@@ -324,7 +330,10 @@ export default {
       let siteConfig = JSON.parse(getRule(location.href))
       this.pageType = new Function('url', siteConfig.detect)(location.href)
       // rules.js 不支持.search()
-      if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+      if (
+        location.href.indexOf('mobile.yangkeduo.com') != -1 &&
+        location.href.search(/\/goods?(\d*)\.html?/) !== -1
+      ) {
         this.pageType = 'detail'
       }
     },

@@ -24,14 +24,12 @@ const BatchCollect = {
       ...document.querySelectorAll('.emalacca-plugin-goods-acquisition-select')
     ].filter(item => item.getAttribute('data-selected') == 1).length
     let text = selectedLen > 0 ? '采集选中（' + selectedLen + '）' : '采集选中'
-    $('.emalacca-plugin-quick-action-sub-button[data-action-type=collect-selected]')
-      .text(text)
-    
+    $('.emalacca-plugin-quick-action-sub-button[data-action-type=collect-selected]').text(text)
   },
 
   handleCollectSelected() {
     console.log('采集选中')
-    let handleSelectChange = (data) => {
+    let handleSelectChange = data => {
       let selectedLen = [
         ...document.querySelectorAll('.emalacca-plugin-goods-acquisition-select')
       ].filter(item => item.getAttribute('data-selected') == 1).length
@@ -55,12 +53,11 @@ const BatchCollect = {
       $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
       handleSelectChange(data)
     })
-    
   },
 
   handleCollectCurrPage() {
     console.log('列表&分类采集本页')
-    let handleCurrPageChange = (data) => {
+    let handleCurrPageChange = data => {
       $('.emalacca-plugin-goods-acquisition-select').each(function(index) {
         let urlString = $(this).attr('data-selecturl')
         imageCrawl(urlString, data, true) //采集操作
@@ -78,7 +75,7 @@ const BatchCollect = {
   },
   handleCollectCurrPageDetail() {
     console.log('详情采集本页')
-    let handleCurrPageChange = (data) => {
+    let handleCurrPageChange = data => {
       imageCrawl(location.href, data, false) //采集操作
     }
     getLoginInfo(data => {

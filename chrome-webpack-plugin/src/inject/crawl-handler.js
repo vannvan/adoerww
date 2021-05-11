@@ -1,25 +1,13 @@
-import {
-  Crawl
-} from '@/background/server/crawl.js'
-import {
-  Html
-} from '@/background/server/html.js'
-import {
-  CONFIGINFO
-} from '@/background/config.js'
-import {
-  MESSAGE
-} from '../lib/conf'
-import {
-  isEmpty
-} from '@/lib/utils'
-import {
-  sendMessageToServer
-} from '@/lib/chrome-client'
+import { Crawl } from '@/background/server/crawl.js'
+import { Html } from '@/background/server/html.js'
+import { CONFIGINFO } from '@/background/config.js'
+import { MESSAGE } from '../lib/conf'
+import { isEmpty } from '@/lib/utils'
+import { sendMessageToServer } from '@/lib/chrome-client'
 
 // 在图片上直接采集
 /**
- * 
+ *
  * @param {string} url 采集商品的url
  * @param {object} data  用户信息
  * @param {boolean} isBatch 是否批量采集
@@ -80,14 +68,14 @@ export function imageCrawl(url, data, isBatch = false, $span) {
   }
 
   crawlObj &&
-    crawlObj.crawl(url, function (data) {
+    crawlObj.crawl(url, function(data) {
       data.token = uid
       // data.repeatCheck = 1 //必须查重
       // 淘宝广告页处理(获取正确的url)
       if (urls.indexOf('taobao.com') > -1 || urls.indexOf('tmall.com') > -1) {
         var realUrl = ''
-        data.html.replace(/\<link rel="canonical".*?\/>/g, function (items) {
-          items.replace(/(http|https).*?id=\d+/g, function (item) {
+        data.html.replace(/\<link rel="canonical".*?\/>/g, function(items) {
+          items.replace(/(http|https).*?id=\d+/g, function(item) {
             realUrl = item
           })
         })
@@ -95,7 +83,7 @@ export function imageCrawl(url, data, isBatch = false, $span) {
           data.url = realUrl
         }
       }
-      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function (result) {
+      Html.postCrawlHtml(CONFIGINFO.url.postCrawlHtml(), data, 0, function(result) {
         if (!isBatch) {
           handleResult(result, $span)
         }
@@ -119,7 +107,6 @@ export function handleResult(res, $span) {
         })
         .html('采集成功')
     }
-
   } else {
     // 后台返回错误信息
     if ($span) {
@@ -134,7 +121,7 @@ export function handleResult(res, $span) {
 }
 
 // 处理淘宝列表里的广告url
-export const taobaoTranslationUrl = function ($a, url) {
+export const taobaoTranslationUrl = function($a, url) {
   let id = $a.attr('data-nid') || '' // 获取商品ID
   let $parents = $a.parents('.item.J_MouserOnverReq.item-ad') // 获取商品的祖父级
   let isTM = false
@@ -181,7 +168,7 @@ export const taobaoTranslationUrl = function ($a, url) {
 }
 
 // 处理1688列表里的广告url
-export const albbTranslationUrl = function ($a) {
+export const albbTranslationUrl = function($a) {
   let id = ''
   let $parents = $a.parents('.ad-item')
   if ($parents.length > 0) {
@@ -199,23 +186,31 @@ export const albbTranslationUrl = function ($a) {
 }
 
 // 当前商品是否已经采集过
-export const  postHasCrawl = (url) => {
+export const postHasCrawl = url => {
   return new Promise((resolve, reject) => {
-    sendMessageToServer('postHasCrawl', {
-      url: url
-    }, data => {
-      resolve(data)
-    })
+    sendMessageToServer(
+      'postHasCrawl',
+      {
+        url: url
+      },
+      data => {
+        resolve(data)
+      }
+    )
   })
 }
 
 // 上传图片到阿里云
-export const handleUploadImages = function (url) {
-  return new Promise((resolve) => {
-    sendMessageToServer('handleUploadImages', {
-      url: url
-    }, data => {
-      resolve(data)
-    })
+export const handleUploadImages = function(url) {
+  return new Promise(resolve => {
+    sendMessageToServer(
+      'handleUploadImages',
+      {
+        url: url
+      },
+      data => {
+        resolve(data)
+      }
+    )
   })
 }

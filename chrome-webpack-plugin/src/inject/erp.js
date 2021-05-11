@@ -69,7 +69,10 @@ export const ERP = {
       console.log('Init Intercept...')
       if (data && data.code == 0) {
         ERP.getCollectSitesAuthInfo() //获取采集站点的cookies
-        $.fn.message({ type: 'success', msg: data.message + '，点击‘完成登录’即可' })
+        $.fn.message({
+          type: 'success',
+          msg: data.message + '，点击‘完成登录’即可'
+        })
       }
     })
   },

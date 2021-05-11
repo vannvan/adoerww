@@ -1,5 +1,5 @@
 import Purchas1688AddAddress from './purchas-1688'
-import PurchasePddAddAddress from './purchas-pdd'
+import PurchasPddAddAddress from './purchas-pdd'
 import {
   setStorageSync,
   getStorageSync,
@@ -28,7 +28,7 @@ class Purchas {
         type: type,
         sendResponse: sendResponse
       }
-      _this.pdd = new PurchasePddAddAddress({
+      _this.pdd = new PurchasPddAddAddress({
         contentNotify: contentNotify
       })
       _this.t1688 = new Purchas1688AddAddress({
@@ -49,9 +49,18 @@ class Purchas {
         return true
       }
 
-      if (action == 'purchas' && type == 'SYNC_1688_ORDER_DETAIL') {
-        let { purchaseOrderno, purchasBuyerName } = options
-        _this.handleSync1688OrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
+      if (action == 'purchas' && type == 'SYNC_PURCHAS_ORDER_DETAIL') {
+        let { purchaseOrderno, purchasBuyerName, site } = options
+        switch (site) {
+          case '1688':
+            _this.handleSync1688OrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
+            break
+          case 'pdd':
+            _this.handleSyncYangkeduoOrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
+            break
+          default:
+            break
+        }
         return true
       }
     })
@@ -121,9 +130,9 @@ class Purchas {
         let { orderInfo } = tabOrderInfo
         let updateParams = {
           ordersn: orderInfo.ordersn, //原始订单号
-          purchaseOrderno: options.purchaseOrderno, //采集平台订单号
+          purchaseOrderno: options.purchaseOrderno, //采购平台(1688/yangkeduo)订单号
           orderno: orderInfo.orderno, //采购单号
-          status: 2,
+          status: 2, // 待付款
           reqCookie: cookieStr,
           purchaseAccount: uniqueSiteId,
           purchaseTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
@@ -189,18 +198,45 @@ class Purchas {
   async handleSync1688OrderInfo(orderNO, orderBuyer, call) {
     let { result, code, message } = await this.t1688.get1688OrderInfo(orderNO, orderBuyer)
     if (code == 0 && result) {
-      let orderStatusTextNode = $(result).find('.stress') || null //订单状态节点
-      let orderLogisticsNode = $(result).find('.logistics-flow-exposure') || null
-      console.log('orderLogisticsNode', orderLogisticsNode)
+      let orderStatusTextNode = $(result).find('.stress') //订单状态节点
+      let orderLogisticsNode = $(result).find('.logistics-flow-exposure') || []
+      console.log('orderStatusTextNode', orderStatusTextNode)
       const orderStatusText = orderStatusTextNode.length
         ? orderStatusTextNode[0].innerText
         : '未知状态'
       const orderLogistic = orderLogisticsNode.length ? orderLogisticsNode[0].dataset : null
       call({
         code: 0,
-        message: '同步1688订单信息成功',
+        message: message,
         result: {
-          orderStatusText: orderStatusText,
+          purchaseSourceStatus: orderStatusText,
+          purchaseOrderno: orderNO,
+          ...orderLogistic
+        }
+      })
+    } else {
+      call({
+        code: -1,
+        message: message,
+        result: null
+      })
+    }
+  }
+
+  // 取yangkeduo订单详情
+  // 订单已取消 210416-287971738610624
+  // 已签收 210506-406569687943457
+  // 待付款 210510-123612765063457
+  async handleSyncYangkeduoOrderInfo(orderNO, orderBuyer, call) {
+    let { result, code, message } = await this.pdd.getYangkeduoOrderInfo(orderNO, orderBuyer)
+    if (code == 0 && result) {
+      let { data } = JSON.parse(result)
+      const orderLogistic = data.expressInfo || null
+      call({
+        code: 0,
+        message: message,
+        result: {
+          purchaseSourceStatus: data.pddStatusDesc, // pddStatusDesc是物流状态 orderStatusText 是订单状态
           purchaseOrderno: orderNO,
           ...orderLogistic
         }

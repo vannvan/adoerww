@@ -3,12 +3,13 @@ import { sendMessageToBackground } from '@/lib/chrome-client.js'
 import { sub } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
 import dragApp from './drag'
-import { data } from 'browserslist'
+const regeneratorRuntime = require('@/assets/js/runtime.js')
 
 class BindOrder {
   constructor() {
     this.supportSite = ['1688', 'yangkeduo']
     this.purchasOrderInfo = {}
+    this.timer = null
   }
   locationObserver() {
     // 监听页面链接更新
@@ -104,7 +105,10 @@ class BindOrder {
         purchaseOrderno = alipayQuery.order_sn
         console.log(alipayQuery.order_sn, 'pdd订单号')
       } catch (error) {
-        $.fn.message({ type: 'error', msg: '获取拼多多订单信息失败' })
+        $.fn.message({
+          type: 'error',
+          msg: '获取拼多多订单信息失败'
+        })
         console.error('pdd订单号获取失败')
       }
     }
@@ -121,7 +125,10 @@ class BindOrder {
       'SUBMIT_PURCHAS_ORDER_NUMBER',
       data => {
         if (data) {
-          $.fn.message({ type: data.code == 0 ? 'success' : 'error', msg: data.message })
+          $.fn.message({
+            type: data.code == 0 ? 'success' : 'error',
+            msg: data.message
+          })
         }
       }
     )
@@ -167,9 +174,17 @@ class BindOrder {
 
   // erp操作监听
   erpMessageHandler(e) {
+    let self = this
     // 采购下单操作
     if (e.data && e.data.action == 'init-purchas-order') {
-      let { purchasLink, orderInfo } = e.data
+      let { purchasLink, orderInfo } = e.data.params
+      if (!purchasLink || !orderInfo) {
+        $.fn.message({
+          type: 'error',
+          msg: '采购单关键数据缺失'
+        })
+        return false
+      }
       if (/1688|yangkeduo/.test(purchasLink)) {
         sendMessageToBackground(
           'purchas',
@@ -192,28 +207,74 @@ class BindOrder {
       }
     }
 
-    //同步订单信息操作
-    if (e.data && e.data.action == 'sync-1688-order-detail') {
-      let { purchaseOrderno, purchasBuyerName } = e.data
-      sendMessageToBackground(
-        'purchas',
-        {
-          purchaseOrderno: purchaseOrderno,
-          purchasBuyerName: purchasBuyerName || '啊哈'
-        },
-        'SYNC_1688_ORDER_DETAIL',
-        data => {
-          if (data && data.code == 0) {
-            console.log(data)
+    // 批量同步采购订单信息
+    if (e.data && e.data.action == 'batch-sync-purchas-order-detail') {
+      let { purchasList } = e.data.params
+      if (purchasList && purchasList.length > 0) {
+        self.timer = setInterval(() => {
+          let currentOrder = purchasList.splice(0, 1)[0]
+          // 三个关键参数
+          // purchaseOrderno：采购平台订单号
+          // purchasePlatform：采购平台
+          // purchaseAccount：采购平台用户名
+          let {
+            purchaseOrderno,
+            purchasePlatform,
+            purchaseAccount,
+            itemName,
+            orderno
+          } = currentOrder
+          if (purchaseOrderno && purchasePlatform && purchaseAccount) {
+            sendMessageToBackground(
+              'purchas',
+              {
+                purchaseOrderno: purchaseOrderno,
+                purchasBuyerName: purchaseAccount || '用户名',
+                site: purchasePlatform
+              },
+              'SYNC_PURCHAS_ORDER_DETAIL',
+              data => {
+                if (data && data.code == 0) {
+                  // 快递号码字段 1688: billno yangkeduo: trackingNumber
+                  // 快递公司名称字段 1688: companyname yangkeduo: shippingName
+                  // 统一订单状态文字 orderStatusText
+                  let {
+                    billno,
+                    trackingNumber,
+                    purchaseSourceStatus,
+                    companyname,
+                    shippingName
+                  } = data.result
+                  window.postMessage(
+                    {
+                      action: 'resolve-purchas-order-detail',
+                      code: 0,
+                      result: {
+                        orderno: orderno,
+                        itemName: itemName,
+                        purchaseLogisticsno: billno || trackingNumber, //快递单号
+                        purchaseLogisticsName: companyname || shippingName, //快递公司
+                        purchaseSourceStatus: purchaseSourceStatus // 订单状态
+                      },
+                      message: '采购平台订单信息同步成功'
+                    },
+                    '*'
+                  )
+                }
+                if (data && data.code == -1) {
+                  $.fn.message({
+                    type: 'error',
+                    msg: data.message
+                  })
+                }
+              }
+            )
           }
-          if (data && data.code == -1) {
-            $.fn.message({
-              type: 'error',
-              msg: data.message
-            })
+          if (purchasList.length == 0) {
+            clearInterval(self.timer)
           }
-        }
-      )
+        }, 2600)
+      }
     }
   }
 

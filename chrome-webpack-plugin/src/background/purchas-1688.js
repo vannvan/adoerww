@@ -113,6 +113,7 @@ class Purchas1688AddAddress {
     return html.map(el => JSON.parse($(el).attr('data-address')))
   }
 
+  //解析1688地址
   parse1688Address(realConsigneeInfo) {
     let { contacts, phone, fullAddress } = realConsigneeInfo
     let _this = this
@@ -223,6 +224,7 @@ class Purchas1688AddAddress {
     })
   }
 
+  // 获取1688订单详情
   get1688OrderInfo(orderId, orderBuyer) {
     const url = `https://trade.1688.com/order/new_step_order_detail.htm?orderId=${orderId}`
     return new Promise(resolve => {

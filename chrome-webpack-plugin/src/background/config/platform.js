@@ -53,7 +53,10 @@ export const isDetail = function(url) {
   let siteConfig = JSON.parse(linkRule)
   let pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
   // rules.js 不支持.search()
-  if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+  if (
+    location.href.indexOf('mobile.yangkeduo.com') != -1 &&
+    location.href.search(/\/goods?(\d*)\.html?/) !== -1
+  ) {
     pageType = 'detail'
   }
   return pageType === 'detail' && url === location.href
@@ -389,7 +392,10 @@ export const Platform = {
             domain: '.yangkeduo.com'
           },
           data => {
-            $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseAgainLoginPinDuoDuo })
+            $.fn.message({
+              type: 'error',
+              msg: MESSAGE.error.pleaseAgainLoginPinDuoDuo
+            })
           }
         )
         return

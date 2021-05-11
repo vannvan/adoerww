@@ -31,7 +31,7 @@ chrome.extension.onMessage.addListener(function(message, sender, callback) {
     case 'notify':
       $.fn.message({
         type: 'error',
-        msg: message.msg
+        msg: message
       })
       break
     case 'handleLinks':
@@ -138,7 +138,10 @@ function insertFetchBtn($a, url) {
   var CONFIG_OBJ = JSON.parse(linkruleHref)
   var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
   // rules.js 不支持.search()
-  if (location.href.indexOf('mobile.yangkeduo.com') != -1 && location.href.search(/\/goods?(\d*)\.html?/) !== -1) {
+  if (
+    location.href.indexOf('mobile.yangkeduo.com') != -1 &&
+    location.href.search(/\/goods?(\d*)\.html?/) !== -1
+  ) {
     pageType = 'detail'
   }
   var sumaitongShowArr = ['category', 'sortlist']
@@ -240,14 +243,16 @@ function insertFetchBtn($a, url) {
         $a.parents('.img').on('mouseleave', function() {
           hideCreationDiv()
         })
-      } else{
+      } else {
         // 处理淘宝小图显示
-        if (location.href.indexOf('taobao.com') > -1 && ($firstImg.width() > 30 || $a.width() > 30)) {
+        if (
+          location.href.indexOf('taobao.com') > -1 &&
+          ($firstImg.width() > 30 || $a.width() > 30)
+        ) {
           appendItems()
         } else if (location.href.indexOf('taobao.com') === -1) {
           appendItems()
         }
-        
       }
     } else if (url.indexOf('dhgate.com') > -1 && $a.hasClass('pic')) {
       // 敦煌列表的商品，img延迟加载处理
@@ -259,7 +264,6 @@ function insertFetchBtn($a, url) {
   }
 
   $a.on('mouseenter', function() {
-    
     //   如果是列表
     if (sumaitongShowArr.includes(pageType)) {
       // 列表页显示
@@ -270,7 +274,7 @@ function insertFetchBtn($a, url) {
       if (url.indexOf('dhgate.com') > -1 && $isShowImgGather.length == 0) {
         $isShowImgGather = $(this).find('img')
       }
-      if ($isShowImgGather.length > 0 ) {
+      if ($isShowImgGather.length > 0) {
         $crawlSelect.css({
           'pointer-events': 'auto',
           display: 'block'

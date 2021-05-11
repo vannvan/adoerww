@@ -73,9 +73,9 @@ export const backEvent = {
           if (status == 'timeout') {
             tt < 3
               ? init(t, tt + 1)
-              : $.fn.message({ type: 'error', msg: '请求超时，请稍后重试！' })
+              : $.fn.message({ type: 'error', msg:MESSAGEPRIFIX+ '请求超时，请稍后重试！' })
           } else if (status == 'error') {
-            $.fn.message({ type: 'error', msg: '请求出错，请联系管理员！' })
+            $.fn.message({ type: 'error', msg:MESSAGEPRIFIX+ '请求出错，请联系管理员！' })
           }
         },
       })*/
@@ -164,12 +164,12 @@ export const backEvent = {
           code: -1,
           msg: `授权过期，请重新<a href="${ERP_LOGIN_URL}">登录</a>`
         })
-        // data.msg = '采集成功！'
+        // data.msg:MESSAGEPRIFIX+ = '采集成功！'
         // call(data)
       },
       error: function() {
         //增加访问出错信息返回
-        // call({ code: 0, msg: '请求出错请联系管理员' })
+        // call({ code: 0, msg:MESSAGEPRIFIX+ '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
         let code = ''
@@ -224,7 +224,7 @@ export const backEvent = {
       },
       error: function() {
         //增加访问出错信息返回
-        // call({ code: 0, msg: '请求出错请联系管理员' })
+        // call({ code: 0, msg:MESSAGEPRIFIX+ '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
         let code = ''
@@ -343,7 +343,7 @@ export const backEvent = {
       },
       error: function() {
         //增加访问出错信息返回
-        // call({ code: 0, msg: '请求出错请联系管理员' })
+        // call({ code: 0, msg:MESSAGEPRIFIX+ '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
         if (status == 'error') {
