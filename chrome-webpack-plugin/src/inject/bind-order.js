@@ -250,6 +250,7 @@ class BindOrder {
                       action: 'resolve-purchas-order-detail',
                       code: 0,
                       result: {
+                        isFinish: purchasList.length == 0, //
                         orderno: orderno,
                         itemName: itemName,
                         purchaseLogisticsno: billno || trackingNumber, //快递单号

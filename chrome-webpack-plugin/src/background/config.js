@@ -1,5 +1,5 @@
 import { ERP_SYSTEM } from '@/lib/env.conf'
-const SITEAPI = ERP_SYSTEM[process.env.NODE_ENV] + '/'
+const SITEAPI = ERP_SYSTEM[process.env.NODE_ENV] + 'api/'
 const COLLECT = ERP_SYSTEM[process.env.NODE_ENV] + '/goods/collect'
 console.log(process.env.NODE_ENV)
 export const CONFIGINFO = {

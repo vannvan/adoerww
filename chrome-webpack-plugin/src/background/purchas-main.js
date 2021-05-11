@@ -55,7 +55,7 @@ class Purchas {
           case '1688':
             _this.handleSync1688OrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
             break
-          case 'pdd':
+          case '拼多多':
             _this.handleSyncYangkeduoOrderInfo(purchaseOrderno, purchasBuyerName, sendResponse)
             break
           default:
@@ -236,9 +236,9 @@ class Purchas {
         code: 0,
         message: message,
         result: {
-          purchaseSourceStatus: data.pddStatusDesc, // pddStatusDesc是物流状态 orderStatusText 是订单状态
-          purchaseOrderno: orderNO,
-          ...orderLogistic
+          ...orderLogistic,
+          purchaseSourceStatus: data.pddStatusDesc || data.chatStatusPrompt, // pddStatusDesc是物流状态 orderStatusText 是订单状态
+          purchaseOrderno: orderNO
         }
       })
     } else {
