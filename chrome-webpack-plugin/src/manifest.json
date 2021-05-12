@@ -108,6 +108,7 @@
         "tabs",
         "webRequest",
         "webRequestBlocking",
+        "activeTab",
         "https://desc.alicdn.com/",
         "http://dsc.taobaocdn.com/",
         "http://*.aliexpress.com/",
@@ -129,6 +130,7 @@
         "https://www.chinabrands.cn/",
         "https://www.chinabrands.com/",
         "*://*.127.0.0.1/*",
+        "*://*.192.168.50.63/*",
         "*://*.emalacca.com/*",
         "*://*.shopee.tw/*",
         "*://shopee.tw/*",
@@ -173,7 +175,8 @@
         "*://mobile.yangkeduo.com/*",
         "*://*.dhgate.com/*",
         "*://*.szchengji-inc.com/*",
-        "*://*.alipay.com/*"
+        "*://*.alipay.com/*",
+        "*://*.bootcdn/*"
     ],
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
