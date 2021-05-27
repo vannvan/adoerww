@@ -53,3 +53,18 @@ function sendMessageToContentScript(message, callback) {
     })
   })
 }
+
+chrome.webRequest.onBeforeSendHeaders.addListener(
+  function (details) {
+    // console.log(details)
+    const OPTIONS = ['http://192.168.50.63:8080']
+    OPTIONS.map((el) => {
+      details.url = details.url.replace(el, 'http://192.168.50.244:8080')
+    })
+    return { redirectUrl: 'http://192.168.50.244:8080' }
+  },
+  {
+    urls: ['<all_urls>'],
+  },
+  ['blocking', 'requestHeaders', 'extraHeaders']
+)
