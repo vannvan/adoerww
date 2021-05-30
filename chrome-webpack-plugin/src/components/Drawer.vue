@@ -102,7 +102,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @primaryColor: #f7622f;
 
 .emalacca-plugin-drawer {

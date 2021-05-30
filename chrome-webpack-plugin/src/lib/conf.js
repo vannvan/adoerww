@@ -258,3 +258,19 @@ export const RIGHT_MENU = [
     ]
   }
 ]
+
+// 公共工具
+export const COMMON_TOOLS = [
+  {
+    name: '工具',
+    icon: 'em-icon-gongju',
+    id: 'EmalaccaTools',
+    fixed: false,
+    children: [
+      {
+        name: '定价工具',
+        action: 'tools-dingjia'
+      }
+    ]
+  }
+]

@@ -1,5 +1,5 @@
 const importAll = context => {
-	const map = {}
+	const map = {} 
 	for (const key of context.keys()) {
 		const keyArr = key.split('/')
 		keyArr.shift() // 移除.

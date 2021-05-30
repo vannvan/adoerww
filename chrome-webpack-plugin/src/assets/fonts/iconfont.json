@@ -6,6 +6,69 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "21773143",
+      "name": "工具",
+      "font_class": "gongju",
+      "unicode": "9e70",
+      "unicode_decimal": 40560
+    },
+    {
+      "icon_id": "316180",
+      "name": "arrow-top",
+      "font_class": "13",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
+      "icon_id": "10147128",
+      "name": "right",
+      "font_class": "right1",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "20540080",
+      "name": "下载",
+      "font_class": "xingzhuangjiehe",
+      "unicode": "e60d",
+      "unicode_decimal": 58893
+    },
+    {
+      "icon_id": "20538459",
+      "name": "解锁",
+      "font_class": "jiesuo",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "20538460",
+      "name": "手机",
+      "font_class": "shouji",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "20538461",
+      "name": "密码",
+      "font_class": "mima",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "20336050",
+      "name": "morentouxiang",
+      "font_class": "head-img",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "8760086",
+      "name": "elipsis-v",
+      "font_class": "elipsis-v",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
       "icon_id": "19869662",
       "name": "矩形",
       "font_class": "pick-down",

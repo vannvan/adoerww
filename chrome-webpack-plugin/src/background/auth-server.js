@@ -3,12 +3,23 @@
 // import $ from 'jquery'
 import { WEBSITES } from '@/lib/conf'
 import { getStorage, handleJudgeLink } from '@/lib/utils'
+import { isMatches } from '@/lib/content-scripts-config'
 import { Request } from './shopee-server'
 import { getCookies, sendMessageToContentScript } from '@/lib/chrome'
+// 修改async await
 const regeneratorRuntime = require('@/assets/js/runtime.js')
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   let { action, options, type } = request
+  console.log(request, 'request')
+  // 加载脚本css或js，manifest.json => content_scripts
+  // isMatches判断url是否允许加载脚本
+  if (type === 'EXECUTE_SCRIPT' && isMatches(sender.url)) {
+    Promise.all(options.map(item => {
+      executeScript(item, sender.tab?.id)
+    }))
+    return true
+  }
   // 同步erp
   if (action == 'auth' && type == 'SYNC_ERP_AUTH_INFO') {
     Auth.syncErpToken(options, type, sendResponse)
@@ -44,7 +55,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 export const Auth = {
   requestFlag: false,
   //同步虾皮登录token
-  setCookies: function(params, type, call) {
+  setCookies: function (params, type, call) {
     console.log(params, type)
     // 如果没有退出
     if (params.csrfToken && localStorage.setItem('csrfToken', params.csrfToken)) {
@@ -53,7 +64,7 @@ export const Auth = {
   },
 
   //同步erptoken
-  syncErpToken: function(params, type, call) {
+  syncErpToken: function (params, type, call) {
     console.log(params, type)
     return new Promise((resolve, reject) => {
       let { authInfo } = params || {}
@@ -76,7 +87,7 @@ export const Auth = {
   },
 
   // 配置虾皮平台信息
-  syncShoppeBaseInfo: function(params, type, call) {
+  syncShoppeBaseInfo: function (params, type, call) {
     console.log(params, type)
     let _this = this
     if (_this.requestFlag) {
@@ -145,7 +156,7 @@ export const Auth = {
   },
 
   // 1688登录状态检查
-  check1688Auth: function() {
+  check1688Auth: function () {
     return new Promise(resolve => {
       let addressUrl = 'https://wuliu.1688.com/foundation/receive_address_manager.htm'
       $.ajax({
@@ -170,7 +181,7 @@ export const Auth = {
   },
 
   // pdd登录状态检查
-  checkPddAuth: function() {
+  checkPddAuth: function () {
     return new Promise(resolve => {
       getCookies({ domain: '.yangkeduo.com' }, async cookies => {
         try {
@@ -192,7 +203,7 @@ export const Auth = {
   },
 
   // 淘宝登录状态检查
-  checkTaobaoAuth: function() {
+  checkTaobaoAuth: function () {
     return new Promise(resolve => {
       getCookies({ domain: '.taobao.com' }, async cookies => {
         try {
@@ -215,7 +226,7 @@ export const Auth = {
   },
 
   // 天猫登录状态检查
-  checkTmallAuth: function() {
+  checkTmallAuth: function () {
     return new Promise(resolve => {
       getCookies({ domain: '.tmall.com' }, async cookies => {
         try {
@@ -237,7 +248,7 @@ export const Auth = {
   },
 
   // 获取采集站点的cookies
-  getCollectSitesAuthInfo: async function(params, type, call) {
+  getCollectSitesAuthInfo: async function (params, type, call) {
     console.log(params, type)
     const t1688LoginStatus = await Auth.check1688Auth()
     const pddLoginStatus = await Auth.checkPddAuth()
@@ -256,24 +267,24 @@ export const Auth = {
     let alibabaValidCookies = [].concat(taobaox5sec, tmallx5sec, t1688x5sec)
     let taobaoNormalCookies = taobaoLoginStatus
       ? taobaoLoginStatus.cookieArr
-          .filter(item => item.name != 'x5sec')
-          .reduce((prev, curr) => {
-            return `${curr.name}=${curr.value}; ` + prev
-          }, '')
+        .filter(item => item.name != 'x5sec')
+        .reduce((prev, curr) => {
+          return `${curr.name}=${curr.value}; ` + prev
+        }, '')
       : false
     let tmallNormalCookies = tmallLoginStatus
       ? tmallLoginStatus.cookieArr
-          .filter(item => item.name != 'x5sec')
-          .reduce((prev, curr) => {
-            return `${curr.name}=${curr.value}; ` + prev
-          }, '')
+        .filter(item => item.name != 'x5sec')
+        .reduce((prev, curr) => {
+          return `${curr.name}=${curr.value}; ` + prev
+        }, '')
       : false
     let t1688NormalCookies = t1688LoginStatus
       ? t1688LoginStatus.cookieArr
-          .filter(item => item.name != 'x5sec')
-          .reduce((prev, curr) => {
-            return `${curr.name}=${curr.value}; ` + prev
-          }, '')
+        .filter(item => item.name != 'x5sec')
+        .reduce((prev, curr) => {
+          return `${curr.name}=${curr.value}; ` + prev
+        }, '')
       : false
     call({
       code: 0,
@@ -289,10 +300,10 @@ export const Auth = {
   },
 
   // 对采集站点操作行为进行拦截
-  handleInterceptCollectSiteLoginAction: async function(params, type, call) {
+  handleInterceptCollectSiteLoginAction: async function (params, type, call) {
     console.log(params, type)
     chrome.webRequest.onCompleted.addListener(
-      function(details) {
+      function (details) {
         //对采集站点登录行为进行拦截
         if (/login\.do/.test(details.url) && details.statusCode == 200) {
           console.log('登录成功')
@@ -305,13 +316,13 @@ export const Auth = {
         }
         if (/_____tmd_____/.test(details.url) && details.statusCode == 200) {
           console.log('阿里巴巴出现了验证码')
-          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function(response) {
+          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function (response) {
             console.log(response, 'UPDATE_SITE_COOKIES')
           })
         }
         if (/sib\.htm/.test(details) && details.statusCode == 200) {
           console.log('详情页数据请求')
-          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function(response) {
+          sendMessageToContentScript({ type: 'UPDATE_SITE_COOKIES' }, function (response) {
             console.log(response, 'UPDATE_SITE_COOKIES')
           })
         }
@@ -326,4 +337,27 @@ export const Auth = {
       }
     )
   }
+}
+
+// 读取url的数据,加载脚本js或css到页面, manifest.json => content_scripts
+function executeScript(item, tabId = null) { 
+  let xhr = new XMLHttpRequest()
+  xhr.open('GET', item.url)
+  xhr.responseType = 'blob'
+  xhr.onload = function () {
+    const reader = new FileReader()
+    reader.onload = () => {
+      // 加载脚本js或css到页面
+      let insertExecuteType = item.type === 'js' ? chrome.tabs.executeScript : chrome.tabs.insertCSS
+      insertExecuteType(
+        tabId,
+        {
+          code: reader.result,
+          runAt: 'document_end'
+        }
+      )
+    }
+    reader.readAsText(this.response)
+  }
+  xhr.send();
 }

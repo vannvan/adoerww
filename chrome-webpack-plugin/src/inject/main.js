@@ -4,6 +4,8 @@ import WUI from '@/components/index'
 import dragApp from './drag'
 import Follow from './shopee'
 import '@/wui-theme/src/index.scss'
+import '@styles/home.less'
+import '@fonts/iconfont.css'
 
 let rightFixed = document.createElement('div')
 rightFixed.id = 'EmalaccaPluginApp'

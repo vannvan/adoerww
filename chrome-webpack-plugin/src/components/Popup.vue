@@ -4,7 +4,7 @@
       <img class="emalacca-pupup-header-logo" src="@/assets/icon/logo-radius.png" alt="" />
       <b class="emalacca-plugin-name">
         {{ pluginName }}
-        <template v-if="isVersionNewest">
+        <!-- <template v-if="isVersionNewest">
           {{ nowVersion }}
         </template>
         <a
@@ -16,7 +16,7 @@
         >
           {{ nowVersion }}
           <i class="update-red"></i>
-        </a>
+        </a> -->
       </b>
 
       <img

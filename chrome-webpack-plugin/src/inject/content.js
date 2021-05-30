@@ -19,10 +19,7 @@ import getBtnLocationItems from '@/lib/location-btn'
 import { getLoginInfo } from '@/lib/chrome-client'
 import { getStorageSync } from '@/lib/chrome'
 //----------------------------------------------新增内容---------------------------------------------
-const linkrule = getRule(location.href)
-console.log(linkrule, 'linkrule')
-const CONFIG = linkrule ? JSON.parse(linkrule) : null
-console.log(CONFIG, 'CONFIG')
+const CONFIG = getRule(location.href) || null
 chrome.extension.onMessage.addListener(function(message, sender, callback) {
   if (message.ID !== 'content') {
     return
@@ -45,10 +42,11 @@ const debounceHandleLinks = debounce(function() {
     handleLinks(CONFIG.detail)
   }
 }, 800)
-
+console.log(CONFIG, 'CONFIG')
 if (CONFIG) {
   // 判断插件是否被停用
   getStorageSync('isDisabledPlug').then(data => {
+    console.log(data, 'data')
     if (!data['isDisabledPlug']) {
       $(document).ready(handleLinks(CONFIG.detail))
       $(window).scroll(debounceHandleLinks)
@@ -79,7 +77,7 @@ function handleLinks(fnBody) {
 
     try {
       //将链接与后台返回的规则进行匹配
-      var test = new Function('url', fnBody)(href)
+      var test = fnBody(href)
       if (window.location.href.indexOf('joom.com') && test) {
         var $a = $(a)
         insertFetchBtn($a, href)
@@ -134,9 +132,8 @@ function insertFetchBtn($a, url) {
   if (hrefReg.test(hrefItem)) {
     return
   }
-  var linkruleHref = getRule(location.href)
-  var CONFIG_OBJ = JSON.parse(linkruleHref)
-  var pageType = new Function('url', CONFIG_OBJ.detect)(location.href)
+  var CONFIG_OBJ = getRule(location.href)
+  var pageType = CONFIG_OBJ ? CONFIG_OBJ.detect(location.href) : null
   // rules.js 不支持.search()
   if (
     location.href.indexOf('mobile.yangkeduo.com') != -1 &&

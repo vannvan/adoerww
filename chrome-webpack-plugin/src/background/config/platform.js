@@ -49,16 +49,8 @@ export const queryUrlPar = function(url = '') {
 
 // 判断当前网页是否是详情页&&采集当前商品
 export const isDetail = function(url) {
-  let linkRule = getRule(location.href)
-  let siteConfig = JSON.parse(linkRule)
-  let pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
-  // rules.js 不支持.search()
-  if (
-    location.href.indexOf('mobile.yangkeduo.com') != -1 &&
-    location.href.search(/\/goods?(\d*)\.html?/) !== -1
-  ) {
-    pageType = 'detail'
-  }
+  let siteConfig = getRule(location.href)
+  let pageType = siteConfig ? siteConfig.detect(location.href) : false //当前页面类型
   return pageType === 'detail' && url === location.href
 }
 

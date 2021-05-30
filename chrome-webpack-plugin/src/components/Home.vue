@@ -71,7 +71,7 @@
 
 <script>
 import $ from 'jquery'
-import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE, COMMON_COLLECT_DETAIL } from '@/lib/conf'
+import { COMMON_COLLECT, RIGHT_MENU, getSiteLink, MESSAGE, COMMON_COLLECT_DETAIL, COMMON_TOOLS } from '@/lib/conf'
 import { setStorageSync, getStorageSync } from '@/lib/chrome'
 import { isEmpty, getCookie } from '@/lib/utils'
 import { getRule } from '@/lib/rules'
@@ -171,19 +171,11 @@ export default {
           if (oldHref != location.href) {
             _this.initPage()
             oldHref = location.href
-            let linkRule = getRule(location.href)
-            let siteConfig = JSON.parse(linkRule)
-            _this.isStorePage =
-              new Function('url', siteConfig.detail)(location.href) ||
+            let siteConfig = getRule(location.href)
+            _this.isStorePage = siteConfig.detail(location.href) ||
               isShopMainPageAndNotSelfStore() //如果是某店铺的页面
-            _this.pageType = new Function('url', siteConfig.detect)(location.href) //当前页面类型
-            // rules.js 不支持.search()
-            if (
-              location.href.indexOf('mobile.yangkeduo.com') != -1 &&
-              location.href.search(/\/goods?(\d*)\.html?/) !== -1
-            ) {
-              _this.pageType = 'detail'
-            }
+            _this.pageType = siteConfig.detect(location.href) //当前页面类型
+            
             _this.loadMenuAction()
           }
         })
@@ -320,6 +312,10 @@ export default {
         case 'EmalaccaCollectDetail':
           BatchCollect.handleCollectCurrPageDetail()
           break
+        // 工具栏
+        case 'EmalaccaTools':
+          this.handleTools()
+          break
         default:
           break
       }
@@ -327,15 +323,8 @@ export default {
 
     //匹配各个站点的列表页，以判断是否显示采集
     getPageType() {
-      let siteConfig = JSON.parse(getRule(location.href))
-      this.pageType = new Function('url', siteConfig.detect)(location.href)
-      // rules.js 不支持.search()
-      if (
-        location.href.indexOf('mobile.yangkeduo.com') != -1 &&
-        location.href.search(/\/goods?(\d*)\.html?/) !== -1
-      ) {
-        this.pageType = 'detail'
-      }
+      let siteConfig = getRule(location.href)
+      this.pageType = siteConfig ? siteConfig.detect(location.href) : false
     },
 
     //加载程序菜单
@@ -359,6 +348,7 @@ export default {
       } else {
         this.rightMenu = []
       }
+      // this.rightMenu = this.rightMenu.concat(COMMON_TOOLS)
       // 从缓存中获取用户操作习惯, _isfixed是否为固定
       // 当前操作按钮是否已经固定
       let arrKey = ['emalacca_isShrink'] // 记录侧栏工具id && 展开状态
@@ -409,6 +399,9 @@ export default {
     },
     helpClick() {
       window.open(ERP_LOGIN_URL + 'welcome')
+    },
+    handleTools() {
+      console.log(111111111)
     }
   }
 }

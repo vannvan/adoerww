@@ -1,7 +1,6 @@
 import { isEmpty, isNil } from '@/lib/utils'
 
 const getBtnLocationItems = ($a) => {
-  console.log($a, '$a2')
   let locationHref = location.href
   let top,
     left,
@@ -34,7 +33,7 @@ const getBtnLocationItems = ($a) => {
     }
   }
   // 天猫
-  if (locationHref.indexOf('tmall.com') !== -1) {
+  if (locationHref.indexOf('tmall.com') !== -1 || locationHref.indexOf('tmall.hk') !== -1) {
     let $divImg = $a.find('div:first-child')
     //attributes是个类数组对象，当为null时，也是为object；只能用isNil判断是否为null
     let divStyle = $divImg.length > 0 ? $divImg[0].attributes.getNamedItem('style') : ''
@@ -42,6 +41,7 @@ const getBtnLocationItems = ($a) => {
 
     let $aStyle = attributes.getNamedItem('style')
     let textContent = !isNil($aStyle) ? $aStyle.value : ''
+    console.log($childImg, 'childImg')
     if (!isEmpty($childImg) && $childImg.length > 0) {
       // a标签里有img标签的商品（子级或者孙级节点）
       top = $childImg.offset().top

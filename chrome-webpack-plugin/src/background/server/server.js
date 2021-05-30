@@ -167,7 +167,7 @@ export const backEvent = {
         // data.msg:MESSAGEPRIFIX+ = '采集成功！'
         // call(data)
       },
-      error: function() {
+      error: function(data) {
         //增加访问出错信息返回
         // call({ code: 0, msg:MESSAGEPRIFIX+ '请求出错请联系管理员' })
       },
@@ -222,14 +222,16 @@ export const backEvent = {
         data.msg = '采集成功！'
         call(data)
       },
-      error: function() {
+      error: function(data) {
         //增加访问出错信息返回
         // call({ code: 0, msg:MESSAGEPRIFIX+ '请求出错请联系管理员' })
       },
       complete: function(XMLHttpRequest, status) {
         let code = ''
+        let errorMsg = ''
         if (!isEmpty(XMLHttpRequest)) {
           code = XMLHttpRequest.responseJSON.code
+          errorMsg = XMLHttpRequest.responseJSON.message
         }
         if (/300/.test(code)) {
           call({
@@ -241,7 +243,7 @@ export const backEvent = {
         if (status == 'error') {
           call({
             code: -1,
-            msg: '请求出错'
+            msg: errorMsg || '请求出错'
           })
         } else if (status == 'parsererror') {
           call({

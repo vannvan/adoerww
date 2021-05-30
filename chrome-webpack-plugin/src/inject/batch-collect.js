@@ -37,6 +37,7 @@ const BatchCollect = {
         $.fn.message({ type: 'error', msg: MESSAGE.error.pleaseSelectSomeGoods })
         return
       }
+      $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
       $('.emalacca-plugin-goods-acquisition-select').each(function(index) {
         let isSelected = $(this).attr('data-selected')
         if (isSelected === '1') {
@@ -50,7 +51,6 @@ const BatchCollect = {
         $.fn.message({ type: 'error', msg: MESSAGE.error.checkIsAuthedERP })
         return
       }
-      $.fn.message({ type: 'success', msg: MESSAGE.success.savehaveBeenAdd })
       handleSelectChange(data)
     })
   },

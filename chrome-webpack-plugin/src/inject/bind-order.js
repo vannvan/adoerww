@@ -17,8 +17,7 @@ class BindOrder {
     let oldHref = null
     let bodyList = document.querySelector('body'),
       observer = new MutationObserver(function(mutations) {
-        if (oldHref != location.pathname && /1688|yangkeduo/.test(location.href)) {
-          console.log('切换页面', location.href)
+        if (oldHref != location.pathname && /1688|yangkeduo|alipay/.test(location.href)) {
           oldHref = location.pathname
           sendMessageToBackground(
             'purchas',
@@ -72,9 +71,8 @@ class BindOrder {
   }
 
   getPageType() {
-    const linkrule = getRule(location.href)
-    const CONFIG = linkrule ? JSON.parse(linkrule) : null
-    let isDetail = new Function('url', CONFIG.detail)(location.href)
+    const CONFIG = getRule(location.href) || {}
+    let isDetail = CONFIG ? CONFIG.detail(location.href) : false
     if (/smart_make_order|order_checkout/.test(location.href)) {
       return 'preOrder'
     }
