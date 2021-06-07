@@ -7,7 +7,7 @@
 * {
     font-size: 14px;
     font-family: "微软雅黑 Light";
-    user-select: none;
+    user-select: none
 }
 
 body {
@@ -149,6 +149,7 @@ body::-webkit-scrollbar {
                 display: flex;
                 justify-content: space-between;
                 opacity: 0;
+
                 #input {
                     height: 100%;
                     border: 2px solid #09c;
