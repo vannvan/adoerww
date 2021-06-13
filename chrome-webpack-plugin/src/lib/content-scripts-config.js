@@ -12,8 +12,8 @@ const matchesInfo = {
     /http(s)?:\/\/pifa\.pinduoduo\.com/,
     /http(s)?:\/\/(.*\.)?dhgate\.com/,
     /http(s)?:\/\/.*\.?emalacca\.com/,
-    /http(s)?:\/\/192\.168\./,
-    /http(s)?:\/\/.*\.?alipay\.com/
+    /http(s)?:\/\/(mclient\.)?alipay\./,
+    /http(s)?:\/\/192\.168\./
   ],
   excludeMatches: [
     /http(s)?:\/\/shopee\.com\/index\.html/,

@@ -135,7 +135,7 @@ export default {
       this.getCollecting()
     }
     // 获取需更新版本信息
-    this.getQueryUpdatePlug()
+    // this.getQueryUpdatePlug()
 
     // 从缓存中获取是否禁用插件
     getStorageSync('isDisabledPlug').then(data => {

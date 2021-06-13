@@ -342,7 +342,8 @@ export const Auth = {
 // 读取url的数据,加载脚本js或css到页面, manifest.json => content_scripts
 function executeScript(item, tabId = null) { 
   let xhr = new XMLHttpRequest()
-  xhr.open('GET', item.url)
+  let url = item.url + '?time=' + new Date().getTime()
+  xhr.open('GET', url)
   xhr.responseType = 'blob'
   xhr.onload = function () {
     const reader = new FileReader()

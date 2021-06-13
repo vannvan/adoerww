@@ -5,5 +5,7 @@ import './background/importAll'
 // let oHead = document.getElementsByTagName('HEAD').item(0);
 // script.type = 'text/javascript'
 // script.async = true
-// script.src = 'https://sw-erp.oss-accelerate.aliyuncs.com/crawl-plugin/background.js'
+// let url = 'https://sw-erp.oss-accelerate.aliyuncs.com/crawl-plugin/background.js' + '?time=' + new Date().getTime()
+// script.src = url
+
 // oHead.appendChild(script);

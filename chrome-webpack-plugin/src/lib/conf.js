@@ -64,7 +64,7 @@ export const WEBSITES = [
     name: '巴西',
     key: 'br',
     seller: 'https://seller.shopee.com.br/',
-    front: 'https://shopee.com.br/',
+    front: 'https://shopee.com.br/',  
     mall: 'https://mall.shopee.com.br/shop/ID/following?__classic__=1',
     cnseller: 'https://seller.br.shopee.cn/',
     cnfront: 'https://br.xiapibuy.com/',

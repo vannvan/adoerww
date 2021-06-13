@@ -17,7 +17,8 @@ class BindOrder {
     let oldHref = null
     let bodyList = document.querySelector('body'),
       observer = new MutationObserver(function(mutations) {
-        if (oldHref != location.pathname && /1688|yangkeduo|alipay/.test(location.href)) {
+        if (oldHref != location.pathname && /1688|yangkeduo/.test(location.href)) {
+          console.log('切换页面', location.href)
           oldHref = location.pathname
           sendMessageToBackground(
             'purchas',

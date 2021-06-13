@@ -287,7 +287,14 @@ export default {
                   if (isShopMainPageAndNotSelfStore()) {
                     storeId = location.pathname.match(/shop(.*?)/).input.replace(/[^0-9]/gi, '')
                   }
-                  window.open(`/shop/${storeId}/followers?other=true`)
+                  // https://br.xiapibuy.com/
+                  const origin = window.location.origin
+                  // 处理巴西关注店铺粉丝跳转，使用xiapibuy
+                  if (origin == 'https://shopee.com.br') {
+                    window.open(`https://br.xiapibuy.com/shop/${storeId}/followers?other=true`)
+                  } else {
+                    window.open(`/shop/${storeId}/followers?other=true`)
+                  }
                 } catch (error) {
                   $.fn.message({ type: 'warning', msg: MESSAGE.error.notSupport })
                   console.log(error)
@@ -348,7 +355,7 @@ export default {
       } else {
         this.rightMenu = []
       }
-      // this.rightMenu = this.rightMenu.concat(COMMON_TOOLS)
+      this.rightMenu = this.rightMenu.concat(COMMON_TOOLS)
       // 从缓存中获取用户操作习惯, _isfixed是否为固定
       // 当前操作按钮是否已经固定
       let arrKey = ['emalacca_isShrink'] // 记录侧栏工具id && 展开状态
@@ -401,7 +408,7 @@ export default {
       window.open(ERP_LOGIN_URL + 'welcome')
     },
     handleTools() {
-      console.log(111111111)
+      window.open(ERP_LOGIN_URL + 'other/pricing-tools')
     }
   }
 }
