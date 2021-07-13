@@ -270,6 +270,10 @@ $(document).ready(function() {
                     name: '现代JavaScript教程',
                     link: 'https://zh.javascript.info/',
                 },
+                {
+                    name: "markdown编辑器",
+                    link: 'https://pandao.github.io/editor.md/'
+                }
             ],
         },
         {
