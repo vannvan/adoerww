@@ -9,7 +9,7 @@ import Monitor from 'vue-behavior-monitor'
 
 const monitor = new Monitor()
 monitor.init({
-	router
+  router
 })
 ```
 
