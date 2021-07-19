@@ -1,0 +1,33 @@
+{
+    "name": "vue-behavior-monitor",
+    "version": "0.0.2",
+    "description": "Vue.js用户行为埋点方案",
+    "main": "dist/index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "deploy": "npm version patch && npm publish"
+    },
+    "files": [
+        "package.json",
+        "dist"
+    ],
+    "devDependencies": {
+        "@babel/core": "^7.14.6",
+        "@babel/preset-env": "^7.14.7",
+        "rollup": "^2.53.2",
+        "rollup-plugin-babel": "^4.4.0",
+        "rollup-plugin-terser": "^7.0.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/vannvan/adoerww/tree/master/vue-behavior-monitor"
+    },
+    "author": "https://github.com/vannvan",
+    "license": "MIT",
+    "homepage": "https://github.com/vannvan/adoerww/tree/master/vue-behavior-monitor#readme",
+    "keywords": [
+        "vue",
+        "行为埋点",
+        "埋点"
+    ]
+}
