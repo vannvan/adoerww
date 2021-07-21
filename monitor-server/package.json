@@ -1,0 +1,25 @@
+{
+  "name": "monitor-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.3",
+    "nodemon": "^2.0.12"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "express-session": "^1.17.2",
+    "qs": "^6.10.1",
+    "require-dir": "^1.2.0"
+  }
+}

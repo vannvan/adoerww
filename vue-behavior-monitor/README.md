@@ -51,7 +51,7 @@ monitor.init({
       userName: 'zhangsan',
       mobile:'13666666666'
     }
-  }
+  },
   // 使用此钩子函数
   vptHanlder: (val) => {
     // val = monitor.get()
