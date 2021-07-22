@@ -2,9 +2,9 @@ const { post, get } = require("./axios");
 const axios = require("axios");
 
 // 登录erp后台拿token
-function handlerLoginERPMG() {
+function handlerLoginERPMG(account, password) {
 	return new Promise((resolve, reject) => {
-		let params = { account: "18792401991", password: "lz530826541", type: 2 };
+		let params = { account: account, password: password, type: 2 };
 		post("api/mg/mg-account/login", params)
 			.then((res) => {
 				let { token } = res.data;

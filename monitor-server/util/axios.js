@@ -1,15 +1,7 @@
 const axios = require("axios");
 const QS = require("qs");
-const session = require("express-session");
 const express = require("express");
 const app = express();
-app.use(
-	session({
-		secret: "keyboard cat",
-		resave: true,
-		saveUninitialized: true,
-	})
-);
 
 const Axios = axios.create({
 	baseURL: "https://mg-erp.emalacca.com/", // api的base_url

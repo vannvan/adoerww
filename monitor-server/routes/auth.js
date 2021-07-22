@@ -4,7 +4,6 @@ const { sendJson, throwError } = require("../util/tool");
 const { User } = require("../db/mongo");
 const app = express();
 const log = require("../util/log");
-const session = require("express-session");
 
 const { handlerLoginERPMG, getErpAllMenuList } = require("../util/server");
 

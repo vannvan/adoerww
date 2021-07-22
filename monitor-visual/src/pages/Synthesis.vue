@@ -199,7 +199,6 @@ export default {
         userAgent,
         dpi
       } = this.formData
-      console.log(dpi, 'dpi')
       let params = {
         createdStartTime: createdTime[0]
           ? dayjs(createdTime[0]).format('YYYY-MM-DD')
@@ -234,7 +233,6 @@ export default {
         let { data, total } = res
         this.page.total = total
         this.monitorData = data
-        console.log(this.monitorData)
         this.loading = false
       })
     },
