@@ -27,6 +27,7 @@
 
 <script>
 import Monitor from '@/api/monitor.js'
+import { createTree } from '@/utils'
 import { mapState } from 'vuex'
 export default {
   data() {
@@ -57,7 +58,8 @@ export default {
           this.$Message.info('登录成功')
           let { userInfo, menuList } = res.data
           this.$store.commit('setUserInfo', userInfo)
-          this.$store.commit('setMenuList', menuList)
+          let tree = createTree(menuList)
+          this.$store.commit('setMenuList', tree)
           this.$router.push('/home')
         } else {
           this.$Message.error(res.message)

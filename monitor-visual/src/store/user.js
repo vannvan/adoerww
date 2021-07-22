@@ -1,7 +1,7 @@
 // 用户信息
 export default {
   state: {
-    userInfo: {},
+    userInfo: null,
     menuList: []
   },
   mutations: {

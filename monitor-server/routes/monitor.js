@@ -142,7 +142,7 @@ app.get("/list", (req, res) => {
 	}
 
 	let condition = {
-		path: path,
+		path: { $regex: path },
 		"uaInfo.userAgent": { $regex: userAgent },
 		"pageInfo.entryTime": {
 			$gte: pageEntryTime ? Date.parse(pageEntryTime) : 0,

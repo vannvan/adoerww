@@ -3,12 +3,11 @@ import Router from 'vue-router'
 import routes from './routers'
 import { flatData, generateRoleRouters } from '@/utils'
 import authMenu from '@/assets/menu.js'
+import store from '@/store/index'
 
 const CURRENT_AUTH = 'admin' //当前角色
 
 const permissionSwitch = false //权限开关，用于某些场景开发环境需要所有路由可访问的情况
-
-const flatAuthMenu = flatData(authMenu[CURRENT_AUTH])
 
 Vue.use(Router)
 
@@ -21,10 +20,12 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.title) {
-    document.title = to.meta.title
+  const { userInfo } = store.state.user
+  if (!userInfo && to.path != '/login') {
+    next({ path: '/login' })
+  } else {
+    next()
   }
-  next()
 })
 
 router.afterEach(() => {

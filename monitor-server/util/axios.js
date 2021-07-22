@@ -66,6 +66,7 @@ function get(url, params) {
  * @param {Object} params [请求时携带的参数]
  */
 function post(url, params) {
+	console.log(url, params);
 	return new Promise((resolve, reject) => {
 		Axios.post(url, params)
 			.then((res) => {

@@ -19,21 +19,25 @@ const checkUserExit = function (params) {
 app.post("/register", function (request, response) {
 	let params = request.body;
 	const user = new User(params);
-	checkUserExit({
-		name: params.name,
-	}).then((res) => {
-		if (res) {
-			response.send(sendJson(0, "用户名已存在"));
-		} else {
-			user.save(function (error, res) {
-				if (error) {
-					response.send(throwError());
-				} else {
-					response.send(sendJson(1, "注册成功"));
-				}
-			});
-		}
-	});
+	try {
+		checkUserExit({
+			name: params.name,
+		}).then((res) => {
+			if (res) {
+				response.send(sendJson(0, "用户名已存在"));
+			} else {
+				user.save(function (error, res) {
+					if (error) {
+						response.send(throwError());
+					} else {
+						response.send(sendJson(1, "注册成功"));
+					}
+				});
+			}
+		});
+	} catch (error) {
+		response.send(sendJson(0, "服务器错误"));
+	}
 });
 
 //登录
@@ -50,18 +54,25 @@ app.post("/login", function (request, response) {
 				if (params.password != res.password) {
 					response.send(sendJson(0, "用户名或密码错误"));
 				} else {
-					let token = await handlerLoginERPMG();
-					let menuList = await getErpAllMenuList(token);
-					response.send(
-						sendJson(
-							1,
-							"用户验证成功",
-							Object.assign(
-								{ userInfo: { userName: params.name } },
-								{ menuList: menuList }
+					try {
+						let token = await handlerLoginERPMG({
+							password: params.password,
+							account: params.name,
+						});
+						let menuList = await getErpAllMenuList(token);
+						response.send(
+							sendJson(
+								1,
+								"用户验证成功",
+								Object.assign(
+									{ userInfo: { userName: params.name } },
+									{ menuList: menuList }
+								)
 							)
-						)
-					);
+						);
+					} catch (error) {
+						response.send(sendJson(0, "服务器错误"));
+					}
 				}
 			}
 		}
