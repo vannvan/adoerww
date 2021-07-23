@@ -32,10 +32,7 @@ export default {
   methods: {
     handleCheckNode(node) {
       const { href } = node[0]
-      console.log(href)
-      if (href) {
-        this.getPageMonitor(href)
-      }
+      href && this.getPageMonitor(href)
     },
 
     getPageMonitor(href) {
@@ -56,7 +53,6 @@ export default {
 <style lang="scss" scoped>
 .page-analysis-page {
   display: flex;
-  // height: calc(100vh - 90px);
   .tree-wrap {
     width: 280px;
     height: 100%;

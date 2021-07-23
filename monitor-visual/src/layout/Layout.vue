@@ -12,7 +12,16 @@
           <h2>埋点监控系统</h2>
         </div>
         <div class="layout-nav " style="color:#fff">
-          Hello {{ emoji }}~ {{ userInfo.userName }} 现在是: {{ currentTime }}
+          Hello哇 {{ emoji }}~ 现在是: {{ currentTime }}
+          <Dropdown trigger="click">
+            <span style="user-select: none;cursor: pointer;">
+              {{ userInfo.userName }}
+            </span>
+            <Icon type="ios-arrow-down"></Icon>
+            <DropdownMenu slot="list">
+              <DropdownItem @click="logout()">退出</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </div>
       </Menu>
     </Header>
@@ -74,6 +83,13 @@ export default {
         .replace('T', ' ')
         .substring(0, 19)
     }, 1000)
+  },
+
+  methods: {
+    logout() {
+      this.$store.commit('setUserInfo', null)
+      this.$router.push('/login')
+    }
   }
 }
 </script>
@@ -87,55 +103,56 @@ export default {
   position: relative;
   border-radius: 4px;
   overflow: hidden;
-}
+  .ivu-layout-header {
+    padding: 0 30px;
+    .layout-logo {
+      border-radius: 3px;
+      float: left;
+      position: relative;
+      left: -10px;
+      line-height: 30px;
+      text-align: center;
+      color: #fff;
+      display: flex;
+      height: 100%;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
 
-.layout-logo {
-  border-radius: 3px;
-  float: left;
-  position: relative;
-  left: -30px;
-  line-height: 30px;
-  text-align: center;
-  color: #fff;
-  display: flex;
-  height: 100%;
-  align-items: center;
-  justify-content: space-between;
+      img {
+        width: 38px;
+        height: 38px;
+        margin-right: 10px;
+        animation: turn 3s linear infinite;
+      }
 
-  img {
-    width: 38px;
-    height: 38px;
-    margin-right: 10px;
-    animation: turn 3s linear infinite;
-  }
+      @keyframes turn {
+        0% {
+          -webkit-transform: rotate(0deg);
+        }
 
-  @keyframes turn {
-    0% {
-      -webkit-transform: rotate(0deg);
+        100% {
+          -webkit-transform: rotate(360deg);
+        }
+      }
     }
-
-    100% {
-      -webkit-transform: rotate(360deg);
+    .layout-nav {
+      margin: 0 auto;
+      margin-right: 0px;
     }
   }
-}
-
-.layout-nav {
-  margin: 0 auto;
-  margin-right: 0px;
-}
-
-.layout-left-menu {
-  height: calc(100vh - 60px);
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.ivu-layout-content {
-  overflow-y: auto;
-  height: calc(100vh - 90px);
-}
-.page-content {
-  height: 100%;
-  overflow-y: auto;
+  .layout-left-menu {
+    height: calc(100vh - 60px);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .ivu-layout-content {
+    overflow-y: auto;
+    height: calc(100vh - 90px);
+    .page-content {
+      height: 100%;
+      overflow-y: auto;
+    }
+  }
 }
 </style>
