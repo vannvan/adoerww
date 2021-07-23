@@ -15,6 +15,16 @@
           <Input v-model="formData.pagePath" style="width:190px" clearable>
           </Input>
         </FormItem>
+        <FormItem prop="isAction" label="有无操作">
+          <Select v-model="formData.isAction" style="width:190px">
+            <Option
+              v-for="item in actionOptions"
+              :key="item.type"
+              :value="item.value"
+              >{{ item.type }}
+            </Option>
+          </Select>
+        </FormItem>
 
         <FormItem prop="visiteTime" label="访问时间">
           <DatePicker
@@ -26,12 +36,22 @@
           ></DatePicker>
         </FormItem>
 
-        <FormItem prop="userMobile" label="用户账号">
-          <Input v-model="formData.userMobile" style="width:190px" clearable>
+        <FormItem prop="maAccount" label="用户账号">
+          <Input
+            v-model="formData.maAccount"
+            style="width:190px"
+            clearable
+            placeholder="maAccount"
+          >
           </Input>
         </FormItem>
-        <FormItem prop="userName" label="用户姓名">
-          <Input v-model="formData.userName" style="width:190px" clearable>
+        <FormItem prop="memberNO" label="用户ID">
+          <Input
+            v-model="formData.memberNO"
+            style="width:190px"
+            clearable
+            placeholder="memberNO"
+          >
           </Input>
         </FormItem>
         <FormItem prop="userAgent" label="设备信息">
@@ -43,6 +63,7 @@
           >
           </Input>
         </FormItem>
+
         <!-- <FormItem prop="dpi" label="分辨率哈">
           <Select v-model="formData.dpi" style="width:190px" clearable>
             <Option
@@ -53,7 +74,13 @@
             >
           </Select>
         </FormItem> -->
-        <Button type="primary" @click="handleSearch()">搜索</Button>
+        <Button
+          type="primary"
+          @click="handleSearch()"
+          style="margin-left:10px"
+          icon="md-search"
+          >搜索</Button
+        >
       </Form>
     </div>
     <div class="table-wrap">
@@ -75,6 +102,12 @@
           <p>
             {{ formatTime(row.pageInfo.leaveTime) }}
           </p>
+          <p>
+            停留时常:{{
+              division(row.pageInfo.leaveTime - row.pageInfo.entryTime, 60) +
+                's'
+            }}
+          </p>
         </template>
         <!-- 设备信息 -->
         <template slot-scope="{ row }" slot="uaInfoSlot">
@@ -92,8 +125,8 @@
         </template>
         <!-- 用户信息 -->
         <template slot-scope="{ row }" slot="userInfoSlot">
-          <p>用户姓名:{{ row.userInfo.userName }}</p>
-          <p>用户账号:{{ row.userInfo.userMobile }}</p>
+          <p>用户账号:{{ row.userInfo.maAccount }}</p>
+          <p>用户ID:{{ row.userInfo.memberNO }}</p>
         </template>
         <!-- 事件信息 -->
         <template slot-scope="{ row }" slot="eventInfoSlot">
@@ -123,15 +156,17 @@
 <script>
 import Monitor from '@/api/monitor.js'
 import dayjs from 'dayjs'
+import { division } from '@/utils'
 export default {
   data() {
     return {
       loading: false,
       formData: {
+        isAction: null,
         createdTime: [],
         visiteTime: [],
-        userMobile: null,
-        userName: null,
+        memberNO: null,
+        maAccount: null,
         pagePath: null,
         dpi: ''
       },
@@ -167,12 +202,10 @@ export default {
         current: 1,
         pageSize: 20
       },
-      dpiOptions: [
-        { key: 1, value: '600*1000' },
-        {
-          key: 2,
-          value: '600*1900'
-        }
+      actionOptions: [
+        { value: 0, type: '全部' },
+        { value: 1, type: '无操作' },
+        { value: 2, type: '有操作' }
       ]
     }
   },
@@ -180,6 +213,11 @@ export default {
     formatTime() {
       return (time) => {
         return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
+      }
+    },
+    division() {
+      return (a, b) => {
+        return division(a, b).toFixed(2)
       }
     }
   },

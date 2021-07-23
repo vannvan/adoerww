@@ -44,7 +44,7 @@ let monitor = {
 	},
 	userInfo: {
 		type: Object,
-		required: true,
+		// required: true,
 	},
 	eventData: {
 		type: Array,

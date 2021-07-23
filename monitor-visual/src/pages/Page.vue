@@ -13,7 +13,6 @@
 import { mapState } from 'vuex'
 import Monitor from '@/api/monitor.js'
 import dayjs from 'dayjs'
-
 export default {
   data() {
     return {

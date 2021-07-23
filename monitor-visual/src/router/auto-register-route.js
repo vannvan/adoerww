@@ -5,6 +5,30 @@ const requireAllVueComponents = require.context(
   'lazy'
 )
 
+function toInLine(str) {
+  const renderStr = (pageNum) =>
+    pageNum
+      .split('')
+      .map((ele, index) => {
+        if (index === 0) {
+          ele = ele.toLowerCase()
+        } else {
+          if (/[A-Z]/.test(ele)) ele = '-' + ele.toLowerCase()
+        }
+        return ele
+      })
+      .join('')
+
+  return (
+    '/' +
+    str
+      .replace('/', '')
+      .split('/')
+      .map((ele) => renderStr(ele))
+      .join('/')
+  )
+}
+
 const routerList = []
 
 const EXCLUDE_PAGE = ['Login'] //需要排除的一些特例页面,例如登录页面，空缺页
@@ -24,12 +48,10 @@ requireAllVueComponents.keys().forEach((allVueComponentItem) => {
   // 文件名尾部有数值的情况下 自动注入路由
   if (completeName.match(/\w\.vue$/g) && !isComponents && !isExclude) {
     const routerMap = {}
-    routerMap.path = allVueComponentItem
-      .replace(/(^\.|\.vue)/g, '')
-      .toLowerCase()
-    routerMap.name = allVueComponentItem
-      .replace(/(\.\/|\/|\.vue)/g, '')
-      .toLowerCase()
+    routerMap.path = toInLine(allVueComponentItem.replace(/(^\.|\.vue)/g, ''))
+    routerMap.name = toInLine(
+      allVueComponentItem.replace(/(\.\/|\/|\.vue)/g, '').toLowerCase()
+    )
     routerMap.component = () => requireAllVueComponents(allVueComponentItem)
     routerList.push(routerMap)
   }

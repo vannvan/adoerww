@@ -41,7 +41,10 @@
               埋点数据
             </template>
             <MenuItem name="1-1" to="/synthesis">综合查询</MenuItem>
-            <MenuItem name="1-2" to="/page">页面维度</MenuItem>
+            <MenuItem name="1-2" to="/module">功能模块</MenuItem>
+            <MenuItem name="1-3" to="/page">访问页面</MenuItem>
+            <MenuItem name="1-4" to="/behavior-track">用户行为追踪</MenuItem>
+            <MenuItem name="1-5" to="/js-error">JS错误</MenuItem>
           </Submenu>
         </Menu>
       </Sider>
