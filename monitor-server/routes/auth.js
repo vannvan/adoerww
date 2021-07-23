@@ -71,7 +71,7 @@ app.post("/login", function (request, response) {
 							)
 						);
 					} catch (error) {
-						response.send(sendJson(0, "服务器错误"));
+						response.send(sendJson(0, error));
 					}
 				}
 			}

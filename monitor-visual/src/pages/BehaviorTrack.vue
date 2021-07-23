@@ -17,11 +17,14 @@
       </List>
     </div>
     <div class="right-records-list">
+      <div class="equipment-info">
+        设备信息
+      </div>
       <Timeline>
         <TimelineItem v-for="(item, index) in currentUserRecords" :key="index">
           <p class="time">
             访问时间 : {{ formatTime(item.pageInfo.entryTime) }} 离开时间 :
-            {{ formatTime(item.pageInfo.leaveTime) }} 停留时间 :
+            {{ formatTime(item.pageInfo.leaveTime) }} 逗留时长 :
             {{
               division(item.pageInfo.leaveTime - item.pageInfo.entryTime, 60) +
                 's'
@@ -107,16 +110,23 @@ export default {
   justify-content: space-between;
 
   .left-user-list {
-    width: 280px;
+    width: 400px;
     background: #fff;
     height: 100%;
     overflow-y: auto;
+    margin-right: 12px;
+    border-right: 5px solid #ededed;
+    padding: 12px;
+    box-sizing: border-box;
   }
   .right-records-list {
     flex: 1;
     padding: 12px;
     height: 100%;
     overflow-y: auto;
+    .equipment-info {
+      height: 200px;
+    }
   }
 }
 </style>

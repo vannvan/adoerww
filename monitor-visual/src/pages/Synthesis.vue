@@ -103,7 +103,7 @@
             {{ formatTime(row.pageInfo.leaveTime) }}
           </p>
           <p>
-            停留时常:{{
+            逗留时长:{{
               division(row.pageInfo.leaveTime - row.pageInfo.entryTime, 60) +
                 's'
             }}
