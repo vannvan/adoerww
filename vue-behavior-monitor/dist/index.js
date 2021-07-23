@@ -1,9 +1,9 @@
 /**
  * vue-behavior-monitor
- * @version 0.0.2
+ * @version 0.0.3
  * @author https://github.com/vannvan 
  * @github https://github.com/vannvan/adoerww/blob/master/vue-behavior-monitor/src/index.js 
- * @update Mon Jul 19 2021 16:31:27 GMT+0800 (中国标准时间)
+ * @update Fri Jul 23 2021 11:37:22 GMT+0800 (中国标准时间)
  */
 
 define(function () { 'use strict';
@@ -165,10 +165,10 @@ define(function () { 'use strict';
       }
       /**
        * @description 初始化方法:
-       *  extentData 用于传入基于业务的数据信息，
+       *  extendData 用于传入基于业务的数据信息，
        *  router 是vue-router对象,这里既可以通过init传入，也可以在当前类模块直接引入，
        *  config 是配置信息
-       * @param {*} { extentData = null, router = null, config = {} }
+       * @param {*} { extendData = null, router = null, config = {} }
        * @memberof Monitor
        */
 
@@ -177,8 +177,8 @@ define(function () { 'use strict';
       value: function init(_ref) {
         var _this = this;
 
-        var _ref$extentData = _ref.extentData,
-            extentData = _ref$extentData === void 0 ? null : _ref$extentData,
+        var _ref$extendData = _ref.extendData,
+            extendData = _ref$extendData === void 0 ? null : _ref$extendData,
             _ref$router = _ref.router,
             router = _ref$router === void 0 ? null : _ref$router,
             _ref$config = _ref.config,
@@ -217,7 +217,7 @@ define(function () { 'use strict';
                         pageInfo: {
                           entryTime: _this.getTime()
                         }
-                      }, extentData), {}, {
+                      }, extendData), {}, {
                         eventData: []
                       })];
 
