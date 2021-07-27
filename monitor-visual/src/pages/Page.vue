@@ -4,7 +4,15 @@
       <Tree :data="erpMenuList" @on-select-change="handleCheckNode"> </Tree>
     </div>
     <div class="data-wrap">
-      {{ pageEventData }}
+      <p v-for="(item, index) in pageEventData" :key="index">
+        <Tag
+          v-for="(actionItem, subIndex) in item"
+          :key="subIndex"
+          type="border"
+          >{{ actionItem.innerText }}
+          {{ formatTime(actionItem.clickTime) }}</Tag
+        >
+      </p>
     </div>
   </div>
 </template>
@@ -60,6 +68,8 @@ export default {
   .data-wrap {
     flex: 1;
     background: #ededed;
+    height: 100%;
+    overflow-y: auto;
   }
 }
 </style>

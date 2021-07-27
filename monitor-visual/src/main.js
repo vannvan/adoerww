@@ -6,6 +6,9 @@ import store from './store/index'
 import ViewUI from 'view-design'
 import 'view-design/dist/styles/iview.css'
 
+import globalMixins from '@/mixins/global'
+Vue.mixin(globalMixins)
+
 Vue.use(ViewUI)
 
 Vue.config.productionTip = false

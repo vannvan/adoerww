@@ -155,7 +155,6 @@
 
 <script>
 import Monitor from '@/api/monitor.js'
-import dayjs from 'dayjs'
 import { division } from '@/utils'
 export default {
   data() {
@@ -210,11 +209,6 @@ export default {
     }
   },
   computed: {
-    formatTime() {
-      return (time) => {
-        return dayjs(time).format('YYYY-MM-DD HH:mm:ss')
-      }
-    },
     division() {
       return (a, b) => {
         return division(a, b).toFixed(2)

@@ -9,7 +9,7 @@
       >
         <div class="layout-logo">
           <img src="@/assets/github.png" alt="" />
-          <h2>埋点监控系统</h2>
+          <h2>The Monitor</h2>
         </div>
         <div class="layout-nav " style="color:#fff">
           Hello哇 {{ emoji }}~ 现在是: {{ currentTime }}

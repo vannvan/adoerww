@@ -17,7 +17,7 @@
       </List>
     </div>
     <div class="right-records-list">
-      <p>默认追踪最近200条记录</p>
+      <h3 style="line-height:50px">默认追踪最近200条记录</h3>
       <Timeline>
         <TimelineItem v-for="(item, index) in currentUserRecords" :key="index">
           <p class="time">
@@ -39,7 +39,6 @@
 import dayjs from 'dayjs'
 import Monitor from '@/api/monitor.js'
 import { division } from '@/utils'
-
 export default {
   data() {
     return {
@@ -124,7 +123,7 @@ export default {
   }
   .right-records-list {
     flex: 1;
-    padding: 12px;
+    padding: 0 12px;
     height: 100%;
     overflow-y: auto;
     .equipment-info {
