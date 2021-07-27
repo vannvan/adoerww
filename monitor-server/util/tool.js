@@ -33,9 +33,20 @@ const getTime = function () {
 	return new Date().getTime();
 };
 
+// 过滤请求参数
+const filterQueryParams = (params) => {
+	Object.keys(params).forEach((key) => {
+		if (!params[key]) {
+			delete params[key];
+		}
+	});
+	return params;
+};
+
 module.exports = {
 	sendJson,
 	throwError,
 	JSONToString,
 	getTime,
+	filterQueryParams,
 };

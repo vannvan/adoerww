@@ -1,30 +1,17 @@
 const express = require("express");
 const app = express();
-const { sendJson, throwError } = require("../util/tool");
-const { Monitor } = require("../db/mongo");
+const { sendJson, throwError, filterQueryParams } = require("../util/tool");
+const { Monitor, Member } = require("../db/mongo");
 const log = require("../util/log");
-
-// 过滤请求参数
-const filterQueryParams = (params) => {
-	Object.keys(params).forEach((key) => {
-		if (!params[key]) {
-			delete params[key];
-		}
-	});
-	return params;
-};
-
-// 查找行为记录是否有当前用户
-//
+const { checkCurrentMemberExit } = require("./member");
 
 // 新增
 app.post("/add", (req, res) => {
 	log(`请求参数:, ${JSON.stringify(req.body)}`);
-
 	let params = req.body;
 	params.created = Date.now();
 	const monitor = new Monitor(params);
-	monitor.save((error, data) => {
+	monitor.save((error) => {
 		if (error) {
 			res.status(400);
 			res.send(throwError());
@@ -35,14 +22,21 @@ app.post("/add", (req, res) => {
 });
 
 // 批量新增
-app.post("/add-batch", (req, res) => {
-	log(`请求参数:, ${JSON.stringify(req.body)}`);
+app.post("/add-batch", async (req, res) => {
+	log(`${req.baseUrl}请求参数:, ${JSON.stringify(req.body)}`);
+	if (!req.body || !req.body.length) {
+		res.status(400);
+		res.send(throwError("请求数据错误"));
+		return;
+	}
+	// 添加成员
+	let memberInfo = req.body[0].userInfo;
+	await checkCurrentMemberExit(memberInfo);
 	try {
 		let params = req.body;
 		if (params && params.length) {
 			params.map((el) => {
 				el.created = Date.now();
-				// let monitor = new Monitor(el);
 			});
 			Monitor.insertMany(params, (error, data) => {
 				if (error) {
@@ -50,7 +44,7 @@ app.post("/add-batch", (req, res) => {
 					res.status(400);
 					res.send(throwError(error.message));
 				} else {
-					res.send(sendJson(1, "操作成功"));
+					res.send(sendJson(1, null));
 				}
 			});
 		}
@@ -62,7 +56,7 @@ app.post("/add-batch", (req, res) => {
 
 // 获取分页列表
 app.get("/page", (req, res) => {
-	log(`请求参数:, ${JSON.stringify(req.query)}`);
+	log(`${req.baseUrl}请求参数:, ${JSON.stringify(req.query)}`);
 	let {
 		pageSize = 10,
 		pageNo = 1,
@@ -95,13 +89,13 @@ app.get("/page", (req, res) => {
 		"uaInfo.dpiWidth": Number(dpiWidth),
 		"uaInfo.dpiHeight": Number(dpiHeight),
 	};
-	console.log("查询条件:", filterQueryParams(condition));
+	console.log(`${req.baseUrl}查询条件:`, filterQueryParams(condition));
 	Monitor.countDocuments(filterQueryParams(condition), (error, count) => {
 		if (error) {
 			res.send(throwError());
 		} else {
 			Monitor.find(filterQueryParams(condition))
-				.skip(1)
+				.skip((pageNo - 1) * pageSize)
 				.lean(true)
 				.limit(parseInt(pageSize))
 				.sort({ created: -1 })
@@ -128,7 +122,7 @@ app.get("/page", (req, res) => {
 // 这里用于前端页面直接查询某页面具体某一天的按钮点击量，可以查询某个人
 // 所以页面需要全匹配路径，时间范围也是必填
 app.get("/list", (req, res) => {
-	log(`请求参数:, ${JSON.stringify(req.query)}`);
+	log(`${req.baseUrl}请求参数:, ${JSON.stringify(req.query)}`);
 	let {
 		path = "",
 		userAgent = "",
@@ -138,6 +132,7 @@ app.get("/list", (req, res) => {
 		createEndTime = 0,
 		maAccount = "",
 		memberNO = "",
+		limit = 200,
 	} = req.query || {};
 	if (!createdStartTime && !createEndTime) {
 		res.status(400);
@@ -166,13 +161,14 @@ app.get("/list", (req, res) => {
 		"userInfo.memberNO": { $regex: String(memberNO) },
 	};
 
-	console.log("查询条件:", filterQueryParams(condition));
+	console.log(`${req.baseUrl}查询条件:`, filterQueryParams(condition));
 	Monitor.countDocuments({}, (error, count) => {
 		if (error) {
 			res.send(throwError(error));
 		} else {
 			Monitor.find(filterQueryParams(condition))
 				.sort({ created: -1 })
+				.limit(limit)
 				.exec((err, data) => {
 					if (err) {
 						res.status(400);
@@ -189,4 +185,5 @@ app.get("/list", (req, res) => {
 		}
 	});
 });
+
 module.exports = app;

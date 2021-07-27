@@ -5,5 +5,7 @@ export default {
 
   handleLogin: (p) => post('/auth/login', p), //登录
 
-  getMonitorList: (p) => get('/monitor/list', p) // 获取列表
+  getMonitorList: (p) => get('/monitor/list', p), // 获取列表
+
+  getMemberPage: (p) => get('/member/page', p) //成员列表
 }

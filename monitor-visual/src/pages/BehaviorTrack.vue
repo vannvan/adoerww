@@ -2,11 +2,11 @@
   <div class="content-wrap behabior-wrap">
     <div class="left-user-list">
       <List>
-        <ListItem v-for="item in userList" :key="item.maAccount">
+        <ListItem v-for="item in memberList" :key="item.maAccount">
           <ListItemMeta
             avatar="https://dev-file.iviewui.com/userinfoPDvn9gKWYihR24SpgC319vXY8qniCqj4/avatar"
             :title="item.maAccount"
-            :description="'最后登录时间:' + item.lastLoginTime"
+            :description="'最后记录时间:' + formatTime(item.updateTime)"
           />
           <template slot="action">
             <li>
@@ -17,9 +17,7 @@
       </List>
     </div>
     <div class="right-records-list">
-      <div class="equipment-info">
-        设备信息
-      </div>
+      <p>默认追踪最近200条记录</p>
       <Timeline>
         <TimelineItem v-for="(item, index) in currentUserRecords" :key="index">
           <p class="time">
@@ -40,21 +38,17 @@
 <script>
 import dayjs from 'dayjs'
 import Monitor from '@/api/monitor.js'
-const uniqueElementsBy = (arr, fn) =>
-  arr.reduce((acc, v) => {
-    if (!acc.some((x) => fn(v, x))) acc.push(v)
-    return acc
-  }, [])
 import { division } from '@/utils'
 
 export default {
   data() {
     return {
       allRecordsList: [],
-      userList: [],
+      memberList: [],
       recordsList: [],
       currentUserAccount: null,
-      currentUserRecords: []
+      currentUserRecords: [],
+      deviceInfo: {} //还没想好怎么显示
     }
   },
 
@@ -71,25 +65,34 @@ export default {
     }
   },
 
-  mounted() {
-    this.getRecordsList()
+  async mounted() {
+    let maAccount = await this.getMemberPage()
+    this.getRecordsList(maAccount)
   },
 
   methods: {
+    getMemberPage() {
+      return new Promise((resolve, reject) => {
+        Monitor.getMemberPage()
+          .then(({ data }) => {
+            this.memberList = data
+            this.currentUserAccount = data[0].maAccount
+            resolve(data[0].maAccount)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
+    },
+
     getRecordsList() {
       let params = {
         createEndTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss'),
         maAccount: this.currentUserAccount
       }
-      Monitor.getMonitorList(params).then((res) => {
-        console.log(res)
-        let { data } = res
-        this.currentUserAccount = data[0].userInfo.maAccount
+      Monitor.getMonitorList(params).then(({ data }) => {
         this.currentUserRecords = data
-        this.userList = uniqueElementsBy(
-          data.map((el) => el.userInfo),
-          (a, b) => a.maAccount == b.maAccount
-        )
+        this.deviceInfo = data[0].uaInfo
       })
     },
 

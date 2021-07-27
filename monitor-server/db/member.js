@@ -8,6 +8,10 @@ let member = {
 	memberNO: {
 		type: String,
 	},
+	updateTime: {
+		type: Number,
+		required: true,
+	},
 };
 
 const memberSchema = Schema(member);
