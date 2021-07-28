@@ -4,9 +4,11 @@ const Schema = mongoose.Schema;
 let member = {
 	maAccount: {
 		type: String,
+		required: true,
 	},
 	memberNO: {
 		type: String,
+		required: true,
 	},
 	updateTime: {
 		type: Number,

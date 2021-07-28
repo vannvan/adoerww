@@ -162,7 +162,7 @@ app.get("/list", (req, res) => {
 	};
 
 	console.log(`${req.baseUrl}查询条件:`, filterQueryParams(condition));
-	Monitor.countDocuments({}, (error, count) => {
+	Monitor.countDocuments(filterQueryParams(condition), (error, count) => {
 		if (error) {
 			res.send(throwError(error));
 		} else {

@@ -189,6 +189,10 @@ $(document).ready(function() {
                     name: 'css-tricks(国外技术栈)',
                     link: 'https://css-tricks.com/archives/',
                 },
+                {
+                    name: '政采云',
+                    link: "https://weekly.zoo.team/"
+                }
             ],
         },
         {
