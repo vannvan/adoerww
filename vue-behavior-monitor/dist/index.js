@@ -1,9 +1,9 @@
 /**
  * vue-behavior-monitor
- * @version 0.0.3
+ * @version 0.0.5
  * @author https://github.com/vannvan 
  * @github https://github.com/vannvan/adoerww/blob/master/vue-behavior-monitor/src/index.js 
- * @update Fri Jul 23 2021 11:37:22 GMT+0800 (中国标准时间)
+ * @update Thu Jul 29 2021 10:53:19 GMT+0800 (中国标准时间)
  */
 
 define(function () { 'use strict';
@@ -300,11 +300,14 @@ define(function () { 'use strict';
       value: function clickEventHandler(ele) {
         var _this3 = this;
 
+        console.log(ele);
         var _ele$target = ele.target,
             innerText = _ele$target.innerText,
             localName = _ele$target.localName,
             formAction = _ele$target.formAction,
-            type = _ele$target.type;
+            type = _ele$target.type,
+            x = _ele$target.x,
+            y = _ele$target.y;
         var isEv = this.limitNodeType.includes(localName);
 
         if (isEv) {
@@ -314,6 +317,8 @@ define(function () { 'use strict';
             formAction: formAction,
             eleType: type,
             eventType: 'click',
+            mouseX: x,
+            mouseY: y,
             clickTime: this.getTime()
           }];
           var index = this.pageDataQuene.findIndex(function (el) {
