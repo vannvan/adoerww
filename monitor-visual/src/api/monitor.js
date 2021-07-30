@@ -7,5 +7,7 @@ export default {
 
   getMonitorList: (p) => get('/monitor/list', p), // 获取列表
 
-  getMemberPage: (p) => get('/member/page', p) //成员列表
+  getMemberPage: (p) => get('/member/page', p), //成员列表
+
+  handleAddProject: (p) => post('/project/add', p) //新增项目
 }

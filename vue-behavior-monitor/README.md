@@ -1,6 +1,8 @@
 # Vue.js项目用户行为埋点方案插件
 
 ## Use
+ 
+> npm i vue-behavior-monitor -S
 
 ```js
 // 在router管理模块进行使用

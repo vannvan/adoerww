@@ -10,10 +10,10 @@ class Monitor {
         this.uaInfo = {}
 
         // 页面级别的数据队列
-        this.pageDataQuene = []
+        this.pageDataQueue = []
 
         // 当前操作队列ID
-        this.currentQueneId = null
+        this.currentQueueId = null
 
         // 此属性用于保存bind返回的匿名函数
         this.eventHandler = null
@@ -69,9 +69,9 @@ class Monitor {
                 this.vptHandler()
 
                 // 当前操作页面的唯一标识
-                this.currentQueneId = this.guid()
+                this.currentQueueId = this.guid()
                 let initPageData = [{
-                    id: this.currentQueneId,
+                    id: this.currentQueueId,
                     path: to.path,
                     uaInfo: this.uaInfo,
                     pageInfo: {
@@ -80,10 +80,10 @@ class Monitor {
                     ...extendData,
                     eventData: []
                 }]
-                if (this.pageDataQuene.length >= this.vpt) {
+                if (this.pageDataQueue.length >= this.vpt) {
                     this.clear()
                 }
-                this.pageDataQuene = this.pageDataQuene.concat(initPageData)
+                this.pageDataQueue = this.pageDataQueue.concat(initPageData)
             })
         } else {
             console.warn('请传入router对象')
@@ -107,11 +107,11 @@ class Monitor {
      * @memberof Monitor
      */
     updateLeaveTime() {
-        let index = this.pageDataQuene.findIndex(
-            (el) => el.id == this.currentQueneId
+        let index = this.pageDataQueue.findIndex(
+            (el) => el.id == this.currentQueueId
         )
         if (index >= 0) {
-            this.pageDataQuene[index].pageInfo.leaveTime = this.getTime()
+            this.pageDataQueue[index].pageInfo.leaveTime = this.getTime()
         }
     }
 
@@ -133,7 +133,6 @@ class Monitor {
      * @memberof Monitor
      */
     clickEventHandler(ele) {
-        console.log(ele)
         const { innerText, localName, formAction, type, x, y } = ele.target
         let isEv = this.limitNodeType.includes(localName)
         if (isEv) {
@@ -148,11 +147,11 @@ class Monitor {
                 clickTime: this.getTime()
             }]
 
-            let index = this.pageDataQuene.findIndex(
-                (el) => el.id == this.currentQueneId
+            let index = this.pageDataQueue.findIndex(
+                (el) => el.id == this.currentQueueId
             )
             if (index >= 0) {
-                this.pageDataQuene[index].eventData = this.pageDataQuene[
+                this.pageDataQueue[index].eventData = this.pageDataQueue[
                     index
                 ].eventData.concat(eventData)
             }
@@ -164,7 +163,7 @@ class Monitor {
      * @memberof Monitor
      */
     vptHandler() {
-        if (this.pageDataQuene.length >= this.vpt) {
+        if (this.pageDataQueue.length >= this.vpt) {
             this.sendData()
         }
     }
@@ -176,8 +175,8 @@ class Monitor {
      */
     get() {
         return {
-            value: this.pageDataQuene,
-            length: this.pageDataQuene.length
+            value: this.pageDataQueue,
+            length: this.pageDataQueue.length
         }
     }
 
@@ -187,7 +186,7 @@ class Monitor {
      */
     clear() {
         //TODO
-        this.pageDataQuene = []
+        this.pageDataQueue = []
     }
 
     // 销毁监听事件

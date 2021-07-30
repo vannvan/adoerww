@@ -9,6 +9,11 @@
 export default {
   components: {
     // Layout
+  },
+  mounted() {
+    if (typeof window !== undefined && window._VV === undefined) {
+      window._VV = this
+    }
   }
 }
 </script>

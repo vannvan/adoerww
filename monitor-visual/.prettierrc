@@ -4,5 +4,6 @@
   "singleQuote": true,
   "trailingComma": "none",
   "endOfLine": "auto",
-  "jsxBracketSameLine": true
+  "jsxBracketSameLine": true,
+  "HTMLWhitespaceSensitivity": "ignore"
 }

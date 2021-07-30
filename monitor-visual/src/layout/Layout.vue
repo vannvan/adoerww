@@ -31,11 +31,11 @@
         :style="{ background: '#fff' }"
         class="layout-left-menu"
       >
-        <Menu active-name="1-0" theme="light" width="auto" :open-names="['1']">
-          <MenuItem name="1-0" to="/overview"
+        <Menu active-name="0" theme="light" width="auto" :open-names="['1']">
+          <MenuItem name="0" to="/overview"
             ><Icon type="ios-analytics" />数据总览</MenuItem
           >
-          <Submenu name="1">
+          <!--  <Submenu name="1">
             <template slot="title">
               <Icon type="md-desktop" />
               埋点数据
@@ -45,6 +45,21 @@
             <MenuItem name="1-3" to="/page">访问页面</MenuItem>
             <MenuItem name="1-4" to="/behavior-track">用户行为追踪</MenuItem>
             <MenuItem name="1-5" to="/js-error">JS错误</MenuItem>
+          </Submenu> -->
+          <Submenu v-for="(item, index) in menuList" :key="index" :name="index">
+            <template slot="title">
+              <Icon type="md-desktop" />
+              {{ item.name }}
+            </template>
+            <template v-if="item.children">
+              <MenuItem
+                v-for="(subItem, subIndex) in item.children"
+                :name="index + subIndex"
+                :to="subItem.link"
+                :key="index + subIndex"
+                >{{ subItem.name }}</MenuItem
+              >
+            </template>
           </Submenu>
         </Menu>
       </Sider>
@@ -60,12 +75,34 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-
+const menuList = [
+  {
+    name: '项目管理',
+    link: '/project',
+    children: [
+      {
+        name: '项目列表',
+        link: '/project/list'
+      }
+    ]
+  },
+  {
+    name: '综合数据',
+    link: '/synthesis',
+    children: [
+      {
+        name: '综合查询',
+        link: '/synthesis/search'
+      }
+    ]
+  }
+]
 export default {
   data() {
     return {
       currentTime: null,
-      emoji: null
+      emoji: null,
+      menuList
     }
   },
 

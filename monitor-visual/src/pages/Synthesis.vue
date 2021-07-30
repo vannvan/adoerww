@@ -141,22 +141,18 @@
         </template>
       </Table>
     </div>
-    <div class="page-wrap">
-      <Page
-        :total="page.total"
-        show-sizer
-        show-total
-        @on-change="changePage"
-        :page-size="page.pageSize"
-      />
-    </div>
+    <TablePagination :pageInfo="page" @on-change="changePage" />
   </div>
 </template>
 
 <script>
 import Monitor from '@/api/monitor.js'
 import { division } from '@/utils'
+import TablePagination from '@/components/TablePagination'
 export default {
+  components: {
+    TablePagination
+  },
   data() {
     return {
       loading: false,
@@ -196,11 +192,7 @@ export default {
         }
       ],
       monitorData: [],
-      page: {
-        total: null,
-        current: 1,
-        pageSize: 20
-      },
+      page: {},
       actionOptions: [
         { value: 0, type: '全部' },
         { value: 1, type: '无操作' },
@@ -277,14 +269,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.table-wrap {
-  margin: 16px 10px;
-  height: 600px;
-}
-.page-wrap {
-  margin: 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-</style>
+<style lang="scss"></style>

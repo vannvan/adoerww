@@ -12,10 +12,12 @@ db.once("open", function () {
 const User = require("./user");
 const Monitor = require("./monitor");
 const Member = require("./member");
+const Project = require("./project");
 
 module.exports = {
 	mongoose,
 	User,
 	Monitor,
 	Member,
+	Project,
 };

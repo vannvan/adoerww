@@ -7,7 +7,7 @@ const { checkCurrentMemberExit } = require("./member");
 
 // 新增
 app.post("/add", (req, res) => {
-	log(`请求参数:, ${JSON.stringify(req.body)}`);
+	log(`${req.baseUrl}请求参数:, ${JSON.stringify(req.body)}`);
 	let params = req.body;
 	params.created = Date.now();
 	const monitor = new Monitor(params);

@@ -90,3 +90,11 @@ export function division(num1, num2) {
   r2 = Number(num2.toString().replace('.', ''))
   return (r1 / r2) * Math.pow(10, t2 - t1)
 }
+
+export function guid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
