@@ -333,6 +333,10 @@ $(document).ready(function() {
             name: '躺平工具',
             icon: 'icon-ai-tool',
             linkList: [{
+                    name: "GitMind",
+                    link: 'https://gitmind.cn/app/template'
+                },
+                {
                     name: '图床',
                     link: 'https://imgchr.com/',
                 },
