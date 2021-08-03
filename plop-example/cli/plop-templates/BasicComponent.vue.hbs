@@ -1,0 +1,16 @@
+{{!-- ./plop-templates/component.vue.hbs --}}
+
+<template>
+  <div class="{{ dashCase name }}">{{ name }}</div>
+</template>
+
+<script>
+  export default {
+    name: '{{ properCase name }}',
+  }
+</script>
+
+<style lang="scss">
+@import "./index.scss";
+
+</style>

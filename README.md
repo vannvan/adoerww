@@ -12,3 +12,4 @@
 - [node的websocket](https://github.com/vannvan/adoerww/blob/master/node-ws)
 - [react企业级脚手架搭建参考](https://github.com/vannvan/adoerww/blob/master/react-cli)
 - [用于生成二维码的chrome扩展](https://github.com/vannvan/adoerww/blob/master/create-qrcode-chrome-extension)
+- [小而美的脚手架](https://github.com/vannvan/adoerww/blob/master/plop-example)
