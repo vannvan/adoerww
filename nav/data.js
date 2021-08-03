@@ -571,6 +571,10 @@ $(document).ready(function() {
                     name: 'Google邮箱',
                     link: 'https://mail.google.com/',
                 },
+                {
+                    name: "wikiHow",
+                    link: 'https://zh.wikihow.com/%E9%A6%96%E9%A1%B5'
+                }
             ],
         },
     ]
