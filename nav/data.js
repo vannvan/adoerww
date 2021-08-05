@@ -538,6 +538,10 @@ $(document).ready(function() {
                     name: '壁纸',
                     link: 'https://wallhere.com/',
                 },
+                {
+                    name: "emoji",
+                    link: 'https://www.emojiall.com/zh-hans/all-emojis'
+                }
             ],
         },
         {
