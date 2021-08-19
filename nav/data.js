@@ -183,7 +183,7 @@ $(document).ready(function() {
                 },
                 {
                     name: '奇舞周刊-优秀好文章',
-                    link: 'https://weekly.75team.com/',
+                    link: 'https://weekly.75.team/',
                 },
                 {
                     name: 'css-tricks(国外技术栈)',
