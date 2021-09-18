@@ -18,7 +18,8 @@
         let baiduWord = 'https://www.baidu.com/s?wd='
         let baiduTranslate = 'https://fanyi.baidu.com/#zh/en/'
         let youdaoTranslate = 'http://dict.youdao.com/w/'
-        if (event.ctrlKey && event.keyCode == 13) {
+ 
+        if ((event.ctrlKey || event.metaKey)&& event.keyCode == 13) {
             window.open(baiduTranslate + inputValue);
             return
         }
@@ -26,7 +27,7 @@
             window.open(youdaoTranslate + inputValue);
             return
         }
-        if (event.keyCode == 13) {
+        if (event.keyCode == 13 && inputValue) {
             window.open(baiduWord + inputValue)
         }
     };
@@ -51,7 +52,7 @@
             </div>
             <div class="right-content">
                 <div class="search">
-                    <input type="text" id="input" name="word" autofocus placeholder="回车百度搜索 | Ctrl+Enter百度翻译 | Alt+Enter有道翻译" />
+                    <input type="text" id="input" name="word" autofocus placeholder="回车百度搜索 | ⌘ + Enter百度翻译 | option+Enter有道翻译" />
                     <input type="button" id="search-btn" value="Search" />
                 </div>
                 <div class="website"></div>
