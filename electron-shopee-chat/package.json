@@ -72,7 +72,7 @@
     "author": "马六甲",
     "license": "CC0-1.0",
     "devDependencies": {
-        "electron": "^11.3.0",
+        "electron": "^11.5.0",
         "electron-builder": "^22.10.5"
     },
     "dependencies": {
