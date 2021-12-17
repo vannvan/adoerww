@@ -496,6 +496,10 @@ $(document).ready(function () {
           name: '观察星系',
           link: 'http://stars.chromeexperiments.com/',
         },
+        {
+          name::"画板" ,
+          link:'https://excalidraw.com/'
+        }
       ],
     },
     {
