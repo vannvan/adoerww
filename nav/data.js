@@ -196,6 +196,10 @@ $(document).ready(function () {
           name: '政采云',
           link: 'https://weekly.zoo.team/',
         },
+        {
+          name:"HelloWorld",
+          link:"https://www.helloworld.net/"
+        }
       ],
     },
     {
