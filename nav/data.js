@@ -14,10 +14,7 @@ let hiddenProperty =
     : 'mozHidden' in document
     ? 'mozHidden'
     : null
-let visibilityChangeEvent = hiddenProperty.replace(
-  /hidden/i,
-  'visibilitychange'
-)
+let visibilityChangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange')
 let onVisibilityChange = function () {
   if (!document[hiddenProperty]) {
     clearInterval(timer)
@@ -197,9 +194,9 @@ $(document).ready(function () {
           link: 'https://weekly.zoo.team/',
         },
         {
-          name:"HelloWorld",
-          link:"https://www.helloworld.net/"
-        }
+          name: 'HelloWorld',
+          link: 'https://www.helloworld.net/',
+        },
       ],
     },
     {
@@ -501,9 +498,9 @@ $(document).ready(function () {
           link: 'http://stars.chromeexperiments.com/',
         },
         {
-          name::"画板" ,
-          link:'https://excalidraw.com/'
-        }
+          name: '画板',
+          link: 'https://excalidraw.com/',
+        },
       ],
     },
     {
@@ -648,8 +645,7 @@ $(document).ready(function () {
   function buildList(elName, dataList) {
     let htmlStr = `<div class="title">${elName}</div>`
     $.each(dataList, (index) => {
-      let className =
-        HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
+      let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
       htmlStr += `<li class="link-item ${className}" onClick="window.open('${dataList[index].link}','_blank')" ><a target="view_window">${dataList[index].name}</a></li>`
     })
     if (dataList.length % 5 != 0) {
