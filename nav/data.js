@@ -341,6 +341,10 @@ $(document).ready(function () {
           name: 'nest.js',
           link: 'https://exlley.gitbooks.io/nest-js/content/chapter1/di-yi-ge-kong-zhi-qi.html',
         },
+        {
+          name:'sveltejs',
+          link:"https://www.sveltejs.cn/docs"
+        }
       ],
     },
     {
