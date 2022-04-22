@@ -505,6 +505,10 @@ $(document).ready(function () {
           name: '画板',
           link: 'https://excalidraw.com/',
         },
+        {
+          name:"loading.io",
+          link:"https://loading.io/animation/icon/"
+        }
       ],
     },
     {
