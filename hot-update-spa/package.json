@@ -1,0 +1,21 @@
+{
+  "name": "hot-update-spa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.72.0",
+    "webpack-dev-server": "^4.8.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.9.2"
+  }
+}
