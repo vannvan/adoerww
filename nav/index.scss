@@ -85,6 +85,66 @@ body::-webkit-scrollbar {
 
 }
 
+
+
+.face {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: #ffcc09;
+  justify-content: center;
+  align-items: center;
+  margin: 30px;
+}
+.face::before {
+  content: '';
+  position: absolute;
+  top: 136px;
+  width: 84px;
+  height: 45px;
+  background: #b57700;
+  left: 56.3px;
+  border-bottom-left-radius: 70px;
+  border-bottom-right-radius: 70px;
+  transition: 0.5s;
+}
+.face:hover::before {
+  top: 140px;
+  width: 84px;
+  height: 20px;
+  background: #b57700;
+  left: 56.3px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.eyes {
+  position: relative;
+  top: 58px;
+  left: 30px;
+  display: flex;
+}
+.eyes .eye {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: block;
+  background: #fff;
+  margin: 0 15px;
+  border-radius: 50%;
+}
+.eyes .eye::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 25px;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border-radius: 50%;
+}
+
 .content {
   width: 100%;
   height: auto;
