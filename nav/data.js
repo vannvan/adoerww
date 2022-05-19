@@ -349,6 +349,10 @@ $(document).ready(function () {
           name: 'sveltejs',
           link: 'https://www.sveltejs.cn/docs',
         },
+        {
+          name: '飞冰',
+          link: 'https://ice.work/',
+        },
       ],
     },
     {
