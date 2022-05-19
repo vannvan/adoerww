@@ -276,6 +276,10 @@ $(document).ready(function () {
           link: 'https://undraw.co/illustrations',
         },
         {
+          name: '插画2',
+          link: 'https://www.manypixels.co/gallery',
+        },
+        {
           name: '现代JavaScript教程',
           link: 'https://zh.javascript.info/',
         },
