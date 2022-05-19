@@ -342,9 +342,9 @@ $(document).ready(function () {
           link: 'https://exlley.gitbooks.io/nest-js/content/chapter1/di-yi-ge-kong-zhi-qi.html',
         },
         {
-          name:'sveltejs',
-          link:"https://www.sveltejs.cn/docs"
-        }
+          name: 'sveltejs',
+          link: 'https://www.sveltejs.cn/docs',
+        },
       ],
     },
     {
@@ -418,6 +418,10 @@ $(document).ready(function () {
         {
           name: 'bootCDN',
           link: 'https://www.bootcdn.cn/',
+        },
+        {
+          name: 'cdnjs',
+          link: 'https://cdnjs.com/',
         },
         {
           name: '在线抠图',
@@ -506,9 +510,9 @@ $(document).ready(function () {
           link: 'https://excalidraw.com/',
         },
         {
-          name:"loading.io",
-          link:"https://loading.io/animation/icon/"
-        }
+          name: 'loading.io',
+          link: 'https://loading.io/animation/icon/',
+        },
       ],
     },
     {
