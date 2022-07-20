@@ -1,0 +1,115 @@
+.model {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 99999999;
+}
+
+.model_popup {
+    width: 452px;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    text-align: center;
+    padding-bottom: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -226px;
+    margin-top: -140px;
+    overflow: hidden;
+    z-index: 99999999;
+
+
+    .popup-text {
+        padding: 25px 40px 35px;
+        text-align: center;
+        font-size: 16px;
+        color: #333333;
+        /* border-bottom: 1px solid #f2f2f2; */
+        border-top: 1px solid #99bafa;
+    }
+
+    .popup-ts {
+        height: 45px;
+        text-align: center;
+        line-height: 45px;
+        font-size: 16px;
+        color: #333333;
+        font-size: 16px;
+        color: #333333;
+    }
+}
+
+
+.model_toast {
+    border-radius: 8px;
+    text-align: center;
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999999;
+    min-width: 400px;
+    user-select: none;
+    background: rgba(19, 194, 194, 0.9);
+
+    .popup-toast {
+        padding: 15px 32px;
+        text-align: center;
+        font-size: 16px;
+        color: #fff;
+        font-weight: 600;
+
+        .close {
+            position: absolute;
+            right: 18px;
+            top: 5px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+    }
+}
+
+
+
+.popup-btn {
+    overflow: hidden;
+
+    .sure {
+        display: inline-block;
+        width: 100px;
+        height: 34px;
+        line-height: 34px;
+        background-color: #3475f5;
+        cursor: pointer;
+        font-size: 14px;
+        color: #fff;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        /* float: right; */
+        margin-right: 40px;
+    }
+
+    .alert_sure {
+        margin: 0;
+    }
+
+    .cancel {
+        display: inline-block;
+        width: 100px;
+        height: 34px;
+        line-height: 34px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+        background-color: #fff;
+        border: 1px solid #3475f5;
+        color: #3475f5;
+        /* float: right;
+        margin-right: 40px; */
+    }
+
+}

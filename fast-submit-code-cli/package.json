@@ -1,0 +1,24 @@
+{
+    "name": "fast-submit-code-cli",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "bin": {
+        "submit": "bin/index.js",
+        "push": "bin/index.js"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "files": [
+        "package.json",
+        "bin",
+        "util"
+    ],
+    "author": "vannvan",
+    "license": "ISC",
+    "dependencies": {
+        "inquirer": "^8.1.1",
+        "shelljs": "^0.8.4"
+    }
+}

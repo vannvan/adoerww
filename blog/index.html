@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1"> -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <!-- <meta name="referrer" content="no-referrer"/> -->
+  <title>vannvan</title>
+  <link rel="stylesheet" href="atom-one-dark-reasonable.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1413143_basptk773d.css">
+</head>
+
+<body>
+  <div id="containter">
+    <div id="nav" class="scroll"></div>
+    <div id="header">
+      <i class="iconfont icon-menu"></i>
+      <a href="https://github.com/vannvan/archives" target="view_window"><i class="iconfont icon-github"></i></a>
+    </div>
+    <div id="content" class="scroll"></div>
+    <div id="cate-modal"></div>
+    <!-- <div id="outline"></div> -->
+  </div>
+  <script src="https://cdn.bootcdn.net/ajax/libs/marked/1.1.0/marked.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <script src="flexible.debug.js"></script>
+  <script src="highlight.pack.js"></script>
+  <script src="filelist.js"></script>
+  <script>
+    var cateList = new Map()
+    //文件分类
+    async function buildCate(archives) {
+      archives.map(el => {
+        let cateName = el.split('/')[0]
+        let fileName = el.split('/')[1]
+        if (!cateList.has(cateName)) {
+          cateList.set(cateName, [].concat(fileName))
+        } else {
+          cateList.set(cateName, cateList.get(cateName).concat(fileName))
+        }
+      })
+      await renderList()
+    }
+    buildCate(archives)
+    //渲染列表
+    async function renderList() {
+      let itemStr = ''
+      cateList.forEach((item, key) => {
+        let subitem = getSubItemList(item)
+        itemStr += `<ul data-name="${key}" class="cate"><p class="cate-name">${key}</p>${subitem}</ul>`
+      })
+      let closeNode = '<b class="close-btn">X</b>'
+      document.getElementById("nav").innerHTML = itemStr
+      document.getElementById("cate-modal").innerHTML = itemStr
+      $("#cate-modal").append(closeNode)
+    }
+
+    function getSubItemList(item) {
+      if (item.length < 1) return
+      let subItemStr = ''
+      item.map(el => {
+        let subItemName = el.split(".")[0]
+        subItemStr += `<li data-path="${el}" class="file-name-item">${subItemName}</li>`
+      })
+      return subItemStr
+    }
+    //默认加载README
+    handleGetFile('README.md')
+
+    function handleGetFile(fullPath) {
+      document.title = location.hash = fullPath
+      $.get(fullPath, function (response, status, xhr) {
+        $("#content").html(marked(response));
+        replaceLanguageVue()
+        appendColorToCodeBlock()
+        document.querySelectorAll('pre code').forEach((block) => {
+          hljs.highlightBlock(block);
+        });
+      });
+    }
+
+    let cateListNode = [...document.querySelectorAll(".cate")]
+    cateListNode.map(el => {
+      el.addEventListener('click', function (e) {
+        let catePath = this.dataset.name
+        let filePath = e.target.dataset.path
+        if (!filePath) return
+        resetActive()
+        e.target.setAttribute('class', 'active-name file-name-item')
+
+        let fullPath = catePath + '/' + filePath
+        handleGetFile(fullPath)
+      })
+    })
+
+    function resetActive() {
+      let fileNameItemNode = [...document.querySelectorAll(".file-name-item")]
+      fileNameItemNode.map(el => {
+        el.setAttribute('class', 'file-name-item')
+      })
+    }
+
+
+    //替换所有language-vue
+    function replaceLanguageVue() {
+      let fileNameItemNode = [...document.querySelectorAll(".language-vue")]
+      fileNameItemNode.map(el => {
+        el.setAttribute('class', 'language-html hljs')
+      })
+    }
+
+    //给所有code非代码块标签内的文字换颜色
+    function appendColorToCodeBlock() {
+      let codeBlockItemNode = [...document.querySelectorAll('code')]
+      codeBlockItemNode.map(el => {
+        if (!el.className) {
+          el.style.color = '#155E63'
+        }
+      })
+    }
+
+
+    //判断设备
+    function IsPC() {
+      var userAgentInfo = navigator.userAgent;
+      var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+      var flag = true;
+      for (var v = 0; v < Agents.length; v++) {
+        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+          flag = false;
+          break;
+        }
+      }
+      return flag;
+    }
+    if (!IsPC()) {
+      document.getElementById("nav").style.display = 'none'
+      document.getElementById("header").style.width = '100%'
+    } else {
+      document.querySelector(".icon-menu").style.display = 'none'
+    }
+
+
+    $(".icon-menu").click(function () {
+      $("#cate-modal").show()
+    })
+    $("#cate-modal").click(function () {
+      $("#cate-modal").hide()
+    })
+  </script>
+
+
+</body>
+
+</html>

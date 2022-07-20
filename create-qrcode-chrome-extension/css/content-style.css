@@ -1,0 +1,21 @@
+body::-webkit-scrollbar-thumb,
+.common-scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-image: linear-gradient(45deg, #88d3ce 0%, #6e45e2 99%, #6e45e2 100%);
+}
+
+
+body::-webkit-scrollbar-track,
+.common-scroll::-webkit-scrollbar-track {
+    background: #f5f7f9;
+}
+
+body::-webkit-scrollbar,
+.common-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+#wrapper_wrapper .page-inner a {
+    box-shadow: 0 0 3px rgba(0,0,0,0.3);
+}

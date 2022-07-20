@@ -1,0 +1,41 @@
+{
+    "manifest_version": 2,
+    "name": "vannvan",
+    "version": "1.0.0",
+    "description": "开发者工具",
+    "author": "vannvan",
+    "icons": {
+        "48": "icon.png",
+        "128": "icon.png"
+    },
+    "homepage_url": "https://github.com/vannvan",
+    "browser_action": {
+        "default_icon": "icon.png"
+    },
+    "permissions": [
+        "declarativeContent",
+        "storage",
+        "webNavigation",
+        "tabs",
+        "notifications",
+        "http://*/",
+        "https://*/",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "./js/content.js"
+            ],
+            "run_at": "document_end",
+            "all_frames": true
+        }
+    ],
+    "web_accessible_resources": [
+        "/js/ajaxhook.js"
+    ]
+}

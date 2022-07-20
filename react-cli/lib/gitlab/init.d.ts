@@ -1,0 +1,1 @@
+declare const gitInit: () => void;

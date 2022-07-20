@@ -1,0 +1,43 @@
+{
+  "manifest_version": 2,
+  "description": "https://erp.emalacca.com/ ",
+  "homepage_url": "https://erp.emalacca.com/",
+  "icons": {
+    "16": "icon/app.png",
+    "48": "icon/app.png",
+    "128": "icon/app.png"
+  },
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": [
+      "./inject/inject.js"
+    ],
+  
+    "run_at": "document_end"
+  }],
+  "background": {
+    "persistent": true,
+    "scripts": [
+      "./background/background.js"
+    ]
+  },
+  "web_accessible_resources": [
+    "options/options.html"
+  ],
+  "browser_action": {
+    "default_icon": "icon/app.png",
+    "default_title": "马六甲跨境助手",
+    "default_popup": "popup/popup.html"
+  },
+  "permissions": [
+    "storage",
+    "cookies",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-+x3iipxlWcptQVHtAnXiyH88+kYiRcdKChccBSRjv+w=' https://sw-erp.oss-accelerate.aliyuncs.com; object-src 'self'"
+}

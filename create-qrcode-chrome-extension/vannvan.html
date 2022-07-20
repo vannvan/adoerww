@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .content {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 12px
+    }
+
+    .content .img-wrap {
+        width: 110px;
+        height: 110px;
+        position: relative;
+        margin-right: -1px;
+        margin-bottom: -1px;
+        border: 1px solid #ccc;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .content .img-wrap img {
+        width: 100px;
+        height: 100px;
+        margin-top: 5px
+    }
+
+    .content .img-wrap:hover {
+        background: #ededed;
+    }
+
+    .content .delete {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        top: 0;
+        right: -1px;
+        background-image: url(./delete.png);
+        background-size: 100% 100%;
+        display: block;
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <p id="status"></p>
+    <button id="get_all_images">获取图片资源</button>
+    <button id="download_all_images">下载图片资源</button>
+    <button id="view_dom_attr">查看DOM属性</button>
+    <div class="content"></div>
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/file-saver.min.js"></script>
+    <script src="./js/jszip.js"></script>
+    <script type="text/javascript" src="./js/devtool-get-img.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>单页面热更新工具</title>
+  </head>
+  <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+  <style>
+    li {
+      list-style: none;
+    }
+    .item {
+      float: left;
+      /* height: 40px; */
+      writing-mode: vertical-lr;
+      text-orientation: upright;
+      overflow: hidden;
+    }
+  </style>
+  <body style="background: #2c3e50; color: #fff">
+    <div class="wrap"></div>
+    <script>
+      const value = 500023
+
+      const numberGrow = (ele, time = 1) => {
+        let step = (value * 10) / (time * 1000)
+        let current = 0
+        let start = 0
+        let t = setInterval(function () {
+          start += step
+          if (start > value) {
+            clearInterval(t)
+            start = value
+            t = null
+          }
+          if (current === start) {
+            return
+          }
+          current = start
+          ele.innerHTML = current.toString().replace(/(\d)(?=(?:\d{3}[+]?)+$)/g, '$1,')
+        }, 10)
+      }
+
+      let fontSize = 36
+      // let maxFontSize = 12
+      // // setInterval(() => {
+      // fontSize += 2
+      let number = Array.from({ length: 10 }, (v, k) => {
+        return `<li  style="font-size:${fontSize}px;">${k}</li>`
+      }).join('')
+      let numbers = Array.from({ length: 6 }, (v, k) => {
+        return `<div class="item" style="font-size:${fontSize}px;">${number}</div>`
+      }).join('')
+      numberGrow($('.wrap'))
+      // $('.wrap').html(`<div><div class="item">我</div>${numbers}</div>`)
+    </script>
+  </body>
+</html>

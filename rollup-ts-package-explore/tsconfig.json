@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		/* Basic Options */
+		"outDir": "./lib", // 输出目录
+		"target": "es5",
+		"module": "commonjs",
+		/* Strict Type-Checking Options */
+		"strict": true,
+		/* Module Resolution Options */
+		"esModuleInterop": true,
+		/* Advanced Options */
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	},
+	"include": [
+		"src/*" // 导入目录
+	]
+}
