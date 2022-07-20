@@ -611,6 +611,10 @@ $(document).ready(function () {
         {
           name:"产品经理导航",
           link:"https://www.pmbaobao.com/"
+        },
+        {
+          name:"程序员的乐趣",
+          link:"https://www.webhek.com/"
         }
       ],
     },
