@@ -1,106 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script src="https://files.mogulinker.com/other/20210412/jquery.min-42c2e17e8d12471c96e202cafd8ec7e0.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/FZ6XpvbKBXIP-d50e9ff694624254a6ea9b856f35e426.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/httSGS3APJMm-856b4ff4f37442248e3e85c7c827d059.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/product_generated-3e7cb5ab28d0444e8010e064dcbfb1c9.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/ht-e42eee517b3e430aad4e47cb4551660c.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/plugin.min-2af745cf9eff4d16a2785bc77afb17a8.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/handlebars.min-e0476f9b501943b8b12958e5df03d17f.js"></script>
-    <script src="https://files.mogulinker.com/other/20210412/buckle-0c7a11fd9637466b9618ad9ba6cc8d2f.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <title></title>
   </head>
-  <style>
-    html,
+  <style type="text/css">
     body {
-      padding: 0px;
-      margin: 0px;
+      background: #94b3d0;
+    }
+    .pie {
+      height: 160px;
+      width: 160px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: conic-gradient(
+        transparent 0deg,
+        transparent 180deg,
+
+        #a2dee9 356deg,
+        #fff 360deg
+      );
     }
 
-    .main {
-      margin: 0px;
-      padding: 0px;
-      position: absolute;
-      top: 0px;
-      bottom: 0px;
-      left: 0px;
-      right: 0px;
-      background: #434343;
+    .pie1 {
+      margin-top: 20px;
+      height: 160px;
+      width: 160px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      background: conic-gradient(
+        transparent 0deg,
+        transparent 179deg,
+        rgba(162, 222, 233, 0.1) 180deg,
+        #a2dee9 356deg,
+        #fff 360deg
+      );
     }
   </style>
-
   <body>
-    <script>
-      function init() {
-        dataModel = new ht.DataModel()
-        graphView = new ht.graph.GraphView(dataModel)
-        view = graphView.getView()
-        graphView.setEditable(true)
+    <div class="pie"></div>
 
-        view.className = 'main'
-        document.body.appendChild(view)
-        window.addEventListener(
-          'resize',
-          function (e) {
-            graphView.invalidate()
-          },
-          false
-        )
-        ht.Default.setImage('Box', {
-          width: { func: 'field@_width', value: 160 },
-          height: { func: 'field@_height', value: 160 },
-          renderHTML: (data, graphView, cache) => {
-            const $ = window.$
-            if (!cache.htmlView) {
-              // 创建html
-              const chartWrapper = document.createElement('div')
-              cache.htmlView = chartWrapper
-              cache.initTime = 0
-            }
-            cache.htmlView.layoutHTML = function () {
-              graphView.layoutHTML(data, cache.htmlView, false)
-            }
-            $(cache.htmlView).html(
-              `<div style="width:300px;height:300px;background:#3498db">hello</div>`
-            )
-            // cache.htmlView.appendChild('div')
-            return cache.htmlView
-          },
-          comps: [],
-        })
-
-        let node3 = new ht.Text()
-        node3.s({
-          pixelPerfect: false,
-          text: '文字',
-          'text.align': 'center',
-          'text.color': '#fff',
-          'text.font': '400 32px Arial, sans-serif',
-          'text.vAlign': 'middle',
-        })
-        // node3.setLayer('s')
-        node3.setSize(200, 200)
-        node3.setPosition(220, 220)
-        node3.setLayer('ss')
-
-        console.log(node3)
-
-        dataModel.add(node3)
-
-        let node = new ht.Node()
-        node.setImage('Box')
-        node.setLayer('ss')
-        node.setSize(200, 200)
-        node.setPosition(200, 200)
-        dataModel.add(node)
-        // dataModel.moveToBottom(node3)
-      }
-      init()
-    </script>
+    <div class="pie1"></div>
   </body>
 </html>
