@@ -308,6 +308,10 @@ $(document).ready(function () {
           name: '在线JS环境',
           link: 'https://stackblitz.com/',
         },
+        {
+          name:"netlify静态资源",
+          link:"https://app.netlify.com/sites"
+        }
       ],
     },
     {
@@ -615,11 +619,8 @@ $(document).ready(function () {
         {
           name:"程序员的乐趣",
           link:"https://www.webhek.com/"
-        },
-        {
-          name:"程序员的乐趣",
-          link:"https://www.webhek.com/"
         }
+        
       ],
     },
     {
