@@ -538,6 +538,10 @@ $(document).ready(function () {
           name: 'loading.io',
           link: 'https://loading.io/animation/icon/',
         },
+        {
+          name:"canisuse",
+          link:"https://caniuse.com/"
+        }
       ],
     },
     {
