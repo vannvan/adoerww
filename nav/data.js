@@ -663,6 +663,10 @@ $(document).ready(function () {
           name: 'wikiHow',
           link: 'https://zh.wikihow.com/%E9%A6%96%E9%A1%B5',
         },
+        {
+          name:"即时热榜",
+          link:"http://www.jsrank.cn/c/news.html"
+        }
       ],
     },
   ]
