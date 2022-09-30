@@ -8,17 +8,14 @@
       background: #94b3d0;
     }
     .pie {
-      height: 160px;
-      width: 160px;
+      height: 178px;
+      width: 178px;
       border-radius: 50%;
       border: 3px solid #fff;
-      background: conic-gradient(
-        transparent 0deg,
-        transparent 180deg,
-
-        #a2dee9 356deg,
-        #fff 360deg
-      );
+      background: conic-gradient(transparent 0deg, transparent 180deg, #a2dee9 356deg, #fff 360deg);
+      position: absolute;
+      top: 16px;
+      left: 16px;
     }
 
     .pie1 {
@@ -35,10 +32,30 @@
         #fff 360deg
       );
     }
+
+    .circle {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: conic-gradient(
+        transparent 0deg,
+        #fff 45deg,
+        transparent 91deg,
+        transparent 180deg,
+        #fff 270deg,
+        transparent 281deg,
+        transparent 359deg
+      );
+      -webkit-mask: radial-gradient(transparent, transparent 98px, #000 98px);
+      /* mask: radial-gradient(transparent, transparent 98px, #000 98px); */
+      padding: 10px;
+      position: relative;
+    }
   </style>
   <body>
-    <div class="pie"></div>
+    <!-- <div class="pie1"></div> -->
 
-    <div class="pie1"></div>
+    <div class="circle"></div>
+    <div class="pie"></div>
   </body>
 </html>
