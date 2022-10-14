@@ -210,6 +210,10 @@ $(document).ready(function () {
           name: 'HelloWorld',
           link: 'https://www.helloworld.net/',
         },
+        {
+          name:"阮一峰",
+          link:"https://www.ruanyifeng.com/blog/"
+        }
       ],
     },
     {
