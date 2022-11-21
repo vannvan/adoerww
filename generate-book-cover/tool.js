@@ -46,12 +46,16 @@ let tools = {
         //2、根据时间戳生成文件名
         // cb(null, Date.now() + extname)
         const fileName = Buffer.from(file.originalname, 'latin1').toString('utf8')
-        const isExit = fs.existsSync(uploadDir + fileName)
+        const isExit = fs.existsSync(path.resolve(uploadDir + '/' + fileName))
+        // console.log('isExit', isExit, uploadDir + fileName)
         if (isExit) {
-          exec(`rm ${uploadDir + fileName}`)
+          // console.log('删除已存在的', `rm -rf ${path.resolve(uploadDir + '/' + fileName)}`)
+          exec(`rm -rf ${path.resolve(uploadDir + '/' + fileName)}`)
         }
+        setTimeout(() => {
+          cb(null, fileName)
+        }, 500)
         // console.log('fileName', fileName)
-        cb(null, fileName)
       },
     })
     const upload = multer({ storage: storage })

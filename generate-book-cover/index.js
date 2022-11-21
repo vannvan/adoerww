@@ -22,7 +22,7 @@ class BookCover {
   }
 
   init() {
-    // $('.book-cover').attr('src', 'http://127.0.0.1:3001/images/苏菲的世界-ss.png')
+    // $('.book-cover').attr('src', 'http://127.0.0.1:3001/images/上瘾-尼尔·埃亚尔.jpeg')
     // $('.book-title').html('苏菲的世界')
     // $('.book-author').html('作者啊哈')
     this.getBooks()
