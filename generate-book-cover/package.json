@@ -1,0 +1,29 @@
+{
+  "name": "hot-update-spa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "html2canvas": "^1.4.1",
+    "jquery": "^3.6.1",
+    "mkdirp": "^1.0.4",
+    "multer": "^1.4.5-lts.1",
+    "silly-datetime": "^0.1.2",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.72.0",
+    "webpack-dev-server": "^4.8.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.9.2"
+  }
+}

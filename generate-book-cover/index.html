@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .content {
+      background: #f8f9fa;
+      width: 460px;
+      height: 288px;
+      display: flex;
+      align-items: center;
+      border-radius: 8px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+    }
+    .left {
+      height: 100%;
+      padding-top: 49px;
+      padding-left: 49px;
+      box-sizing: border-box;
+    }
+    .book-cover {
+      width: 131px;
+      height: 190px;
+    }
+    .right {
+      height: 190px;
+      flex: 1;
+      margin-left: 20px;
+      margin-right: 49px;
+      /* font-family: 娃娃体-简; */
+      font-family: 手札体-简;
+      position: relative;
+    }
+    .book-title {
+      font-size: 30px;
+    }
+    .book-author {
+      position: absolute;
+      bottom: 16px;
+      font-size: 20px;
+      color: #adb5bd;
+    }
+  </style>
+  <body>
+    <div class="content">
+      <div class="left">
+        <img class="book-cover" src="" alt="书籍封面" />
+      </div>
+      <div class="right">
+        <div class="book-title"></div>
+        <div class="book-author"></div>
+      </div>
+    </div>
+  </body>
+</html>
