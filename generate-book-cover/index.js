@@ -36,8 +36,8 @@ class BookCover {
         const { code, data: bookList } = res
         if (code === 0) {
           let i = 0
-          this.timer = setInterval(() => {
-            this.setBook(bookList[i])
+          this.timer = setInterval(async () => {
+            await this.setBook(bookList[i])
             i++
           }, 3000)
         }
@@ -45,10 +45,11 @@ class BookCover {
     })
   }
 
-  setBook(bookInfo) {
+  async setBook(bookInfo) {
     if (!bookInfo) {
       clearInterval(this.timer)
       console.log('封面处理完毕')
+      alert('封面处理完毕')
       return
     }
     console.log('bookInfo', bookInfo)
@@ -56,10 +57,12 @@ class BookCover {
     $('.book-cover').attr('src', fileName)
     $('.book-title').html(bookName)
     $('.book-author').html(bookAuthor)
-    this.createImage(bookInfo)
+    setTimeout(async () => {
+      await this.createImage(bookInfo)
+    }, 500)
   }
 
-  createImage(bookInfo) {
+  async createImage(bookInfo) {
     html2canvas(document.querySelector('.content'), {
       useCORS: true,
     }).then((html) => {
