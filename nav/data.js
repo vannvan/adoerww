@@ -39,7 +39,7 @@ function eyeball() {
 document.addEventListener(visibilityChangeEvent, onVisibilityChange)
 $(document).ready(function () {
   let currentHour = new Date().getHours()
-  let theme = currentHour < 19 ? 'light' : 'dark'
+  let theme = currentHour < 19 || window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
   const HOVER_CLASS = [
     'hvr-sweep-to-right',
     'hvr-sweep-to-left',
@@ -204,7 +204,7 @@ $(document).ready(function () {
         },
         {
           name: '政采云',
-          link: 'https://weekly.zoo.team/',
+          link: 'http://zoo.zhengcaiyun.cn/',
         },
         {
           name: 'HelloWorld',
@@ -749,3 +749,6 @@ $(document).ready(function () {
     return 'rgb(' + r + ',' + g + ',' + b + ')'
   }
 })
+
+
+// window.matchMedia('(prefers-color-scheme: dark)').matches
