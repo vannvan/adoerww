@@ -1,0 +1,111 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  // background: #fff;
+}
+.content {
+  width: 100%;
+  height: 100%;
+  // background: #ccc;
+  display: flex;
+  .left {
+    width: 200px;
+    height: 100%;
+    width: 260px;
+    .logo {
+      height: 80px;
+    }
+    .menu-content {
+      width: 100%;
+      .menu-item {
+        height: 60px;
+        line-height: 60px;
+        box-sizing: border-box;
+        padding-left: 60px;
+        border-bottom: 1px solid #e9ecef;
+        cursor: pointer;
+        font-weight: 400;
+        .iconfont {
+          margin-right: 10px;
+        }
+        .name {
+          // text-decoration: underline;
+        }
+      }
+      .count {
+        position: fixed;
+        bottom: 20px;
+        left: 100px;
+      }
+    }
+  }
+  .right {
+    // background: #ccc;
+    flex: 1;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    .search-wrap {
+      position: fixed;
+      right: calc((100% - 60% - 260px) / 2);
+      top: 80px;
+      width: 60%;
+      height: 54px;
+      // background: #999;
+      input {
+        width: 100%;
+        height: 54px;
+        background: transparent;
+        outline: none;
+        border-style: solid;
+        border-width: 2px;
+        padding-left: 12px;
+        box-sizing: border-box;
+      }
+      button {
+        position: absolute;
+        right: 0;
+        border-radius: 0;
+        height: 54px;
+        width: 160px;
+        border: none;
+      }
+    }
+    .web-content {
+      position: absolute;
+      top: 180px;
+      height: calc(100% - 100px);
+      width: 100%;
+      background: #ccc;
+      overflow: auto;
+      scrollbar-width: none; /* firefox */
+      -ms-overflow-style: none; /* IE 10+ */
+      &::-webkit-scrollbar {
+        display: none; /* Chrome Safari */
+      }
+      .web-p-content {
+        width: 80%;
+        height: calc(100% - 200px);
+        background: #666;
+        margin-bottom: 100px;
+        .p-name {
+          height: 80px;
+        }
+        .link-content {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          .link-item {
+            width: 100px;
+            height: 60px;
+          }
+        }
+      }
+    }
+  }
+}
