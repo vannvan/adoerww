@@ -14,7 +14,7 @@
     "start": "npm run serve"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.2",
     "core-js": "^3.6.5",
     "dayjs": "^1.10.6",
     "view-design": "^4.6.1",
