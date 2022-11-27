@@ -76,7 +76,7 @@
         "electron-builder": "^22.10.5"
     },
     "dependencies": {
-        "axios": "^0.21.1",
+        "axios": "^0.21.2",
         "bootstrap": "^4.6.0",
         "electron-localstorage": "^1.0.5",
         "electron-log": "^4.3.2",
