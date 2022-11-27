@@ -1,0 +1,77 @@
+#root {
+  margin: 0;
+  margin: 0;
+  background: #e1dfdd;
+}
+
+.content {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  .left {
+    width: 560px;
+    height: calc(100% - 32px);
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .right {
+    margin-left: 16px;
+    flex: 1;
+    height: calc(100% - 32px);
+    border-radius: 8px;
+    background: #fff;
+    padding: 16px;
+    .ant-card-body {
+      padding: 15px !important;
+    }
+
+    .book-cover-content {
+      width: 460px;
+      height: 288px;
+      display: flex;
+      align-items: center;
+      border-radius: 8px;
+      background: #f8f9fa;
+      position: relative;
+      user-select: none;
+      .cover-left {
+        height: 100%;
+        padding-top: 49px;
+        padding-left: 49px;
+        box-sizing: border-box;
+        .book-cover {
+          width: 131px;
+          height: 190px;
+          position: relative;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+            0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+      }
+
+      .cover-right {
+        height: 190px;
+        flex: 1;
+        margin-left: 20px;
+        margin-right: 49px;
+        /* font-family: 娃娃体-简; */
+        font-family: '手札体-简';
+        position: relative;
+        font-weight: 600;
+        .book-title {
+          font-size: 30px;
+        }
+        .book-author {
+          position: absolute;
+          bottom: 16px;
+          font-size: 20px;
+          color: #adb5bd;
+        }
+      }
+    }
+  }
+}
