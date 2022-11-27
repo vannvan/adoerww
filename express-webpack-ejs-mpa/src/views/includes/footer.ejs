@@ -1,0 +1,62 @@
+<footer class="emalacca-footer">
+	<div class="emalacca-footer-content">
+		<div class="company-info">
+			<div class="info-item-1">
+				<img class="logo" src="../static/images/logo-white.png">
+				<article>
+					做Shopee就用 马六甲ERP<br />上架新产品更快！
+				</article>
+			</div>
+			<div class="info-item-2">
+				<ul class="info-sub-item">
+					<p class="title">产品与服务</p>
+					<li><a href="https://erp.emalacca.com/" target="_blank">马六甲ERP</a></li>
+					<li><a href="/plug">采集插件</a></li>
+					<li><a href="https://fw.emalacca.com/" target="_blank">TMS</a></li>
+					<li><a href="https://wms.emalacca.com/" target="_blank">WMS</a></li>
+				</ul>
+				<ul class="info-sub-item">
+					<p class="title">关于我们</p>
+					<li><a href="/about">关于我们</a></li>
+					<li><a href="/about">风采展示</a></li>
+					<li><a href="/news">新闻动态</a></li>
+				</ul>
+				<ul class="info-sub-item">
+					<p class="title">联系我们</p>
+					<li>商务合作：13682470365</li>
+					<li>友链合作：18098951720</li>
+					<li>深圳总部：深圳市龙华区光浩国际中心A座24-25楼</li>
+					<li>其他办事处：杭州、广州、福建、华中、北方办事处</li>
+				</ul>
+			</div>
+			<div class="info-item-3">
+				<div class="qr-code-item">
+					<img src="../static/images/wechat-code-1.png" alt="">
+					<p>
+						客服
+					</p>
+				</div>
+				<div class="qr-code-item">
+					<img src="../static/images/public-account.png" alt="">
+					<p>
+						微信公众号
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="link-wrap">
+			<%% for(var i=0; i < partnersLink.length; i++) { %>
+				<%% const link=partnersLink[i]%>
+					<a href="<%%=link.link%>" target="_blank">
+						<%%=link.name%>
+					</a>
+					<%%}%>
+		</div>
+		<div class="copyright">
+			<span>
+				深圳市卖旺商务服务有限公司 All Rights Reserved.
+			</span>
+			<a href="https://beian.miit.gov.cn" target="_blank">备案号：粤ICP备2020141515号</a>
+		</div>
+	</div>
+</footer>

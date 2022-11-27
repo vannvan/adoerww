@@ -1,0 +1,178 @@
+@import "./common/common.less";
+
+.emalacca-customer-wrap {
+  height: auto;
+  .top-content-1 {
+    height: 400px;
+    width: 100%;
+    background: url("../static/images/customer/banner-1.png");
+    background-size: 100% 100%;
+    padding: 140px 0;
+    color: #fff;
+    text-align: center;
+    box-sizing: border-box;
+    .desc-top {
+      line-height: 70px;
+    }
+  }
+  .case-wrap {
+    width: 1180px;
+    margin: 0 auto;
+    height: auto;
+    padding: 60px 0 50px;
+    box-sizing: border-box;
+    .desc {
+      margin: 18px 0 49px;
+      line-height: 20px;
+    }
+    .case-content {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 10px 0;
+      .case-item {
+        width: 380px;
+        height: auto;
+        background: #fafafa;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        transition: all 0.5s ease-in-out;
+        cursor: pointer;
+
+        .pic-wrap {
+          width: 380px;
+          height: 180px;
+          overflow: hidden;
+          img {
+            transition: 0.5s ease-in-out;
+            transform: scale(1);
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+        .title {
+          font-weight: 600;
+          font-size: 20px;
+          color: #131415;
+          text-align: left;
+          padding: 8px 18px;
+          box-sizing: border-box;
+        }
+        article {
+          padding: 8px 18px;
+          text-align: left;
+          font-size: 14px;
+          color: #828999;
+          line-height: 24px;
+          height: 90px;
+          .ellipsisMultiline(4);
+        }
+        section {
+          text-align: left;
+          padding: 8px 18px;
+          font-size: 14px;
+          margin-top: 12px;
+          color: #828999;
+          .keywords {
+            display: inline-block;
+            background: #ededed;
+            padding: 4px 12px;
+            margin-bottom: 10px;
+            & + .keywords {
+              margin-left: 10px;
+            }
+          }
+        }
+        &:hover {
+          background: #ffffff;
+          box-shadow: 0px 6px 26px 0px rgba(211, 211, 211, 0.5);
+          border-radius: 1px;
+          transform: translateY(-5px);
+          &img {
+            transform: scale(1.1);
+          }
+          & .case-text{
+            color: #f7622f;
+          }
+        }
+        .case-text {
+          word-break: break-all;
+          word-wrap: break-word;
+        }
+      }
+    }
+  }
+  .content-3 {
+    width: 1180px;
+    margin: 0 auto 50px auto;
+    height: auto;
+    .xx-large-title {
+      line-height: 150px;
+    }
+    .contact {
+      display: flex;
+      justify-content: space-around;
+      .left {
+        width: 50%;
+        position: relative;
+        padding: 20px 0;
+        box-sizing: border-box;
+        .title {
+          margin-bottom: 12px;
+        }
+        b {
+          font-size: 28px;
+          font-weight: 600px;
+          color: @primaryColor;
+        }
+        &::after {
+          content: "";
+          width: 1px;
+          height: 80%;
+          background: #ededed;
+          position: absolute;
+          right: 80px;
+          top: 0;
+        }
+      }
+      .right {
+        display: flex;
+        flex-wrap: wrap;
+        flex: 1;
+        .qr-code {
+          width: 100%;
+          height: 80px;
+          margin-bottom: 20px;
+          display: flex;
+          text-align: left;
+          align-items: center;
+          .desc {
+            color: @fontColor5;
+            font-size: 14px;
+          }
+        }
+        img {
+          width: 80px;
+          height: 80px;
+          margin-right: 40px;
+        }
+      }
+    }
+  }
+  .case-swiper-pagination {
+    display: inline-block;
+    width: 28px;
+    height: 6px;
+    background-color: #f4f4f4;
+    margin: 0 4px;
+    cursor: pointer;
+    &-active {
+      background-color: #f7622f;
+    }
+  }
+}

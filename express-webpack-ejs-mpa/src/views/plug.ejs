@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<% include ./includes/title.ejs %>
+	<% include ./includes/link.ejs %>
+</head>
+
+<body>
+	<div id="root">
+		<% include ./includes/header.ejs %>
+		<% include ./includes/rightFixed.ejs%>
+		<div class="container">
+			<article class="layout-banner">
+				<div class="banner-content delay200 animated" data-animate="fadeInRight">
+					<div class="banner-text">
+						<h5 class="xx-large-title">采集插件</h5>
+						<p>
+							√适用于浏览器端的采集插件<br />
+              √支持10+平台采集<br />
+              √自动获取粉丝关注
+						</p>
+            <div class="banner-footer">
+              <button class="banner-btn download-plugin">立即下载插件</button>
+              <a class="banner-help" href="/help?type=1">插件使用帮助 ></a>
+            </div>
+						
+					</div>
+					<img class="banner-img" src="../static/images/plug/plug_4.png" alt="" />
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInUp">
+					<h5 class="xx-large-title">支持10+平台，主流站点采集</h5>
+					<p class="desc">支持Shopee、拼多多、1688、淘宝、天猫、Lazada、速卖通等平台的产品采集和找货源</p>
+					<img class="layout-img" src="../static/images/plug/plug_1.png">
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInUp">
+					<h5 class=" xx-large-title">采集生态闭环</h5>
+					<img class="layout-img" src="../static/images/plug/plug_2.png">
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInLeft">
+					<h5 class="xx-large-title">自动获取粉丝关注</h5>
+					<p class="desc">自动关注和过滤用户，快速增加商店关注者。</p>
+					<img class="layout-img" src="../static/images/plug/plug_3.png">
+					<p class="notice">注意：自动关注和过滤用户，支持自定义用户过滤条件</p>
+				</div>
+			</article>
+			<article class="layout-apply">
+				<h5>免费无限采集刊登插件</h5>
+				<button class="apply-btn download-plugin">下载插件</button>
+			</article>
+		</div>
+		<% include ./includes/footer.ejs %>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<% include ./includes/title.ejs %>
+	<% include ./includes/link.ejs %>
+	<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+	<script src="https://unpkg.com/swiper@6.6.2/swiper-bundle.min.js"></script>
+</head>
+
+<body>
+	<div id="root">
+		<% include ./includes/header.ejs %>
+		<% include ./includes/rightFixed.ejs%>
+		<div class="container">
+			<article class="layout-banner">
+				<div class="swiper-container" data-list="<%%=adList.length%>">
+					<div class="swiper-wrapper">
+						<div class="case-content swiper-slide">
+							<div class="banner-content delay100 animated" data-animate="fadeInRight">
+								<div class="banner-text">
+									<h5>做Shopee 就用马六甲ERP<br />上架新产品更快</h5>
+									<p>80%Shopee官方认证机构推荐的ERP</p>
+									<button class="banner-btn erp-btn">免费使用</button>
+								</div>
+								<img class="banner-img" src="../static/images/home/home_1.png" alt="" />
+							</div>
+						</div>
+						<%% if(customerList.length>1) {%>
+              <%% for(var i=0; i < adList.length; i++) { %>
+                <div class="case-content swiper-slide" >
+                  <a href="<%%=adList[i].link%>">
+                    <img src="<%%=adList[i].imgs%>" alt="" class="ad-banner-pic">
+                  </a>
+                </div>
+                <%%}%>
+							<%%}%>
+					</div>
+					<%% if(customerList.length>1) {%>
+            <div class="swiper-pagination"></div>
+          <%%}%>
+				</div>
+			</article>
+
+			<article class="layout-full">
+				<div class="layout-info delay200 animated" data-animate="fadeInUp">
+					<h5 class="xx-large-title">特色免费功能</h5>
+					<p class="desc">帮助卖家节省运营支出</p>
+					<div class="features">
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_1.png" />
+								无限采集刊登
+							</div>
+							<div class="fetures-content">
+								主流平台一键批量刊登、刊登数量不限，一键采集支持拼多多、1688、淘宝、天猫、速卖通、Shopee、lazada、敦煌网
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_2.png" />
+								无限店铺免费绑定
+							</div>
+							<div class="fetures-content">
+								单个注册账号支持跨境、本店铺无限绑定
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_3.png" />
+								图片翻译免费
+							</div>
+							<div class="fetures-content">
+								支持无限商品的图片一键翻译，语言支持英语+小语种
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_4.png" />
+								商品自动置顶
+							</div>
+							<div class="fetures-content">
+								支持在线商品批量自动置顶和按计划置顶
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_5.png" />
+								聊聊客户管理工具
+							</div>
+							<div class="fetures-content">
+								集成多店铺管理、客服、类EDM和CRM功能，为卖家提供高效统一的运营管理工具
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_6.png" />
+								自动获取粉丝关注
+							</div>
+							<div class="fetures-content">
+								通过插件自动获取店铺粉丝关注，为店铺积累精准流量
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_7.png" />
+								准确的定价模版
+							</div>
+							<div class="fetures-content">
+								设定利润率即到手利润率，支持跨境店物流自动藏价，汇率自定义；
+							</div>
+						</div>
+						<div class="features-items">
+							<div class="features-title">
+								<img src="../static/images/home/icon_8.png" />
+								自动发起代打包
+							</div>
+							<div class="fetures-content">
+								一键自动发起代打包，自动同步货源平台订单状态及物流信息；
+							</div>
+						</div>
+					</div>
+					<button class="features-btn erp-btn">立即体验</button>
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info">
+					<h5 class="xx-large-title">东南亚跨境电商一站式解决方案</h5>
+					<p class="desc">真正实现一站式店铺运营</p>
+					<div class="solution animated" data-animate="fadeInRight">
+						<div class="solution-article">
+							<div class="solution-items">
+								<h6>一键开店 &nbsp;&nbsp;店铺管理</h6>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_9.png" />
+									<div>
+										<div class="solution-title">一站式店铺管理</div>
+										<p>无限绑定店铺 一键搬家 权限管理</p>
+									</div>
+								</div>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_10.png" />
+									<div>
+										<div class="solution-title">简单、高效的商品上架流程</div>
+										<p>无限采集 图片翻译 批量编辑 智能定价</p>
+									</div>
+								</div>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_11.png" />
+									<div>
+										<div class="solution-title">一体化的订单管理</div>
+										<p>一键代打包 一键采购 一键发货 批量处理运单</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<span></span>
+						<img style="width: 594px; height: 369px;" src="../static/images/home/home_2.png" />
+					</div>
+					<div class="solution delay100 animated" data-animate="fadeInLeft">
+						<img style="width: 590px; height: 350px;" src="../static/images/home/home_3.png" />
+						<span></span>
+						<div class="solution-article">
+							<div class="solution-items">
+								<h6>仓储物流解决方案</h6>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_12.png" />
+									<div>
+										<div class="solution-title">仓储管理</div>
+										<p>进销存管理 智能补货 扫描产品智能匹配订单</p>
+									</div>
+								</div>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_13.png" />
+									<div>
+										<div class="solution-title">TMS和WMS物流解决方案</div>
+										<p>
+											优选市场上高性价比、服务有保障的货代服务商、东南亚海外仓，省时、省心，少踩坑。
+										</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<div class="solution delay200 animated" data-animate="fadeInRight">
+						<div class="solution-article">
+							<div class="solution-items">
+								<h6>数据化管理 轻松掌控店铺业绩</h6>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_12.png" />
+									<div>
+										<div class="solution-title">多维度财务报</div>
+										<p>
+											销售额、退款、发货费、广告费、测评费、销量、退款量、退货率、佣金、广告销售额、采购成本、国内物流费用等。
+										</p>
+									</div>
+								</div>
+								<div class="solution-item">
+									<img src="../static/images/home/icon_14.png" />
+									<div>
+										<div class="solution-title">数据分析 助力决策</div>
+										<p>
+											实时关注销量、排名、流量、广告、利润、库存、退货率; 支持按sku、店铺、日、周、月汇总分析;随时查看你想要的销售数据，轻松掌控店铺业绩。
+										</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<span></span>
+						<img style="width: 627px; height: 350px;" src="../static/images/home/home_4.png" />
+					</div>
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInUp">
+					<h5 class="xx-large-title">
+						为东南亚卖家赋能 成就更多可能
+					</h5>
+					<p class="desc">更好的服务，铸造更好的信任</p>
+					<div class="synopsis">
+						<div class="synopsis-items">
+							<img src="../static/images/home/icon_15.png" />
+							<h6>专业</h6>
+							<p>
+								功能贴合Shopee、lazada等东南亚卖家，多店铺数据实时获取，专业高效服务团队
+							</p>
+						</div>
+						<div class="synopsis-items">
+							<img src="../static/images/home/icon_16.png" />
+							<h6>易用</h6>
+							<p>界面简洁易用，上手快，浏览器即可随时访问注册</p>
+						</div>
+						<div class="synopsis-items">
+							<img src="../static/images/home/icon_17.png" />
+							<h6>服务贴心</h6>
+							<p>
+								5分钟客服快速响应，顾问与技术支持全程跟踪，全程免费培训与服务支持
+							</p>
+						</div>
+						<div class="synopsis-items">
+							<img src="../static/images/home/icon_18.png" />
+							<h6>安全保障</h6>
+							<p>阿里云服务器最高级别防护，全库加密，保证卖家数据安全</p>
+						</div>
+					</div>
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInRight">
+					<h5 class="xx-large-title">客户案例</h5>
+					<p class="desc">听听他们怎么说</p>
+					<div class="customer">
+						<%% for(var i=0; i < customerList.length; i++) { %>
+							<%% const customer=customerList[i]%>
+								<div class="customer-items">
+									<div class="customer-item">
+										<em class="sign-start"></em>
+										<em class="sign-end"></em>
+										<a href="/customer/<%%= customer.id %>">
+											<div class="customer-text animated ">
+
+												<%%- customer.preview %>
+											</div>
+										</a>
+									</div>
+									<p class="customer-user">
+										<%% if (i==0) { %>
+											<img src="../static/images/home/icon_25.png" />
+											<%%}%>
+												<%% if (i==1) { %>
+													<img src="../static/images/home/icon_26.png" />
+													<%%}%>
+														<%% if (i==2) { %>
+															<img src="../static/images/home/icon_24.png" />
+															<%%}%>
+																<%%= customer.title %>
+									</p>
+								</div>
+								<%%}%>
+					</div>
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info animated" data-animate="fadeInUp">
+					<h5 class="xx-large-title">部分合作伙伴</h5>
+					<p class="desc">
+						电商平台、Shopee官方认证培训机构、媒体支持
+					</p>
+					<div class="partner">
+						<a target="_blank" href="https://Shopee.com/index.html" title="Shopee">
+							<img src="../static/images/home/logo_1.png" />
+						</a>
+						<a target="_blank" href="https://www.1688.com/" title="1688">
+							<img src="../static/images/home/logo_2.png" />
+						</a>
+						<a target="_blank" href="https://www.aliexpress.com/" title="速卖通">
+							<img src="../static/images/home/logo_3.png" />
+						</a>
+						<a target="_blank" href="https://www.taobao.com/" title="淘宝">
+							<img src="../static/images/home/logo_4.png" />
+						</a>
+						<a target="_blank" href="https://www.tmall.com/" title="天猫">
+							<img src="../static/images/home/logo_5.png" />
+						</a>
+						<a target="_blank" href="https://www.lazada.com/en/" title="Lazada">
+							<img src="../static/images/home/logo_6.png" />
+						</a>
+						<a target="_blank" href="https://mobile.yangkeduo.com/" title="拼多多">
+							<img src="../static/images/home/logo_7.png" />
+						</a>
+						<a target="_blank" href="https://www.dhgate.com/" title="敦煌">
+							<img src="../static/images/home/logo_8.png" />
+						</a>
+						<a target="_blank" href="http://www.hpeixun.com" title="百聚汇">
+							<img src="../static/images/home/logo_9.png" />
+						</a>
+						<a target="_blank" href="https://www.cifnews.com" title="雨果跨境">
+							<img src="../static/images/home/logo_10.png" />
+						</a>
+						<a target="_blank" href="https://www.ikjzd.com" title="跨境知道">
+							<img src="../static/images/home/logo_11.png" />
+						</a>
+						<a target="_blank" href="https://www.123Shopee.com/index" title="暴走蜗牛">
+							<img src="../static/images/home/logo_12.png" />
+						</a>
+						<a target="_blank" href="https://www.Shopeeing.com" title="宾果电商">
+							<img src="../static/images/home/logo_13.png" />
+						</a>
+						<a target="_blank" href="#" title="必创">
+							<img src="../static/images/home/logo_14.png" />
+						</a>
+						<a target="_blank" href="http://www.zp165.cn/" title="正派跨境商学院">
+							<img src="../static/images/home/logo_15.png" />
+						</a>
+						<a target="_blank" href="https://www.dny123.com/" title="雨课">
+							<img src="../static/images/home/logo_16.png" />
+						</a>
+						<a target="_blank" href="https://www.dny123.com/" title="东南亚跨境卖家导航">
+							<img src="../static/images/home/logo_17.png" />
+						</a>
+						<a target="_blank" href="#" title="千鸟跨境">
+							<img src="../static/images/home/logo_18.png" />
+						</a>
+						<a target="_blank" href="http://gz.chinamede.com/" title="美迪电商教育">
+							<img src="../static/images/home/logo_19.png" />
+						</a>
+						<a target="_blank" href="#" title="林超聊跨境">
+							<img src="../static/images/home/logo_20.png" />
+						</a>
+						<a target="_blank" href="#" title="东南亚知识局">
+							<img src="../static/images/home/logo_21.png" />
+						</a>
+						<a target="_blank" href="#" title="思源电商学院">
+							<img src="../static/images/home/logo_22.png" />
+						</a>
+						<a target="_blank" href="#" title="指创电商">
+							<img src="../static/images/home/logo_23.png" />
+						</a>
+						<a style="cursor: auto;"></a>
+					</div>
+				</div>
+			</article>
+			<article class="layout-full">
+				<div class="layout-info">
+					<h5 class="xx-large-title">更多资讯推荐</h5>
+					<p class="desc">关注东南亚跨境行业、关注马六甲ERP</p>
+					<div class="message">
+						<div class="message-items">
+							<div class="message-title message-industry">
+								<img src="../static/images/home/icon_19.png" />
+								<div>
+									<h6>行业动态</h6>
+									<p>东南亚Shopee Lazada前沿资讯</p>
+								</div>
+							</div>
+							<%% for(var i=0; i < businessList.length; i++) { %>
+								<%% const item=businessList[i] %>
+									<div class="message-content">
+										<span>
+											<%%= item.updateTime%>
+										</span>
+										<a class="preview" href="news/<%%= item.id %>">
+											<%%= item.title%>
+										</a>
+									</div>
+									<%% } %>
+						</div>
+						<div class="message-items">
+							<div class="message-title message-company">
+								<img src="../static/images/home/icon_20.png" />
+								<div>
+									<h6>公司动态</h6>
+									<p>简单、高效、成就跨境人</p>
+								</div>
+							</div>
+							<%% for(var i=0; i < companyList.length; i++) { %>
+								<%% const item=companyList[i] %>
+									<div class="message-content">
+										<span>
+											<%%= item.updateTime%>
+										</span>
+										<a class="preview" href="news/<%%= item.id %>">
+											<%%= item.title%>
+										</a>
+									</div>
+									<%% } %>
+						</div>
+						<div class="message-items">
+							<div class="message-title message-activity">
+								<img src="../static/images/home/icon_21.png" />
+								<div>
+									<h6>活动动态</h6>
+									<p>线上线下活动</p>
+								</div>
+							</div>
+							<%% for(let i=0; i < activityList.length; i++) { %>
+								<%% const item=activityList[i] %>
+									<div class="message-content">
+										<span>
+											<%%= item.updateTime%>
+										</span>
+										<a class="preview" href="/news/<%%= item.id %>">
+											<%%= item.title%>
+										</a>
+									</div>
+									<%% } %>
+						</div>
+					</div>
+					<a href="/news" class="features-btn">全部动态</a>
+				</div>
+			</article>
+			<article class="layout-apply">
+				<h5>80%Shopee官方认证机构推荐的ERP</h5>
+				<button class="apply-btn erp-btn">免费使用</button>
+			</article>
+		</div>
+		<% include ./includes/footer.ejs %>
+	</div>
+</body>
+
+</html>

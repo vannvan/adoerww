@@ -1,0 +1,6 @@
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET /public/views/home.ejs HTTP/1.1" 200 28935 "-" "axios/0.18.1"
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET /public/views/500.ejs HTTP/1.1" 200 1001 "-" "axios/0.18.1"
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET / HTTP/1.1" 500 957 "http://127.0.0.1:8889/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET /favicon.ico HTTP/1.1" 302 32 "http://127.0.0.1:8889/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET /public/views/404.ejs HTTP/1.1" 200 949 "-" "axios/0.18.1"
+::ffff:127.0.0.1 - - [30/May/2021:13:02:43 +0000] "GET /error/404 HTTP/1.1" 200 943 "http://127.0.0.1:8889/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"

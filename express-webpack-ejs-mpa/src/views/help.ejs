@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<% include ./includes/title.ejs %>
+	<% include ./includes/link.ejs %>
+</head>
+
+<body>
+	<div id="root">
+		<% include ./includes/header.ejs %>
+		<% include ./includes/rightFixed.ejs%>
+
+		<div class="container">
+			<article class="layout-banner">
+				<div class="banner-content">
+					<div class="banner-box">
+						<div class="banner-title">有什么问题可以帮助到您？</div>
+						<div class="banner-search">
+							<em></em>
+							<input type="text" placeholder="请输入关键词" id="searchKey">
+							<button class="search-btn" id="searchBtn">搜索</button>
+						</div>
+						<div class="banner-shortcut">
+							<a href="/help?search=插件下载安装" class="search-record">插件下载安装</a>
+							<a href="/help?search=采集" class="search-record">采集</a>
+							<a href="/help?search=店铺授权" class="search-record">店铺授权</a>
+							<a href="/help?search=商品编辑" class="search-record">商品编辑</a>
+							<a href="/help?search=代打包" class="search-record">代打包</a>
+							<a href="/help?search=订单管理" class="search-record">订单管理</a>
+						</div>
+					</div>
+				</div>
+			</article>
+			<div class="layout-box">
+				<article class="layout-content">
+					<div class="problem-left">
+						<%% for(var i=0; i < typeList.length; i++) { %>
+							<%% if (!problemData.typeId && !query.search && i==0) { %>
+								<div class="title action" data-type="<%%= typeList[i].classifyId %>">
+									<%%= typeList[0].name %>
+								</div>
+								<%% }else if(problemData.typeId==typeList[i].classifyId) { %>
+									<div class="title action" data-type="<%%= typeList[i].classifyId %>">
+										<%%= typeList[i].name %>
+									</div>
+									<%% } else {%>
+                      <a class="title" href="/help?type=<%%= typeList[i].classifyId %>" data-type="<%%= typeList[i].classifyId %>">
+                        <%%= typeList[i].name %>
+                      </a>
+                    <%% }%>
+                  <%% } %>
+            </div>
+            <div class="problem-right">
+              <%% if (!problemData.id) { %>
+                <div class="problem-list">
+                  <%% if (query.search) { %>
+                    <div class="problem-search">
+                      关于 <span class="search-action">"<%%= query.search %>"</span>
+                      共搜索出<%%= problemData.total %>个结果
+                    </div>
+                    <%% } else {%>
+                      <div class="problem-subject">
+                        <%%= problemData.typeName %>
+                      </div>
+                      <%% }%>
+                        <%% if (helpList.length===0) { %>
+                          <div class="list-empty">
+                            <img src="../static/images/help/icon_2.png" />
+                            <p>没有找到您搜索的内容，请尝试换一个关键词</p>
+                          </div>
+                          <%% } else {%>
+                            <%% for(var i=0; i < helpList.length; i++) { %>
+                              <div class="problem-items">
+                                <a class="problem-title" href="/help?type=<%%= helpList[i].classifyId %>&id=<%%= helpList[i].contentId %>">
+                                  <%%= helpList[i].title %>
+                                </a>
+                                <div class="problem-time">
+                                  <%%= helpList[i].updateTime %>
+                                </div>
+                              </div>
+                              <%% } %>
+                              <%% if (problemData.total>15) { %>
+                                <div class="list-pagination" data-total="<%%= problemData.total %>" data-current="<%%= query.current %>"></div>
+                              <%% } %>
+                          <%% }%>
+                </div>
+                <%% } else {%>
+                  <div class="problem-details">
+                    <div class="details-breadcrumb">
+                      <a href="/help">帮助中心</a>
+                      <span class="breadcrumb-symbol">></span>
+                      <a href="/help?type=<%%= problemData.typeId %>">
+                        <%%= problemData.typeName %>
+                      </a>
+                      <span class="breadcrumb-symbol">></span>
+                      <span>
+                        当前正文
+                      </span>
+                    </div>
+                    <h5 class="details-title">
+                      <%%= helpDetails.title %>
+                    </h5>
+                    <p class="details-time">
+                      <%%= helpDetails.updateTime %>
+                    </p>
+                    <div class="w-e-text">
+                      <%%- helpDetails.content %>
+                    </div>
+                  </div>
+                  <%% }%>
+            </div>
+          </article>
+        </div>
+      </div>
+      <% include ./includes/footer.ejs %>
+  </div>
+</body>
+<script>
+  let searchBtn = document.getElementById('searchBtn')
+  let searchKey = document.getElementById('searchKey')
+  searchBtn.onclick = function() {
+    const href = window.location.pathname;
+    window.location = href + '?search=' + searchKey.value;
+  }
+</script>
+</html>

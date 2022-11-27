@@ -1,0 +1,87 @@
+@import "./common/common.less";
+@import "./common/wangeditor-text.less";
+
+html {
+		background-color: #efefef;
+		text-align: center;
+}
+
+.article-detail-wrap {
+		background: #fff;
+		padding-bottom: 34px;
+
+		.position {
+				height: 48px;
+				width: 100vw;
+				line-height: 48px;
+				background: #f9fafb;
+
+				.content {
+						display: flex;
+						justify-content: flex-start;
+
+						.bread-item {
+								font-size: 12px;
+								color: #828999;
+								position: relative;
+								margin-right: 6px;
+
+								.catalog:hover {
+										color: #f7622f;
+								}
+
+								&::after {
+										content: ">";
+										margin-left: 6px;
+								}
+
+								&:last-of-type:after {
+										content: "";
+								}
+						}
+				}
+		}
+
+		.article-title {
+				text-align: left;
+				color: #020202;
+				font-size: 24px;
+				line-height: 44px;
+				font-weight: 600;
+				margin: 20px auto;
+		}
+
+		.article-time {
+				text-align: left;
+				color: #6f6f6f;
+				font-size: 14px;
+
+				>span::before {
+						content: "|";
+						margin: 0 6px;
+						color: #cacaca;
+				}
+
+				.article-tags {
+						display: inline-block;
+						background: #ededed;
+						padding: 4px 12px;
+
+						&+.article-tags {
+								margin-left: 12px;
+						}
+				}
+		}
+
+		article {
+				margin: 30px auto;
+				line-height: 34px;
+				color: #575b66;
+				font-weight: 400;
+				text-align: left;
+		}
+
+		.content {
+				width: 900px;
+		}
+}

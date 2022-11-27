@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+		<!-- title -->
+		<% include ./includes/title.ejs %>
+		<!-- link -->
+		<% include ./includes/link.ejs %>
+</head>
+
+<body>
+		<div id="root">
+				<%% if (error) { %>
+				<%%=error%>
+				<%% } else { %>
+				<div style="width: 400px;height: 400px;text-align: center;margin-left: 50%;position: absolute;top: 200px;left: -200px;">
+						<img class="not-found-pic" style="width: 400px;" src="../static/images/undraw_server_down.png" alt="">
+						<div class="404">服务器错误～～<a href="/" style='color:#f76230'>回到首页</a></div>
+				</div>
+				<%% } %>
+		</div>
+</body>
+
+</html>

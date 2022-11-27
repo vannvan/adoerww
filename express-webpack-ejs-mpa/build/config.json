@@ -1,0 +1,17 @@
+{
+  "PORT": 8889,
+  "PROD_PORT": 3000,
+  "PATH": {
+    "PUBLIC_PATH": "/public/"
+  },
+  "DIR": {
+    "DIST": "dist",
+    "PROD": "prod",
+    "VIEW": "views",
+    "STYLE": "css",
+    "SCRIPT": "js",
+    "FONT": "fonts",
+    "IMAGE": "imgs"
+  },
+  "EXT": "ejs"
+}

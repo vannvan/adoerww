@@ -1,0 +1,272 @@
+@import "./common/common.less";
+@import "./common/pagination.less";
+
+html {
+		background-color: #efefef;
+		text-align: center;
+}
+
+.layout-banner {
+		width: 100%;
+		height: 280px;
+		background: url("../static/images/help/help_1.png") no-repeat center;
+		background-size: 100% 100%;
+
+		.banner-content {
+				width: 1180px;
+				height: 100%;
+				margin: 0 auto;
+				padding: 70px 0;
+				box-sizing: border-box;
+		}
+
+		.banner-box {
+				width: 660px;
+				height: 100%;
+				margin: 0 auto;
+		}
+
+		.banner-title {
+				font-size: 26px;
+				color: #000000;
+				margin-bottom: 24px;
+		}
+
+		.banner-search {
+				width: 100%;
+				height: 44px;
+				background: #ffffff;
+				border-radius: 4px;
+				position: relative;
+
+				>em {
+						position: absolute;
+						top: 15px;
+						left: 11px;
+						width: 15px;
+						height: 15px;
+						background-image: url("../static/images/help/icon_1.png");
+						display: inline-block;
+						background-size: 100% 100%;
+				}
+
+				input {
+						font-size: 14px;
+						position: absolute;
+						top: 14px;
+						left: 40px;
+						width: 500px;
+						display: inline-block;
+				}
+
+				.search-btn {
+						width: 68px;
+						height: 32px;
+						background: #fb7732;
+						border-radius: 4px;
+						font-size: 14px;
+						display: inline-block;
+						position: absolute;
+						color: #ffffff;
+						line-height: 32px;
+						cursor: pointer;
+						top: 5px;
+						right: 5px;
+				}
+		}
+
+		.banner-shortcut {
+				margin-top: 12px;
+				text-align: left;
+
+				.search-record {
+						font-size: 12px;
+						cursor: pointer;
+						color: #5c5c5c;
+						display: inline-block;
+
+						&+.search-record {
+								margin-left: 30px;
+						}
+
+						&:hover {
+								color: #f7622f;
+						}
+				}
+		}
+}
+
+.layout-box {
+		width: 100%;
+		height: auto;
+		min-height: 500px;
+		background-color: #fff;
+		padding-top: 60px;
+}
+
+.layout-content {
+		width: 1180px;
+		margin: 0 auto;
+		display: flex;
+}
+
+.problem-left {
+		width: 180px;
+		padding: 10px 0 40px;
+		min-height: 100px;
+		border-right: 1px solid rgba(#979797, 0.2);
+
+		.title {
+				font-size: 16px;
+				padding: 8px 10px;
+				color: #323336;
+				text-align: left;
+				cursor: pointer;
+				display: block;
+		}
+
+		.title.action {
+				color: #f7622f;
+				border-left: 2px solid #f7622f;
+		}
+
+		.title:hover {
+				color: #f7622f;
+				background-color: #efefef;
+		}
+}
+
+.problem-right {
+		flex: 1;
+		position: relative;
+		text-align: left;
+		padding-left: 40px;
+		padding-bottom: 40px;
+}
+
+.problem-list {
+		position: relative;
+		min-height: 440px;
+		padding-bottom: 60px;
+
+		.problem-subject {
+				font-size: 24px;
+				font-weight: 600;
+				color: #202124;
+				margin-bottom: 18px;
+		}
+
+		.problem-search {
+				font-size: 14px;
+				padding-left: 10px;
+				color: #828999;
+				margin-bottom: 18px;
+
+				.search-action {
+						color: #fb7732;
+				}
+		}
+
+		.problem-items {
+				width: 100%;
+				border-bottom: 1px solid #ebebeb;
+				padding: 16px 0;
+
+				.problem-title {
+						font-size: 14px;
+						color: #323336;
+						margin-bottom: 3px;
+						cursor: pointer;
+
+						&:hover {
+								color: #f7622f;
+						}
+				}
+
+				.problem-time {
+						font-size: 12px;
+						color: #828999;
+				}
+		}
+
+		.list-empty {
+				position: absolute;
+				font-size: 12px;
+				color: #828999;
+				top: 50%;
+				left: 50%;
+				text-align: center;
+				transform: translate(-50%, -50%);
+				-webkit-transform: translate(-50%, -50%);
+				-moz-transform: translate(-50%, -50%);
+				-ms-transform: translate(-50%, -50%);
+
+				img {
+						display: inline-block;
+						width: 44px;
+						height: 40px;
+						margin-bottom: 19px;
+				}
+		}
+}
+
+.list-pagination {
+		text-align: center;
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		text-align: center;
+}
+
+.details-breadcrumb {
+		font-size: 12px;
+		color: #202124;
+		text-align: left;
+
+		.breadcrumb-symbol {
+				margin: 0 5px;
+		}
+
+		>a:hover {
+				color: #fb7732;
+		}
+}
+
+.problem-details {
+		.details-title {
+				font-size: 24px;
+				font-weight: 600;
+				color: #202124;
+				margin: 13px 0;
+		}
+
+		.details-time {
+				font-size: 14px;
+				color: #6f6f6f;
+				margin-bottom: 30px;
+		}
+}
+
+input:-ms-input-placeholder {
+		color: #a9a9a9;
+}
+
+/* Internet Explorer 10+ */
+
+input::-webkit-input-placeholder {
+		color: #a9a9a9;
+}
+
+/* WebKit browsers */
+
+input::-moz-placeholder {
+		color: #a9a9a9;
+}
+
+/* Mozilla Firefox 4 to 18 */
+
+input:-moz-placeholder {
+		color: #a9a9a9;
+}
+
+/* Mozilla Firefox 19+ */

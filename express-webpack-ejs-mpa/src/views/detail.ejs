@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- title -->
+	<% include ./includes/title.ejs %>
+	<!-- link -->
+	<% include ./includes/link.ejs %>
+</head>
+
+<body>
+	<div id="root">
+		<% include ./includes/header.ejs %>
+		<% include ./includes/rightFixed.ejs%>
+
+		<div class="container article-detail-wrap">
+			<div class="position">
+				<div class="bread-wrap content">
+					<div class="bread-item"><a class="catalog" href="<%%=rootData.url %>">
+							<%%=rootData.name %>
+						</a></div>
+					<%% if (currentTypeName) { %>
+						<div class="bread-item">
+							<a class="catalog" href="<%%=rootData.url %>?type=<%%=currentTypeValue %>">
+								<%%= currentTypeName%>
+							</a>
+						</div>
+						<%% } %>
+							<div class="bread-item">当前正文</div>
+				</div>
+			</div>
+			<p class="article-title content">
+				<%%= article.title%>
+			</p>
+			<p class="article-time content">
+				<time>
+					<%%= article.updateTime%>
+				</time>
+				<%% if (currentTypeName) { %>
+					<span>
+						<%%=currentTypeName%>
+					</span>
+					<%% } %>
+						<%% if (article.tagsArr && article.tagsArr.length !==0) { %>
+							<span>
+								<%% for(var i=0; i < article.tagsArr.length; i++) { %>
+									<span class="article-tags">
+										<%%=article.tagsArr[i]%>
+									</span>
+									<%% } %>
+							</span>
+							<%% } %>
+			</p>
+			<article class="content article">
+				<div style="word-break: break-all; word-wrap: break-word;">
+					<%%- article.content %>
+				</div>
+
+			</article>
+		</div>
+		<% include ./includes/footer.ejs %>
+	</div>
+</body>
+
+</html>

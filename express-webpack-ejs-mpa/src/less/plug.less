@@ -1,0 +1,123 @@
+@import "./common/common.less";
+
+html {
+	background-color: #efefef;
+	text-align: center;
+}
+.btn {
+	background: skyblue;
+	cursor: pointer;
+}
+.layout-banner{
+  width: 100%;
+  height: 365px;
+  background-color: #F7622F;
+  border-radius: 1px;
+  .banner-content{
+    display: flex;
+    width: 1180px;
+    height: 100%;
+    justify-content: space-between;
+    margin: 0 auto;
+    
+    .banner-text{
+      width: 609px;
+      color: #FFFFFF;
+      text-align: left;
+      padding: 48px 0;
+      box-sizing: border-box;
+      position: relative;
+      h5{
+        font-size: 32px;
+        line-height: 45px;
+        font-weight: 600;
+      }
+      p{
+        margin-top: 10px;
+        font-size: 14px;
+        line-height: 2;
+      }
+      .banner-footer{
+        position: absolute;
+        bottom: 90px;
+        .banner-help{
+          margin-left: 18px;
+          color: #FEFEFE;
+          font-size: 14px;
+          cursor: pointer;
+        }
+      }
+      .banner-btn{
+        width: 145px;
+        height: 39px;
+        border-radius: 1px;
+        cursor: pointer;
+        background-color: #FFFFFF;
+        color: #F7622F;
+        border: 1px solid #FFFFFF;
+      }
+    }
+    .banner-img{
+      margin-left: 40px;
+      padding-top: 23px;
+      width: 511px;
+      height: 100%;
+    }
+  }
+}
+.layout-full:nth-child(even){
+  background-color: #FFFFFF;
+}
+
+.layout-full:nth-child(odd){
+  background: #FAFCFD;
+}
+.layout-full{
+  width: 100%;
+  padding: 90px 0 64px;
+  box-sizing: border-box;
+}
+.layout-info{
+  width: 1180px;
+  margin: 0 auto;
+  >p{
+    margin-top: 12px;
+  }
+  .notice{
+    font-size: 14px;
+    color: #6F6F6F;
+  }
+}
+.layout-apply{
+  height: 198px;
+  width: 100%;
+  background: linear-gradient(144deg, #FFB76A 0%, #FF8056 100%);
+  padding-top: 45px;
+  color: #FFFFFF;
+  box-sizing: border-box;
+  h5{
+    font-size: 29px;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  p{
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+}
+.layout-img{
+  display: inline-block;
+  width: 100%;
+  height: auto;
+  margin-top: 50px;
+}
+.apply-btn{
+  width: 139px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+    color: #F7622F;
+  border: 1px solid #ffffff;
+  font-size: 16px;
+}

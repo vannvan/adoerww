@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+		<% include ./includes/title.ejs %>
+		<% include ./includes/link.ejs %>
+		<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+		<script src="https://unpkg.com/swiper@6.6.2/swiper-bundle.min.js"></script>
+</head>
+
+<body>
+		<div id="root">
+				<% include ./includes/header.ejs %>
+				<% include ./includes/rightFixed.ejs%>
+				<div class="container emalacca-customer-wrap">
+						<div class="top-content-1">
+								<p class="xx-large-title delay200 animated" data-animate="fadeInUp">
+										做Shopee 就用马六甲ERP
+								</p>
+								<p class="desc-top delay500 animated" data-animate="fadeInUp">
+										上架新产品更快
+								</p>
+						</div>
+						<!-- 客户案例 -->
+						<div class="case-wrap content">
+								<p class="xx-large-title">部分客户案例</p>
+								<p class="desc">跨境买家ERP</p>
+								<div class="swiper-container" style="width: 1180px;" data-list="<%%=customerList.length%>">
+										<div class="swiper-wrapper">
+												<%% for(let i=0; i < customerList.length; i++) { %>
+												<%% const itemArr=customerList[i] %>
+												<div class="case-content swiper-slide">
+														<%% for(let k=0; k < itemArr.length; k++) { %>
+														<%% const item=itemArr[k] %>
+														<div class="case-item" data-src="/customer/<%%= item.id %>">
+																<div class="pic-wrap">
+																		<img src="<%%= item.imgs%>" alt="" />
+																</div>
+																<p class="title">
+																		<%%= item.title%>
+																</p>
+																<article>
+																		<p class="case-text">
+																				<%%- item.preview %>
+																		</p>
+																</article>
+																<section>
+																		<%% for(var j=0; j < item.tagsArr.length; j++) { %>
+																		<%% const tag=item.tagsArr[j] %>
+																		<span class="keywords">
+																				<%%=tag%>
+																		</span>
+																		<%% }%>
+																</section>
+														</div>
+														<%% }%>
+												</div>
+												<%%}%>
+										</div>
+										<!-- 如果需要分页器 -->
+										<%% if(customerList.length>1) {%>
+										<div class="swiper-pagination"></div>
+										<%%}%>
+								</div>
+						</div>
+						<!--  -->
+						<div class="content-3 content">
+								<p class="xx-large-title">80%Shopee官方认证培训机构推荐的ERP</p>
+								<div class="contact">
+										<div class="left">
+												<p class="title">请拨打官方服务热线</p>
+												<p>
+														<b>
+																180-9895-1720
+														</b>
+												</p>
+										</div>
+										<div class="right">
+												<div class="qr-code">
+														<img src="../static/images/public-account.png" alt="" />
+														<div class="">
+																<p>关注微信</p>
+																<p class="desc">获取更多马六甲ERP信息</p>
+														</div>
+												</div>
+												<div class="qr-code">
+														<img src="../static/images/wechat-code-1.png" alt="" />
+														<div class="">
+																<p>在线洽谈</p>
+																<p class="desc">实时在线客服，解答您的所有问题</p>
+														</div>
+												</div>
+										</div>
+								</div>
+						</div>
+				</div>
+				<% include ./includes/footer.ejs %>
+		</div>
+</body>
+
+</html>

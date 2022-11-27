@@ -1,0 +1,15 @@
+.trans-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: transLate(-50%, -50%);
+}
+
+//文字多行超出显示省略号
+.ellipsisMultiline(@number: 1) {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: @number; //决定几行换行
+	-webkit-box-orient: vertical;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<% include ./includes/title.ejs %>
+	<% include ./includes/link.ejs %>
+</head>
+
+<body>
+	<div id="root">
+		<% include ./includes/header.ejs %>
+		<% include ./includes/rightFixed.ejs%>
+		<div class="container emalacca-news-wrap">
+			<div class="content content-1">
+				<p class="xx-large-title delay200">新闻动态</p>
+				<p class="desc delay500">更多东南亚电商前沿资讯、运营干货尽在马六甲ERP</p>
+			</div>
+			<div class="content content-2">
+				<div class="left-content">
+					<div class="tab-wrap">
+						<div class="tab-item" data-type="0">
+							全部动态
+						</div>
+						<%% for(var i=0; i < newsTypeList.length; i++) { %>
+							<%% const type=newsTypeList[i]%>
+								<div class="tab-item" data-type="<%%= type.id %>">
+									<%%= type.typeName%>
+								</div>
+								<%%}%>
+					</div>
+					<div class="article-info-wrap">
+						<%% for(var i=0; i < newsList.length; i++) { %>
+							<%% const item=newsList[i]%>
+								<div class="article-item">
+									<div class="article-pic">
+										<img src="<%%= item.imgs%>" alt="<%%= item.title %>">
+									</div>
+									<div class="article-desc">
+										<a href="news/<%%= item.id %>">
+											<p class="title">
+												<%%= item.title %>
+											</p>
+											<article>
+												<%%= item.preview%>
+											</article>
+											<time class="date">
+												<%%= item.updateTime %>
+													<span>
+														<%%= item.typeName %>
+													</span>
+											</time>
+										</a>
+									</div>
+								</div>
+								<%% } %>
+					</div>
+					<%% if (page.total> 15) { %>
+						<div class="list-pagination" data-total="<%%= page.total %>"
+							data-current="<%%= page.current %>">
+						</div>
+						<%% } %>
+				</div>
+				<div class="right-content">
+					<div class="title">
+						热门文章
+					</div>
+					<div class="article-info-wrap">
+						<%% for(var i=0; i < hotNewsList.length; i++) { %>
+							<%% const item=hotNewsList[i]%>
+								<li class="article-item">
+									<div class="serial">
+										<%% if (i < 10) { %>
+											0<%%=i+1%>
+												<%% } else { %>
+													<%%= i %>
+														<%% } %>
+									</div>
+									<div class="article-desc">
+										<p class="article-title">
+											<a href="news/<%%= item.id %>">
+												<%%= item.title%>
+											</a>
+										</p>
+										<p class="date">
+											<%%= item.updateTime %>
+										</p>
+									</div>
+								</li>
+								<%% } %>
+					</div>
+				</div>
+			</div>
+		</div>
+		<% include ./includes/footer.ejs %>
+	</div>
+</body>
+
+</html>
