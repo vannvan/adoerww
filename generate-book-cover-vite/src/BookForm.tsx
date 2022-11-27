@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   MinusCircleOutlined,
   PlusOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons'
-import { Button, Form, Input, Select, Space } from 'antd'
+import { Button, Form, Input, message, Select, Space } from 'antd'
+import { fileToBase64 } from './utils'
 
 interface IBookForm {
   generateHandler: (bookList: TBookInfo[]) => void
@@ -13,11 +14,21 @@ const STORE_KEY = 'bookList'
 
 const BookForm = (props: IBookForm) => {
   const { generateHandler } = props
+
   const [form] = Form.useForm()
 
-  const [initialValue, setInitialValue] = useState<TBookInfo[]>(
-    JSON.parse(localStorage.getItem(STORE_KEY) as any)
-  )
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  const [currentUploadIndex, setCurrentUploadIndex] = useState<number>(0)
+
+  useEffect(() => {
+    const list = localStorage.getItem(STORE_KEY)
+    if (list) {
+      form.setFieldsValue({
+        books: JSON.parse(list),
+      })
+    }
+  }, [])
 
   const onFinish = (values: any) => {
     // console.log('Received values of form:', values)
@@ -31,8 +42,36 @@ const BookForm = (props: IBookForm) => {
     typeof generateHandler === 'function' && generateHandler(bookList)
   }
 
-  const handleChange = () => {
-    form.setFieldsValue({ sights: [] })
+  const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let file = e.target.files
+    if (file) {
+      const { books } = await form.getFieldsValue()
+      const _newBookList = [...books]
+      fileToBase64(file[0], (base64: string) => {
+        // console.log('base64', base64)
+        if (currentUploadIndex > -1) {
+          _newBookList[currentUploadIndex].coverLink = base64
+          form.setFieldsValue({
+            books: _newBookList,
+          })
+        }
+      })
+    }
+  }
+
+  const preUpload = (index: number) => {
+    setCurrentUploadIndex(index)
+    if (fileInput.current) {
+      fileInput.current.value = ''
+      fileInput.current.dispatchEvent(new MouseEvent('click'))
+    }
+  }
+
+  const storeForm = async () => {
+    localStorage.setItem(
+      STORE_KEY,
+      JSON.stringify(await form.getFieldsValue().books)
+    )
   }
 
   return (
@@ -41,7 +80,15 @@ const BookForm = (props: IBookForm) => {
       name="dynamic_form_complex"
       onFinish={onFinish}
       autoComplete="off">
-      <Form.List name="books" initialValue={initialValue}>
+      <input
+        id="Import"
+        type="file"
+        accept=".jpg,jpeg,.png"
+        style={{ display: 'none' }}
+        ref={fileInput}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => fileChange(e)}
+      />
+      <Form.List name="books">
         {(fields, { add, remove }) => (
           <div>
             {fields.map((field, index) => (
@@ -58,8 +105,14 @@ const BookForm = (props: IBookForm) => {
                   label="封面链接"
                   name={[field.name, 'coverLink']}
                   rules={[{ required: true }]}>
-                  <Input />
+                  <Input style={{ width: '80%' }} />
                 </Form.Item>
+                <Button
+                  onClick={() => preUpload(index)}
+                  type="primary"
+                  style={{ position: 'absolute', top: 16, right: 16 }}>
+                  上传
+                </Button>
                 <Space>
                   <Form.Item
                     label="书籍名称"
@@ -89,7 +142,17 @@ const BookForm = (props: IBookForm) => {
             <Form.Item>
               <Button
                 type="dashed"
-                onClick={() => add()}
+                onClick={() => {
+                  form
+                    .validateFields()
+                    .then((values) => {
+                      add()
+                      storeForm()
+                    })
+                    .catch((error) => {
+                      message.error('请完善数据再添加')
+                    })
+                }}
                 block
                 icon={<PlusOutlined />}>
                 添加书籍
@@ -99,9 +162,11 @@ const BookForm = (props: IBookForm) => {
         )}
       </Form.List>
       <Form.Item>
-        <Button type="primary" htmlType="submit">
-          生成封面
-        </Button>
+        <Space>
+          <Button type="primary" htmlType="submit">
+            生成封面
+          </Button>
+        </Space>
       </Form.Item>
     </Form>
   )

@@ -1,9 +1,10 @@
 import { useCallback, useState } from 'react'
 import DEFAULT_IMG from './assets/default.jpg'
 import './App.less'
-import { Button, Card, Col, message, Row } from 'antd'
+import { Button, Card, Col, FloatButton, message, Popconfirm, Row } from 'antd'
 import html2canvas from 'html2canvas'
 import BookForm from './BookForm'
+import { DownloadOutlined } from '@ant-design/icons'
 
 function App() {
   const [bookList, setBookList] = useState<TBookInfo[]>([])
@@ -22,7 +23,7 @@ function App() {
       const _newBookList: any = [...(_bookList as any)]
       if (list.length) {
         list.forEach((book: any) => {
-          console.log('book', book)
+          // console.log('book', book)
           html2canvas(book, {
             useCORS: true,
           }).then((html) => {
@@ -51,6 +52,15 @@ function App() {
     } else {
       message.error('无效链接')
     }
+  }
+
+  /**
+   * 批量下载
+   */
+  const batchDownload = () => {
+    bookList.map((el) => {
+      downLoadImg(el.base64, `${el.bookName}-${el.bookAuthor}.png`)
+    })
   }
 
   const imgUrlToBase64 = (imgUrl: String) => {
@@ -120,6 +130,18 @@ function App() {
           ))}
         </Row>
       </div>
+      {bookList.length ? (
+        <Popconfirm
+          title="确认要下载全部?"
+          onConfirm={() => batchDownload()}
+          okText="Yes"
+          placement="left"
+          cancelText="No">
+          <FloatButton icon={<DownloadOutlined />} type="primary"></FloatButton>
+        </Popconfirm>
+      ) : (
+        <></>
+      )}
     </div>
   )
 }
