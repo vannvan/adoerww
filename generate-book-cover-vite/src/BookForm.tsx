@@ -104,7 +104,7 @@ const BookForm = (props: IBookForm) => {
                 <Form.Item
                   label="封面链接"
                   name={[field.name, 'coverLink']}
-                  rules={[{ required: true }]}>
+                  rules={[{ required: true, message: '请输入链接' }]}>
                   <Input style={{ width: '80%' }} />
                 </Form.Item>
                 <Button
@@ -117,13 +117,13 @@ const BookForm = (props: IBookForm) => {
                   <Form.Item
                     label="书籍名称"
                     name={[field.name, 'bookName']}
-                    rules={[{ required: true }]}>
+                    rules={[{ required: true, message: '请输入名称' }]}>
                     <Input />
                   </Form.Item>
                   <Form.Item
                     label="书籍作者"
                     name={[field.name, 'bookAuthor']}
-                    rules={[{ required: true }]}>
+                    rules={[{ required: true, message: '请输入作者' }]}>
                     <Input />
                   </Form.Item>
                 </Space>
@@ -150,7 +150,9 @@ const BookForm = (props: IBookForm) => {
                       storeForm()
                     })
                     .catch((error) => {
-                      message.error('请完善数据再添加')
+                      // message.error({
+                      //   content: '请完善信息再添加',
+                      // })
                     })
                 }}
                 block
