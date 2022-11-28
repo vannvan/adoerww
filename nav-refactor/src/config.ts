@@ -8,7 +8,8 @@ export const THEME_COLOR = {
     leftBarBgColor: '#fff',
     rightTitleBgColor: '#fff',
     rightLinkItemBgColor: 'rgba(255,255,255,0.8)',
-    inputColor: '#27ae60',
+    inputColor: '#ffffff',
+    inputBgColor: 'rgba(52, 73, 94, 0.5)',
   },
   dark: {
     body: '#434343',
@@ -19,7 +20,8 @@ export const THEME_COLOR = {
     leftBarBgColor: '#242424',
     rightTitleBgColor: '#242424',
     rightLinkItemBgColor: 'rgba(36,36,36,0.8)',
-    inputColor: '#09c',
+    inputColor: '#ecf0f1',
+    inputBgColor: '#2f3542',
   },
 }
 

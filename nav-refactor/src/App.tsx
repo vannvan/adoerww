@@ -14,7 +14,7 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState<number>(0)
 
   const [backgroundImage, setBackgroundImage] = useState<string>(
-    'https://tva4.sinaimg.cn/large/9bd9b167gy1g4li1eazaaj21hc0xc4qp.jpg'
+    'https://tva3.sinaimg.cn/large/9bd9b167gy1g2rkyjhn3vj21hc0u0tjq.jpg'
   )
 
   const STORE_BACK_KEY = 'background'
@@ -214,12 +214,14 @@ function App() {
       <div className="right">
         <div className="time-wrap">{timeString}</div>
         <div id="SearchWrap" className="search-wrap">
+          <span className="iconfont icon-linggan prefix"></span>
           <input
             type="text"
             id="input"
             placeholder="⏎百度搜索 | ⌘ + ⏎百度翻译 | ⎇ + ⏎有道翻译"
             style={{
               color: THEME_COLOR[theme].inputColor,
+              background: THEME_COLOR[theme].inputBgColor,
               borderColor: THEME_COLOR[theme].inputColor,
             }}
           />
