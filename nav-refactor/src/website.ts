@@ -517,6 +517,14 @@ const WEBSITE: TWebsite = [
         name: '程序员的乐趣',
         link: 'https://www.webhek.com/',
       },
+      {
+        name: '免费接口-韩小韩',
+        link: 'https://api.vvhan.com/',
+      },
+      {
+        name: '免费接口-夏柔',
+        link: 'https://api.aa1.cn/',
+      },
     ],
   },
   {

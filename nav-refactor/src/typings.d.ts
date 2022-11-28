@@ -7,5 +7,6 @@ type TWebsite = {
   linkList: {
     name: string
     link: string
+    icon?: string
   }[]
 }[]

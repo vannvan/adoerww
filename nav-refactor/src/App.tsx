@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import WEBSITE from './website'
 import { HOVER_CLASS, THEME_COLOR } from './config'
 import './App.less'
-import { debounce } from 'lodash'
 import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
-import fly from 'flyio'
 
 import 'swiper/css/swiper.min.css' // 引入样式
+import './hover.css'
+
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
@@ -23,7 +23,17 @@ function App() {
 
   const swiper = useRef(null)
 
+  const timer: any = useRef(null)
+
   const [websiteList, setWebsiteList] = useState<TWebsite>()
+
+  const [todayText, setTodayText] = useState<string>('')
+
+  const [timeString, setTimeString] = useState<string>(
+    new Date().toLocaleString().split(' ')[1].substr(0, 5)
+  )
+
+  // https://api.vvhan.com/api/en?type=sj
 
   useEffect(() => {
     // 加工一下列表
@@ -80,20 +90,7 @@ function App() {
         ? 'light'
         : 'dark'
     setTheme(theme as any)
-
-    // 特效
-    // document.querySelector('body').addEventListener('mousemove', eyeball)
-    // function eyeball() {
-    //   var eye = document.querySelectorAll('.eye')
-    //   eye.forEach(function (eye) {
-    //     let x = eye.getBoundingClientRect().left + eye.clientWidth / 2
-    //     let y = eye.getBoundingClientRect().top + eye.clientHeight / 2
-    //     let radian = Math.atan2(event.pageX - x, event.pageY - y)
-    //     let rot = radian * (180 / Math.PI) * -1 + 270
-    //     eye.style.transform = 'rotate(' + rot + 'deg)'
-    //   })
-    // }
-
+    // swiper
     setTimeout(() => {
       swiper.current = new Swiper('.swiper-container', {
         direction: 'vertical',
@@ -114,11 +111,24 @@ function App() {
           },
         },
       })
-    }, 1000)
+    }, 1500)
+
+    // 今天的话
+    getTodayText()
+
+    //
+    timer.current = setInterval(() => {
+      setTimeString(new Date().toLocaleString().split(' ')[1].substr(0, 5))
+    }, 60)
+
+    return () => {
+      clearInterval(timer.current)
+    }
   }, [])
 
+  // 背景
   const initBackground = () => {
-    fetch('http://api.btstu.cn/sjbz/api.php?lx=dongman&format=json').then(async (res) => {
+    fetch('http://api.btstu.cn/sjbz/api.php?lx=fengjing&format=json').then(async (res) => {
       if (res) {
         const { imgurl } = await res.json()
         setBackgroundImage(imgurl)
@@ -134,15 +144,14 @@ function App() {
   }
 
   const locationTo = (index: number) => {
-    // console.log(index, swiper.current)
     setCurrentIndex(index)
     swiper.current && (swiper.current as any).slideTo(index + 1, 0)
   }
 
-  const changeTheme = () => {
+  const changeTheme = useCallback(() => {
     const targetTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(targetTheme)
-  }
+  }, [theme])
 
   const openPage = (link: string) => {
     window.open(link)
@@ -151,6 +160,16 @@ function App() {
   const getRandomHover = () => {
     let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
     return className
+  }
+
+  // 今日励志
+  const getTodayText = () => {
+    fetch('https://api.vvhan.com/api/en?type=sj').then(async (res) => {
+      const { data } = await res.json()
+      if (data) {
+        setTodayText(data.zh)
+      }
+    })
   }
 
   return (
@@ -173,12 +192,17 @@ function App() {
                     : THEME_COLOR[theme].leftBarBgColor,
               }}>
               <span className={['iconfont', el.icon].join(' ')}></span>
+              <div className="tooltip">{el.name}</div>
             </div>
           ))}
-
-          {/* <div className="count">已收录{WEBSITE.map((el) => el.linkList).flat().length}</div> */}
         </div>
         <div className="extend-tool">
+          <div
+            className="tool-item"
+            onClick={() => initBackground()}
+            style={{ color: THEME_COLOR[theme].linkFontColor }}>
+            <span className="iconfont icon-fengche"></span>
+          </div>
           <div
             className="tool-item"
             onClick={() => changeTheme()}
@@ -188,6 +212,7 @@ function App() {
         </div>
       </div>
       <div className="right">
+        <div className="time-wrap">{timeString}</div>
         <div id="SearchWrap" className="search-wrap">
           <input
             type="text"
@@ -217,7 +242,7 @@ function App() {
                           onClick={() => link.link && openPage(link.link)}
                           className={[
                             'link-item',
-                            'hvr-bounce-to-left',
+                            link.name && getRandomHover(),
                             !link.name ? 'empty' : '',
                           ].join(' ')}
                           key={link.name + subIndex}
@@ -238,6 +263,7 @@ function App() {
           </div>
           <div className="swiper-pagination"></div>
         </div>
+        <div className="today-text">「{todayText}」</div>
       </div>
     </div>
   )
