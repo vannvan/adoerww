@@ -102,16 +102,17 @@ function App() {
         on: {
           slideChange: function () {
             const _this = this as any
-            // console.log(_this.activeIndex)
-            if (_this.activeIndex > WEBSITE.length) {
-              setCurrentIndex(0)
-            } else {
-              setCurrentIndex(_this.activeIndex - 1)
-            }
+            setCurrentIndex(_this.realIndex)
+            // console.log(_this.realIndex, _this.activeIndex)
+            // if (_this.activeIndex > WEBSITE.length) {
+            //   setCurrentIndex(0)
+            // } else {
+            //   setCurrentIndex(_this.activeIndex - 1)
+            // }
           },
         },
       })
-    }, 1500)
+    }, 1000)
 
     // 今天的话
     getTodayText()
