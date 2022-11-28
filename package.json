@@ -8,6 +8,7 @@
     "vuepress": "^1.9.7"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "swiper": "^8.4.5"
   }
 }

@@ -1,7 +1,7 @@
-const WEBSITE = [
+const WEBSITE: TWebsite = [
   {
     name: '社区博客',
-    icon: 'icon-bokexinwen',
+    icon: 'icon-shequ',
     linkList: [
       {
         name: 'Github',
@@ -107,7 +107,7 @@ const WEBSITE = [
   },
   {
     name: '工具文档',
-    icon: 'icon-shiyongshouce',
+    icon: 'icon-wxbgongju',
     linkList: [
       {
         name: 'parcel',
@@ -209,7 +209,7 @@ const WEBSITE = [
   },
   {
     name: '框架文档',
-    icon: 'icon-bangzhushouce',
+    icon: 'icon-wenjian',
     linkList: [
       {
         name: 'Element',
@@ -267,7 +267,7 @@ const WEBSITE = [
   },
   {
     name: '躺平工具',
-    icon: 'icon-ai-tool',
+    icon: 'icon-gongju1',
     linkList: [
       {
         name: 'GitMind',
@@ -521,7 +521,7 @@ const WEBSITE = [
   },
   {
     name: '世间百态',
-    icon: 'icon-yinleyule',
+    icon: 'icon-life',
     linkList: [
       {
         name: '天猫',

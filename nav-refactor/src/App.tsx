@@ -1,80 +1,190 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import WEBSITE from './website'
-import { THEME_COLOR } from './config'
+import { HOVER_CLASS, THEME_COLOR } from './config'
 import './App.less'
 import { debounce } from 'lodash'
+import Swiper from 'swiper/js/swiper.js' // 引入js
+import logo from './assets/logo.png'
+import fly from 'flyio'
 
+import 'swiper/css/swiper.min.css' // 引入样式
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   const [currentIndex, setCurrentIndex] = useState<number>(0)
 
-  const [contentHeight, setContentHeight] = useState<number>(0)
+  const [backgroundImage, setBackgroundImage] = useState<string>(
+    'https://tva4.sinaimg.cn/large/9bd9b167gy1g4li1eazaaj21hc0xc4qp.jpg'
+  )
 
-  let scrollTop = 0
-  let topValue = 0
+  const STORE_BACK_KEY = 'background'
 
-  let scrollFlag = true
+  const LIMIT_TIME = 1000 * 60 * 60 * 2
 
-  let _currentIndex = 0
-  const bindHandleScroll = () => {
-    const content = document.querySelector('.web-content') as any
-    const _contentHeight = 400
+  const swiper = useRef(null)
 
-    scrollTop = content.scrollTop
-    if (scrollFlag) {
-      if (scrollTop <= topValue) {
-        console.log('向上')
-        _currentIndex -= 1
-        setCurrentIndex(_currentIndex + 1)
-        // setIsShow(false)
-      } else {
-        console.log('向下')
-        _currentIndex += 1
-        setCurrentIndex(_currentIndex - 1)
-        // setIsShow(true)
-      }
-
-      setTimeout(() => {
-        console.log('_currentIndex', _currentIndex)
-        const target = (_currentIndex + 1 + 1) * _contentHeight
-        console.log(document.querySelector('.web-p-content' + currentIndex))
-        // document.querySelector('.web-p-content' + currentIndex).style.transform = translateY(${target}px)`
-        // document.querySelector('.web-p-content')[
-        //   _currentIndex
-        // ].style.transform = `translateY(${target})`
-        // content.scroll(0, (_currentIndex + 1 + 1) * _contentHeight)
-        scrollFlag = true
-        topValue = scrollTop
-      }, 600)
-      scrollFlag = false
-    }
-  }
+  const [websiteList, setWebsiteList] = useState<TWebsite>()
 
   useEffect(() => {
-    const content = document.querySelector('.web-content') as any
-    setTimeout(() => {
-      const height = (document.querySelector('.web-p-content') as any).offsetHeight
-      setContentHeight(height)
-    }, 500)
-    content.addEventListener('scroll', debounce(bindHandleScroll, 600))
-    return () => {
-      content.removeEventListener('scroll', bindHandleScroll)
+    // 加工一下列表
+
+    const _list = [...WEBSITE].map((el) => {
+      const len = el.linkList.length
+      if (len % 5 != 0) {
+        const add = Array.from({ length: 5 - (len % 5) }, (v, k) => {
+          return {
+            name: '',
+            link: '',
+          }
+        })
+        el.linkList = [...el.linkList, ...add]
+      }
+      return el
+    })
+    setWebsiteList(_list)
+
+    // 背景
+    const storeBg = localStorage.getItem(STORE_BACK_KEY)
+    if (storeBg) {
+      const { time, url } = JSON.parse(storeBg)
+      // 如果过期了再换
+      if (new Date().getTime() - time > LIMIT_TIME) {
+        initBackground()
+      }
     }
+
+    // 键盘
+    document.onkeydown = function (event) {
+      let inputValue = (document.getElementById('input') as any).value
+      let baiduWord = 'https://www.baidu.com/s?wd='
+      let baiduTranslate = 'https://fanyi.baidu.com/#zh/en/'
+      let youdaoTranslate = 'http://dict.youdao.com/w/'
+
+      if ((event.ctrlKey || event.metaKey) && event.keyCode == 13) {
+        window.open(baiduTranslate + inputValue)
+        return
+      }
+      if (event.altKey && event.keyCode == 13) {
+        window.open(youdaoTranslate + inputValue)
+        return
+      }
+      if (event.keyCode == 13 && inputValue) {
+        window.open(baiduWord + inputValue)
+      }
+    }
+
+    // 主题
+    let currentHour = new Date().getHours()
+    let theme =
+      currentHour < 19 || window.matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark'
+    setTheme(theme as any)
+
+    // 特效
+    // document.querySelector('body').addEventListener('mousemove', eyeball)
+    // function eyeball() {
+    //   var eye = document.querySelectorAll('.eye')
+    //   eye.forEach(function (eye) {
+    //     let x = eye.getBoundingClientRect().left + eye.clientWidth / 2
+    //     let y = eye.getBoundingClientRect().top + eye.clientHeight / 2
+    //     let radian = Math.atan2(event.pageX - x, event.pageY - y)
+    //     let rot = radian * (180 / Math.PI) * -1 + 270
+    //     eye.style.transform = 'rotate(' + rot + 'deg)'
+    //   })
+    // }
+
+    setTimeout(() => {
+      swiper.current = new Swiper('.swiper-container', {
+        direction: 'vertical',
+        loop: true,
+        // observer: true, //开启动态检查器，监测swiper和slide
+        // speed: 800,
+        runCallbacksOnInit: true,
+        mousewheel: true,
+        on: {
+          slideChange: function () {
+            const _this = this as any
+            // console.log(_this.activeIndex)
+            if (_this.activeIndex > WEBSITE.length) {
+              setCurrentIndex(0)
+            } else {
+              setCurrentIndex(_this.activeIndex - 1)
+            }
+          },
+        },
+      })
+    }, 1000)
   }, [])
 
+  const initBackground = () => {
+    fetch('http://api.btstu.cn/sjbz/api.php?lx=dongman&format=json').then(async (res) => {
+      if (res) {
+        const { imgurl } = await res.json()
+        setBackgroundImage(imgurl)
+        localStorage.setItem(
+          STORE_BACK_KEY,
+          JSON.stringify({
+            time: new Date().getTime(),
+            url: imgurl,
+          })
+        )
+      }
+    })
+  }
+
+  const locationTo = (index: number) => {
+    // console.log(index, swiper.current)
+    setCurrentIndex(index)
+    swiper.current && (swiper.current as any).slideTo(index + 1, 0)
+  }
+
+  const changeTheme = () => {
+    const targetTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(targetTheme)
+  }
+
+  const openPage = (link: string) => {
+    window.open(link)
+  }
+
+  const getRandomHover = () => {
+    let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
+    return className
+  }
+
   return (
-    <div className="content">
+    <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
-        <div className="logo">logo</div>
+        <div className="logo">
+          <img src={logo} />
+        </div>
+
         <div className="menu-content" style={{ color: THEME_COLOR[theme].linkFontColor }}>
-          {WEBSITE.map((el) => (
-            <div key={el.name} className="menu-item">
+          {WEBSITE.map((el, index) => (
+            <div
+              key={el.name}
+              className="menu-item"
+              onClick={() => locationTo(index)}
+              style={{
+                background:
+                  currentIndex == index
+                    ? THEME_COLOR[theme].activeBgColor
+                    : THEME_COLOR[theme].leftBarBgColor,
+              }}>
               <span className={['iconfont', el.icon].join(' ')}></span>
-              <span className="name">{el.name}</span>
             </div>
           ))}
-          <div className="count">已收录{WEBSITE.map((el) => el.linkList).flat().length}</div>
+
+          {/* <div className="count">已收录{WEBSITE.map((el) => el.linkList).flat().length}</div> */}
+        </div>
+        <div className="extend-tool">
+          <div
+            className="tool-item"
+            onClick={() => changeTheme()}
+            style={{ color: THEME_COLOR[theme].linkFontColor }}>
+            <span className="iconfont icon-zhutise theme-icon"></span>
+          </div>
         </div>
       </div>
       <div className="right">
@@ -88,24 +198,45 @@ function App() {
               borderColor: THEME_COLOR[theme].inputColor,
             }}
           />
-          <button style={{ background: THEME_COLOR[theme].inputColor }}>灵感来了</button>
+          <span
+            className="iconfont icon-sousuo search-icon"
+            style={{ color: THEME_COLOR[theme].inputColor }}></span>
+          {/* <button style={{ background: THEME_COLOR[theme].inputColor }}>灵感来了</button> */}
         </div>
         <div className="web-content">
-          {WEBSITE.map((el, index) => (
-            <div
-              className={['web-p-content', 'web-p-content' + index].join(' ')}
-              style={{ opacity: currentIndex == index ? 1 : 0 }}
-              key={el.name}>
-              <div className="p-name">{el.name}</div>
-              <div className="link-content">
-                {el.linkList.map((link, subIndex) => (
-                  <div className="link-item" key={link.name + subIndex}>
-                    {link.name}
+          <div className="swiper-container">
+            <div className="swiper-wrapper" style={{ color: '#fff' }}>
+              {websiteList ? (
+                websiteList.map((el, index) => (
+                  <div
+                    className={['web-p-content', 'swiper-slide', 'web-p-content' + index].join(' ')}
+                    key={el.name}>
+                    <div className="link-content">
+                      {el.linkList.map((link, subIndex) => (
+                        <div
+                          onClick={() => link.link && openPage(link.link)}
+                          className={[
+                            'link-item',
+                            'hvr-bounce-to-left',
+                            !link.name ? 'empty' : '',
+                          ].join(' ')}
+                          key={link.name + subIndex}
+                          style={{
+                            background: THEME_COLOR[theme].rightLinkItemBgColor,
+                            color: THEME_COLOR[theme].linkFontColor,
+                          }}>
+                          {link.name}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <></>
+              )}
             </div>
-          ))}
+          </div>
+          <div className="swiper-pagination"></div>
         </div>
       </div>
     </div>

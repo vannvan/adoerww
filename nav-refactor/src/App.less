@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
 }
+
 #root {
   width: 100vw;
   height: 100vh;
@@ -11,14 +12,34 @@
 .content {
   width: 100%;
   height: 100%;
-  // background: #ccc;
   display: flex;
+  position: relative;
+  &::after {
+    content: '';
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 60px;
+    background: linear-gradient(to top right, rgba(90, 149, 207, 0.5), rgba(58, 76, 99, 0.8));
+    box-shadow: 10px -10px 20px rgba(0, 0, 0, 0.2), -10px 10px 20px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(2px); /*  元素后面区域添加模糊效果 */
+    z-index: 1;
+  }
   .left {
     width: 200px;
     height: 100%;
-    width: 260px;
+    width: 60px;
+    position: relative;
     .logo {
       height: 80px;
+      img {
+        height: 30px;
+        width: 30px;
+        border-radius: 15px;
+        margin-top: 20px;
+        margin-left: 15px;
+      }
     }
     .menu-content {
       width: 100%;
@@ -26,21 +47,27 @@
         height: 60px;
         line-height: 60px;
         box-sizing: border-box;
-        padding-left: 60px;
-        border-bottom: 1px solid #e9ecef;
+        text-align: center;
         cursor: pointer;
         font-weight: 400;
-        .iconfont {
-          margin-right: 10px;
-        }
-        .name {
-          // text-decoration: underline;
+        font-size: 24px;
+        &:last-child {
+          border-bottom: none;
         }
       }
-      .count {
-        position: fixed;
-        bottom: 20px;
-        left: 100px;
+    }
+    .extend-tool {
+      width: 100%;
+      position: absolute;
+      bottom: 12px;
+      text-align: center;
+      .tool-item {
+        height: 60px;
+        line-height: 60px;
+        .iconfont {
+          font-size: 24px;
+          cursor: pointer;
+        }
       }
     }
   }
@@ -50,9 +77,11 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
+    z-index: 2;
     .search-wrap {
-      position: fixed;
-      right: calc((100% - 60% - 260px) / 2);
+      position: absolute;
+      // left: 15%;
+      right: calc((100% - 60%) / 2);
       top: 80px;
       width: 60%;
       height: 54px;
@@ -64,16 +93,22 @@
         outline: none;
         border-style: solid;
         border-width: 2px;
-        padding-left: 12px;
+        padding-left: 18px;
         box-sizing: border-box;
+        border-radius: 27px;
+        font-size: 16px;
+        font-weight: 500;
       }
-      button {
+      input::-webkit-input-placeholder {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+      }
+      .search-icon {
         position: absolute;
-        right: 0;
-        border-radius: 0;
-        height: 54px;
-        width: 160px;
+        right: 18px;
+        top: 14px;
         border: none;
+        font-size: 24px;
       }
     }
     .web-content {
@@ -81,28 +116,46 @@
       top: 180px;
       height: calc(100% - 100px);
       width: 100%;
-      background: #ccc;
-      overflow: auto;
+      overflow: hidden;
       scrollbar-width: none; /* firefox */
       -ms-overflow-style: none; /* IE 10+ */
       &::-webkit-scrollbar {
         display: none; /* Chrome Safari */
       }
+      .swiper-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        padding: 0;
+      }
       .web-p-content {
         width: 80%;
+        margin-left: 10%;
         height: calc(100% - 200px);
-        background: #666;
-        margin-bottom: 100px;
         .p-name {
-          height: 80px;
+          height: 40px;
+          margin-bottom: 20px;
         }
         .link-content {
           width: 100%;
           display: flex;
           flex-wrap: wrap;
+          justify-content: space-between;
           .link-item {
-            width: 100px;
-            height: 60px;
+            list-style: none;
+            width: 15%;
+            text-align: center;
+            padding: 20px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 2s;
+            position: relative;
+            transition: 800ms;
+            overflow: hidden;
+            &.empty {
+              background: none !important;
+              cursor: auto;
+            }
           }
         }
       }
