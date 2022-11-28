@@ -128,7 +128,7 @@ function App() {
 
   // 背景
   const initBackground = () => {
-    fetch('http://api.btstu.cn/sjbz/api.php?lx=fengjing&format=json').then(async (res) => {
+    fetch('https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=json').then(async (res) => {
       if (res) {
         const { imgurl } = await res.json()
         setBackgroundImage(imgurl)
