@@ -10,3 +10,7 @@ type TWebsite = {
     icon?: string
   }[]
 }[]
+
+interface Window {
+  dayjs: any
+}

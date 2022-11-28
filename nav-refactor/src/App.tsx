@@ -8,6 +8,8 @@ import logo from './assets/logo.png'
 import 'swiper/css/swiper.min.css' // 引入样式
 import './hover.css'
 
+const WEEK = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期天']
+
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
@@ -213,7 +215,12 @@ function App() {
         </div>
       </div>
       <div className="right">
-        <div className="time-wrap">{timeString}</div>
+        <div className="time-wrap">
+          <p className="time">{timeString}</p>
+          <p className="date">
+            {window.dayjs().format('MM月DD日')} {WEEK[window.dayjs().format('d') - 1]}
+          </p>
+        </div>
         <div id="SearchWrap" className="search-wrap">
           <span className="iconfont icon-linggan prefix"></span>
           <input
