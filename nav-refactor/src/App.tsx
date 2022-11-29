@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import WEBSITE from './website'
-import { HOVER_CLASS, THEME_COLOR } from './config'
+import { GITHUB_SITE, HOVER_CLASS, THEME_COLOR, WEEK } from './config'
 import './App.less'
 import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
 
 import 'swiper/css/swiper.min.css' // 引入样式
 import './hover.css'
-
-const WEEK = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期天']
+import { getBackground, getLunarInfo, getTodayTextString } from './api'
+import { getStoreData, storeIsExpire, storeToLocal } from './utils'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -19,27 +19,26 @@ function App() {
     'https://tva3.sinaimg.cn/large/9bd9b167gy1g2rkyjhn3vj21hc0u0tjq.jpg'
   )
 
-  const STORE_BACK_KEY = 'background'
-
-  const LIMIT_TIME = 1000 * 60 * 60 * 2
-
   const swiper = useRef(null)
 
   const timer: any = useRef(null)
 
+  // 导航列表
   const [websiteList, setWebsiteList] = useState<TWebsite>()
 
+  // 今天的话
   const [todayText, setTodayText] = useState<string>('')
 
+  // 时间
   const [timeString, setTimeString] = useState<string>(
     new Date().toLocaleString().split(' ')[1].substr(0, 5)
   )
 
-  // https://api.vvhan.com/api/en?type=sj
+  // 农历
+  const [lunarText, setLunarText] = useState<string>('')
 
   useEffect(() => {
     // 加工一下列表
-
     const _list = [...WEBSITE].map((el) => {
       const len = el.linkList.length
       if (len % 5 != 0) {
@@ -54,16 +53,6 @@ function App() {
       return el
     })
     setWebsiteList(_list)
-
-    // 背景
-    const storeBg = localStorage.getItem(STORE_BACK_KEY)
-    if (storeBg) {
-      const { time, url } = JSON.parse(storeBg)
-      // 如果过期了再换
-      if (new Date().getTime() - time > LIMIT_TIME) {
-        initBackground()
-      }
-    }
 
     // 键盘
     document.onkeydown = function (event) {
@@ -116,34 +105,57 @@ function App() {
       })
     }, 1000)
 
-    // 今天的话
-    getTodayText()
+    // 页面数据
+    initPageData()
 
-    //
     timer.current = setInterval(() => {
       setTimeString(new Date().toLocaleString().split(' ')[1].substr(0, 5))
-    }, 60)
+    }, 1000)
 
     return () => {
       clearInterval(timer.current)
     }
   }, [])
 
+  // 页面数据
+  const initPageData = async () => {
+    // 农历
+    if (storeIsExpire('lunar')) {
+      const lunar = await getLunarInfo(window.dayjs().format('YYYY-MM-DD'))
+      setLunarText(lunar)
+      console.log('lunar', lunar)
+      storeToLocal('lunar', { lunar })
+    } else {
+      const { lunar } = getStoreData('lunar')
+      setLunarText(lunar)
+    }
+
+    // 背景
+    if (storeIsExpire('background')) {
+      initBackground()
+    } else {
+      const { imgurl } = getStoreData('background')
+      setBackgroundImage(imgurl)
+    }
+
+    // 今天的话
+    if (storeIsExpire('todayText')) {
+      const text = await getTodayTextString()
+      text && setTodayText(text)
+      storeToLocal('todayText', { text })
+    } else {
+      const { text } = getStoreData('todayText')
+      setTodayText(text)
+    }
+  }
+
   // 背景
-  const initBackground = () => {
-    fetch('https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=json').then(async (res) => {
-      if (res) {
-        const { imgurl } = await res.json()
-        setBackgroundImage(imgurl)
-        localStorage.setItem(
-          STORE_BACK_KEY,
-          JSON.stringify({
-            time: new Date().getTime(),
-            url: imgurl,
-          })
-        )
-      }
-    })
+  const initBackground = async () => {
+    const imgurl = await getBackground('fengjing')
+    if (imgurl) {
+      setBackgroundImage(imgurl as string)
+      storeToLocal('background', { imgurl })
+    }
   }
 
   const locationTo = (index: number) => {
@@ -156,29 +168,19 @@ function App() {
     setTheme(targetTheme)
   }, [theme])
 
-  const openPage = (link: string) => {
-    window.open(link)
-  }
-
+  /**
+   * 随机hover样式
+   * @returns
+   */
   const getRandomHover = () => {
     let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
     return className
   }
 
-  // 今日励志
-  const getTodayText = () => {
-    fetch('https://api.vvhan.com/api/en?type=sj').then(async (res) => {
-      const { data } = await res.json()
-      if (data) {
-        setTodayText(data.zh)
-      }
-    })
-  }
-
   return (
     <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
-        <div className="logo">
+        <div className="logo" onClick={() => window.open(GITHUB_SITE)}>
           <img src={logo} />
         </div>
 
@@ -223,7 +225,7 @@ function App() {
         <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
           <p className="time">{timeString}</p>
           <p className="date">
-            {window.dayjs().format('MM月DD日')} {WEEK[window.dayjs().format('d') - 1]}
+            {window.dayjs().format('MM月DD日')} {WEEK[window.dayjs().format('d') - 1]} {lunarText}
           </p>
         </div>
         <div id="SearchWrap" className="search-wrap">
@@ -256,7 +258,7 @@ function App() {
                     <div className="link-content">
                       {el.linkList.map((link, subIndex) => (
                         <div
-                          onClick={() => link.link && openPage(link.link)}
+                          onClick={() => link.link && window.open(link.link)}
                           className={[
                             'link-item',
                             link.name && getRandomHover(),
