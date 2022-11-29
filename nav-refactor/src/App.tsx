@@ -222,7 +222,9 @@ function App() {
           </p>
         </div>
         <div id="SearchWrap" className="search-wrap">
-          <span className="iconfont icon-linggan prefix"></span>
+          <span
+            className="iconfont icon-linggan prefix"
+            style={{ color: THEME_COLOR[theme].inputColor }}></span>
           <input
             type="text"
             id="input"
