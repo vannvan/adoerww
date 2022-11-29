@@ -210,7 +210,12 @@ function App() {
             className="tool-item"
             onClick={() => changeTheme()}
             style={{ color: THEME_COLOR[theme].linkFontColor }}>
-            <span className="iconfont icon-zhutise theme-icon"></span>
+            <span
+              className={[
+                'iconfont',
+                'theme-icon',
+                theme === 'light' ? 'icon-taiyang' : 'icon-yueliang',
+              ].join(' ')}></span>
           </div>
         </div>
       </div>
