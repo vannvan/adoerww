@@ -10,6 +10,7 @@ export const THEME_COLOR = {
     rightLinkItemBgColor: 'rgba(255,255,255,0.8)',
     inputColor: '#ffffff',
     inputBgColor: 'rgba(52, 73, 94, 0.5)',
+    timeColor: '#fff',
   },
   dark: {
     body: '#434343',
@@ -22,6 +23,7 @@ export const THEME_COLOR = {
     rightLinkItemBgColor: 'rgba(36,36,36,0.8)',
     inputColor: '#ecf0f1',
     inputBgColor: '#2f3542',
+    timeColor: '#f5f5f5',
   },
 }
 

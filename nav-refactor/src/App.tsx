@@ -220,7 +220,7 @@ function App() {
         </div>
       </div>
       <div className="right">
-        <div className="time-wrap">
+        <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
           <p className="time">{timeString}</p>
           <p className="date">
             {window.dayjs().format('MM月DD日')} {WEEK[window.dayjs().format('d') - 1]}
