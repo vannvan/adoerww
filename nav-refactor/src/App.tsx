@@ -5,7 +5,7 @@ import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
 import 'swiper/css/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
-import { getStoreData, storeIsExpire, storeToLocal } from './utils'
+import { getStoreData, randomColor, storeIsExpire, storeToLocal } from './utils'
 import Favorite from './components/Favorite'
 import './hover.css'
 import './App.less'
@@ -128,7 +128,6 @@ function App() {
       dayjs().month() + 1,
       dayjs().date()
     )
-    console.log('solar2lunarData', solar2lunarData)
     const { gzYear, dayCn, monthCn } = solar2lunarData
     setLunarText(gzYear + monthCn + dayCn)
 
@@ -200,12 +199,6 @@ function App() {
       }
     })
   }
-
-  const randomColor = () =>
-    '#' +
-    Math.floor(Math.random() * 0xffffff)
-      .toString(16)
-      .padEnd(6, '0')
 
   return (
     <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
@@ -286,9 +279,9 @@ function App() {
                 websiteList.map((el, index) => (
                   <div
                     className={['web-p-content', 'swiper-slide', 'web-p-content' + index].join(' ')}
-                    key={el.name}>
-                    {el.linkList.length > 0 ? (
-                      <div className="link-content">
+                    key={el.name + index}>
+                    {index > 0 ? (
+                      <div className="link-content" key={el.name + index}>
                         {el.linkList.map((link, subIndex) => (
                           <div
                             onClick={() => link.link && window.open(link.link)}
@@ -305,16 +298,20 @@ function App() {
                             {link.logo ? (
                               <img src={link.logo} className="logo" />
                             ) : (
-                              <div className="random-logo" style={{ background: randomColor() }}>
+                              <div
+                                className="logo random-logo"
+                                style={{ background: randomColor() }}>
                                 {link.name.charAt(0).toUpperCase()}
                               </div>
                             )}
-                            <span className="name"> {link.name}</span>
+                            <span className="name">{link.name}</span>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <Favorite siteList={el.linkList} />
+                      <div key={el.name + Math.random()}>
+                        <Favorite webInfo={el} />
+                      </div>
                     )}
                   </div>
                 ))
