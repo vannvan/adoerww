@@ -647,7 +647,6 @@ const WEBSITE: TWebsite = [
       {
         name: '天猫',
         link: 'https://www.tmall.com/',
-        logo: './logo/天猫.png',
       },
       {
         name: '京东',

@@ -10,6 +10,7 @@ import Favorite from './components/Favorite'
 import './hover.css'
 import './App.less'
 import _ from 'lodash'
+import solarLunar from 'solarlunar'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -92,7 +93,7 @@ function App() {
         loop: true,
         // observer: true, //开启动态检查器，监测swiper和slide
         // speed: 800,
-        initialSlide: 2,
+        initialSlide: 0,
         runCallbacksOnInit: true,
         mousewheel: true,
         on: {
@@ -121,15 +122,15 @@ function App() {
    */
   const initPageData = async () => {
     // 农历
-    if (storeIsExpire('lunar')) {
-      const lunar = await getLunarInfo(window.dayjs().format('YYYY-MM-DD'))
-      setLunarText(lunar)
-      console.log('lunar', lunar)
-      storeToLocal('lunar', { lunar })
-    } else {
-      const { lunar } = getStoreData('lunar')
-      setLunarText(lunar)
-    }
+    const dayjs = window.dayjs
+    const solar2lunarData = solarLunar.solar2lunar(
+      dayjs().year(),
+      dayjs().month() + 1,
+      dayjs().date()
+    )
+    console.log('solar2lunarData', solar2lunarData)
+    const { gzYear, dayCn, monthCn } = solar2lunarData
+    setLunarText(gzYear + monthCn + dayCn)
 
     // 背景
     if (storeIsExpire('background')) {

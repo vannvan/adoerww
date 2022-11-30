@@ -1,5 +1,6 @@
 declare module 'lodash'
 declare module 'swiper/js/swiper.js'
+declare module 'solarlunar'
 
 type TWebsite = {
   name: string
