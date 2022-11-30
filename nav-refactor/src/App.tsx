@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import WEBSITE from './website'
 import { GITHUB_SITE, HOVER_CLASS, THEME_COLOR, WEEK } from './config'
-import './App.less'
 import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
-
 import 'swiper/css/swiper.min.css' // 引入样式
-import './hover.css'
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
 import { getStoreData, storeIsExpire, storeToLocal } from './utils'
+import Favorite from './components/Favorite'
+import './hover.css'
+import './App.less'
+import _ from 'lodash'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -41,8 +42,9 @@ function App() {
     // 加工一下列表
     const _list = [...WEBSITE].map((el) => {
       const len = el.linkList.length
-      if (len % 5 != 0) {
-        const add = Array.from({ length: 5 - (len % 5) }, (v, k) => {
+      const row = 8
+      if (len % row != 0) {
+        const add = Array.from({ length: row - (len % row) }, (v, k) => {
           return {
             name: '',
             link: '',
@@ -53,6 +55,8 @@ function App() {
       return el
     })
     setWebsiteList(_list)
+
+    // console.log('_list', _list)
 
     // 键盘
     document.onkeydown = function (event) {
@@ -88,18 +92,13 @@ function App() {
         loop: true,
         // observer: true, //开启动态检查器，监测swiper和slide
         // speed: 800,
+        initialSlide: 2,
         runCallbacksOnInit: true,
         mousewheel: true,
         on: {
           slideChange: function () {
             const _this = this as any
             setCurrentIndex(_this.realIndex)
-            // console.log(_this.realIndex, _this.activeIndex)
-            // if (_this.activeIndex > WEBSITE.length) {
-            //   setCurrentIndex(0)
-            // } else {
-            //   setCurrentIndex(_this.activeIndex - 1)
-            // }
           },
         },
       })
@@ -117,7 +116,9 @@ function App() {
     }
   }, [])
 
-  // 页面数据
+  /**
+   * 调第三方接口
+   */
   const initPageData = async () => {
     // 农历
     if (storeIsExpire('lunar')) {
@@ -132,7 +133,7 @@ function App() {
 
     // 背景
     if (storeIsExpire('background')) {
-      initBackground()
+      initBackground(1)
     } else {
       const { imgurl } = getStoreData('background')
       setBackgroundImage(imgurl)
@@ -150,22 +151,30 @@ function App() {
   }
 
   // 背景
-  const initBackground = async () => {
-    const imgurl = await getBackground('fengjing')
+  const initBackground = async (source: 1 | 2) => {
+    const imgurl = await getBackground(source, 'fengjing')
     if (imgurl) {
       setBackgroundImage(imgurl as string)
       storeToLocal('background', { imgurl })
     }
   }
 
+  /**
+   * 定位到指定swiper
+   * @param index
+   */
   const locationTo = (index: number) => {
     setCurrentIndex(index)
     swiper.current && (swiper.current as any).slideTo(index + 1, 0)
   }
 
+  /**
+   * 更换主题
+   */
   const changeTheme = useCallback(() => {
     const targetTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(targetTheme)
+    storeToLocal('theme', targetTheme)
   }, [theme])
 
   /**
@@ -177,17 +186,36 @@ function App() {
     return className
   }
 
+  //判断图片是否存在
+  const checkImgExists = (imgurl: string) => {
+    return new Promise(function (resolve, reject) {
+      var ImgObj = new Image()
+      ImgObj.src = imgurl
+      ImgObj.onload = function (res) {
+        resolve(res)
+      }
+      ImgObj.onerror = function (err) {
+        reject(err)
+      }
+    })
+  }
+
+  const randomColor = () =>
+    '#' +
+    Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padEnd(6, '0')
+
   return (
     <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
         <div className="logo" onClick={() => window.open(GITHUB_SITE)}>
           <img src={logo} />
         </div>
-
         <div className="menu-content" style={{ color: THEME_COLOR[theme].linkFontColor }}>
           {WEBSITE.map((el, index) => (
             <div
-              key={el.name}
+              key={Math.random()}
               className="menu-item"
               onClick={() => locationTo(index)}
               style={{
@@ -197,19 +225,23 @@ function App() {
                     : THEME_COLOR[theme].leftBarBgColor,
               }}>
               <span className={['iconfont', el.icon].join(' ')}></span>
+              {/* <p className="name">{el.name}</p> */}
               <div className="tooltip">{el.name}</div>
             </div>
           ))}
         </div>
         <div className="extend-tool">
           <div
-            className="tool-item"
-            onClick={() => initBackground()}
+            className="tool-item background-icon"
             style={{ color: THEME_COLOR[theme].linkFontColor }}>
             <span className="iconfont icon-fengche"></span>
+            <div className="source-list">
+              <li onClick={() => initBackground(1)}>资源一</li>
+              <li onClick={() => initBackground(2)}>资源二</li>
+            </div>
           </div>
           <div
-            className="tool-item"
+            className="tool-item theme-icon"
             onClick={() => changeTheme()}
             style={{ color: THEME_COLOR[theme].linkFontColor }}>
             <span
@@ -245,34 +277,44 @@ function App() {
           <span
             className="iconfont icon-sousuo search-icon"
             style={{ color: THEME_COLOR[theme].inputColor }}></span>
-          {/* <button style={{ background: THEME_COLOR[theme].inputColor }}>灵感来了</button> */}
         </div>
         <div className="web-content">
           <div className="swiper-container">
-            <div className="swiper-wrapper" style={{ color: '#fff' }}>
+            <div className="swiper-wrapper">
               {websiteList ? (
                 websiteList.map((el, index) => (
                   <div
                     className={['web-p-content', 'swiper-slide', 'web-p-content' + index].join(' ')}
                     key={el.name}>
-                    <div className="link-content">
-                      {el.linkList.map((link, subIndex) => (
-                        <div
-                          onClick={() => link.link && window.open(link.link)}
-                          className={[
-                            'link-item',
-                            link.name && getRandomHover(),
-                            !link.name ? 'empty' : '',
-                          ].join(' ')}
-                          key={link.name + subIndex}
-                          style={{
-                            background: THEME_COLOR[theme].rightLinkItemBgColor,
-                            color: THEME_COLOR[theme].linkFontColor,
-                          }}>
-                          {link.name}
-                        </div>
-                      ))}
-                    </div>
+                    {el.linkList.length > 0 ? (
+                      <div className="link-content">
+                        {el.linkList.map((link, subIndex) => (
+                          <div
+                            onClick={() => link.link && window.open(link.link)}
+                            className={[
+                              'link-item',
+                              link.name && getRandomHover(),
+                              !link.name ? 'empty' : '',
+                            ].join(' ')}
+                            key={link.name + subIndex}
+                            style={{
+                              background: THEME_COLOR[theme].rightLinkItemBgColor,
+                              color: THEME_COLOR[theme].linkFontColor,
+                            }}>
+                            {link.logo ? (
+                              <img src={link.logo} className="logo" />
+                            ) : (
+                              <div className="random-logo" style={{ background: randomColor() }}>
+                                {link.name.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <span className="name"> {link.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <Favorite siteList={el.linkList} />
+                    )}
                   </div>
                 ))
               ) : (
@@ -280,7 +322,7 @@ function App() {
               )}
             </div>
           </div>
-          <div className="swiper-pagination"></div>
+          {/* <div className="swiper-pagination"></div> */}
         </div>
         <div className="today-text">「{todayText}」</div>
       </div>

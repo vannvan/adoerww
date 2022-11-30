@@ -45,14 +45,17 @@
     .menu-content {
       width: 100%;
       .menu-item {
-        height: 60px;
-        line-height: 60px;
+        height: 50px;
+        line-height: 50px;
         box-sizing: border-box;
         text-align: center;
         cursor: pointer;
         font-weight: 400;
         font-size: 24px;
         position: relative;
+        &:hover {
+          // background: #d9d9d9 !important;
+        }
         &:last-child {
           border-bottom: none;
         }
@@ -60,16 +63,26 @@
           opacity: 1;
           transition: 0.8s;
         }
+        .iconfont {
+          // position: absolute;
+        }
+        .name {
+          font-size: xx-small;
+        }
         .tooltip {
           opacity: 0;
           position: absolute;
-          font-size: 14px;
-          right: -80px;
           top: 0;
-          padding: 0 12px;
+          left: 60px;
+          font-size: 14px;
+          width: auto;
+          white-space: nowrap;
+          padding: 0 14px;
+          height: 50px;
           z-index: 2;
           box-sizing: border-box;
           font-weight: 500;
+          display: block;
           background: rgba(0, 0, 0, 0.4);
         }
       }
@@ -82,9 +95,41 @@
       .tool-item {
         height: 60px;
         line-height: 60px;
+        position: relative;
         .iconfont {
           font-size: 24px;
+          // cursor: pointer;
+        }
+        .theme-icon {
           cursor: pointer;
+        }
+        &.background-icon {
+          position: relative;
+          &:hover .source-list {
+            opacity: 1;
+            transition: 0.8s;
+          }
+          .source-list {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 60px;
+            z-index: 100000;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            display: block;
+            li {
+              list-style: none;
+              height: 30px;
+              line-height: 30px;
+              padding: 4px 12px;
+              white-space: nowrap;
+              cursor: pointer;
+              &:hover {
+                background: rgba(0, 0, 0, 0.3);
+              }
+            }
+          }
         }
       }
     }
@@ -113,13 +158,13 @@
     .search-wrap {
       position: absolute;
       // left: 15%;
-      right: calc((100% - 60%) / 2);
+      right: calc(50% / 2);
       top: 210px;
-      width: 60%;
-      height: 54px;
+      width: 50%;
+      height: 48px;
       input {
         width: 100%;
-        height: 54px;
+        height: 48px;
         background: transparent;
         outline: none;
         border-style: solid;
@@ -132,22 +177,23 @@
         background: rgba(52, 73, 94, 0.5);
       }
       input::-webkit-input-placeholder {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.5);
         font-size: 14px;
       }
       .prefix {
         position: absolute;
         left: 18px;
-        top: 16px;
+        top: 12px;
         border: none;
-        font-size: 24px;
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.4);
       }
       .search-icon {
         position: absolute;
         right: 18px;
-        top: 16px;
+        top: 12px;
         border: none;
-        font-size: 22px;
+        font-size: 20px;
       }
     }
     .web-content {
@@ -170,11 +216,12 @@
       .web-p-content {
         width: 80%;
         margin-left: 10%;
-        height: calc(100% - 200px);
-        .p-name {
-          height: 40px;
-          margin-bottom: 20px;
-        }
+        height: 100%;
+        // background: #ccc;
+        // .p-name {
+        //   height: 40px;
+        //   margin-bottom: 20px;
+        // }
         .link-content {
           width: 100%;
           display: flex;
@@ -182,19 +229,47 @@
           justify-content: space-between;
           .link-item {
             list-style: none;
-            width: 15%;
+            width: 10%;
             text-align: center;
-            padding: 20px;
-            margin-top: 15px;
+            padding: 12px;
+            margin-bottom: 18px;
             cursor: pointer;
             transition: 2s;
             position: relative;
             transition: 800ms;
             overflow: hidden;
+            font-size: 14px;
             font-weight: 500;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            .logo {
+              width: 32px;
+              height: 32px;
+              border-radius: 8px;
+              margin-right: 12px;
+            }
+            .random-logo {
+              width: 32px;
+              height: 32px;
+              margin-right: 12px;
+              border-radius: 8px;
+              line-height: 32px;
+              color: #fff;
+            }
+            .name {
+              // position: absolute;
+              // bottom: 6px;
+              // left: 50px;
+              font-size: xx-small;
+              white-space: nowrap;
+              overflow: hidden;
+            }
             &.empty {
               background: none !important;
               cursor: auto;
+              // display: none;
+              visibility: hidden;
             }
             &:hover {
               color: #fff !important;

@@ -3,16 +3,29 @@
  * @returns
  */
 
-export const getBackground = (type: string): Promise<string> => {
+export const getBackground = (source: 1 | 2, type: string): Promise<string> => {
   return new Promise((resolve) => {
-    fetch(`https://api.btstu.cn/sjbz/api.php?lx=${type}&format=json`).then(async (res) => {
-      if (res) {
-        const { imgurl } = await res.json()
-        resolve(imgurl)
-      } else {
-        resolve('')
-      }
-    })
+    if (source === 1) {
+      fetch(`https://api.btstu.cn/sjbz/api.php?lx=${type}&format=json`).then(async (res) => {
+        if (res) {
+          const { imgurl } = await res.json()
+          resolve(imgurl)
+        } else {
+          resolve('')
+        }
+      })
+    }
+    if (source === 2) {
+      fetch('https://api.vvhan.com/api/bing?type=json&rand=sj').then(async (res) => {
+        if (res) {
+          const { data } = await res.json()
+          // console.log('url', data)
+          resolve(data.url)
+        } else {
+          resolve('')
+        }
+      })
+    }
   })
 }
 

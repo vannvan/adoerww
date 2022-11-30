@@ -6,7 +6,7 @@ const LIMIT_TIME = 1000 * 60 * 60 * 2
  * @returns
  */
 
-type TStoreKey = 'background' | 'lunar' | 'todayText'
+type TStoreKey = 'background' | 'lunar' | 'todayText' | 'theme'
 
 export const storeIsExpire = (key: TStoreKey, limit?: string) => {
   if (!key) return true

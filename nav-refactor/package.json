@@ -21,6 +21,10 @@
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^2.2.0",
+    "cheerio": "^1.0.0-rc.12",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "request": "^2.88.2",
     "typescript": "^4.6.4",
     "vite": "^3.2.3"
   }
