@@ -18,5 +18,6 @@
 ---- 
 
 - [5年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)
+ps：内附在线地址和添加为浏览器新标签页方法
 
 ![](https://tva1.sinaimg.cn/large/008vxvgGgy1h8nbplny62j31ff0u0wmi.jpg)
