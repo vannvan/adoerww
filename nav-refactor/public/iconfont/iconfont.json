@@ -1,0 +1,121 @@
+{
+  "id": "3793938",
+  "name": "我的导航",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "4936656",
+      "name": "home-fill",
+      "font_class": "home-fill",
+      "unicode": "e867",
+      "unicode_decimal": 59495
+    },
+    {
+      "icon_id": "11372777",
+      "name": "收藏",
+      "font_class": "shoucang",
+      "unicode": "e8c6",
+      "unicode_decimal": 59590
+    },
+    {
+      "icon_id": "4294082",
+      "name": "太阳",
+      "font_class": "taiyang",
+      "unicode": "e78b",
+      "unicode_decimal": 59275
+    },
+    {
+      "icon_id": "5203321",
+      "name": "月亮",
+      "font_class": "yueliang",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "17605469",
+      "name": "灵感",
+      "font_class": "linggan",
+      "unicode": "e816",
+      "unicode_decimal": 59414
+    },
+    {
+      "icon_id": "9495542",
+      "name": "我我我",
+      "font_class": "wowowo",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "798179",
+      "name": "生活",
+      "font_class": "life",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "7817230",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "1118",
+      "name": "文件",
+      "font_class": "wenjian",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "591722",
+      "name": "wxb工具",
+      "font_class": "wxbgongju",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "1181190",
+      "name": "工具1",
+      "font_class": "gongju1",
+      "unicode": "e6ae",
+      "unicode_decimal": 59054
+    },
+    {
+      "icon_id": "4741263",
+      "name": "风车",
+      "font_class": "fengche",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "6966137",
+      "name": "资源",
+      "font_class": "ziyuan",
+      "unicode": "e653",
+      "unicode_decimal": 58963
+    },
+    {
+      "icon_id": "7831434",
+      "name": "工具",
+      "font_class": "gongju",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "9810491",
+      "name": "社区",
+      "font_class": "shequ",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
+      "icon_id": "24849347",
+      "name": "主题色",
+      "font_class": "zhutise",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    }
+  ]
+}

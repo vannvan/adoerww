@@ -10,6 +10,7 @@ import Favorite from './components/Favorite'
 import './hover.css'
 import './App.less'
 import _ from 'lodash'
+import dayjs from 'dayjs'
 import solarLunar from 'solarlunar'
 
 function App() {
@@ -122,7 +123,6 @@ function App() {
    */
   const initPageData = async () => {
     // 农历
-    const dayjs = window.dayjs
     const solar2lunarData = solarLunar.solar2lunar(
       dayjs().year(),
       dayjs().month() + 1,
@@ -251,7 +251,7 @@ function App() {
         <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
           <p className="time">{timeString}</p>
           <p className="date">
-            {window.dayjs().format('MM月DD日')} {WEEK[window.dayjs().format('d') - 1]} {lunarText}
+            {dayjs().format('MM月DD日')} {WEEK[(dayjs().format('d') as any) - 1]} {lunarText}
           </p>
         </div>
         <div id="SearchWrap" className="search-wrap">

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "新标签页",
+  "version": "1.0.0",
+  "description": "vannvan的专属导航",
+  "icons": {
+    "16": "dist/logo.png",
+    "64": "dist/logo.png",
+    "128": "dist/logo.png",
+    "192": "dist/logo.png",
+    "512": "dist/logo.png"
+  },
+  "permissions": [
+    "tabs",
+    "webRequest",
+    "storage"
+  ],
+  "homepage_url": "https://wwnav.netlify.app/",
+  "chrome_url_overrides": {
+    "newtab": "dist/index.html"
+  }
+}

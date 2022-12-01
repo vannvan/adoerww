@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "新标签页",
+  "version": "1.0.0",
+  "description": "新标签页",
+  "icons": {
+    "16": "dist/logo.png",
+    "128": "dist/logo.png",
+    "192": "dist/logo.png",
+    "512": "dist/logo.png",
+    "64": "dist/logo.png"
+  },
+  "browser_action": {
+    "default_icon": "dist/logo.png",
+    "default_title": "这是一个示例Chrome插件"
+  },
+  "permissions": [
+    "tabs",
+    "webRequest",
+    "webRequestBlocking",
+    "storage",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "web_accessible_resources": [
+    "newtab/*"
+  ],
+  "homepage_url": "https://wwnav.netlify.app/",
+  "chrome_url_overrides": {
+    "newtab": "dist/index.html"
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

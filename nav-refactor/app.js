@@ -1,7 +1,4 @@
 // const https = require('https')
-import https from 'https'
-import http from 'http'
-import cheerio from 'cheerio'
 import fs, { link } from 'fs'
 import request from 'request'
 import path, { resolve } from 'path'
@@ -583,12 +580,6 @@ const WEBSITE = [
 
 const down = async (host, filename) => {
   // https://zj.v.api.aa1.cn/api/ico/?url=www.wpon.cn
-
-  // return new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     resolve(host)
-  //   }, 3000)
-  // })
   setTimeout(() => {
     let url = `https://api.vvhan.com/api/ico?url=${host}`
     console.log('url', url)
@@ -609,77 +600,4 @@ for (let i = 0; i < WEBSITE.length; i++) {
     const host = linkItem.link.match(reg)[0]
     let a = await down(host, `${linkItem.name}.png`)
   }
-}
-
-// WEBSITE.forEach((el) => {
-//   el.linkList.forEach(async (linkItem) => {
-//     const host = linkItem.link.match(reg)[0]
-//     let a = await down(host)
-//     console.log('a', a)
-//   })
-// })
-
-// WEBSITE.map((el) => {
-//   el.linkList.map(async (linkItem) => {
-//     // console.log(object);
-//     const host = linkItem.link.match(urlReg)[0]
-//     // setTimeout(() => {
-//     //   // getImage(linkItem.link, linkItem.name)
-//     //   console.log('host', host)
-//     // }, 3000)
-//     let a = await down(host)
-//     console.log('a', a)
-//     // console.log('host', `${host}/favicon.ico`)
-//     // request.get(`${host}/favicon.ico`).pipe(fs.createWriteStream(`download/${linkItem.name}.png`))
-//   })
-// })
-
-function download(url, dir, filename) {
-  //得到扩展名
-  var extname = path.extname(url)
-  if (extname === '.jpg' || extname === '.png' || extname === 'gif' || extname === 'svg') {
-    console.log('url: ', url)
-    request.head(url, function (err, res, body) {
-      request(url).pipe(fs.createWriteStream(dir + '/' + filename))
-    })
-  }
-}
-
-function getImage(siteLink, siteName) {
-  console.log('siteLink', siteLink)
-  let request = /https/.test(siteLink) ? https : http
-  request.get(siteLink, function (res) {
-    // 分段返回的 自己拼接
-    let html = ''
-    // 有数据产生的时候 拼接
-    res.on('data', function (chunk) {
-      html += chunk
-    })
-    // 拼接完成
-    res.on('end', function () {
-      const $ = cheerio.load(html)
-      // console.log($('link'))
-      // $('link').find((item) => {
-      //   console.log(item)
-      // })
-      let img = null
-      $('link').each(function () {
-        let srcUrl = $(this).attr('href')
-        if (/svg|png|ico/.test(srcUrl)) {
-          // console.log(srcUrl)
-          img = srcUrl
-          download(srcUrl, `./download/${siteName}`, 'icon' + path.extname(srcUrl))
-        }
-      })
-      if (!img) {
-        $('img').each(function () {
-          let srcUrl = $(this).attr('src')
-          if (/svg|png|ico/.test(srcUrl)) {
-            // console.log(srcUrl)
-            download(srcUrl, `./download/${siteName}`, 'icon' + path.extname(srcUrl))
-          }
-        })
-      }
-    })
-  })
 }
