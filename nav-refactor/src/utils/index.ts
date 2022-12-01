@@ -67,7 +67,7 @@ export const randomColor = () =>
  * @returns
  */
 export const supplEmptyNodes = (row: number, len: number) => {
-  const add = Array.from({ length: row - (len % row) }, (v, k) => {
+  const add = Array.from({ length: row - Math.abs(len % row) }, (v, k) => {
     return {
       name: '',
       link: '',
