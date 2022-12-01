@@ -27,6 +27,11 @@ const WEBSITE: TWebsite = [
         link: 'https://www.freepik.com/',
         logo: './logo/freepik.png',
       },
+      {
+        name: '语雀书籍封面制作',
+        link: 'https://wwbook.netlify.app/',
+        logo: './logo/语雀书籍封面制作.png',
+      },
     ],
   },
   {
