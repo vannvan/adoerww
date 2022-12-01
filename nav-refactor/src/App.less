@@ -162,6 +162,7 @@
       top: 210px;
       width: 50%;
       height: 48px;
+      z-index: 2;
       input {
         width: 100%;
         height: 48px;
@@ -213,7 +214,11 @@
         height: 100%;
         position: relative;
         // padding: 0;
-        padding-top: 290px;
+        // padding-top: 290px;
+        overflow: hidden;
+      }
+      .swiper-wrapper {
+        margin-top: 290px;
         overflow: hidden;
       }
       .web-p-content {
