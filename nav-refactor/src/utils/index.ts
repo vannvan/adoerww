@@ -6,7 +6,7 @@ const LIMIT_TIME = 1000 * 60 * 60 * 2
  * @returns
  */
 
-type TStoreKey = 'background' | 'lunar' | 'todayText' | 'theme'
+type TStoreKey = 'background' | 'lunar' | 'todayText' | 'theme' | 'webList'
 
 export const storeIsExpire = (key: TStoreKey, limit?: string) => {
   if (!key) return true
@@ -59,3 +59,19 @@ export const randomColor = () =>
   Math.floor(Math.random() * 0xffffff)
     .toString(16)
     .padEnd(6, '0')
+
+/**
+ * 补充空节点
+ * @param row
+ * @param len
+ * @returns
+ */
+export const supplEmptyNodes = (row: number, len: number) => {
+  const add = Array.from({ length: row - (len % row) }, (v, k) => {
+    return {
+      name: '',
+      link: '',
+    }
+  })
+  return add
+}

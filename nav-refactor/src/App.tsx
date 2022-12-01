@@ -5,11 +5,11 @@ import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
 import 'swiper/css/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
-import { getStoreData, randomColor, storeIsExpire, storeToLocal } from './utils'
+import { getStoreData, randomColor, storeIsExpire, storeToLocal, supplEmptyNodes } from './utils'
 import Favorite from './components/Favorite'
 import './hover.css'
 import './App.less'
-import _ from 'lodash'
+import { uniqBy } from 'lodash'
 import dayjs from 'dayjs'
 import solarLunar from 'solarlunar'
 
@@ -42,20 +42,37 @@ function App() {
 
   useEffect(() => {
     // 加工一下列表
-    const _list = [...WEBSITE].map((el) => {
+    const _list = [...WEBSITE].map((el, index) => {
       const len = el.linkList.length
       const row = 8
       if (len % row != 0) {
-        const add = Array.from({ length: row - (len % row) }, (v, k) => {
-          return {
-            name: '',
-            link: '',
-          }
-        })
-        el.linkList = [...el.linkList, ...add]
+        el.linkList = index > 0 ? [...el.linkList, ...supplEmptyNodes(row, len)] : el.linkList // 第一个不用补
       }
       return el
     })
+    const { list: storeList } = getStoreData('webList')
+    if (!storeList) {
+      // 存储到本地
+      storeToLocal('webList', {
+        list: _list
+          .map((el) => el.linkList)
+          .flat()
+          .filter((item) => item.link),
+      })
+    } else {
+      const oldList = [..._list[0].linkList]
+      const top5List = storeList
+        .filter((item: any) => item.clickTimes)
+        .sort((a: any, b: any) => b.clickTimes - a.clickTimes)
+        .slice(0, 5)
+      const uniqueList = uniqBy([...oldList, ...top5List], 'name')
+      const len = uniqueList.length
+      const row = 7
+      if (len % row != 0) {
+        _list[0].linkList = [...uniqueList, ...supplEmptyNodes(row, len)]
+      }
+    }
+
     setWebsiteList(_list)
 
     // console.log('_list', _list)
@@ -129,7 +146,7 @@ function App() {
       dayjs().date()
     )
     const { gzYear, dayCn, monthCn } = solar2lunarData
-    setLunarText(gzYear + monthCn + dayCn)
+    setLunarText(gzYear + '年' + monthCn + dayCn)
 
     // 背景
     if (storeIsExpire('background')) {
@@ -174,7 +191,7 @@ function App() {
   const changeTheme = useCallback(() => {
     const targetTheme = theme === 'dark' ? 'light' : 'dark'
     setTheme(targetTheme)
-    storeToLocal('theme', targetTheme)
+    storeToLocal('theme', { theme: targetTheme })
   }, [theme])
 
   /**
@@ -198,6 +215,20 @@ function App() {
         reject(err)
       }
     })
+  }
+
+  /**
+   * 更新点击次数
+   */
+  const updateClickTimes = (_item: any) => {
+    const { list } = getStoreData('webList')
+    if (list && list.length) {
+      const index = list.findIndex((item: any) => item.link == _item.link)
+      let oldTimes = list[index].clickTimes
+      list[index].clickTimes = oldTimes ? oldTimes + 1 : 1
+      // console.log(list[index])
+      storeToLocal('webList', { list })
+    }
   }
 
   return (
@@ -284,7 +315,12 @@ function App() {
                       <div className="link-content" key={el.name + index}>
                         {el.linkList.map((link, subIndex) => (
                           <div
-                            onClick={() => link.link && window.open(link.link)}
+                            onClick={() => {
+                              if (link.link) {
+                                updateClickTimes(link)
+                                window.open(link.link)
+                              }
+                            }}
                             className={[
                               'link-item',
                               link.name && getRandomHover(),

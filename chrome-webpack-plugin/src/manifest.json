@@ -7,14 +7,18 @@
     "48": "icon/app.png",
     "128": "icon/app.png"
   },
-  "content_scripts": [{
-    "matches": ["http://*/*", "https://*/*"],
-    "js": [
-      "./inject/inject.js"
-    ],
-  
-    "run_at": "document_end"
-  }],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "./inject/inject.js"
+      ],
+      "run_at": "document_end"
+    }
+  ],
   "background": {
     "persistent": true,
     "scripts": [
