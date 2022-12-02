@@ -27,7 +27,7 @@ function App() {
   const timer: any = useRef(null)
 
   // 导航列表
-  const [websiteList, setWebsiteList] = useState<TWebsite>()
+  const [websiteList, setWebsiteList] = useState<TWebsite[]>()
 
   // 今天的话
   const [todayText, setTodayText] = useState<string>('')
@@ -42,15 +42,16 @@ function App() {
 
   useEffect(() => {
     // 加工一下列表
+    const { list: storeList } = getStoreData('webList')
     const _list = [...WEBSITE].map((el, index) => {
       const len = el.linkList.length
       const row = 8
       if (len % row != 0) {
-        el.linkList = index > 0 ? [...el.linkList, ...supplEmptyNodes(row, len)] : el.linkList // 第一个不用补
+        el.linkList =
+          index > 0 && !storeList ? [...el.linkList, ...supplEmptyNodes(row, len)] : el.linkList // 第一个不用补
       }
       return el
     })
-    const { list: storeList } = getStoreData('webList')
     if (!storeList) {
       // 存储到本地
       storeToLocal('webList', {
@@ -114,6 +115,7 @@ function App() {
         initialSlide: 0,
         runCallbacksOnInit: true,
         mousewheel: true,
+        eventsTarged: '.web-content',
         on: {
           slideChange: function () {
             const _this = this as any
@@ -121,7 +123,7 @@ function App() {
           },
         },
       })
-    }, 1000)
+    }, 500)
 
     // 页面数据
     initPageData()

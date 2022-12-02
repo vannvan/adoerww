@@ -8,7 +8,7 @@ interface IFavorite {
 
 const Favorite = (props: IFavorite) => {
   const { webInfo } = props
-  const [webList, setWebList] = useState<any>()
+  const [webList, setWebList] = useState<TWebsite[]>()
 
   useEffect(() => {
     setWebList(webInfo.linkList)
