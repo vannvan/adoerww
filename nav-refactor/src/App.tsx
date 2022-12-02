@@ -5,7 +5,13 @@ import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
 import 'swiper/css/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
-import { getStoreData, randomColor, storeIsExpire, storeToLocal, supplEmptyNodes } from './utils'
+import {
+  getStoreData,
+  randomColor,
+  storeIsExpire,
+  storeToLocal,
+  supplEmptyNodes,
+} from './utils'
 import Favorite from './components/Favorite'
 import './hover.css'
 import './App.less'
@@ -48,7 +54,9 @@ function App() {
       const row = 8
       if (len % row != 0) {
         el.linkList =
-          index > 0 && !storeList ? [...el.linkList, ...supplEmptyNodes(row, len)] : el.linkList // 第一个不用补
+          index > 0 && !storeList
+            ? [...el.linkList, ...supplEmptyNodes(row, len)]
+            : el.linkList // 第一个不用补
       }
       return el
     })
@@ -98,13 +106,6 @@ function App() {
       }
     }
 
-    // 主题
-    let currentHour = new Date().getHours()
-    let theme =
-      currentHour < 19 || window.matchMedia('(prefers-color-scheme: light)').matches
-        ? 'light'
-        : 'dark'
-    setTheme(theme as any)
     // swiper
     setTimeout(() => {
       swiper.current = new Swiper('.swiper-container', {
@@ -149,6 +150,21 @@ function App() {
     )
     const { gzYear, dayCn, monthCn } = solar2lunarData
     setLunarText(gzYear + '年' + monthCn + dayCn)
+
+    // 主题
+
+    if (storeIsExpire('theme')) {
+      let currentHour = new Date().getHours()
+      let theme =
+        currentHour < 19 ||
+        window.matchMedia('(prefers-color-scheme: light)').matches
+          ? 'light'
+          : 'dark'
+      setTheme(theme as any)
+    } else {
+      const { theme: _theme } = getStoreData('theme')
+      setTheme(_theme)
+    }
 
     // 背景
     if (storeIsExpire('background')) {
@@ -234,12 +250,18 @@ function App() {
   }
 
   return (
-    <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
+    <div
+      className="content"
+      style={{ backgroundImage: `url(${backgroundImage})` }}>
+      <div
+        className="left"
+        style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
         <div className="logo" onClick={() => window.open(GITHUB_SITE)}>
           <img src={logo} />
         </div>
-        <div className="menu-content" style={{ color: THEME_COLOR[theme].linkFontColor }}>
+        <div
+          className="menu-content"
+          style={{ color: THEME_COLOR[theme].linkFontColor }}>
           {WEBSITE.map((el, index) => (
             <div
               key={Math.random()}
@@ -281,10 +303,13 @@ function App() {
         </div>
       </div>
       <div className="right">
-        <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
+        <div
+          className="time-wrap"
+          style={{ color: THEME_COLOR[theme].timeColor }}>
           <p className="time">{timeString}</p>
           <p className="date">
-            {dayjs().format('MM月DD日')} {WEEK[(dayjs().format('d') as any) - 1]} {lunarText}
+            {dayjs().format('MM月DD日')}{' '}
+            {WEEK[(dayjs().format('d') as any) - 1]} {lunarText}
           </p>
         </div>
         <div id="SearchWrap" className="search-wrap">
@@ -311,7 +336,11 @@ function App() {
               {websiteList ? (
                 websiteList.map((el, index) => (
                   <div
-                    className={['web-p-content', 'swiper-slide', 'web-p-content' + index].join(' ')}
+                    className={[
+                      'web-p-content',
+                      'swiper-slide',
+                      'web-p-content' + index,
+                    ].join(' ')}
                     key={el.name + index}>
                     {index > 0 ? (
                       <div className="link-content" key={el.name + index}>
@@ -330,7 +359,8 @@ function App() {
                             ].join(' ')}
                             key={link.name + subIndex}
                             style={{
-                              background: THEME_COLOR[theme].rightLinkItemBgColor,
+                              background:
+                                THEME_COLOR[theme].rightLinkItemBgColor,
                               color: THEME_COLOR[theme].linkFontColor,
                             }}>
                             {link.logo ? (
