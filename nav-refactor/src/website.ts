@@ -668,6 +668,11 @@ const WEBSITE: TWebsite = [
         link: 'https://api.aa1.cn/',
         logo: null,
       },
+      {
+        name:"可画",
+        link:"https://www.canva.cn/",
+        logo:null
+      }
     ],
   },
   {
