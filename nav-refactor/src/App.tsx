@@ -54,33 +54,33 @@ function App() {
       const row = 8
       if (len % row != 0) {
         el.linkList =
-          index > 0 && !storeList
+          index > 0
             ? [...el.linkList, ...supplEmptyNodes(row, len)]
             : el.linkList // 第一个不用补
       }
       return el
     })
-    if (!storeList) {
-      // 存储到本地
-      storeToLocal('webList', {
-        list: _list
-          .map((el) => el.linkList)
-          .flat()
-          .filter((item) => item.link),
-      })
-    } else {
-      const oldList = [..._list[0].linkList]
-      const top5List = storeList
-        .filter((item: any) => item.clickTimes)
-        .sort((a: any, b: any) => b.clickTimes - a.clickTimes)
-        .slice(0, 5)
-      const uniqueList = uniqBy([...oldList, ...top5List], 'name')
-      const len = uniqueList.length
-      const row = 7
-      if (len % row != 0) {
-        _list[0].linkList = [...uniqueList, ...supplEmptyNodes(row, len)]
-      }
-    }
+    // if (!storeList) {
+    //   // 存储到本地
+    //   storeToLocal('webList', {
+    //     list: _list
+    //       .map((el) => el.linkList)
+    //       .flat()
+    //       .filter((item) => item.link),
+    //   })
+    // } else {
+    //   const oldList = [..._list[0].linkList]
+    //   const top5List = storeList
+    //     .filter((item: any) => item.clickTimes)
+    //     .sort((a: any, b: any) => b.clickTimes - a.clickTimes)
+    //     .slice(0, 5)
+    //   const uniqueList = uniqBy([...oldList, ...top5List], 'name')
+    //   const len = uniqueList.length
+    //   const row = 7
+    //   if (len % row != 0) {
+    //     _list[0].linkList = [...uniqueList, ...supplEmptyNodes(row, len)]
+    //   }
+    // }
 
     setWebsiteList(_list)
 
