@@ -107,6 +107,11 @@ const tools: TWebsite = {
       link: 'https://app.netlify.com/sites',
       logo: './logo/netlify.png',
     },
+    {
+      name:"做表情包",
+      link:"https://www.wakatool.com/maker",
+
+    }
   ],
 }
 export default tools
