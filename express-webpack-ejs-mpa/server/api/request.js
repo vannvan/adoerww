@@ -2,7 +2,7 @@ const axios = require("axios");
 let BASE_URL = "";
 if (process.env.NODE_ENV === "development") {
 	// BASE_URL = "https://test-mg.emalacca.com/api/";
-	BASE_URL = "https://mg-erp.emalacca.com/api/";
+	BASE_URL = "https://erp.emalacca.com/api/";
 	// BASE_URL = 'http://192.168.50.147:9995'
 	// BASE_URL = "http://192.168.50.59:9995";
 } else {

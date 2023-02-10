@@ -14,7 +14,7 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
       //html编译插件
-      template: './demo.html',
+      template: './svg.html',
     }),
   ],
   devServer: {
@@ -28,6 +28,6 @@ module.exports = {
     host: 'localhost',
     //服务端压缩是否开启
     compress: true,
-    watchFiles: ['./demo.html'],
+    watchFiles: ['./svg.html'],
   },
 }

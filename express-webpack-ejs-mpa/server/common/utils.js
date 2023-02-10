@@ -30,7 +30,7 @@ async function dispatchPageParams(pageParams) {
 			content:
 				"特色免费功能：无限采集刊登、免费图片翻译，免费粉丝插件、免费商品置顶发布等帮助Shopee卖家上新更快，节省运营成本",
 			partnersLink: data.records || [],
-      logoImgUrl: 'https://z3.ax1x.com/2021/06/01/2uUceP.png'
+			logoImgUrl: "https://z3.ax1x.com/2021/06/01/2uUceP.png",
 		},
 		pageParams
 	);

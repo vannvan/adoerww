@@ -1,0 +1,258 @@
+/*
+*项目名: 个人简历
+*创建者: Edit
+*创建时间:2020.2.15 20:40:41
+*联系方式:15622749328(微信同号)
+*描述: 酷炫个人简历
+*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  height: 100vh;
+}
+li {
+  list-style: none;
+}
+html {
+  font-family: 宋体;
+}
+#codeEdit {
+  width: 48%;
+  height: 97vh;
+  margin: auto 0;
+}
+#resume {
+  width: 48%;
+  min-width: 700px;
+  margin: auto 0;
+  position: relative;
+  height: 97vh;
+  overflow-y: scroll;
+  display: flex;
+}
+.ul-list li::before {
+  content: '♦';
+  color: #78b1e8;
+  padding-right: 15px;
+  font-size: 20px;
+  font-family: '-webkit-pictograph';
+}
+.ul-list + .ul-list {
+  margin-top: 10px;
+}
+.tag {
+  color: #ff4614;
+}
+.footer-height {
+  height: 200px;
+}
+.mr {
+  margin-right: 40px;
+}
+body {
+  display: flex;
+  justify-content: space-around;
+}
+.balloon-wrap {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+  animation: balloon-ani 0.8s;
+}
+@keyframes balloon-ani {
+  0% {
+    left: -100vw;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
+}
+img[id*='bg-balloon-'] {
+  position: absolute;
+}
+img#bg-balloon-large {
+  transform: translateY(-17%);
+  right: -55px;
+}
+img#bg-balloon-small {
+  width: 135px;
+  right: 45px;
+  transform: translateY(-10%);
+}
+img#bg-balloon-logo {
+  height: 120px;
+  right: 0;
+}
+.line-wrap {
+  top: 0;
+  padding-left: 20px;
+  display: flex;
+  height: 100%;
+  animation: line-wrap-ani 0.8s;
+}
+@keyframes line-wrap-ani {
+  0% {
+    transform: translateX(100vw);
+  }
+  20% {
+    height: 0;
+  }
+  100% {
+    transform: translateX(0);
+    height: 100%;
+  }
+}
+.line-wrap > div {
+  width: 8px;
+  height: 100%;
+}
+.line-left {
+  background-color: #ffdf7f;
+  margin-right: 12px;
+}
+.line-right {
+  display: flex;
+  flex-direction: column;
+}
+.line-defColor {
+  background-color: #f3d383;
+}
+.line-midColor {
+  background-color: #f3c583;
+}
+.line-darkColor {
+  background-color: #edaf45;
+}
+.line-item1 {
+  height: 20%;
+}
+.line-item2 {
+  height: 20px;
+  flex-shrink: 0;
+}
+.line-item3 {
+  height: 30px;
+  flex-shrink: 0;
+}
+.line-item4 {
+  height: 20%;
+  flex-shrink: 0;
+}
+.line-item5 {
+  height: 25px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+.line-item6 {
+  height: 10%;
+  flex-shrink: 0;
+}
+.line-item7 {
+  height: 8%;
+  flex-shrink: 0;
+}
+.line-item8 {
+  height: 8%;
+  flex-shrink: 0;
+}
+.text-wrap {
+  margin-left: 30px;
+  padding: 40px 50px 40px 0;
+  font-size: 15px;
+  line-height: 1.5em;
+}
+.inten {
+  color: #ef8c06;
+}
+.text-title {
+  margin-top: 15px;
+  color: #548dd4;
+  margin-bottom: 5px;
+}
+.base-info {
+  display: flex;
+}
+.base-info > div:first-child {
+  margin-right: 100px;
+}
+.project-title {
+  font-weight: 700;
+}
+
+@media (min-width: 500px) {
+  /* 滚动条美化 */
+  *::-webkit-scrollbar-track-piece {
+    background-color: #f8f8f8;
+  }
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(150, 150, 150, 0.2);
+    background-clip: padding-box;
+    min-height: 28px;
+    border-radius: 5px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+  }
+  .sbShow::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    background-clip: padding-box;
+    min-height: 28px;
+    border-radius: 5px;
+  }
+}
+@media (max-width: 500px) {
+  body {
+    flex-direction: column;
+  }
+  #resume,
+  #codeEdit {
+    height: 50vh !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+  }
+  .line-wrap {
+    padding-left: 5px;
+  }
+  .line-left {
+    padding-left: 8px;
+  }
+  .text-wrap {
+    margin-left: 15px;
+    padding: 60px 30px 40px 0;
+  }
+  img#bg-balloon-small {
+    width: 85px;
+    right: 32px;
+    transform: translateY(-10%);
+  }
+  img#bg-balloon-large {
+    transform: translateY(-17%);
+    right: -40px;
+    width: 105px;
+  }
+  img#bg-balloon-logo {
+    height: 62px;
+  }
+  .base-info {
+    display: block;
+  }
+  .school span {
+    display: block;
+  }
+}

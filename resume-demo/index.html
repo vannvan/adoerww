@@ -1,0 +1,86 @@
+<!--
+*项目名: 个人简历
+*创建者: Edit
+*创建时间:2020.2.15 20:40:41
+*联系方式:15622749328(微信同号)
+*描述: 酷炫个人简历
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Edit-个人简历</title>
+    <link rel="stylesheet" href="css/prism.css" />
+    <link rel="stylesheet" href="css/index.css" />
+    <style id="styleContent"></style>
+  </head>
+  <body>
+    <pre id="codeEdit" class="language-css" onscroll="toggleScrollBar(event)"></pre>
+    <div id="resume" onscroll="toggleScrollBar(event)"></div>
+  </body>
+  <script src="js/textarr.js"></script>
+  <script src="js/write.js"></script>
+  <script>
+    let currentIndex_ = 0
+    function writeIntro(intro = '', time, callback) {
+      let connect = document.querySelectorAll('.connect')
+      if (connect.length < 1) {
+        resume.innerHTML = intro
+      } else {
+        connect[connect.length - 1].innerHTML = intro
+      }
+      setTimeout(() => {
+        callback()
+      }, time)
+    }
+    function startResume() {
+      writeIntro(balloon, 700, () => {
+        writeIntro(line, 200, () => {
+          writeIntro(text, 0, () => {
+            writeText(textArr[currentIndex_])
+          })
+        })
+      })
+    }
+
+    let num = 0
+    let t = setInterval(() => {
+      if (num <= style.length) {
+        codeEdit.innerHTML = Prism.highlight(style.substr(0, num), Prism.languages.css)
+        codeEdit.scrollTop = 100000
+        styleContent.innerHTML = style.substr(0, num)
+        num++
+      } else {
+        clearInterval(t)
+      }
+    }, 70)
+    setTimeout(() => {
+      if (document.body.clientWidth < 500) {
+        setTimeout(() => {
+          resume.style.cssText = 'height:70vh!important'
+        }, 5000)
+      }
+      startResume()
+    }, 10000)
+  </script>
+  <script src="js/prism.js"></script>
+  <script>
+    let sbTimer = null
+    function toggleScrollBar(self) {
+      self = self.target
+      clearTimeout(sbTimer)
+
+      if (self.getAttribute('class') != 'sbShow') self.classList.add('sbShow')
+
+      sbTimer = setTimeout(() => {
+        self.classList.remove('sbShow')
+      }, 800)
+    }
+  </script>
+</html>
