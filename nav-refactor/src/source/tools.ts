@@ -108,10 +108,13 @@ const tools: TWebsite = {
       logo: './logo/netlify.png',
     },
     {
-      name:"做表情包",
-      link:"https://www.wakatool.com/maker",
-
-    }
+      name: '做表情包',
+      link: 'https://www.wakatool.com/maker',
+    },
+    {
+      name: '视频床',
+      link: 'https://streamja.com/',
+    },
   ],
 }
 export default tools
