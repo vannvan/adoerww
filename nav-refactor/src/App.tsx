@@ -1,22 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import WEBSITE from './website'
 import { GITHUB_SITE, HOVER_CLASS, THEME_COLOR, WEEK } from './config'
-import Swiper from 'swiper/js/swiper.js' // 引入js
+import Swiper from 'swiper/bundle' // 引入js
 import logo from './assets/logo.png'
 import 'swiper/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
 import { getStoreData, randomColor, storeIsExpire, storeToLocal, supplEmptyNodes } from './utils'
-<<<<<<< HEAD
 import Favorite from './components/Favorite'
 import './hover.css'
-=======
 // import './hover.css'
->>>>>>> feat:更新导航样式
 import './App.less'
 import { uniqBy } from 'lodash'
 import dayjs from 'dayjs'
 import solarLunar from 'solarlunar'
-import Favorite from './components/Favorite'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -118,7 +114,7 @@ function App() {
               setCurrentIndex(_this.realIndex)
             },
           },
-        })
+        }) as any
       }
     }, 500)
 

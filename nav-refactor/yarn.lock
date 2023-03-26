@@ -685,12 +685,12 @@
   "resolved" "https://registry.npmmirror.com/delayed-stream/-/delayed-stream-1.0.0.tgz"
   "version" "1.0.0"
 
-"dom7@^2.1.5":
-  "integrity" "sha512-xnhwVgyOh3eD++/XGtH+5qBwYTgCm0aW91GFgPJ3XG+jlsRLyJivnbP0QmUBFhI+Oaz9FV0s7cxgXHezwOEBYA=="
-  "resolved" "https://registry.npmmirror.com/dom7/-/dom7-2.1.5.tgz"
-  "version" "2.1.5"
+"dom7@^3.0.0":
+  "integrity" "sha512-oNlcUdHsC4zb7Msx7JN3K0Nro1dzJ48knvBOnDPKJ2GV9wl1i5vydJZUSyOfrkKFDZEud/jBsTk92S/VGSAe/g=="
+  "resolved" "https://registry.npmmirror.com/dom7/-/dom7-3.0.0.tgz"
+  "version" "3.0.0"
   dependencies:
-    "ssr-window" "^2.0.0"
+    "ssr-window" "^3.0.0-alpha.1"
 
 "ecc-jsbn@~0.1.1":
   "integrity" "sha512-eh9O+hwRHNbG4BLTjEl3nw044CkGm5X6LoaCf7LPp7UU8Qrt47JYNi6nPX8xjW97TKGKm1ouctg0QSpZe9qrnw=="
@@ -725,9 +725,9 @@
   "resolved" "https://registry.npmmirror.com/es-module-lexer/-/es-module-lexer-0.9.3.tgz"
   "version" "0.9.3"
 
-"esbuild-darwin-arm64@0.15.15":
-  "integrity" "sha512-P8jOZ5zshCNIuGn+9KehKs/cq5uIniC+BeCykvdVhx/rBXSxmtj3CUIKZz4sDCuESMbitK54drf/2QX9QHG5Ag=="
-  "resolved" "https://registry.npmmirror.com/esbuild-darwin-arm64/-/esbuild-darwin-arm64-0.15.15.tgz"
+"esbuild-darwin-64@0.15.15":
+  "integrity" "sha512-ohZtF8W1SHJ4JWldsPVdk8st0r9ExbAOSrBOh5L+Mq47i696GVwv1ab/KlmbUoikSTNoXEhDzVpxUR/WIO19FQ=="
+  "resolved" "https://registry.npmmirror.com/esbuild-darwin-64/-/esbuild-darwin-64-0.15.15.tgz"
   "version" "0.15.15"
 
 "esbuild@^0.15.9":
@@ -1339,10 +1339,10 @@
     "safer-buffer" "^2.0.2"
     "tweetnacl" "~0.14.0"
 
-"ssr-window@^2.0.0":
-  "integrity" "sha512-NXzN+/HPObKAx191H3zKlYomE5WrVIkoCB5IaSdvKokxTpjBdWfr0RaP+1Z5KOfDT0ZVz+2tdtiBkhsEQ9p+0A=="
-  "resolved" "https://registry.npmmirror.com/ssr-window/-/ssr-window-2.0.0.tgz"
-  "version" "2.0.0"
+"ssr-window@^3.0.0", "ssr-window@^3.0.0-alpha.1":
+  "integrity" "sha512-q+8UfWDg9Itrg0yWK7oe5p/XRCJpJF9OBtXfOPgSJl+u3Xd5KI328RUEvUqSMVM9CiQUEf1QdBzJMkYGErj9QA=="
+  "resolved" "https://registry.npmmirror.com/ssr-window/-/ssr-window-3.0.0.tgz"
+  "version" "3.0.0"
 
 "supports-color@^5.3.0":
   "integrity" "sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow=="
@@ -1363,13 +1363,14 @@
   "resolved" "https://registry.npmmirror.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   "version" "1.0.0"
 
-"swiper@^5.4.5":
-  "integrity" "sha512-7QjA0XpdOmiMoClfaZ2lYN6ICHcMm72LXiY+NF4fQLFidigameaofvpjEEiTQuw3xm5eksG5hzkaRsjQX57vtA=="
-  "resolved" "https://registry.npmmirror.com/swiper/-/swiper-5.4.5.tgz"
-  "version" "5.4.5"
+"swiper@6.4.5":
+  "integrity" "sha512-MJIY0aXF6UKgUM+/tgwtOxI21fwRiT6QX2decd6m2L9OGA7jLBks8E0CuUuRqpQfmTInQrBPnBy8dqgOtr2O0w=="
+  "resolved" "https://registry.npmmirror.com/swiper/-/swiper-6.4.5.tgz"
+  "version" "6.4.5"
   dependencies:
-    "dom7" "^2.1.5"
-    "ssr-window" "^2.0.0"
+    "dom7" "^3.0.0"
+    "ssr-window" "^3.0.0"
+    "tslib" "^2.0.0"
 
 "tapable@^2.1.1", "tapable@^2.2.0":
   "integrity" "sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ=="
@@ -1410,7 +1411,7 @@
     "psl" "^1.1.28"
     "punycode" "^2.1.1"
 
-"tslib@^2.3.0":
+"tslib@^2.0.0", "tslib@^2.3.0":
   "integrity" "sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA=="
   "resolved" "https://registry.npmmirror.com/tslib/-/tslib-2.4.1.tgz"
   "version" "2.4.1"
