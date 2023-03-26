@@ -1,0 +1,3 @@
+[submodule "themes/hugo-theme-onelou"]
+    path = "themes/hugo-theme-onelou"
+    url = "https://github.com/jyygithub/hugo-theme-onelou.git"
