@@ -3,15 +3,20 @@ import WEBSITE from './website'
 import { GITHUB_SITE, HOVER_CLASS, THEME_COLOR, WEEK } from './config'
 import Swiper from 'swiper/js/swiper.js' // 引入js
 import logo from './assets/logo.png'
-import 'swiper/css/swiper.min.css' // 引入样式
+import 'swiper/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
 import { getStoreData, randomColor, storeIsExpire, storeToLocal, supplEmptyNodes } from './utils'
+<<<<<<< HEAD
 import Favorite from './components/Favorite'
 import './hover.css'
+=======
+// import './hover.css'
+>>>>>>> feat:更新导航样式
 import './App.less'
 import { uniqBy } from 'lodash'
 import dayjs from 'dayjs'
 import solarLunar from 'solarlunar'
+import Favorite from './components/Favorite'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -99,30 +104,26 @@ function App() {
 
     // swiper
     setTimeout(() => {
-      swiper.current = new Swiper('.swiper-container', {
-        direction: 'vertical',
-        loop: true,
-        // observer: true, //开启动态检查器，监测swiper和slide
-        // speed: 800,
-        initialSlide: 0,
-        runCallbacksOnInit: true,
-        mousewheel: true,
-        eventsTarged: '.web-content',
-        on: {
-          slideChange: function () {
-            const _this = this as any
-            setCurrentIndex(_this.realIndex)
+      console.log(swiper.current)
+      if (!swiper.current) {
+        swiper.current = new Swiper('.swiper-container', {
+          slidesPerView: 1,
+          spaceBetween: 30,
+          mousewheel: true,
+          direction: 'vertical',
+          loop: true,
+          on: {
+            slideChange: function () {
+              const _this = this as any
+              setCurrentIndex(_this.realIndex)
+            },
           },
-        },
-      })
+        })
+      }
     }, 500)
 
     // 页面数据
     initPageData()
-
-    timer.current = setInterval(() => {
-      setTimeString(new Date().toLocaleString().split(' ')[1].substr(0, 5))
-    }, 1000)
 
     return () => {
       clearInterval(timer.current)
@@ -133,6 +134,10 @@ function App() {
    * 调第三方接口
    */
   const initPageData = async () => {
+    // 时间
+    timer.current = setInterval(() => {
+      setTimeString(new Date().toLocaleString().split(' ')[1].substr(0, 5))
+    }, 1000)
     // 农历
     const solar2lunarData = solarLunar.solar2lunar(
       dayjs().year(),
@@ -207,8 +212,9 @@ function App() {
    * @returns
    */
   const getRandomHover = () => {
-    let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
-    return className
+    // let className = HOVER_CLASS[Math.floor(Math.random() * HOVER_CLASS.length)] //随机
+    // return className
+    return ''
   }
 
   //判断图片是否存在
@@ -354,7 +360,7 @@ function App() {
                       </div>
                     ) : (
                       <div key={el.name + Math.random()}>
-                        <Favorite webInfo={el} />
+                        <Favorite webInfo={el} theme={theme} />
                       </div>
                     )}
                   </div>
@@ -364,7 +370,6 @@ function App() {
               )}
             </div>
           </div>
-          {/* <div className="swiper-pagination"></div> */}
         </div>
         <div className="today-text">「{todayText}」</div>
       </div>
