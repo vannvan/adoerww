@@ -1,11 +1,3 @@
-baseURL = "https://wwblog.netlify.app/"
-languageCode = "en-us"
-title = "你好哇"
-#指定主题
-theme = "hugo-theme-onelou"
-
-[params]
-#博客简介
-description = "这里是刘悦的个人博客"
-#博客主题颜色
-themeColor = "theme-base-08"
+baseURL = 'http://example.org/'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
