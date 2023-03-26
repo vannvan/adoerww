@@ -1,5 +1,5 @@
 baseURL = 'https://wwblog.netlify.app/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = '你好哇！'
 
 theme="hugo-theme-onelou"

@@ -21,3 +21,4 @@
 ps：内附在线地址和添加为浏览器新标签页方法
 
 ![](https://tva1.sinaimg.cn/large/008vxvgGgy1h8nbplny62j31ff0u0wmi.jpg)
+[hugo-部署到Netlify](https://www.sulinehk.com/post/deploying-hugo-website-to-netlify/)
