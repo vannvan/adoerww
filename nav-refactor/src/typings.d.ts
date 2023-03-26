@@ -24,4 +24,5 @@ type TWebsite = {
 
 interface Window {
   dayjs: any
+  Swiper: any
 }

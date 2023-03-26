@@ -10,6 +10,7 @@
   "dependencies": {
     "lodash": "^4.17.21",
     "node-schedule": "^2.1.1",
+    "shelljs": "^0.8.5",
     "swiper": "^8.4.5"
   }
 }
