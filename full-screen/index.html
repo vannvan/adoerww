@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>fullPage.js 基本演示_fullPage.js全屏滚动插件</title>
+    <meta
+      name="keywords"
+      content="fullPage.js,全屏滚动,jQuery全屏滚动,fullPage全屏滚动,jQuery插件"
+    />
+    <meta
+      name="description"
+      content="fullPage.js 是一个基于 jQuery 的插件，它能够很方便、很轻松的制作出全屏网站。本站详细介绍fullPage各初始化属性设置。如果你也希望你的网站能设计成全屏的，显得更上档次，你可以试试fullPage.js。"
+    />
+    <link rel="stylesheet" href="index.css" />
+    <style>
+      .section {
+        text-align: center;
+        color: #fff;
+      }
+      .section p {
+        font: 30px 'Microsoft Yahei';
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 60px;
+        height: 100vh;
+        background: #ccc;
+        z-index: 100;
+      "
+    ></div>
+    <div
+      style="
+        position: absolute;
+        width: 600px;
+        height: 40px;
+        transform: translate(-50%, -50%);
+        background: #ccc;
+        z-index: 1000;
+        top: 20%;
+        left: 50%;
+      "
+    ></div>
+    <div
+      style="
+        height: 300px;
+        width: calc(100% - 60px);
+        background: transparent;
+        position: absolute;
+        left: 60px;
+        top: 0;
+        z-index: 100;
+      "
+    ></div>
+    <div id="fullPage">
+      <div class="section">
+        <h3>第一屏</h3>
+        <p>fullPage.js — 基本演示</p>
+      </div>
+      <div class="section">
+        <h3>第二屏</h3>
+        <p>fullPage.js — 基本演示</p>
+      </div>
+      <div class="section">
+        <h3>第三屏</h3>
+      </div>
+      <div class="section">
+        <h3>第四屏</h3>
+        <p>这是最后一屏</p>
+      </div>
+    </div>
+    <script src="http://libs.baidu.com/jquery/1.7.2/jquery.js"></script>
+    <script src="fullpage.js"></script>
+    <script>
+      $(function () {
+        $('#fullPage').fullpage({
+          // scrollingSpeed: 500,
+          continuousVertical: true,
+          paddingTop: '400px',
+          sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', '#f90'],
+        })
+      })
+    </script>
+  </body>
+</html>
