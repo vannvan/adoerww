@@ -1,4 +1,4 @@
-## demo项目内容
+## Demo项目内容
 - [前端导航](https://vannvan.github.io/adoerww/web/)
 - [一个用于ajax请求响应拦截的hook](https://github.com/vannvan/adoerww/tree/master/ajax-hook-plugin)
 - [chrome扩展，用于改写浏览器请求地址的](https://github.com/vannvan/adoerww/tree/master/api-proxy)
@@ -15,11 +15,17 @@
 - [小而美的脚手架](https://github.com/vannvan/adoerww/blob/master/plop-example)
 - [rollup+ts打造插件包方法](https://github.com/vannvan/adoerww/blob/master/rollup-ts-package-explore)
 - [hugo-部署到Netlify](https://www.sulinehk.com/post/deploying-hugo-website-to-netlify/)
+- [全屏滚动](https://www.sulinehk.com/post/full-screen)
+
 
 ---- 
 
-- [5年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)
+- [多年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)
 ps：内附在线地址和添加为浏览器新标签页方法
 
-![](https://tva1.sinaimg.cn/large/008vxvgGgy1h8nbplny62j31ff0u0wmi.jpg)
+![](https://p.ipic.vip/8u79pn.jpg)
 
+
+
+## 来过
+如果为您提供了灵感欢迎点个⭐️
