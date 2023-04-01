@@ -1,5 +1,5 @@
 /*
- * Description:
+ * Description: 文件操作
  * Created: 2023-02-23 09:34:34
  * Author: van
  * Email : adoerww@gamil.com
@@ -9,19 +9,11 @@
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
  */
-/**
- * 文件操作
- */
-// const { exec, exit } = require('shelljs')
-// const fs = require('fs')
-// const log = console.log
-// const chalk = require('chalk')
-// const path = require('path')
+
 import fs from 'fs'
 const log = console.log
 import chalk from 'chalk'
-// import { exec, exit } from 'shelljs'
-const { exec, exit } = require('shelljs')
+import { exec, exit } from 'shelljs'
 import path from 'path'
 
 class File {
