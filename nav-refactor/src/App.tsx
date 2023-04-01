@@ -3,7 +3,7 @@ import WEBSITE from './website'
 import { GITHUB_SITE, HOVER_CLASS, THEME_COLOR, WEEK } from './config'
 // import Swiper from 'swiper/bundle' // 引入js
 // @ts-ignore
-import Swiper from 'https://unpkg.com/swiper@8/swiper-bundle.esm.browser.min.js'
+import Swiper from 'https://cdn.bootcdn.net/ajax/libs/Swiper/9.1.1/swiper-bundle.esm.browser.js'
 import logo from './assets/logo.png'
 import 'swiper/swiper.min.css' // 引入样式
 import { getBackground, getLunarInfo, getTodayTextString } from './api'
