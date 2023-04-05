@@ -23,7 +23,10 @@ const Favorite = (props: IFavorite) => {
             <div
               onClick={() => link.link && window.open(link.link)}
               key={link.name + index}
-              style={{ background: THEME_COLOR[theme].rightLinkItemBgColor }}
+              style={{
+                background: THEME_COLOR[theme].rightLinkItemBgColor,
+                color: THEME_COLOR[theme].linkFontColor,
+              }}
               onMouseEnter={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
                 e.preventDefault()
                 const targetStyle = theme === 'dark' ? 'light' : 'dark'
@@ -49,9 +52,7 @@ const Favorite = (props: IFavorite) => {
                   {link.name.charAt(0).toUpperCase()}
                 </div>
               )}
-              <p className="name" style={{ color: THEME_COLOR[theme].linkFontColor }}>
-                {link.name}
-              </p>
+              <p className="name">{link.name}</p>
             </div>
           ))}
       </div>
