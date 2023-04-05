@@ -333,6 +333,19 @@ function App() {
                                 window.open(link.link)
                               }
                             }}
+                            onMouseEnter={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                              e.preventDefault()
+                              const targetStyle = theme === 'dark' ? 'light' : 'dark'
+                              const t = e.currentTarget
+                              t.style.background = THEME_COLOR[targetStyle].rightLinkItemBgColor
+                              t.style.color = THEME_COLOR[targetStyle].linkFontColor
+                            }}
+                            onMouseLeave={(e) => {
+                              e.preventDefault()
+                              const t = e.currentTarget
+                              t.style.background = THEME_COLOR[theme].rightLinkItemBgColor
+                              t.style.color = THEME_COLOR[theme].linkFontColor
+                            }}
                             className={[
                               'link-item',
                               link.name && getRandomHover(),

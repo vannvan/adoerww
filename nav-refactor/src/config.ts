@@ -7,7 +7,7 @@ export const THEME_COLOR = {
     listBgColor: '#fff',
     leftBarBgColor: '#fff',
     rightTitleBgColor: '#fff',
-    rightLinkItemBgColor: 'rgba(255,255,255,0.6)',
+    rightLinkItemBgColor: 'rgba(255,255,255,0.8)',
     inputColor: '#ffffff',
     inputBgColor: 'rgba(52, 73, 94, 0.5)',
     timeColor: '#fff',
