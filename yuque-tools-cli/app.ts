@@ -1,13 +1,15 @@
-import { exportDoc, getYuqueRepos } from './lib/tool'
+import { exportDoc, getYuqueRepos, inquireAccount } from './lib/tool'
 import ora from 'ora'
 const log = console.log
+import chalk from 'chalk'
+import inquirer from 'inquirer'
 
 import F from './lib/file'
 import path from 'path'
-import chalk from 'chalk'
 
 log(chalk.green('hello world'))
 
+// process.exit(0)
 interface IListItem {
   slug: string
   title: string
@@ -16,6 +18,10 @@ interface IListItem {
 ;(async () => {
   const argv = process.argv
   const token = argv[2]
+  const { username, password } = await inquireAccount()
+  //
+
+  return
   if (!token) {
     log(chalk.red('请传入token'))
     process.exit(0)

@@ -1,5 +1,8 @@
 import axios from 'axios'
 import { readdir } from 'fs'
+import inquirer from 'inquirer'
+const log = console.log
+import chalk from 'chalk'
 
 export class HandleThemes {
   public getFolderFiles(path: string): void {
@@ -59,6 +62,32 @@ export const exportDoc = (slug: string) => {
       })
       .catch(function (error) {
         console.log(error)
+      })
+  })
+}
+
+export const inquireAccount = (): Promise<{ username: string; password: string }> => {
+  return new Promise((resolve) => {
+    inquirer
+      .prompt([
+        {
+          type: 'input',
+          message: 'username',
+          name: 'username',
+        },
+        {
+          type: 'password',
+          message: 'password',
+          name: 'password',
+        },
+      ])
+      .then(async (answer) => {
+        const { username, password } = answer
+        if (!username || !password) {
+          log(chalk.red('无效信息'))
+          process.exit(0)
+        }
+        resolve(answer)
       })
   })
 }
