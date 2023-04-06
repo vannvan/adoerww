@@ -2,7 +2,7 @@ import { exportDoc, getLocalCookies, getYuqueRepos, inquireAccount, Log } from '
 import { config as CONFIG } from './config'
 import F from './lib/file'
 import path from 'path'
-import { loginYuque } from './lib/yuque'
+import { getBookStacks, loginYuque } from './lib/yuque'
 import { IAccountInfo } from './lib/type'
 ;(async () => {
   Log.info('开始登录语雀')
@@ -39,7 +39,9 @@ import { IAccountInfo } from './lib/type'
 
     const login = await loginYuque({ password, userName })
     if (login === 'ok') {
-      //
+      setTimeout(() => {
+        getBookStacks()
+      }, 500)
     }
   }
 

@@ -25,6 +25,14 @@ export const config = {
   get userInfoFile() {
     return path.join(config.outputDir, '.meta/userinfo.json')
   },
+
+  /**
+   * 知识库
+   */
+  get bookInfoFile() {
+    return path.join(config.outputDir, '.meta/booksinfo.json')
+  },
+
   /**
    * 信息数据元目录
    */

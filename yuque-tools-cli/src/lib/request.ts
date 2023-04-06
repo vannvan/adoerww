@@ -4,14 +4,16 @@ import { getLocalCookies } from './tool'
 import { config as CONFIG } from '../config'
 
 export const get = <T>(url: string): Promise<{ data: T }> => {
+  const cookie = getLocalCookies()?.data
+  if (!cookie) process.exit(0)
   return new Promise(async (resolve, reject) => {
     const config = {
-      url: url,
+      url: CONFIG.host + url,
       method: 'get',
       headers: {
         'content-type': 'application/json',
         'x-requested-with': 'XMLHttpRequest',
-        cookie: await getLocalCookies()?.data,
+        cookie: cookie,
       },
     }
     axios(config)
@@ -27,7 +29,7 @@ export const get = <T>(url: string): Promise<{ data: T }> => {
 export const post = <T>(url: string, params: any, header?: object): Promise<{ data: T }> => {
   return new Promise((resolve, reject) => {
     const config = {
-      url: url,
+      url: CONFIG.host + url,
       method: 'post',
       data: params,
       headers: Object.assign(header || {}, {
@@ -39,10 +41,14 @@ export const post = <T>(url: string, params: any, header?: object): Promise<{ da
     axios(config)
       .then((res) => {
         if (res.headers['set-cookie']) {
-          const cookieContent = JSON.stringify({
-            expired: Date.now(),
-            data: res.headers['set-cookie'],
-          })
+          const cookieContent = JSON.stringify(
+            {
+              expired: Date.now(),
+              data: res.headers['set-cookie'],
+            },
+            null,
+            4
+          )
           F.touch2(CONFIG.cookieFile, cookieContent)
         }
         resolve(res.data)
