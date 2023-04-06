@@ -31,7 +31,7 @@ class File {
   }
 
   /**
-   * 创建文件
+   * 目录可能不存在，创建文件
    * @param {*} absolutePath  绝对路径
    * @param {*} fileName 文件名称
    * @param {*} content 文件内容
@@ -42,6 +42,17 @@ class File {
     fs.writeFile(`${_fileName}`, content, (error) => {
       if (error) return console.log(`${_fileName}写入文件失败,原因是` + error.message)
       // log(chalk.green(`${_fileName}创建成功`))
+    })
+  }
+
+  /**
+   * 已知目录存在创建文件
+   * @param fileNameAbsolutePath
+   * @param content
+   */
+  touch2(fileNameAbsolutePath: fs.PathLike, content: string) {
+    fs.writeFile(`${fileNameAbsolutePath}`, content, (error) => {
+      if (error) return console.log(`${fileNameAbsolutePath}写入文件失败,原因是` + error.message)
     })
   }
 
@@ -76,7 +87,7 @@ class File {
    * @param {*} fullPath 完整路径
    * @returns
    */
-  isExit(fullPath: fs.PathLike) {
+  async isExit(fullPath: fs.PathLike) {
     return fs.existsSync(fullPath)
   }
 
@@ -85,9 +96,9 @@ class File {
    * @param {*} fileAbsolutePath 完整路径
    * @returns
    */
-  read(fileAbsolutePath: fs.PathOrFileDescriptor) {
-    const _file = fs.readFileSync(fileAbsolutePath, 'utf-8')
-    return _file ? _file.toString() : ''
+  read(fileAbsolutePath: fs.PathLike) {
+    const content = fs.readFileSync(fileAbsolutePath, 'utf-8')
+    return content ? content.toString() : ''
   }
 
   /**

@@ -3,6 +3,10 @@ node_modules
 /dist
 /dist-bak
 /bak
+/directories
+.vscode/
+docs/
+
 
 # local env files
 .env.local

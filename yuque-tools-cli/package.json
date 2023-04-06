@@ -9,19 +9,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "yuque": "ts-node app.ts",
-    "start": "nodemon -e ts --exec ts-node app.ts"
+    "yuque": "ts-node src/app.ts",
+    "start": "nodemon -e ts --exec ts-node src/app.ts"
   },
   "keywords": [],
   "author": "vannvan",
   "license": "ISC",
   "dependencies": {
+    "@types/inquirer": "^9.0.3",
     "@types/node": "^18.15.11",
     "@types/shelljs": "^0.8.11",
     "axios": "^1.3.4",
     "chalk": "4.1.2",
-    "jsencrypt-node": "^1.0.4",
     "inquirer": "8",
+    "jsencrypt-node": "^1.0.4",
     "nodemon": "^2.0.22",
     "ora": "4",
     "shelljs": "^0.8.5",

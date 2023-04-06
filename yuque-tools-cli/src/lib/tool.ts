@@ -3,17 +3,27 @@ import { readdir } from 'fs'
 import inquirer from 'inquirer'
 const log = console.log
 import chalk from 'chalk'
+import F from './file'
+const JSEncrypt = require('jsencrypt-node')
+import { config as CONFIG } from '../config'
+import { ICookies } from './type'
 
-export class HandleThemes {
-  public getFolderFiles(path: string): void {
-    readdir(path, (errStatus, fileList) => {
-      if (errStatus !== null) {
-        console.log('文件读取失败, 错误原因: ', errStatus)
-        return
-      }
-      console.log('文件读取成功', fileList)
-    })
-  }
+export const oneDay = 86400000
+
+/**
+ * 一天之后过期
+ * @returns
+ */
+export const afterOneDay = () => Date.now() + oneDay
+
+/**
+ * 打印日志
+ */
+export const Log = {
+  error: (text: string) => log(chalk.red(text)),
+  info: (text: string) => log(chalk.white(text)),
+  success: (text: string) => log(chalk.green(text)),
+  warn: (text: string) => log(chalk.yellow(text)),
 }
 
 /**
@@ -66,14 +76,14 @@ export const exportDoc = (slug: string) => {
   })
 }
 
-export const inquireAccount = (): Promise<{ username: string; password: string }> => {
+export const inquireAccount = (): Promise<{ userName: string; password: string }> => {
   return new Promise((resolve) => {
     inquirer
       .prompt([
         {
           type: 'input',
-          message: 'username',
-          name: 'username',
+          message: 'userName',
+          name: 'userName',
         },
         {
           type: 'password',
@@ -82,12 +92,42 @@ export const inquireAccount = (): Promise<{ username: string; password: string }
         },
       ])
       .then(async (answer) => {
-        const { username, password } = answer
-        if (!username || !password) {
+        const { userName, password } = answer
+        if (!userName || !password) {
           log(chalk.red('无效信息'))
           process.exit(0)
         }
         resolve(answer)
       })
   })
+}
+
+/**
+ * 获取本地存储的cookie
+ */
+export const getLocalCookies = () => {
+  try {
+    const cookie = F.read(CONFIG.cookieFile)
+    if (cookie) {
+      const _cookies = JSON.parse(cookie) as ICookies
+      return _cookies
+    } else {
+      return undefined
+    }
+  } catch (error) {
+    return undefined
+  }
+}
+
+/**
+ * 加密
+ * @param password
+ * @returns
+ */
+export const genPassword = (password: string) => {
+  const encryptor = new JSEncrypt()
+  encryptor.setPublicKey(CONFIG.publicKey)
+  const time = Date.now()
+  const symbol = time + ':' + password
+  return encryptor.encrypt(symbol)
 }
