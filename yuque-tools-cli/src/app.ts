@@ -1,8 +1,16 @@
-import { exportDoc, getLocalCookies, getYuqueRepos, inquireAccount, Log } from './lib/tool'
+import {
+  delayedDownloadDoc,
+  delayedGetDocCommands,
+  getLocalCookies,
+  inquireAccount,
+  inquireBooks,
+  Log,
+  setJSONString,
+} from './lib/tool'
 import { config as CONFIG } from './config'
 import F from './lib/file'
 import path from 'path'
-import { getBookStacks, loginYuque } from './lib/yuque'
+import { exportMarkdown, getBookStacks, getDocsOfBooks, loginYuque } from './lib/yuque'
 import { IAccountInfo } from './lib/type'
 ;(async () => {
   Log.info('开始登录语雀')
@@ -29,6 +37,46 @@ import { IAccountInfo } from './lib/type'
     }
   }
 
+  const ask = async () => {
+    try {
+      const localBook = F.read(CONFIG.bookInfoFile)
+      const { expired, booksInfo: bookList } = JSON.parse(localBook)
+      if (!expired || expired < Date.now()) {
+        await getBook()
+      } else {
+        const books = (await inquireBooks()) as string[]
+        if (books.length === 0) {
+          Log.error('请选择知识库')
+          process.exit(0)
+        } else {
+          const filterBookList = books.includes('all')
+            ? bookList
+            : bookList.filter((item: any) => books.includes(item.slug))
+
+          delayedDownloadDoc(filterBookList, 1000, (item) => {
+            //
+          })
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      getBook()
+    }
+  }
+
+  const getBook = async () => {
+    setTimeout(async () => {
+      const bookList = await getBookStacks()
+      delayedGetDocCommands(bookList, CONFIG.duration, async (_bookList) => {
+        const content = setJSONString({ booksInfo: bookList, expired: Date.now() + 3600000 })
+        F.touch2(CONFIG.bookInfoFile, content)
+        setTimeout(() => {
+          ask()
+        }, 200)
+      })
+    }, 300)
+  }
+
   const start = async () => {
     if (userName && password) {
       accountInfo.userName = userName
@@ -37,11 +85,11 @@ import { IAccountInfo } from './lib/type'
       accountInfo = await inquireAccount()
     }
 
-    const login = await loginYuque({ password, userName })
+    const login = await loginYuque(accountInfo)
     if (login === 'ok') {
-      setTimeout(() => {
-        getBookStacks()
-      }, 500)
+      ask()
+    } else {
+      Log.error('语雀登录失败')
     }
   }
 

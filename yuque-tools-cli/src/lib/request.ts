@@ -1,6 +1,6 @@
 import axios from 'axios'
 import F from './file'
-import { getLocalCookies } from './tool'
+import { getLocalCookies, setJSONString } from './tool'
 import { config as CONFIG } from '../config'
 
 export const get = <T>(url: string): Promise<{ data: T }> => {
@@ -41,14 +41,10 @@ export const post = <T>(url: string, params: any, header?: object): Promise<{ da
     axios(config)
       .then((res) => {
         if (res.headers['set-cookie']) {
-          const cookieContent = JSON.stringify(
-            {
-              expired: Date.now(),
-              data: res.headers['set-cookie'],
-            },
-            null,
-            4
-          )
+          const cookieContent = setJSONString({
+            expired: Date.now(),
+            data: res.headers['set-cookie'],
+          })
           F.touch2(CONFIG.cookieFile, cookieContent)
         }
         resolve(res.data)

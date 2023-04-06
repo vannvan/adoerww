@@ -28,6 +28,7 @@ export type TBookItem = {
   user: {
     name: string
   }
+  docs: TDocItem[]
 }
 
 export type TBookStackItem = {
@@ -38,4 +39,14 @@ export type TBookStackItem = {
 
 export interface IBookStack {
   data: TBookStackItem[]
+}
+
+export type TDocItem = {
+  title: string
+  slug: string
+  description: string
+}
+
+export interface IDocsOfBook {
+  data: TDocItem[]
 }

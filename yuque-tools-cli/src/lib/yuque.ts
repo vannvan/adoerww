@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { afterOneDay, genPassword, Log } from './tool'
+import { afterOneDay, genPassword, Log, setJSONString } from './tool'
 import { config as CONFIG } from '../config'
 import { get, post } from './request'
-import { IAccountInfo, IBookStack, ILoginResponse, TBookItem, TBookStackItem } from './type'
+import { IAccountInfo, ILoginResponse, TBookItem, TBookStackItem, TDocItem } from './type'
 import F from './file'
 import YUQUE_API from './apis'
 
@@ -29,7 +29,7 @@ export const loginYuque = async (accountInfo: IAccountInfo) => {
   })
 
   if (data.ok) {
-    const userInfoContent = JSON.stringify({ ...data.user, expired: afterOneDay() }, null, 4)
+    const userInfoContent = setJSONString({ ...data.user, expired: afterOneDay() })
     F.touch2(CONFIG.userInfoFile, userInfoContent)
     Log.success('语雀登录成功')
     return 'ok'
@@ -54,10 +54,48 @@ export const getBookStacks = async () => {
         name: item.name,
         user: item.user.name,
         id: item.id,
+        docs: [],
       }
     })
-    const content = JSON.stringify({ booksInfo: _list }, null, 4)
-    F.touch2(CONFIG.bookInfoFile, content)
-    console.log(_list)
+    return _list
+  } else {
+    Log.error('获取知识库失败')
+    process.exit(0)
+  }
+}
+
+/**
+ * 获取知识库下的文档
+ * @param bookId
+ * @returns 文档列表
+ */
+export const getDocsOfBooks = async (bookId: string) => {
+  const { data } = await get<TDocItem[]>(YUQUE_API.yuqueDocsOfBook(bookId))
+  if (data) {
+    const list = data.map((item) => {
+      return {
+        slug: item.slug,
+        name: item.title,
+        // description: item.description,
+      }
+    })
+    return list
+  } else {
+    Log.error(`获取{${bookId}}知识库文档失败`)
+  }
+}
+
+/**
+ * 导出md文件
+ * @param repos 文档路径
+ * @param linebreak 是否保留换行
+ * @returns md内容
+ */
+export const exportMarkdown = async (repos: string, linebreak: boolean = false) => {
+  const markdownContent = await get(YUQUE_API.yuqueExportMarkdown(repos, linebreak))
+  if (markdownContent) {
+    return markdownContent
+  } else {
+    Log.error(`导出{${repos}}知识库文档失败`)
   }
 }

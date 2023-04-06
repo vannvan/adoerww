@@ -12,6 +12,10 @@ export const config = {
   q70sevcmc8SsBNoaMQtyF/gETPBSsyWv3ccBJFrzZ5hxFdlVUfg6tXARtEI8rbIH
   su6TBkVjk+n1Pw/ihQIDAQAB
   -----END PUBLIC KEY-----`,
+  /**
+   * 请求yuque的间隔
+   */
+  duration: 1000,
 
   /**
    * cookie存储地址

@@ -1,14 +1,14 @@
-import axios from 'axios'
-import { readdir } from 'fs'
 import inquirer from 'inquirer'
 const log = console.log
 import chalk from 'chalk'
 import F from './file'
-const JSEncrypt = require('jsencrypt-node')
 import { config as CONFIG } from '../config'
 import { ICookies } from './type'
+import ora from 'ora'
+import { getDocsOfBooks } from './yuque'
+const JSEncrypt = require('jsencrypt-node')
 
-export const oneDay = 86400000
+const oneDay = 86400000
 
 /**
  * 一天之后过期
@@ -27,55 +27,16 @@ export const Log = {
 }
 
 /**
- * 获取知识库数据
- * @param token
+ * 转换为json字符串
+ * @param content
  * @returns
  */
-export const getYuqueRepos = (token: string) => {
-  var config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: 'https://www.yuque.com/api/v2/repos/vannvan/tools/toc',
-    headers: {
-      'X-Auth-Token': token,
-    },
-  }
+export const setJSONString = (content: unknown) => JSON.stringify(content, null, 4)
 
-  return new Promise((resolve, reject) => {
-    axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data))
-        resolve(response.data)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
-  })
-}
-
-export const exportDoc = (slug: string) => {
-  var config = {
-    method: 'get',
-    maxBodyLength: Infinity,
-    url: `https://www.yuque.com/vannvan/tools/${slug}/markdown?attachment=true&latexcode=false&anchor=false&linebreak=false`,
-    headers: {
-      cookie:
-        'yuque_ctoken=D2EIsKDP9AkHiwfjhstu73vf; lang=zh-cn; _yuque_session=kC4Wtyjde9lU30Bjjd_G1a_6TtAJPZdeUjxTnlPOjbyLEJllL6_AQE2P-47b-cpEbCp5uDcE0z_TV9YRUSUECw==; current_theme=default; acw_tc=0bca28e216803190376956281e0166a95434b9121ba5f07b12c1e224dfc5f5',
-    },
-  }
-
-  return new Promise((resolve, reject) => {
-    axios(config)
-      .then(function (response) {
-        // console.log(JSON.stringify(response.data))
-        resolve(response.data)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
-  })
-}
-
+/**
+ * 账号登录
+ * @returns
+ */
 export const inquireAccount = (): Promise<{ userName: string; password: string }> => {
   return new Promise((resolve) => {
     inquirer
@@ -131,4 +92,121 @@ export const genPassword = (password: string) => {
   const time = Date.now()
   const symbol = time + ':' + password
   return encryptor.encrypt(symbol)
+}
+
+/**
+ * 获取知识库下的文档
+ * @param bookList
+ * @param duration
+ * @param finishCallBack
+ */
+export const delayedGetDocCommands = (
+  bookList: any[],
+  duration: number = 1000,
+  finishCallBack: (booklist: any) => void
+) => {
+  if (!bookList || !bookList.length) {
+    Log.error('知识库数据有误')
+    process.exit(0)
+  }
+  let index = 0
+  const MAX = bookList.length
+  const spinner = ora('开始获取文档数据').start()
+
+  let timer = setInterval(async () => {
+    if (index >= MAX) {
+      spinner.stop()
+      Log.success('文档数据获取完成')
+      typeof finishCallBack === 'function' && finishCallBack(bookList)
+      clearInterval(timer)
+      return
+    }
+    const bookName = bookList[index].name
+    spinner.text = `【${index}】开始获取${bookName}的文档数据`
+    const docs = await getDocsOfBooks(bookList[index].id)
+    spinner.text = `【${index}】${bookName}的文档数据获取成功`
+    if (docs) bookList[index].docs = docs as any
+    index++
+  }, duration)
+}
+
+/**
+ * 询问需要的知识库
+ * @returns
+ */
+export const inquireBooks = async () => {
+  const book = F.read(CONFIG.bookInfoFile)
+  if (book) {
+    const { booksInfo } = JSON.parse(book)
+    const all = [{ name: '所有', value: 'all' }]
+    const options = booksInfo.map((item: any, index: number) => {
+      return {
+        name: `[${index + 1}]` + item.name,
+        value: item.slug,
+      }
+    })
+
+    return new Promise((resolve) => {
+      inquirer
+        .prompt([
+          {
+            type: 'checkbox',
+            message: '请选择知识库(空格选中)',
+            name: 'books',
+            choices: options.concat(all),
+          },
+        ])
+        .then(async (answer) => {
+          resolve(answer.books)
+        })
+    })
+  } else {
+    Log.error('知识库数据获取失败')
+  }
+}
+
+const genFlatDocList = (bookList: any[]) => {
+  const ans: any[] = []
+  bookList.map((item) => {
+    item.docs.map((doc: any) => {
+      const repos = item.user + '/' + item.slug + '/' + doc.slug
+      ans.push({
+        repos,
+        dirName: item.name, // 目录名称
+        slug: doc.slug,
+        name: doc.name,
+      })
+    })
+  })
+  return ans
+}
+
+export const delayedDownloadDoc = (
+  bookList: any[],
+  duration: number = 1000,
+  finishCallBack: (markdown: string) => void
+) => {
+  if (!bookList || bookList.length === 0) {
+    Log.error('知识库选项错误')
+    process.exit(0)
+  }
+
+  // 提前初始化知识库目录
+  bookList.map((book) => {
+    // 处理特殊字符
+    const match = book.name.match(/\W+/g)
+    let targetName: string = book.name
+    if (match) {
+      console.log('match', match)
+      targetName = targetName.replace(/\W+/g, `'${match[0]}'`)
+    }
+    console.log('targetName', targetName)
+    // F.mkdir(CONFIG.metaDir + '/' + (book.name))
+  })
+
+  const flatList = genFlatDocList(bookList)
+
+  let index = 0
+
+  //
 }

@@ -5,7 +5,7 @@ node_modules
 /bak
 /directories
 .vscode/
-docs/
+/docs/*
 
 
 # local env files
