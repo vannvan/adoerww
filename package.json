@@ -3,6 +3,7 @@
     "build": "node script/build.js"
   },
   "devDependencies": {
+    "hexo": "7.0.0-rc1",
     "rollup": "^2.73.0",
     "rollup-plugin-terser": "^7.0.2",
     "vuepress": "^1.9.7"

@@ -1,10 +1,11 @@
-import axios from 'axios'
+import jsdom from 'jsdom'
 import { afterOneDay, genPassword, Log, setJSONString } from './tool'
 import { config as CONFIG } from '../config'
 import { get, post } from './request'
 import { IAccountInfo, ILoginResponse, TBookItem, TBookStackItem, TDocItem } from './type'
 import F from './file'
 import YUQUE_API from './apis'
+const { JSDOM } = jsdom
 
 /**
  * 登录语雀
@@ -30,7 +31,7 @@ export const loginYuque = async (accountInfo: IAccountInfo) => {
 
   if (data.ok) {
     const userInfoContent = setJSONString({ ...data.user, expired: afterOneDay() })
-    F.touch2(CONFIG.userInfoFile, userInfoContent)
+    await F.touch2(CONFIG.userInfoFile, userInfoContent)
     Log.success('语雀登录成功')
     return 'ok'
   } else {
@@ -98,4 +99,25 @@ export const exportMarkdown = async (repos: string, linebreak: boolean = false) 
   } else {
     Log.error(`导出{${repos}}知识库文档失败`)
   }
+}
+
+/**
+ * 爬取语雀知识库页面数据
+ */
+export const crawlYuqueBookPage = (repos: string) => {
+  return new Promise((resolve, reject) => {
+    get(repos).then((res) => {
+      const virtualConsole = new jsdom.VirtualConsole()
+      const window = new JSDOM(`${res}`, { runScripts: 'dangerously', virtualConsole }).window
+      virtualConsole.on('error', () => {
+        // don't do anything
+      })
+      try {
+        const { book } = window.appData
+        resolve(book.toc)
+      } catch (error) {
+        Log.error(`知识库${repos}页面数据爬取失败`)
+      }
+    })
+  })
 }

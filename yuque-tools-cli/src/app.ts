@@ -10,14 +10,23 @@ import {
 import { config as CONFIG } from './config'
 import F from './lib/file'
 import path from 'path'
-import { exportMarkdown, getBookStacks, getDocsOfBooks, loginYuque } from './lib/yuque'
+import { getBookStacks, loginYuque } from './lib/yuque'
 import { IAccountInfo } from './lib/type'
 ;(async () => {
   Log.info('开始登录语雀')
+  // load account info from argv
   const [userName, password] = [process.argv[2], process.argv[3]]
   let accountInfo: IAccountInfo = {
-    userName: '',
-    password: '',
+    userName: userName,
+    password: password,
+  }
+
+  // load account info from .yuquerc.js
+  const isExitConfig = await F.isExit(path.resolve('./.yuquerc.js'))
+  if (isExitConfig) {
+    const userInfo = require(path.resolve('./.yuquerc.js'))
+    accountInfo.userName = userInfo.userName
+    accountInfo.password = userInfo.password
   }
 
   // exit docs dir?
@@ -27,8 +36,8 @@ import { IAccountInfo } from './lib/type'
   let needLogin = true
 
   if (!docExit) {
-    F.mkdir(path.resolve(CONFIG.outputDir))
-    F.mkdir(path.resolve(CONFIG.metaDir))
+    await F.mkdir(path.resolve(CONFIG.outputDir))
+    await F.mkdir(path.resolve(CONFIG.metaDir))
   } else {
     const cookie = getLocalCookies()
     // is expired
@@ -42,11 +51,12 @@ import { IAccountInfo } from './lib/type'
       const localBook = F.read(CONFIG.bookInfoFile)
       const { expired, booksInfo: bookList } = JSON.parse(localBook)
       if (!expired || expired < Date.now()) {
+        Log.info('开始获取知识库信息')
         await getBook()
       } else {
         const books = (await inquireBooks()) as string[]
         if (books.length === 0) {
-          Log.error('请选择知识库')
+          Log.error('未选择知识库，程序中断')
           process.exit(0)
         } else {
           const filterBookList = books.includes('all')
@@ -54,12 +64,12 @@ import { IAccountInfo } from './lib/type'
             : bookList.filter((item: any) => books.includes(item.slug))
 
           delayedDownloadDoc(filterBookList, 1000, (item) => {
-            //
+            // TODO这里可以执行导出并存储到本地的动作
           })
         }
       }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       getBook()
     }
   }
@@ -67,7 +77,7 @@ import { IAccountInfo } from './lib/type'
   const getBook = async () => {
     setTimeout(async () => {
       const bookList = await getBookStacks()
-      delayedGetDocCommands(bookList, CONFIG.duration, async (_bookList) => {
+      delayedGetDocCommands(bookList, CONFIG.duration, 'crawl', async (_bookList) => {
         const content = setJSONString({ booksInfo: bookList, expired: Date.now() + 3600000 })
         F.touch2(CONFIG.bookInfoFile, content)
         setTimeout(() => {
@@ -78,10 +88,7 @@ import { IAccountInfo } from './lib/type'
   }
 
   const start = async () => {
-    if (userName && password) {
-      accountInfo.userName = userName
-      accountInfo.password = password
-    } else {
+    if (!accountInfo.userName || !accountInfo.password) {
       accountInfo = await inquireAccount()
     }
 

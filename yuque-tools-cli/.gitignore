@@ -6,6 +6,7 @@ node_modules
 /directories
 .vscode/
 /docs/*
+.yuquerc.js
 
 
 # local env files

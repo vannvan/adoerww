@@ -1,3 +1,6 @@
 [submodule "hugo-blog/themes/hugo-theme-onelou"]
 	path = hugo-blog/themes/hugo-theme-onelou
 	url = https://github.com/jyygithub/hugo-theme-onelou
+[submodule "hexo-explore/themes/zhaoo"]
+	path = hexo-explore/themes/zhaoo
+	url = https://github.com/zhaoo/hexo-theme-zhaoo.git

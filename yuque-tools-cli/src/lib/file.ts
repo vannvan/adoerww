@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-03-11 11:53:26
+ * Last Modified: 2023-04-08 22:59:54
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -21,7 +21,7 @@ class File {
    * 创建文件夹
    * @param {*} absolutePath
    */
-  mkdir(absolutePath: fs.PathLike) {
+  async mkdir(absolutePath: fs.PathLike) {
     const isExit = fs.existsSync(absolutePath)
     if (isExit) {
       // console.log(`${absolutePath}文件夹已存在`)
@@ -36,7 +36,7 @@ class File {
    * @param {*} fileName 文件名称
    * @param {*} content 文件内容
    */
-  touch(absolutePath: any, fileName: any, content: string | NodeJS.ArrayBufferView) {
+  async touch(absolutePath: any, fileName: any, content: string | NodeJS.ArrayBufferView) {
     this.mkdir(absolutePath)
     const _fileName = `${absolutePath}/${fileName}`
     fs.writeFile(`${_fileName}`, content, (error) => {
@@ -50,7 +50,7 @@ class File {
    * @param fileNameAbsolutePath
    * @param content
    */
-  touch2(fileNameAbsolutePath: fs.PathLike, content: string) {
+  async touch2(fileNameAbsolutePath: fs.PathLike, content: string) {
     fs.writeFile(`${fileNameAbsolutePath}`, content, (error) => {
       if (error) return console.log(`${fileNameAbsolutePath}写入文件失败,原因是` + error.message)
     })

@@ -5,7 +5,7 @@ import F from './file'
 import { config as CONFIG } from '../config'
 import { ICookies } from './type'
 import ora from 'ora'
-import { getDocsOfBooks } from './yuque'
+import { crawlYuqueBookPage, getDocsOfBooks } from './yuque'
 const JSEncrypt = require('jsencrypt-node')
 
 const oneDay = 86400000
@@ -76,7 +76,7 @@ export const getLocalCookies = () => {
       return undefined
     }
   } catch (error) {
-    Log.error('本地cookie获取失败')
+    // Log.error('本地cookie获取失败')
     return undefined
   }
 }
@@ -95,7 +95,7 @@ export const genPassword = (password: string) => {
 }
 
 /**
- * 获取知识库下的文档
+ * 获取知识库下的文档任务 api方式或爬取方式
  * @param bookList
  * @param duration
  * @param finishCallBack
@@ -103,6 +103,7 @@ export const genPassword = (password: string) => {
 export const delayedGetDocCommands = (
   bookList: any[],
   duration: number = 1000,
+  type: 'api' | 'crawl',
   finishCallBack: (booklist: any) => void
 ) => {
   if (!bookList || !bookList.length) {
@@ -121,10 +122,11 @@ export const delayedGetDocCommands = (
       clearInterval(timer)
       return
     }
-    const bookName = bookList[index].name
-    spinner.text = `【${index}】开始获取${bookName}的文档数据`
-    const docs = await getDocsOfBooks(bookList[index].id)
-    spinner.text = `【${index}】${bookName}的文档数据获取成功`
+    const { name, slug, user, id } = bookList[index]
+    spinner.text = `【${index}】开始获取${name}的文档数据`
+    const docs =
+      type == 'api' ? await getDocsOfBooks(id) : await crawlYuqueBookPage(`/${user}/${slug}`)
+    spinner.text = `【${index}】${name}的文档数据获取成功`
     if (docs) bookList[index].docs = docs as any
     index++
   }, duration)
@@ -200,6 +202,7 @@ export const delayedDownloadDoc = (
       console.log('match', match)
       targetName = targetName.replace(/\W+/g, `'${match[0]}'`)
     }
+    // 这里存在一个问题，当名称存在特殊字符时touch命令可能创建不了相应的文件
     console.log('targetName', targetName)
     // F.mkdir(CONFIG.metaDir + '/' + (book.name))
   })
