@@ -55,7 +55,7 @@ export const inquireAccount = (): Promise<{ userName: string; password: string }
       .then(async (answer) => {
         const { userName, password } = answer
         if (!userName || !password) {
-          log(chalk.red('无效信息'))
+          Log.error('账号信息无效')
           process.exit(0)
         }
         resolve(answer)
@@ -182,7 +182,12 @@ const genFlatDocList = (bookList: any[]) => {
   })
   return ans
 }
-
+/**
+ * 定时获取文档数据
+ * @param bookList
+ * @param duration
+ * @param finishCallBack
+ */
 export const delayedDownloadDoc = (
   bookList: any[],
   duration: number = 1000,
