@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Components 小尝试</title>
+  </head>
+  <script src="./Button.js" defer></script>
+  <style>
+    #contain {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+  <body>
+    <div id="contain">
+      <h2>外部样式不冲突</h2>
+    </div>
+    <h2>组件使用</h2>
+    <todo-list id="node">
+      <!--原生支持插槽  -->
+      <slot>web component</slot>
+    </todo-list>
+
+    <script>
+      //因为是原生，所以我们需要获取dom节点行后续操作
+      const node = document.getElementById('node')
+      //我们将变量转换一下格式，就能传递给子组件
+      node.dataset.arr = JSON.stringify(['吃饭', '睡觉'])
+    </script>
+  </body>
+</html>
