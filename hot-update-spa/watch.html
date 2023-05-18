@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="show">1</div>
+
+    <button id="button">加一</button>
+
+    <script>
+      const obQueue = new Set()
+
+      function set(target, key, value, receiver) {
+        const result = Reflect.set(target, key, value, receiver)
+        obQueue.forEach((observer) => observer())
+        return result
+      }
+
+      function observable(obj) {
+        return new Proxy(obj, { set })
+      }
+
+      function observe(fn) {
+        obQueue.add(fn)
+      }
+
+      const person = observable({
+        name: '张三',
+        age: 20,
+      })
+
+      const animal = observable({
+        name: 'cat',
+        age: 20,
+      })
+
+      function print() {
+        console.log(animal)
+        console.log(`${person.name}, ${person.age}`)
+      }
+
+      function say() {
+        console.log(`${animal.name},${animal.age}`)
+      }
+
+      observe(print)
+
+      // observe(say)
+
+      person.name = '李四'
+      // 李四，20
+
+      // animal.name = 'dog'
+    </script>
+  </body>
+</html>
