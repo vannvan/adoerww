@@ -1,0 +1,22 @@
+{
+  "name": "bundler-playground",
+  "version": "1.0.0",
+  "description": "简易打包",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node builder"
+  },
+  "keywords": [],
+  "author": "vannvan",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.22.1",
+    "@babel/parser": "^7.22.4",
+    "@babel/preset-env": "^7.22.4",
+    "@babel/traverse": "^7.22.4",
+    "chalk": "^5.2.0",
+    "ora": "^4.1.1",
+    "resolve": "^1.22.2"
+  }
+}
