@@ -74,7 +74,7 @@
     "tslib": "^2.3.0",
     "url-loader": "^4.1.1",
     "web-vitals": "^2.1.0",
-    "webpack": "^5.42.0",
+    "webpack": "^5.76.0",
     "webpack-dev-server": "^3.11.2"
   }
 }
