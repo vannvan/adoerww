@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 export interface IDefineNTSConfig {
-    scripts: {
-        /**
-         * 脚本
-         */
-        cmd: string;
-        /**
-         * 描述
-         */
-        desc: string;
-    }[];
+    scripts: TCmdOpts;
+    /**
+     * 框架平台
+     */
+    platform?: 'vue' | 'react';
+    /**
+     * 构建工具
+     */
+    buildTool: 'vite' | 'webpack';
 }
 /**
- * 通过方法的方式配置，能带来更好的 typescript 体验
+ * 通过提供的方法配置，能带来更好的 typescript 体验
  * @param  {ConfigType} config
  * @returns IDefineNTSConfig
  */

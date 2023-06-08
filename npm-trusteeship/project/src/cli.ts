@@ -11,20 +11,19 @@ console.log('__dirname', __dirname)
 const CONFIG_FILE_NAME = 'cmd-scripts.ts'
 
 export interface IDefineNTSConfig {
-  scripts: {
-    /**
-     * 脚本
-     */
-    cmd: string
-    /**
-     * 描述
-     */
-    desc: string
-  }[]
+  scripts: TCmdOpts
+  /**
+   * 框架平台
+   */
+  platform?: 'vue' | 'react'
+  /**
+   * 构建工具
+   */
+  buildTool: 'vite' | 'webpack'
 }
 
 /**
- * 通过方法的方式配置，能带来更好的 typescript 体验
+ * 通过提供的方法配置，能带来更好的 typescript 体验
  * @param  {ConfigType} config
  * @returns IDefineNTSConfig
  */
@@ -43,3 +42,21 @@ export const defineNTSConfig = (config: IDefineNTSConfig) => config
   // TOTO写入一个ts文件配置再重新读取
   //
 })()
+
+class Nts implements INts {
+  constructor() {
+    //
+  }
+
+  init() {
+    //
+  }
+
+  parseUserConfig() {
+    //
+  }
+
+  executeCmd() {
+    //
+  }
+}
