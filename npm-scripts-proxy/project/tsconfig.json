@@ -7,7 +7,9 @@
     "sourceMap": false,
     "inlineSourceMap": true,
     "noUnusedLocals": false,
+    "esModuleInterop": true,
     "moduleResolution": "node",
+    "declaration": true,
     "skipLibCheck": true
   },
   "include": ["./src/**/*"]

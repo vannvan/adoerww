@@ -1,0 +1,20 @@
+{
+  "name": "test-project",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "vannvan",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.22.1",
+    "@babel/parser": "^7.22.4",
+    "@babel/preset-env": "^7.22.4",
+    "@babel/traverse": "^7.22.4",
+    "resolve": "^1.22.2",
+    "typescript": "^5.1.3"
+  }
+}
