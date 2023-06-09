@@ -4,16 +4,12 @@
 
 ### 有效名称
 
-`nsp.config.js`、`nsp.config.ts`
+`nsp.config.mjs`
 
 ### 配置方式
 
-#### 支持TS的项目
-
-建议采用方式:
-
 ```ts
-// nsp-config.ts
+// nsp-config.mjs
 import { defineNSPConfig, presets } from 'npm-scripts-proxy'
 
 export default defineNSPConfig({
@@ -25,12 +21,3 @@ export default defineNSPConfig({
   ],
   extends: presets,
 })
-
-```
-
-#### 不支持TS的项目
-
-```js
-
-
-```

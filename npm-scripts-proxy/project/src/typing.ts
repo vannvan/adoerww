@@ -1,26 +1,3 @@
-/*
- * Description:
- * Created: 2023-06-08 23:03:33
- * Author: van
- * Email : adoerww@gamil.com
- * -----
- * Last Modified: 2023-06-08 23:07:04
- * Modified By: van
- * -----
- * Copyright (c) 2023 https://github.com/vannvan
- */
-/*
- * Description:
- * Created: 2023-06-08 19:49:27
- * Author: van
- * Email : adoerww@gamil.com
- * -----
- * Last Modified: 2023-06-08 22:32:05
- * Modified By: van
- * -----
- * Copyright (c) 2023 https://github.com/vannvan
- */
-
 /**
  * 框架平台
  */
@@ -31,7 +8,7 @@ export type TPlatform = 'vue' | 'react'
  */
 export type TBuildTool = 'vite' | 'webpack'
 
-export type TCmdOpts = {
+export type TCmdOpt = {
   /**
    * 指令
    */
@@ -45,26 +22,26 @@ export type TCmdOpts = {
    * 描述
    */
   desc: string
-}[]
+}
 
 export type TDefineOpts = {
   /**
    * 脚本配置
    */
-  scripts: TCmdOpts
-  /**
-   * 框架平台
-   */
-  platform?: TPlatform
+  scripts: TCmdOpt[]
   /**
    * 构建工具
    */
   buildTool?: TBuildTool
-  extends?: TCmdOpts
+  /**
+   * 扩展
+   */
+  extends?: TCmdOpt[]
 }
 
 export interface INsp {
   init: () => void
-  parseUserConfig: () => Promise<TCmdOpts>
-  executeCmd: () => void
+  merge: (config: TDefineOpts) => Promise<TCmdOpt[]>
+  parseUserConfig: () => Promise<TDefineOpts | undefined>
+  executeScript: (script: string) => void
 }

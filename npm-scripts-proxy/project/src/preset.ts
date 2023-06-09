@@ -4,17 +4,19 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-08 23:06:51
+ * Last Modified: 2023-06-09 11:45:41
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
  */
 
-import { TBuildTool, TCmdOpts } from './typing'
+import { TBuildTool, TCmdOpt } from './typing'
 
-const presets: {
-  [key in TBuildTool]: TCmdOpts
-} = {
+export type TPresets = {
+  [key in TBuildTool]: TCmdOpt[]
+}
+
+const presets: TPresets = {
   vite: [
     {
       cmd: 'start',
