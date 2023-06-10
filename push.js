@@ -32,7 +32,7 @@ exec2('git pull -p', 'utf8', (err, stdout, stderr) => {
   } else {
     Log.success('【sync origin success】')
     spinner.color = 'yellow'
-    Log.text = 'task in process'
+    spinner.text = 'task in process'
     const task = cmd.map((item, index) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
