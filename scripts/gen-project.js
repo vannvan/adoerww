@@ -11,6 +11,18 @@
  */
 
 const fs = require('fs')
-const path = require('fs')
+const path = require('path')
 
 const Log = require('./log')
+
+const name = process.argv[2]
+
+if (!name) {
+  Log.error('无效的名称')
+  process.exit(0)
+} else {
+  const readmeContent = `# ${name} \n ## 目的 \n --\n ## 描述 \n--
+  `
+  fs.mkdirSync(path.resolve(`./${name}`))
+  fs.writeFileSync(path.resolve(`./${name}/README.md`), readmeContent)
+}
