@@ -11,11 +11,7 @@ export default defineNSPConfig({
       cmd: 'build:test',
       script: 'node build.js',
       desc: '打包测试环境',
-    },
-    {
-      cmd: 'ss',
-      script: 'ss',
-    },
+    }
   ],
   extends: presets.vite,
 })

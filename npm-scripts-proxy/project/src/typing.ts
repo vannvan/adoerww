@@ -6,7 +6,7 @@ export type TPlatform = 'vue' | 'react'
 /**
  * 构建工具
  */
-export type TBuildTool = 'vite' | 'webpack'
+export type TBuildTool = 'vite' | 'webpack' | 'umi'
 
 export type TCmdOpt = {
   /**

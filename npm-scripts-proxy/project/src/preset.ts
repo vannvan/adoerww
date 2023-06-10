@@ -31,6 +31,13 @@ const presets: TPresets = {
       desc: '启动本地服务',
     },
   ],
+  umi: [
+    {
+      cmd: 'start',
+      script: 'cross-env UMI_ENV=dev umi dev',
+      desc: '启动本地服务',
+    },
+  ],
 }
 
 export default presets

@@ -1,21 +1,33 @@
 {
   "name": "test-project",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "vannvan",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cross-env UMI_ENV=dev max dev ",
+    "start:dev": "cross-env REACT_APP_ENV=dev max dev",
+    "start:test": "cross-env REACT_APP_ENV=test max test",
+    "start:lcic": "cross-env UMI_ENV=lcic max dev",
+    "start:prod": "cross-env UMI_ENV=prod max dev",
+    "build:test": "cross-env UMI_ENV=test max build",
+    "build:lcic": "cross-env UMI_ENV=lcic max build",
+    "build:prod": "cross-env UMI_ENV=prod max build",
+    "postinstall": "max setup",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "test": "max-test",
+    "test:coverage": "max-test --coverage",
+    "tree": "node scripts/tree.js >> tree.txt",
+    "comp": "node scripts/init-form-component.js",
+    "docs": "npx typedoc --skipErrorChecking"
   },
-  "dependencies": {
-    "@babel/core": "^7.22.1",
-    "@babel/parser": "^7.22.4",
-    "@babel/preset-env": "^7.22.4",
-    "@babel/traverse": "^7.22.4",
-    "@opentiny/cli": "^1.0.1",
-    "resolve": "^1.22.2",
-    "typescript": "^5.1.3"
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
   }
 }
