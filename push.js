@@ -1,27 +1,61 @@
 #!/usr/bin/env node
+const dayjs = require('dayjs')
 
-var name = process.argv[2] || 'auto-commit'
-var shell = require('shelljs')
-var exec = shell.exec
-var echo = shell.echo
+const { exec: exec2 } = require('child_process')
+const ora = require('ora')
 
-// 先把nav的文件打个包
-exec('npx rollup -c')
-setTimeout(() => {
-  if (exec('git add .').code !== 0) {
-    echo('Error: Git add failed')
-    exit(1)
-  }
-  if (exec(`git commit -am "${name}"`).code !== 0) {
-    echo('Error: Git commit failed')
-    exit(1)
-  }
-  if (exec('git push').code !== 0) {
-    echo('Error: Git push failed')
-    exit(1)
-  }
-  // exec(`echo git success ${name}`);
+const diffCommand = 'git diff --name-only'
 
-  //绿色字体
-  echo('-e', '\033[0;32m git success \033[0m' + `${name}`)
-}, 2500)
+const chalk = require('chalk')
+
+const log = console.log
+
+const spinner = ora('start task').start()
+
+/**
+ * 打印日志
+ */
+const Log = {
+  error: (text) => log(chalk.red(text)),
+  info: (text) => log(chalk.white(text)),
+  success: (text) => log(chalk.green(text)),
+  warn: (text) => log(chalk.yellow(text)),
+}
+
+const commitMessage = dayjs().format('YYYY-MM-DD HH:mm:ss')
+
+const cmd = ['git add .', `git commit -m "${commitMessage}"`, 'git push']
+
+exec2('git pull -p', 'utf8', (err, stdout, stderr) => {
+  if (err) {
+    Log.error(err)
+  } else {
+    Log.success('【sync origin success】')
+    spinner.color = 'yellow'
+    const task = cmd.map((item, index) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          exec2(item, 'utf-8', function (err, sto) {
+            if (err) {
+              Log.error(err)
+              reject(err)
+            } else {
+              resolve(`【${item}】 success`)
+            }
+          })
+        }, index * 500)
+      })
+    })
+
+    Promise.all(task).then((results) => {
+      results.map((item) => {
+        // Log.success(item)
+        if (/push/.test(item)) {
+          spinner.text = 'task executed successfully!'
+          spinner.color = 'green'
+          process.exit(1)
+        }
+      })
+    })
+  }
+})

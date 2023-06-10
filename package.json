@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "node script/build.js"
+    "build": "node script/build.js",
+    "new": "node scripts/gen-project.js"
   },
   "devDependencies": {
     "hexo": "7.0.0-rc1",
