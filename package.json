@@ -10,8 +10,12 @@
     "vuepress": "^1.9.7"
   },
   "dependencies": {
+    "dayjs": "^1.11.8",
+    "ink": "^4.2.0",
     "lodash": "^4.17.21",
     "node-schedule": "^2.1.1",
+    "ora": "4",
+    "react": "^18.2.0",
     "shelljs": "^0.8.5",
     "swiper": "^8.4.5"
   }
