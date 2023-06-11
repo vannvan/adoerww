@@ -10,6 +10,7 @@
     "vuepress": "^1.9.7"
   },
   "dependencies": {
+    "chalk": "4",
     "dayjs": "^1.11.8",
     "ink": "^4.2.0",
     "lodash": "^4.17.21",
