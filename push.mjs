@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-const dayjs = require('dayjs')
+// const dayjs = require('dayjs')
+import dayjs from 'dayjs'
 
-const { exec: exec2 } = require('child_process')
-const ora = require('ora')
+import { exec } from 'child_process'
+import ora from 'ora'
 
 const diffCommand = 'git diff --name-only'
 
-const chalk = require('chalk')
+import chalk from 'chalk'
 
 const log = console.log
 
@@ -26,7 +27,7 @@ const commitMessage = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const cmd = ['git add .', `git commit -m "${commitMessage}"`, 'git push']
 
-exec2('git pull -p', 'utf8', (err, stdout, stderr) => {
+exec('git pull -p', 'utf8', (err, stdout, stderr) => {
   if (err) {
     Log.error(err)
   } else {
@@ -36,7 +37,7 @@ exec2('git pull -p', 'utf8', (err, stdout, stderr) => {
     const task = cmd.map((item, index) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          exec2(item, 'utf-8', function (err, sto) {
+          exec(item, 'utf-8', function (err, sto) {
             if (err) {
               Log.error(err)
               reject(err)
