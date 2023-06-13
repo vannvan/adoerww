@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Newline, Text, useInput } from 'ink';
 import Select from './components/Select/index.js';
+
 import childProcess from 'node:child_process';
 
 import { methodsOptions, TPlatform, TSelectOptions, TProjectType } from './config.js'
@@ -95,23 +96,22 @@ export default function App(props: Props) {
     if (currentKey === 'cmd') {
       setSelectVisible(false)
       setCurrentSelectInfo(undefined)
-      // childProcess.exec('echo hello world')
-      const subProcess = childProcess.exec(value, (err, sto) => {
-        if (err) {
-          console.log(err);
-        } else {
+      childProcess.exec(`echo hello world`, (err, sto) => {
+        if (!err) {
           console.log(sto);
         }
-      });
-
-      // subProcess.stdout.on('data', (newOutput: Buffer) => {
-      //   console.log(newOutput);
-      //   // const lines = stripAnsi(newOutput.toString('utf8')).split('\n');
-      //   // setOutput(lines.slice(-5).join('\n'));
-      // });
-
-      console.log('开始创建项目，请稍后');
+      })
+      handleExcuteScript(value)
     }
+  }
+
+
+  const handleExcuteScript = (script: string) => {
+    console.log('将要执行的命令', script);
+    childProcess.execSync(`${script}`);
+    // setTimeout(() => {
+    //   process.exit(0)
+    // }, 200);
   }
 
   return (

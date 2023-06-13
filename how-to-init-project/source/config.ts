@@ -4,14 +4,14 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-12 20:07:12
+ * Last Modified: 2023-06-13 09:29:12
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
  */
 export type TSelectOptions = {label: string; value: string}[];
 
-export type TPlatform = 'umi@4' | 'vite' | 'bun';
+export type TPlatform = 'umi' | 'vite' | 'bun';
 
 export type TProjectType = {
 	simple: TCmdInfo[];
@@ -28,7 +28,7 @@ export type TInitMethod = {
 	[key in TPlatform]: TProjectType;
 };
 
-const UMI_4: TProjectType = {
+const umi: TProjectType = {
 	simple: [
 		{
 			cmd: 'pnpm dlx create-umi@latest',
@@ -96,7 +96,7 @@ const vite: TProjectType = {
 };
 
 export const methodsOptions: TInitMethod = {
-	'umi@4': UMI_4,
+	umi: umi,
 	vite: vite,
 	bun: {
 		simple: [],
