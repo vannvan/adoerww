@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const dayjs = require('dayjs')
 
-const { exec: exec2 } = require('child_process')
+const { exec: exec2, spawn } = require('child_process')
 const ora = require('ora')
 
 const diffCommand = 'git diff --name-only'
@@ -26,12 +26,13 @@ const commitMessage = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const cmd = ['git add .', `git commit -m "${commitMessage}"`, 'git push']
 
-exec2('npm run gen-list')
+// exec2('npm run gen-list')
 
 exec2('git pull -p', (err, stdout, stderr) => {
   if (err) {
     Log.error(err)
   } else {
+    spawn('npm', ['run', 'gen-list'])
     Log.success('【sync origin success】')
     spinner.color = 'yellow'
     const task = cmd.map((item, index) => {
