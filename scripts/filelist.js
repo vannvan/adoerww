@@ -27,6 +27,7 @@ const list = [
 'monitor-visual',
 'nav',
 'nav-refactor',
+'node-html-to-image',
 'node-schedule',
 'node-ws',
 'node_modules',

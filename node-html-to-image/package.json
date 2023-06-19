@@ -1,0 +1,16 @@
+{
+  "name": "html-to-image",
+  "version": "1.0.0",
+  "description": "<https://github.com/frinyvonnick/node-html-to-image>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node-esm -T app.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-html-to-image": "^3.3.0"
+  }
+}
