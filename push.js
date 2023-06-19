@@ -10,6 +10,11 @@ const chalk = require('chalk')
 
 const log = console.log
 
+// 生成文件列表
+exec2('npx ts-node-esm -T scripts/gen-list.ts', (err, sto) => {
+  console.log(err, sto)
+})
+
 const spinner = ora('start task').start()
 
 /**
@@ -26,13 +31,10 @@ const commitMessage = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const cmd = ['git add .', `git commit -m "${commitMessage}"`, 'git push']
 
-// exec2('npm run gen-list')
-
 exec2('git pull -p', (err, stdout, stderr) => {
   if (err) {
     Log.error(err)
   } else {
-    spawn('npm', ['run', 'gen-list'])
     Log.success('【sync origin success】')
     spinner.color = 'yellow'
     const task = cmd.map((item, index) => {
