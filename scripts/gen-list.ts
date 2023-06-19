@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-19 20:24:05
+ * Last Modified: 2023-06-19 20:26:31
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -16,7 +16,17 @@ import F from './file.js'
 import { Log } from './log.js'
 console.log('hello world')
 ;(async () => {
-  const exclude = ['.git', '.vscode']
+  const exclude = [
+    '.git',
+    '.vscode',
+    'scripts',
+    'node_modules',
+    'nav',
+    'epluspay',
+    '性能监控',
+    '有用的资源',
+    '省份数据',
+  ]
   let content = `const list = [ \n`
   let count = 0
   readdirSync('./').forEach(async (item, _index) => {
