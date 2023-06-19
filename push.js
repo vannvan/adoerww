@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-// const dayjs = require('dayjs')
-import dayjs from 'dayjs'
+const dayjs = require('dayjs')
 
-import { exec } from 'child_process'
-import ora from 'ora'
+const { exec: exec2 } = require('child_process')
+const ora = require('ora')
 
 const diffCommand = 'git diff --name-only'
 
-import chalk from 'chalk'
+const chalk = require('chalk')
 
 const log = console.log
 
@@ -27,17 +26,18 @@ const commitMessage = dayjs().format('YYYY-MM-DD HH:mm:ss')
 
 const cmd = ['git add .', `git commit -m "${commitMessage}"`, 'git push']
 
-exec('git pull -p', 'utf8', (err, stdout, stderr) => {
+exec2('npm run gen-list')
+
+exec2('git pull -p', (err, stdout, stderr) => {
   if (err) {
     Log.error(err)
   } else {
     Log.success('【sync origin success】')
     spinner.color = 'yellow'
-    spinner.text = 'task in process'
     const task = cmd.map((item, index) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          exec(item, 'utf-8', function (err, sto) {
+          exec2(item, function (err, sto) {
             if (err) {
               Log.error(err)
               reject(err)

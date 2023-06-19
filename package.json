@@ -1,6 +1,7 @@
 {
   "scripts": {
     "new": "ts-node-esm -T  scripts/gen-project.ts",
+    "gen-list": "ts-node-esm -T scripts/gen-list.ts",
     "gen-desc": "ts-node-esm -T scripts/gen-desc.ts"
   },
   "devDependencies": {
@@ -9,7 +10,6 @@
     "rollup-plugin-terser": "^7.0.2",
     "vuepress": "^1.9.7"
   },
-  "type": "module",
   "dependencies": {
     "@artus/tsconfig": "^1.0.1",
     "@types/node": "^20.3.0",
