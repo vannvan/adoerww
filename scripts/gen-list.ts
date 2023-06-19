@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-19 19:41:40
+ * Last Modified: 2023-06-19 20:24:05
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -18,13 +18,15 @@ console.log('hello world')
 ;(async () => {
   const exclude = ['.git', '.vscode']
   let content = `const list = [ \n`
-
+  let count = 0
   readdirSync('./').forEach(async (item, _index) => {
     const stat = lstatSync(path.join(item))
     if (stat.isDirectory() && !exclude.includes(item)) {
       content += `'${item}',\n`
+      count++
     }
   })
   content += ']'
   F.touch2('./scripts/filelist.js', content)
+  Log.success(`列表文件已生成，当前共${count}个项目，找时间优化哦！`)
 })()
