@@ -3,6 +3,7 @@ const list = [
 'ajax-hook-plugin',
 'api-proxy',
 'auto-build-swagger-api',
+'auto-fit-explore',
 'blog',
 'bun-explore',
 'bundler-playground',

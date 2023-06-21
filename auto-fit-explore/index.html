@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>自适应屏幕-不是最佳示例</title>
+    <style>
+      #app {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .item {
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      .item > div {
+        background: #ccc;
+        width: 500px;
+        height: 500px;
+        font-size: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+      <div class="item">
+        <div>box1</div>
+      </div>
+    </div>
+    <script type="module">
+      import autofit from './autofit.js'
+      console.log('ssss', autofit)
+      console.log(window)
+      autofit.init(
+        {
+          dh: 1080,
+          dw: 1920,
+          el: '#app',
+          resize: true,
+          transition: 2,
+        },
+        false
+      ) // 可关闭控制台运行提示输出
+    </script>
+  </body>
+</html>
