@@ -10,7 +10,6 @@
 - [一个用于ajax请求响应拦截的hook](/ajax-hook-plugin)
 - [chrome扩展，用于改写浏览器请求地址](/api-proxy)
 - [根据后端swagger文档自动生成前端接口请求配置](/auto-build-swagger-api)
-- [静态博客页面](/tree/master/blog)
 - [chrome扩展搭配webpack的开发方案](/chrome-webpack-plugin)
 - [快速提交的交互式CLI脚本](/fast-submit-code-cli)
 - [项目埋点的node-server端](/monitor-server)
@@ -20,18 +19,15 @@
 - [用于生成二维码的chrome扩展](/create-qrcode-chrome-extension)
 - [小而美的脚手架plop](/plop-example)
 - [rollup+ts打造插件包方法](/rollup-ts-package-explore)
-<!-- - [hugo-部署到Netlify](https://www.sulinehk.com/post/deploying-hugo-website-to-netlify/) -->
 - [全屏滚动](/full-screen)
 - [monorepo项目-企业级模块化工具开发参考](https://github.com/vannvan/monorepo-explore)
 - [ink-用React的方式打开CLI](/ink-react/)
 - [一个简单的前端埋点方案](/monitor-visual/)
 - [组件库文档生成](/storybook-explore/)
 - [node生成网站的截图](/phantom-explore/)
-
-----
-
-- [多年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)
-ps：内附在线地址和添加为浏览器新标签页方法
+- [多场景虚拟滚动方案](/virtual-scrolling/)
+- [假如你遇上了不靠谱的后端，未开启跨域的情况下，用于临时代理后端接口](/api-proxy)
+- [多年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)ps：内附在线地址和添加为浏览器新标签页方法
 
 <!-- ![](https://p.ipic.vip/8u79pn.jpg) -->
 
