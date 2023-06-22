@@ -4,3 +4,7 @@
 [submodule "hexo-explore/themes/zhaoo"]
 	path = hexo-explore/themes/zhaoo
 	url = https://github.com/zhaoo/hexo-theme-zhaoo.git
+
+# https://www.jianshu.com/p/2d74a6f41d07 深入理解Git submodules
+# https://blog.csdn.net/qq_38880380/article/details/123288706
+# git submodule foreach git pull
