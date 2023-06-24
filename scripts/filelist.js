@@ -1,4 +1,5 @@
 const list = [ 
+'.dependencygraph',
 'Pio-demo',
 'ajax-hook-plugin',
 'api-proxy',
@@ -25,9 +26,10 @@ const list = [
 'iview-demo',
 'monitor-server',
 'monitor-visual',
+'nav-old',
 'nav-refactor',
 'node-schedule',
-'node-ws',
+'node-websocket',
 'npm-scripts-proxy',
 'oclif-cli-explore',
 'phantom-explore',
