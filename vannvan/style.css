@@ -58,8 +58,9 @@ a {
 .content {
   width: 80%;
   height: 100%;
-  position: fixed;
+  position: absolute;
   left: 10%;
+  /* overflow: auto; */
   /* background: #ccc; */
 }
 
@@ -80,7 +81,8 @@ a {
   background: var(--themeDarkSignColor);
 }
 footer {
-  margin-top: 200px;
+  margin-top: 150px;
+  padding: 32px 0;
 }
 
 svg {
@@ -95,8 +97,8 @@ svg {
   align-items: center;
 }
 .link a {
-  margin-right: 20px;
   text-decoration: none;
   display: inline-flex;
   line-height: 20px;
+  margin-right: 20px;
 }
