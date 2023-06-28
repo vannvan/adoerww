@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>函数调用栈</title>
+  </head>
+  <body>
+    <div>通过performance查看函数调用关系</div>
+    <img src="https://p.ipic.vip/6hau7a.png" alt="" style="width: 100%; margin-top: 20px" />
+    <script>
+      console.log('hello world')
+
+      function fn1() {
+        console.log('这是fn1')
+        fn2()
+        fn3()
+      }
+
+      function fn2() {
+        console.log('这是fn2')
+        for (let i = 0; i < 10000; i++) {
+          console.log('fn2i', i)
+        }
+      }
+
+      function fn3() {
+        console.log('这是fn3')
+        for (let i = 0; i < 1000; i++) {
+          console.log('fn3', i)
+        }
+      }
+
+      async function fn4() {
+        for (let i = 0; i < 5000; i++) {
+          console.log('fn3', i)
+        }
+        console.log('这是fn4')
+      }
+
+      async function init() {
+        fn1()
+        await fn4()
+      }
+
+      init()
+    </script>
+  </body>
+</html>
