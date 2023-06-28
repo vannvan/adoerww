@@ -1,0 +1,60 @@
+{
+    "data":[
+        {
+            "group_name": "测试内容rb68",
+            "tea_list": [
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                }
+            ]
+        },
+        {
+            "group_name": "测试内容rb68",
+            "tea_list": [
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                },
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                },
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                }
+            ]
+        },
+        {
+            "group_name": "测试内容rb68",
+            "tea_list": [
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                }
+            ]
+        },
+        {
+            "group_name": "测试内容rb68",
+            "tea_list": [
+                {
+                    "checked": 61734,
+                    "phone": "测试内容es7f",
+                    "teacher_id": "测试内容ct44",
+                    "teacher_name": "测试内容b7pl"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,203 @@
+{
+  "data": {
+    "nation_school_total_amount": 11,
+    "nation_user_total_amount": 1254,
+    "nation_teacher_total_amount": 2563,
+    "nation_student_total_amount": 10504,
+    "nation_face_total_amount": 2473,
+    "nation_message_push_total_amount": 19064,
+    "nation_user_amount_top_3": [
+      {
+        "area_name": "南昌市",
+        "area_code": "360100",
+        "value": 7404
+      },
+      {
+        "area_name": "上饶市",
+        "area_code": "339999",
+        "value": 5982
+      },
+      {
+        "area_name": "西安市",
+        "area_code": "610100",
+        "value": 831
+      }
+    ],
+    "nation_device_amount_top_3": [
+      {
+        "area_name": "西安市",
+        "area_code": "610100",
+        "value": 26966
+      },
+      {
+        "area_name": "上饶市",
+        "area_code": "339999",
+        "value": 3465
+      },
+      {
+        "area_name": "南昌市",
+        "area_code": "360100",
+        "value": 1299
+      }
+    ],
+    "nation_attendance_rate_top_10": [
+      {
+        "school_name": "-",
+        "value": 92,
+        "day_and_school": "2019-11-09#8629"
+      },
+      {
+        "school_name": "-",
+        "value": 89,
+        "day_and_school": "2019-12-03#8629"
+      },
+      {
+        "school_name": "-",
+        "value": 86,
+        "day_and_school": "2019-11-01#10005216"
+      },
+      {
+        "school_name": "-",
+        "value": 76,
+        "day_and_school": "2019-12-01#10005216"
+      },
+      {
+        "school_name": "-",
+        "value": 65,
+        "day_and_school": "2019-10-01#10005216"
+      },
+      {
+        "school_name": "微校园测试学校",
+        "value": 56,
+        "day_and_school": "2019-12-31#4420018374"
+      },
+      {
+        "school_name": "交大二附中",
+        "value": 15,
+        "day_and_school": "2019-12-31#6101134004"
+      },
+      {
+        "school_name": "交大二附中",
+        "value": 21,
+        "day_and_school": "2019-12-30#6101134004"
+      },
+      {
+        "school_name": "-",
+        "value": 12,
+        "day_and_school": "2019-10-22#8629"
+      }
+    ],
+    "nation_discern_amount": 3101,
+    "month_new_school_amount": null,
+    "month_new_user_amount": 694,
+    "month_new_device_amount": null,
+    "month_new_discern_amount": 1037,
+    "nation_wear_device_total_amount": 28755,
+    "nation_card_total_amount": 1030,
+    "nation_panel_total_amount": 1525,
+    "nation_camera_total_amount": 421,
+    "nation_user_inc_trend": {
+      "2019-05": 0,
+      "2019-06": 0,
+      "2019-07": 0,
+      "2019-08": 0,
+      "2019-09": 0,
+      "2019-10": 8,
+      "2019-11": 2,
+      "2019-12": 2,
+      "2020-01": 1
+    },
+    "nation_school_inc_trend": {
+      "2019-06": 0,
+      "2019-05": 0,
+      "2019-08": 0,
+      "2019-07": 0,
+      "2019-12": 4,
+      "2019-04": 0,
+      "2019-11": 2,
+      "2019-10": 8,
+      "2019-09": 0
+    },
+    "province_data": [{
+        "province_code": "610000",
+        "area_code": null,
+        "school_cnt": 4,
+        "total_user_amount": 603,
+        "total_tea_amount": 105,
+        "total_stu_amount": 406,
+        "total_face_amount": 140,
+        "total_message_amount": 4710
+      },
+      {
+        "province_code": "360000",
+        "area_code": null,
+        "school_cnt": 3,
+        "total_user_amount": 3702,
+        "total_tea_amount": 666,
+        "total_stu_amount": 2568,
+        "total_face_amount": 1188,
+        "total_message_amount": 4686
+      },
+      {
+        "province_code": "330000",
+        "area_code": null,
+        "school_cnt": 3,
+        "total_user_amount": 2991,
+        "total_tea_amount": 468,
+        "total_stu_amount": 2355,
+        "total_face_amount": 399,
+        "total_message_amount": 156
+      },
+      {
+        "province_code": "440000",
+        "area_code": null,
+        "school_cnt": 1,
+        "total_user_amount": 304,
+        "total_tea_amount": 130,
+        "total_stu_amount": 174,
+        "total_face_amount": 21,
+        "total_message_amount": 17
+      }
+    ],
+    "province_area_rela_data": [{
+      "total_tea_amount": "468",
+      "total_message_amount": "156",
+      "total_face_amount": "399",
+      "total_user_amount": "2991",
+      "school_cnt": "3",
+      "area_code": "339999",
+      "total_stu_amount": "2355",
+      "province_code": "330000"
+    }, {
+      "total_tea_amount": "666",
+      "total_message_amount": "4686",
+      "total_face_amount": "1188",
+      "total_user_amount": "3702",
+      "school_cnt": "3",
+      "area_code": "360100",
+      "total_stu_amount": "2568",
+      "province_code": "360000"
+    }, {
+      "total_tea_amount": "105",
+      "total_message_amount": "4710",
+      "total_face_amount": "140",
+      "total_user_amount": "603",
+      "school_cnt": "4",
+      "area_code": "610100",
+      "total_stu_amount": "406",
+      "province_code": "610000"
+    }, {
+      "total_tea_amount": "130",
+      "total_message_amount": "17",
+      "total_face_amount": "21",
+      "total_user_amount": "304",
+      "school_cnt": "1",
+      "area_code": "442000",
+      "total_stu_amount": "174",
+      "province_code": "440000"
+    }]
+  },
+  "message": "处理成功!",
+  "timestamp": 1577887660910,
+  "error_code": "0"
+}

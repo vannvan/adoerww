@@ -1,0 +1,13 @@
+{
+  "cmd": 0,
+  "contentMsg": "",
+  "data": {
+    "total": 655,
+    "invalidCent": "您有135金豆将在2019年12月31日失效",
+    "recordUrl": "http://jxapp.hjy.zhiless.com:18130/mobile3//pull/web/gbean.do?action=myexchangerule&accountId=10422&userType=2&userId=3094661&areaAbb=nc&version=wxChat",
+    "mallUrl": "http://jxapp.hjy.zhiless.com:18130/mobile3//pull/web/gbean.do?action=index&accountId=10422&userType=2&userId=3094661&areaAbb=nc&version=wxChat"
+  },
+  "dt": 1573459227971,
+  "msg": "请求处理成功",
+  "state": 1
+}
