@@ -29,7 +29,6 @@ const list = [
 'monitor-visual',
 'nav-old',
 'nav-refactor',
-'node-html-to-image',
 'node-mock-api',
 'node-schedule',
 'node-websocket',
@@ -39,6 +38,7 @@ const list = [
 'plop-example',
 'react-cli',
 'react-jest',
+'resume',
 'resume-demo',
 'rollup-ts-package-explore',
 'screen-roll',
@@ -53,5 +53,4 @@ const list = [
 'web-components-explore',
 'wwvue-cli-home',
 'yuque-tools',
-'yuque-tools-cli',
 ]

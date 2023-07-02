@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -fr lib && set NODE_ENV=production&& rollup -c rollup.config.js"
   },
-  "browser": "lib/index.ts",
+  "browser": "lib/index.js",
   "types": "lib/typings.d.ts",
   "keywords": [],
   "author": "",

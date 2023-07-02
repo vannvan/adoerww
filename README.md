@@ -28,6 +28,7 @@
 - [多场景虚拟滚动方案](/virtual-scrolling/)
 - [假如你遇上了不靠谱的后端，未开启跨域的情况下，用于临时代理后端接口](/api-proxy)
 - [多年积累的前端开发知识工具导航](https://github.com/vannvan/adoerww/tree/master/nav-refactor)ps：内附在线地址和添加为浏览器新标签页方法
+- [火焰图使用技巧之一](/function-stack)
 
 <!-- ![](https://p.ipic.vip/8u79pn.jpg) -->
 
