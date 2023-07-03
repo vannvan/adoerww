@@ -1,5 +1,4 @@
 const list = [ 
-'.dependencygraph',
 'Pio-demo',
 'ajax-hook-plugin',
 'api-proxy',
@@ -25,6 +24,7 @@ const list = [
 'hugo-blog',
 'ink-react',
 'iview-demo',
+'memory-leaks-analysis',
 'monitor-server',
 'monitor-visual',
 'nav-old',
