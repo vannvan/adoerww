@@ -1,0 +1,27 @@
+{
+  "name": "lithent-explore",
+  "version": "1.0.0",
+  "description": "## 目的",
+  "main": "index.js",
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nabla/vite-plugin-eslint": "^1.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "htm": "^3.1.1",
+    "lithent": "^1.0.4",
+    "prettier": "^2.8.8",
+    "vite": "^4.4.1",
+    "vite-plugin-checker": "^0.6.1",
+    "vite-plugin-dts": "^3.1.1"
+  }
+}
