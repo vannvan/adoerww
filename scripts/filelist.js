@@ -42,6 +42,7 @@ const list = [
 'react-jest',
 'resume-demo',
 'rollup-ts-package-explore',
+'sapper-explore',
 'screen-roll',
 'storybook-explore',
 'svg-demo',
