@@ -11,6 +11,7 @@
   "dependencies": {
     "compression": "^1.7.1",
     "dayjs": "^1.11.9",
+    "gray-matter": "^4.0.3",
     "marked": "^0.7.0",
     "polka": "next",
     "prismjs": "^1.29.0",
