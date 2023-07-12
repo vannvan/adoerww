@@ -46,6 +46,7 @@ const list = [
 'screen-roll',
 'storybook-explore',
 'svg-demo',
+'tauri-explore',
 'vannvan',
 'virtual-scrolling',
 'vorlonjs-explore',
