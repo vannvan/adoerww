@@ -1,0 +1,25 @@
+{
+  "name": "flex",
+  "version": "1.0.0",
+  "private": true,
+  "description": "使用pnpm实现menorepo项目开发",
+  "keywords": [],
+  "license": "MIT",
+  "author": "vannvan",
+  "main": "index.js",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "installall": "pnpm --filter=@flex/* run install",
+    "link": "pnpm --filter=@flex/* run link",
+    "watch": "pnpm  run start -r",
+    "build": "pnpm --filter=@flex/* run build"
+  },
+  "dependencies": {
+    "@types/node": "^20.4.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2"
+  }
+}

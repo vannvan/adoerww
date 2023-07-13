@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-10 15:38:01
+ * Last Modified: 2023-07-12 19:23:09
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -20,7 +20,7 @@ if (!projectName) {
   Log.error('无效的名称')
   process.exit(0)
 } else {
-  const readmeContent = `# ${projectName} \n ## 目的 \n --\n ## 描述 \n--
+  const readmeContent = `# ${projectName} \n## 目的\n--\n## 描述 \n--
   `
   mkdirSync(path.resolve(`./${projectName}`))
   writeFileSync(path.resolve(`./${projectName}/README.md`), readmeContent)

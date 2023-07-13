@@ -1,0 +1,20 @@
+{
+  "name": "@flex/shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "install": "pnpm i",
+    "link": "npm link",
+    "build": "tsc -p tsconfig.release.json",
+    "start": "tsc -p tsconfig.json -w"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

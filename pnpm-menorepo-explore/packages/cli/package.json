@@ -1,0 +1,19 @@
+{
+  "name": "@flex/cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "install": "pnpm i",
+    "build": "tsc -p tsconfig.release.json",
+    "start": "tsc -p tsconfig.json -w"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@flex/shared": "workspace:*",
+    "@flex/core": "workspace:*"
+  }
+}
