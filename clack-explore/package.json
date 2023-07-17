@@ -1,0 +1,23 @@
+{
+  "name": "clack-explore",
+  "version": "1.0.0",
+  "description": "## 目的",
+  "main": "index.js",
+  "scripts": {
+    "start": "jiti ./index.ts",
+    "build": "tsc index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@clack/core": "^0.3.2",
+    "@clack/prompts": "^0.6.3",
+    "picocolors": "^1.0.0",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "jiti": "^1.19.1"
+  }
+}

@@ -8,6 +8,7 @@ const list = [
 'bun-explore',
 'bundler-playground',
 'chrome-webpack-plugin',
+'clack-explore',
 'codux-explore',
 'create-qrcode-chrome-extension',
 'deno-explore',
