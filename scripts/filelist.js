@@ -10,6 +10,7 @@ const list = [
 'chrome-webpack-plugin',
 'clack-explore',
 'codux-explore',
+'commander-practice',
 'create-qrcode-chrome-extension',
 'deno-explore',
 'dist',
