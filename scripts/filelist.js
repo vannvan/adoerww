@@ -55,7 +55,6 @@ const list = [
 'vannvan',
 'virtual-scrolling',
 'vorlonjs-explore',
-'vscode-extension-explore',
 'vue-behavior-monitor',
 'vue行为埋点',
 'web-components-explore',
