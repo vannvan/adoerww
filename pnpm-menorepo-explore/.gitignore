@@ -1,5 +1,4 @@
 dist/
-type/
 .idea
 node_modules
 packages/**/package-lock.json
@@ -11,6 +10,6 @@ packages/**/package-lock.json
 /test/**
 link.sh
 .run
-.npmrc
+# .npmrc
 pnpm-lock.yaml
 elog.config.js

@@ -1,11 +1,5 @@
-/*
- * Filename: /Users/vannvan/Documents/vannvan@github/adoerww/pnpm-menorepo-explore/packages/shared/tsconfig.release.json
- * Path: /Users/vannvan/Documents/vannvan@github/adoerww/pnpm-menorepo-explore/packages/shared
- * Created Date: Thursday, July 13th 2023, 3:11:50 pm
- * Author: van
- *
- * Copyright (c) 2023 https://github.com/vannvan
- */
+
+
 
 {
   "extends": "../../tsconfig.root.json",

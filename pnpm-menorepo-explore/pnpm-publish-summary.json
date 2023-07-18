@@ -1,0 +1,16 @@
+{
+	"publishedPackages": [
+		{
+			"name": "@flex/shared",
+			"version": "1.0.0"
+		},
+		{
+			"name": "@flex/core",
+			"version": "1.0.0"
+		},
+		{
+			"name": "@flex/cli",
+			"version": "1.0.0"
+		}
+	]
+}

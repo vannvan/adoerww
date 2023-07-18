@@ -1,0 +1,16 @@
+{
+  "name": "use-flex-cli-temp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "vannvan",
+  "license": "ISC",
+  "dependencies": {
+    "@flex/cli": "^1.0.1",
+    "@flex/core": "^1.0.0"
+  }
+}
