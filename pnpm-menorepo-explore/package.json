@@ -2,7 +2,7 @@
   "name": "flex",
   "version": "1.0.0",
   "private": true,
-  "description": "使用pnpm实现menorepo项目开发",
+  "description": "开箱即用的基于pnpm的menorepo工具开发方案",
   "keywords": [],
   "license": "MIT",
   "author": "vannvan",
