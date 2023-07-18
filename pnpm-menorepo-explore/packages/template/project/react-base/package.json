@@ -1,5 +1,5 @@
 {
-  "name": "@flex/flex-template-project-react-base",
+  "name": "@flex/template-project-react-base",
   "version": "0.0.1",
   "description": "基础的react.js项目模板",
   "main": "index.js",

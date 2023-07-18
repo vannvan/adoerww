@@ -1,5 +1,5 @@
 {
-  "name": "@flex/flex-template-project-vue-base",
+  "name": "@flex/template-project-vue-base",
   "version": "0.0.1",
   "description": "基础的vue.js项目模板",
   "main": "index.js",
