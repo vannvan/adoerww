@@ -1,0 +1,13 @@
+{
+  "name": "@flex/flex-template-project-react-base",
+  "version": "0.0.1",
+  "description": "基础的react.js项目模板",
+  "main": "index.js",
+  "files": [
+    "./index.js"
+  ],
+  "scripts": {},
+  "keywords": [],
+  "author": "vannvan",
+  "license": "MIT"
+}
