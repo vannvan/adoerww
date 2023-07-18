@@ -1,5 +1,8 @@
-import { add } from '@flex/shared'
+#!/usr/bin/env node
 
-console.log('hello world!')
+import { add, sayHello } from '@flex/shared'
 
-console.log(add(1, 2))
+sayHello('Bob')
+
+const sum = add(1, 2)
+console.log('求和', sum)

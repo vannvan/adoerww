@@ -17,6 +17,7 @@ const list = [
 'electron-shopee-chat',
 'express-webpack-ejs-mpa',
 'fast-submit-code-cli',
+'father-project-explore',
 'full-screen',
 'function-stack',
 'generate-book-cover',

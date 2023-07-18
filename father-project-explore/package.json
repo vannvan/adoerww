@@ -1,0 +1,31 @@
+{
+  "name": "father-project-explore",
+  "version": "0.0.1",
+  "description": "father-project-explore",
+  "keywords": [],
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "bin": {
+    "hello": "dist/cjs/index.js"
+  },
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "scripts": {
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "dev": "father dev",
+    "prepublishOnly": "father doctor && npm run build"
+  },
+  "devDependencies": {
+    "father": "^4.2.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "authors": [
+    "vannvan"
+  ]
+}

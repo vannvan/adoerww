@@ -2,17 +2,16 @@
   "name": "@flex/core",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "keywords": [],
+  "license": "MIT",
+  "author": "vannvan",
   "type": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "install": "pnpm i",
     "build": "tsc -p tsconfig.release.json",
-    "start": "tsc -p tsconfig.json -w"
+    "start": "rimraf dist && tsc -p tsconfig.json -w"
   },
   "dependencies": {
     "@flex/shared": "workspace:*"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT"
+  }
 }

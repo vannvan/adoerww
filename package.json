@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "hexo": "7.0.0-rc1",
+    "lint-staged": "^13.2.3",
     "rollup": "^2.73.0",
     "rollup-plugin-terser": "^7.0.2",
     "vuepress": "^1.9.7"

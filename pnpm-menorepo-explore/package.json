@@ -8,11 +8,10 @@
   "author": "vannvan",
   "main": "index.js",
   "scripts": {
+    "build": "pnpm --filter=@flex/* run build",
     "preinstall": "npx only-allow pnpm",
     "installall": "pnpm --filter=@flex/* run install",
-    "link": "pnpm --filter=@flex/* run link",
-    "watch": "pnpm  run start -r",
-    "build": "pnpm --filter=@flex/* run build"
+    "watch": "pnpm --stream -r --parallel run start"
   },
   "dependencies": {
     "@types/node": "^20.4.2",
