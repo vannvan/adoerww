@@ -1263,12 +1263,12 @@ scheduler@^0.23.0:
     loose-envify "^1.1.0"
 
 semver@^5.6.0:
-  version "5.7.1"
-  resolved "https://registry.npmmirror.com/semver/-/semver-5.7.1.tgz"
+  version "5.7.2"
+  resolved "https://registry.npmmirror.com/semver/-/semver-5.7.2.tgz#48d55db737c3287cd4835e17fa13feace1c41ef8"
 
 semver@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.npmmirror.com/semver/-/semver-6.3.0.tgz"
+  version "6.3.1"
+  resolved "https://registry.npmmirror.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
 
 simple-swizzle@^0.2.2:
   version "0.2.2"
