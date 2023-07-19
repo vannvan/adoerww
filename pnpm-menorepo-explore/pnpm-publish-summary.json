@@ -1,6 +1,26 @@
 {
 	"publishedPackages": [
 		{
+			"name": "@flex/template-dev-utils",
+			"version": "0.0.1"
+		},
+		{
+			"name": "@flex/template-docs-dumi-doc",
+			"version": "0.0.1"
+		},
+		{
+			"name": "@flex/template-project-vue-base",
+			"version": "0.0.1"
+		},
+		{
+			"name": "@flex/generator",
+			"version": "0.0.1"
+		},
+		{
+			"name": "@flex/template-project-react-base",
+			"version": "0.0.1"
+		},
+		{
 			"name": "@flex/shared",
 			"version": "1.0.0"
 		},
@@ -10,7 +30,7 @@
 		},
 		{
 			"name": "@flex/cli",
-			"version": "1.0.0"
+			"version": "1.0.1"
 		}
 	]
 }
