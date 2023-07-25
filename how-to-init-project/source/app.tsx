@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Select from './components/Select/index.js';
+import {Text} from 'ink';
 
 import clipboard from 'clipboardy';
 
@@ -101,7 +102,7 @@ export default function App(props: Props) {
 
 	const handleCopyScript = (script: string) => {
 		clipboard.write(script).then(() => {
-			console.log('已写入剪切板');
+			console.log('已复制到剪切板');
 		});
 	};
 

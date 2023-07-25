@@ -6,6 +6,7 @@ import App from './app.js';
 
 const cli = meow(
 	`
+  定制自己的帮助信息
 	Usage
 	  $ how-to-init-project
 
