@@ -1,8 +1,10 @@
 {
 	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
+		"jsx": "react",
 		"outDir": "dist",
 		"noUnusedLocals": false,
+		"declaration": false,
 		"noUnusedParameters": false
 	},
 	"include": ["source"]

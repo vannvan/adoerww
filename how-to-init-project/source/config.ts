@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-13 09:29:12
+ * Last Modified: 2023-07-25 21:56:12
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -60,25 +60,21 @@ const vite: TProjectType = {
 	simple: [
 		{
 			cmd: 'npm create vite@latest',
-			desc: '创建一个',
+			desc: '用npm创建一个vite项目',
 		},
 		{
 			cmd: 'yarn create vite',
-			desc: '',
+			desc: '用yarn创建一个vite项目',
 		},
 		{
 			cmd: 'pnpm create vite',
-			desc: '',
+			desc: '用pnpm创建一个vite项目',
 		},
 	],
 	template: [
 		{
 			cmd: 'npm create vite@latest my-vue-app --template vue',
-			desc: '创建一个vue项目，适用于npm@6',
-		},
-		{
-			cmd: 'npm create vite@latest my-vue-app --template vue',
-			desc: '创建一个vue项目，适用于npm@7',
+			desc: '创建一个vue项目，适用于npm',
 		},
 		{
 			cmd: 'npm create vite@latest my-vue-app --template vue-ts',
