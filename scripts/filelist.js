@@ -59,6 +59,7 @@ const list = [
 'vue-behavior-monitor',
 'vue行为埋点',
 'web-components-explore',
+'webpack-learn',
 'wwvue-cli-home',
 'yuque-tools',
 ]

@@ -5,6 +5,7 @@
     "gen-desc": "ts-node-esm -T scripts/gen-desc.ts"
   },
   "devDependencies": {
+    "@webpack-cli/generators": "^3.0.7",
     "hexo": "7.0.0-rc1",
     "lint-staged": "^13.2.3",
     "rollup": "^2.73.0",
