@@ -1,1 +1,3 @@
-console.log("Hello World!");
+import { printHello } from './print'
+
+printHello('Bob')
