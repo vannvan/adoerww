@@ -11,6 +11,7 @@ const list = [
 'codux-explore',
 'commander-practice',
 'create-qrcode-chrome-extension',
+'data-visual',
 'deno-explore',
 'dist',
 'electron-shopee-chat',
