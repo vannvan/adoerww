@@ -4,7 +4,7 @@
  * Author: van
  * Email : adoerww@gamil.com
  * -----
- * Last Modified: 2023-06-19 20:26:31
+ * Last Modified: 2023-12-18 22:11:59
  * Modified By: van
  * -----
  * Copyright (c) 2023 https://github.com/vannvan
@@ -26,6 +26,11 @@ console.log('hello world')
     '性能监控',
     '有用的资源',
     '省份数据',
+    'epluspay',
+    'electron-shopee-chat',
+    'auto-build-swagger-api',
+    'tauri-explore',
+    'node-mock-api',
   ]
   let content = `const list = [ \n`
   let count = 0

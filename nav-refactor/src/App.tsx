@@ -15,6 +15,7 @@ import './App.less'
 import { uniqBy } from 'lodash'
 import dayjs from 'dayjs'
 import solarLunar from 'solarlunar'
+import QueueAnim from 'rc-queue-anim'
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -43,6 +44,9 @@ function App() {
   // 农历
   const [lunarText, setLunarText] = useState<string>('')
 
+  const [currentWebList, setCurrentWebList] = useState<any>([])
+
+  const scrollTimes = useRef(0)
   useEffect(() => {
     // 加工一下列表
     const { list: storeList } = getStoreData('webList')
@@ -101,24 +105,39 @@ function App() {
     }
 
     // swiper
-    setTimeout(() => {
-      console.log(swiper.current)
-      if (!swiper.current) {
-        swiper.current = new Swiper('.swiper-container', {
-          slidesPerView: 1,
-          spaceBetween: 30,
-          mousewheel: true,
-          direction: 'vertical',
-          loop: true,
-          on: {
-            slideChange: function () {
-              const _this = this as any
-              setCurrentIndex(_this.realIndex)
-            },
-          },
-        }) as any
-      }
-    }, 500)
+    // setTimeout(() => {
+    //   console.log(swiper.current)
+    //   if (!swiper.current) {
+    //     swiper.current = new Swiper('.swiper-container', {
+    //       slidesPerView: 1,
+    //       spaceBetween: 30,
+    //       mousewheel: true,
+    //       direction: 'vertical',
+    //       loop: true,
+    //       on: {
+    //         slideChange: function () {
+    //           const _this = this as any
+    //           setCurrentIndex(_this.realIndex)
+    //         },
+    //       },
+    //     }) as any
+    //   }
+    // }, 500)
+
+    document.querySelector('.virtual-container')!.onscrollend = (event) => {
+      console.log('滚动结束')
+      scrollTimes.current++
+      console.log('websiteList', scrollTimes.current % _list!.length)
+      setCurrentWebList(undefined)
+      document.querySelector('.web-p-content')!.style.transform = `translateY(100px)`
+
+      setTimeout(() => {
+        console.log(_list![scrollTimes.current % _list!.length])
+        setCurrentWebList(_list![scrollTimes.current % _list!.length])
+        // 采用向上移动的动画
+        document.querySelector('.web-p-content')!.style.transform = `translateY(0px)`
+      }, 300)
+    }
 
     // 页面数据
     initPageData()
@@ -244,85 +263,154 @@ function App() {
   }
 
   return (
-    <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
-        <div className="logo" onClick={() => window.open(GITHUB_SITE)}>
-          <img src={logo} />
-        </div>
-        <div className="menu-content" style={{ color: THEME_COLOR[theme].linkFontColor }}>
-          {WEBSITE.map((el, index) => (
-            <div
-              key={Math.random()}
-              className="menu-item"
-              onClick={() => locationTo(index)}
-              style={{
-                background:
-                  currentIndex == index
-                    ? THEME_COLOR[theme].activeBgColor
-                    : THEME_COLOR[theme].leftBarBgColor,
-              }}>
-              <span className={['iconfont', el.icon].join(' ')}></span>
-              {/* <p className="name">{el.name}</p> */}
-              <div className="tooltip">{el.name}</div>
-            </div>
-          ))}
-        </div>
-        <div className="extend-tool">
-          <div
-            className="tool-item background-icon"
-            style={{ color: THEME_COLOR[theme].linkFontColor }}>
-            <span className="iconfont icon-fengche"></span>
-            <div className="source-list">
-              <li onClick={() => initBackground(1)}>资源一</li>
-              <li onClick={() => initBackground(2)}>资源二</li>
-            </div>
-          </div>
-          <div
-            className="tool-item theme-icon"
-            onClick={() => changeTheme()}
-            style={{ color: THEME_COLOR[theme].linkFontColor }}>
-            <span
-              className={[
-                'iconfont',
-                'theme-icon',
-                theme === 'light' ? 'icon-taiyang' : 'icon-yueliang',
-              ].join(' ')}></span>
-          </div>
-        </div>
+    <>
+      <div
+        className="virtual-container"
+        style={{
+          height: '100vh',
+          width: '100vw',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          overflow: 'auto',
+          zIndex: 1000,
+        }}
+      >
+        <div style={{ height: 10000, width: '100%' }}></div>
       </div>
-      <div className="right">
-        <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
-          <p className="time">{timeString}</p>
-          <p className="date">
-            {dayjs().format('MM月DD日')} {WEEK[(dayjs().format('d') as any) - 1]} {lunarText}
-          </p>
+      <div className="content" style={{ backgroundImage: `url(${backgroundImage})` }}>
+        <div className="left" style={{ background: THEME_COLOR[theme].leftBarBgColor }}>
+          <div className="logo" onClick={() => window.open(GITHUB_SITE)}>
+            <img src={logo} />
+          </div>
+          <div className="menu-content" style={{ color: THEME_COLOR[theme].linkFontColor }}>
+            {WEBSITE.map((el, index) => (
+              <div
+                key={Math.random()}
+                className="menu-item"
+                onClick={() => locationTo(index)}
+                style={{
+                  background:
+                    currentIndex == index
+                      ? THEME_COLOR[theme].activeBgColor
+                      : THEME_COLOR[theme].leftBarBgColor,
+                }}
+              >
+                <span className={['iconfont', el.icon].join(' ')}></span>
+                {/* <p className="name">{el.name}</p> */}
+                <div className="tooltip">{el.name}</div>
+              </div>
+            ))}
+          </div>
+          <div className="extend-tool">
+            <div
+              className="tool-item background-icon"
+              style={{ color: THEME_COLOR[theme].linkFontColor }}
+            >
+              <span className="iconfont icon-fengche"></span>
+              <div className="source-list">
+                <li onClick={() => initBackground(1)}>资源一</li>
+                <li onClick={() => initBackground(2)}>资源二</li>
+              </div>
+            </div>
+            <div
+              className="tool-item theme-icon"
+              onClick={() => changeTheme()}
+              style={{ color: THEME_COLOR[theme].linkFontColor }}
+            >
+              <span
+                className={[
+                  'iconfont',
+                  'theme-icon',
+                  theme === 'light' ? 'icon-taiyang' : 'icon-yueliang',
+                ].join(' ')}
+              ></span>
+            </div>
+          </div>
         </div>
-        <div id="SearchWrap" className="search-wrap">
-          <span
-            className="iconfont icon-linggan prefix"
-            style={{ color: THEME_COLOR[theme].inputColor }}></span>
-          <input
-            type="text"
-            id="input"
-            placeholder="⏎百度搜索 | ⌘ + ⏎百度翻译 | ⎇ + ⏎有道翻译"
-            style={{
-              color: THEME_COLOR[theme].inputColor,
-              background: THEME_COLOR[theme].inputBgColor,
-              borderColor: THEME_COLOR[theme].inputColor,
-            }}
-          />
-          <span
-            className="iconfont icon-sousuo search-icon"
-            style={{ color: THEME_COLOR[theme].inputColor }}></span>
-        </div>
-        <div className="web-content">
-          <div className="swiper-container">
-            <div className="swiper-wrapper">
-              {websiteList ? (
+
+        <div className="right">
+          <div className="time-wrap" style={{ color: THEME_COLOR[theme].timeColor }}>
+            <p className="time">{timeString}</p>
+            <p className="date">
+              {dayjs().format('MM月DD日')} {WEEK[(dayjs().format('d') as any) - 1]} {lunarText}
+            </p>
+          </div>
+          <div id="SearchWrap" className="search-wrap">
+            <span
+              className="iconfont icon-linggan prefix"
+              style={{ color: THEME_COLOR[theme].inputColor }}
+            ></span>
+            <input
+              type="text"
+              id="input"
+              placeholder="⏎百度搜索 | ⌘ + ⏎百度翻译 | ⎇ + ⏎有道翻译"
+              style={{
+                color: THEME_COLOR[theme].inputColor,
+                background: THEME_COLOR[theme].inputBgColor,
+                borderColor: THEME_COLOR[theme].inputColor,
+              }}
+            />
+            <span
+              className="iconfont icon-sousuo search-icon"
+              style={{ color: THEME_COLOR[theme].inputColor }}
+            ></span>
+          </div>
+          <div className="web-content">
+            <div className="web-p-content" key={'1111'}>
+              <div className="link-content">
+                {currentWebList &&
+                  currentWebList.linkList?.map((link: any, index: number) => (
+                    <div
+                      key={Math.random()}
+                      className={[
+                        'link-item',
+                        link.name && getRandomHover(),
+                        !link.name ? 'empty' : '',
+                      ].join(' ')}
+                      onClick={() => {
+                        if (link.link) {
+                          updateClickTimes(link)
+                          window.open(link.link)
+                        }
+                      }}
+                      onMouseEnter={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                        e.preventDefault()
+                        const targetStyle = theme === 'dark' ? 'light' : 'dark'
+                        const t = e.currentTarget
+                        t.style.background = THEME_COLOR[targetStyle].rightLinkItemBgColor
+                        t.style.color = THEME_COLOR[targetStyle].linkFontColor
+                      }}
+                      onMouseLeave={(e) => {
+                        e.preventDefault()
+                        const t = e.currentTarget
+                        t.style.background = THEME_COLOR[theme].rightLinkItemBgColor
+                        t.style.color = THEME_COLOR[theme].linkFontColor
+                      }}
+                      style={{
+                        background: THEME_COLOR[theme].rightLinkItemBgColor,
+                        color: THEME_COLOR[theme].linkFontColor,
+                      }}
+                    >
+                      {link.logo ? (
+                        <img src={link.logo} className="logo" />
+                      ) : (
+                        <div className="logo random-logo" style={{ background: randomColor() }}>
+                          {link.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="name">{link.name}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* {websiteList ? (
                 websiteList.map((el, index) => (
                   <div
                     className={['web-p-content', 'swiper-slide', 'web-p-content' + index].join(' ')}
-                    key={el.name + index}>
+                    key={el.name + index}
+                  >
                     {index > 0 ? (
                       <div className="link-content" key={el.name + index}>
                         {el.linkList.map((link, subIndex) => (
@@ -355,13 +443,15 @@ function App() {
                             style={{
                               background: THEME_COLOR[theme].rightLinkItemBgColor,
                               color: THEME_COLOR[theme].linkFontColor,
-                            }}>
+                            }}
+                          >
                             {link.logo ? (
                               <img src={link.logo} className="logo" />
                             ) : (
                               <div
                                 className="logo random-logo"
-                                style={{ background: randomColor() }}>
+                                style={{ background: randomColor() }}
+                              >
                                 {link.name.charAt(0).toUpperCase()}
                               </div>
                             )}
@@ -378,13 +468,12 @@ function App() {
                 ))
               ) : (
                 <></>
-              )}
-            </div>
+              )} */}
           </div>
+          <div className="today-text">「{todayText}」</div>
         </div>
-        <div className="today-text">「{todayText}」</div>
       </div>
-    </div>
+    </>
   )
 }
 

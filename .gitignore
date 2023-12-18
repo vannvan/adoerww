@@ -28,3 +28,13 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+
+epluspay/
+electron-shopee-chat/
+auto-build-swagger-api/
+tauri-explore/
+node-mock-api/
+nav-old/
+省份数据/
+有用的资源/

@@ -9,6 +9,11 @@
   overflow: hidden;
   // background: #fff;
 }
+.virtual-container {
+  &::-webkit-scrollbar {
+    display: none; /* Chrome Safari */
+  }
+}
 .content {
   width: 100%;
   height: 100%;
@@ -206,13 +211,14 @@
       height: 100%;
       // background: #ccc;
       // height: calc(100vh - 290px);
-      overflow: hidden;
+      // overflow: hidden;
+      overflow: auto;
       // padding-top: 290px;
       // margin-top: 290px;
-      scrollbar-width: none; /* firefox */
-      -ms-overflow-style: none; /* IE 10+ */
+      // scrollbar-width: none; /* firefox */
+      // -ms-overflow-style: none; /* IE 10+ */
       &::-webkit-scrollbar {
-        display: none; /* Chrome Safari */
+        // display: none; /* Chrome Safari */
       }
       .swiper-container {
         width: 100%;
@@ -233,7 +239,10 @@
         margin-left: 10%;
         height: 600px;
         // background: #fff;
-
+        position: absolute;
+        top: 290px;
+        z-index: 9;
+        transition: 0.5s;
         .link-content {
           width: 100%;
           display: flex;
@@ -254,7 +263,7 @@
             border-radius: 6px;
             display: flex;
             align-items: center;
-            transition: 0.5s;
+            transition: 0.3s;
             .logo {
               width: 32px;
               height: 32px;
