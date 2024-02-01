@@ -7459,9 +7459,9 @@ shell-quote@^1.6.1:
   integrity sha1-Z6fQLHbJ2iT5nSCAj8re0ODgS+I=
 
 shvl@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.npm.taobao.org/shvl/download/shvl-2.0.1.tgz#e49c21b7f223041dd3912c5ce9abf2474b69e680"
-  integrity sha1-5Jwht/IjBB3TkSxc6avyR0tp5oA=
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/shvl/-/shvl-2.0.3.tgz#eb4bd37644f5684bba1fc52c3010c96fb5e6afd1"
+  integrity sha512-V7C6S9Hlol6SzOJPnQ7qzOVEWUQImt3BNmmzh40wObhla3XOYMe4gGiYzLrJd5TFa+cI2f9LKIRJTTKZSTbWgw==
 
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.3"
